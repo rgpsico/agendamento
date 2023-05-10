@@ -9,3 +9,8 @@ Route::get('/register', function () {
 Route::get('/login', function () {
     return view('auth.login');
 });
+
+
+Route::get('/', function () {
+    return view('index');
+});
