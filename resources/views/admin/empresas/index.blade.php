@@ -3,7 +3,7 @@
         <div class="content container-fluid">
         
             <!-- Page Header -->
-           <x-header.breadcumbs pageTitle="{{$pageTitle}}"/>
+           <x-header.titulo pageTitle="{{$pageTitle}}"/>
             <!-- /Page Header -->
             
             <div class="row">
@@ -44,7 +44,7 @@
                                                         <i class="fe fe-pencil"></i> Edit
                                                     </a>
 
-                                                    <a class="btn btn-sm bg-info" href="{{route('alunos.show',['id' => 1])}}">
+                                                    <a class="btn btn-sm bg-info" href="{{route($route.'.show',['id' => 1])}}">
                                                         <i class="fe fe-eye"></i> Ver
 
                                                     </a>

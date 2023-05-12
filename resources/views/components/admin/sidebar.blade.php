@@ -5,14 +5,23 @@
                 <li class="menu-title"> 
                     <span>Menu</span>
                 </li>
+
                 <li> 
-                    <a href="{{route('alunos.index')}}">
+                    <a href="{{route('dashboard')}}">
                         <i class="fe fe-home"></i> <span>Dashboard</span>
                     </a>
                 </li>
+
+                <li> 
+                    <a href="{{route('empresa.index')}}">
+                        <i class="fe fe-layout"></i><span>Escolas</span>
+                    </a>
+                </li>
+                
+
                 <li> 
                     <a href="">
-                        <i class="fe fe-layout"></i><span>Appointments</span>
+                        <i class="fe fe-layout"></i><span>Configuração</span>
                     </a>
                 </li>
                
