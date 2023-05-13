@@ -40,4 +40,9 @@ class EmpresaController extends Controller
     {
         return $this->loadView('show');
     }
+
+    public function configuracao()
+    {
+        return $this->loadView('configuracao');
+    }
 }

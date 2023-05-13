@@ -152,7 +152,7 @@
 									<img src="{{asset('admin/img/profiles/avatar-01.jpg')}}" alt="User Image" class="avatar-img rounded-circle">
 								</div>
 								<div class="user-text">
-									<h6>Ryan Taylor</h6>
+									<h6>TESTE</h6>
 									<p class="text-muted mb-0">Administrator</p>
 								</div>
 							</div>

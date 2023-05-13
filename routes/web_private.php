@@ -1,9 +1,7 @@
 <?php
 
-use App\Http\Controllers\AlunosController;
 use App\Http\Controllers\DashBoardController;
 use App\Http\Controllers\EmpresaController;
-use App\Http\Controllers\ProfessorController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -21,5 +19,6 @@ Route::prefix('admin')->group(function () {
         Route::post('/{id}/update', [EmpresaController::class, 'update'])->name('empresa.update');
         Route::post('/post', [EmpresaController::class, 'store'])->name('empresa.store');
         Route::delete('/{id}/destroy', [EmpresaController::class, 'destroy'])->name('empresa.destroy');
+        Route::get('/config', [EmpresaController::class, 'configuracao'])->name('empresa.configuracao');
     });
 });
