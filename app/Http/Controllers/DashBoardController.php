@@ -15,32 +15,18 @@ class DashBoardController extends Controller
     {
     }
 
-
-    public function dashboard()
+    public function index()
     {
-        return $this->loadView();
+        return view('admin.dashboard.index');
     }
 
-    public function create()
+    public function dashboardAlunos()
     {
-        return $this->loadView('create');
-    }
-
-    public function show($id)
-    {
-        return $this->loadView('show');
-    }
-
-    private function loadView($viewSuffix = 'index', $data = [])
-    {
-        $defaultData = [
-            'pageTitle' => $this->pageTitle,
-            'route' => $this->route,
-            'breadcumb' => $this->breadcumb,
-        ];
-
-        $mergedData = array_merge($defaultData, $data);
-
-        return view('admin.' . $this->view . '.' . $viewSuffix, $mergedData);
+        return view(
+            'admin.dashboard.index',
+            [
+                'pageTitle' => $this->pageTitle
+            ]
+        );
     }
 }

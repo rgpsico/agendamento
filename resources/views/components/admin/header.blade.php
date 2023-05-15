@@ -170,6 +170,7 @@
 			<!-- /Header -->
 			
 			<!-- Sidebar -->
-         <x-admin.sidebar/>
+         {{-- <x-admin.sidebar/> --}}
+		 <x-admin.sidebarescola/>
 			<!-- /Sidebar -->
 			

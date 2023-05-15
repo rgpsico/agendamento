@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-class AlunosController extends Controller
+class AgendaController extends Controller
 {
-    protected $pageTitle = "Aluno";
-    protected $view = "admin.escola.aluno";
+    protected $pageTitle = "Agenda";
+    protected $view = "admin.escola.agenda";
     protected $route = "Aluno";
     protected $model;
 
