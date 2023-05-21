@@ -83,7 +83,7 @@
 										</a>
 									</div>
 									<div class="clinic-booking">
-										<a class="apt-btn" href="booking.html">Book Appointment</a>
+										<a class="apt-btn" href="{{route('home.booking',['id' => 1])}}">Agendar</a>
 									</div>
 								</div>
 							</div>

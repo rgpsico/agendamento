@@ -47,4 +47,29 @@ class HomeController extends Controller
             ]
         );
     }
+
+
+    public function checkout($id)
+    {
+        return view(
+            $this->view . '.checkout',
+            [
+                'pageTitle' => $this->pageTitle,
+                'view' => $this->view,
+                'route' => $this->route,
+            ]
+        );
+    }
+
+    public function checkoutSucesso($id)
+    {
+        return view(
+            $this->view . '.checkoutsucesso',
+            [
+                'pageTitle' => $this->pageTitle,
+                'view' => $this->view,
+                'route' => $this->route
+            ]
+        );
+    }
 }

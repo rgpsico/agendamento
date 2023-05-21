@@ -198,7 +198,7 @@
 					
 					<!-- Submit Section -->
 					<div class="submit-section proceed-btn text-end">
-						<a href="{{route('home.show',['id' => 1])}}" class="btn btn-primary submit-btn">Agendar e Pagar</a>
+						<a href="{{route('home.checkout',['id' => 1])}}" class="btn btn-primary submit-btn">Agendar e Pagar</a>
 					</div>
 					<!-- /Submit Section -->
 					
