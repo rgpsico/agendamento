@@ -3,7 +3,7 @@
         <div class="content container-fluid">
         
             <!-- Page Header -->
-           <x-header.titulo pageTitle="{{$pageTitle}}"/>
+           <x-header.titulo pageTitle="{{$pageTitle}}" btAdd="true" route="{{$route}}" />
             <!-- /Page Header -->
             
             <div class="row">

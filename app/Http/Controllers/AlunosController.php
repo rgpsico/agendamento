@@ -8,7 +8,7 @@ class AlunosController extends Controller
 {
     protected $pageTitle = "Aluno";
     protected $view = "admin.escola.aluno";
-    protected $route = "Aluno";
+    protected $route = "alunos";
     protected $model;
 
     public function __construct()
@@ -19,7 +19,11 @@ class AlunosController extends Controller
     {
         return view(
             $this->view . '.index',
-            ['pageTitle' => $this->pageTitle]
+            [
+                'pageTitle' => $this->pageTitle,
+                'view' => $this->view,
+                'route' => $this->route,
+            ]
         );
     }
 

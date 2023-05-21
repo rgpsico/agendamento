@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/register', function () {
@@ -16,6 +17,9 @@ Route::get('/', function () {
 });
 
 
+Route::get('/', [HomeController::class, 'index'])->name('home.index');
+Route::get('/{id}/profissional', [HomeController::class, 'show'])->name('home.show');
+Route::get('/{id}/bokking', [HomeController::class, 'booking'])->name('home.booking');
 
 Route::prefix('public')->group(function () {
     Route::group(['prefix' => '/categoria'], function () {

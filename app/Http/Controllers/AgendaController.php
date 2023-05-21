@@ -8,7 +8,7 @@ class AgendaController extends Controller
 {
     protected $pageTitle = "Agenda";
     protected $view = "admin.escola.agenda";
-    protected $route = "Aluno";
+    protected $route = "agenda";
     protected $model;
 
     public function __construct()
@@ -19,10 +19,21 @@ class AgendaController extends Controller
     {
         return view(
             $this->view . '.index',
-            ['pageTitle' => $this->pageTitle]
+            [
+                'pageTitle' => $this->pageTitle,
+                'view' => $this->view,
+                'route' => $this->route,
+            ]
         );
     }
 
+    public function form()
+    {
+        return view(
+            $this->view . '._partials.form',
+            ['pageTitle' => $this->pageTitle]
+        );
+    }
 
     public function create()
     {
