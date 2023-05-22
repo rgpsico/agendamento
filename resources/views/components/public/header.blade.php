@@ -49,7 +49,7 @@
 									<span></span>
 								</span>
 							</a>
-							<a href="" class="navbar-brand logo">
+							<a href="{{route("home.index")}}" class="navbar-brand logo">
 								<img src="{{asset('template/assets/img/logo.png')}}" class="img-fluid" alt="Logo">
 							</a>
 						</div>
@@ -64,16 +64,20 @@
 							</div>
 							<ul class="main-nav">
 								<li class="has-submenu ">
-									<a href="">Home <i class="fas fa-chevron-down"></i></a>
+									<a href="{{route("home.index")}}">Home <i class="fas fa-chevron-down"></i></a>
 									
 								</li>
 								
-								<li class="login-link"><a href="login.html">Login / Cadastrar</a></li>
+								<li class="login-link">
+									<a href="{{route('home.login')}}">Login / Cadastrar</a></li>
 								<li class="register-btn">
-									<a href="register.html" class="btn reg-btn"><i class="feather-user"></i>Registrar</a>
+									<a href="{{route('home.register')}}" class="btn reg-btn">
+										<i class="feather-user">
+											</i>Registrar</a>
 								</li>
 								<li class="register-btn">
-									<a href="login.html" class="btn btn-primary log-btn"><i class="feather-lock"></i>Login</a>
+									<a href="{{route('home.login')}}" class="btn btn-primary log-btn">
+										<i class="feather-lock"></i>Login</a>
 								</li>
 							</ul>
 						</div>

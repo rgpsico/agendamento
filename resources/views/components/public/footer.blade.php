@@ -5,7 +5,9 @@
 				<div class="col-lg-3 col-md-4">
 					<div class="footer-widget footer-about">
 						<div class="footer-logo">
+							<a href="{{route("home.index")}}">
 							<img src="{{asset('template/assets/img/logo.png')}}" alt="logo">
+						</a>
 						</div>
 						<div class="footer-about-content">
 							<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore.</p>
@@ -85,7 +87,7 @@
 				<div class="row">
 					<div class="col-md-6 col-lg-6">
 						<div class="copyright-text">
-							<p class="mb-0"> Copyright © 2023 <a href="https://themeforest.net/user/dreamguys/portfolio" target="_blank">Dreamguys.</a> All Rights Reserved</p>
+							<p class="mb-0"> Copyright © 2023 <a href="https://rogerneves.com.br" target="_blank">Roger Neves.</a> All Rights Reserved</p>
 						</div>
 					</div>
 					<div class="col-md-6 col-lg-6">

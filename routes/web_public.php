@@ -17,6 +17,9 @@ Route::get('/', function () {
 });
 
 
+Route::get('/register', [HomeController::class, 'register'])->name('home.register');
+Route::get('/login', [HomeController::class, 'login'])->name('home.login');
+
 Route::get('/', [HomeController::class, 'index'])->name('home.index');
 Route::get('/{id}/profissional', [HomeController::class, 'show'])->name('home.show');
 Route::get('/{id}/bokking', [HomeController::class, 'booking'])->name('home.booking');

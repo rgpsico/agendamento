@@ -72,4 +72,28 @@ class HomeController extends Controller
             ]
         );
     }
+
+    public function register()
+    {
+        return view(
+            'public.registrar.register',
+            [
+                'pageTitle' => $this->pageTitle,
+                'view' => $this->view,
+                'route' => $this->route
+            ]
+        );
+    }
+
+    public function login()
+    {
+        return view(
+            'public.registrar.login',
+            [
+                'pageTitle' => $this->pageTitle,
+                'view' => $this->view,
+                'route' => $this->route
+            ]
+        );
+    }
 }
