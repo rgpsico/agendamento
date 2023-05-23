@@ -18,29 +18,30 @@
                                             <th>id</th>
                                             <th>Aluno</th>
                                             <th>Email</th>
-                                            <th>Idade</th>
                                             <th>Telefone</th>
                                            <th class="text-center">Ação</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        
+                                        @foreach ($model as $value )
+                                            
+                                    
                                         <tr>
-                                            <td>#PT015</td>
+                                            <td>{{$value->id}}</td>
                                             <td>
                                                 <h2 class="table-avatar">
-                                                    <a href="profile.html" class="avatar avatar-sm me-2">
+                                                    <a href="{{route('alunos.show',['id' => $value->id ])}}" class="avatar avatar-sm me-2">
                                                         <img class="avatar-img rounded-circle" src="{{asset('admin/img/patients/patient15.jpg')}}" alt="User Image"></a>
-                                                    <a href="profile.html">Jessica Garza</a>
+                                                    <a href="{{route('alunos.show',['id' => $value->id ])}}">{{$value->nome}}</a>
                                                 </h2>
                                             </td>
                                    
-                                            <td>4672  Rose Street, Schaumburg, Illinois, 60173</td>
-                                            <td>7082788201</td>
-                                            <td>6 Nov 2019</td>
+                                            <td>{{$value->email ?? ''}}</td>
+                                            <td>{{$value->telefone ?? ''}}</td>
                                             <td class="text-center">
                                                 <div class="actions">
-                                                    <a class="btn btn-sm bg-info-light" data-bs-toggle="modal" href="#edit_specialities_details">
+                                                    <a class="btn btn-sm bg-info-light" 
+                                                    data-bs-toggle="modal" href="#edit_specialities_details">
                                                         <i class="fe fe-pencil"></i> Edit
                                                     </a>
 
@@ -54,6 +55,7 @@
                                                 </div>
                                             </td>
                                         </tr>
+                                        @endforeach
                                     </tbody>
                                 </table>
                             </div>

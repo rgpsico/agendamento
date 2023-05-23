@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Aluno;
+use App\Models\Usuario;
 use Illuminate\Http\Request;
 
 class AlunosController extends Controller
@@ -11,18 +13,22 @@ class AlunosController extends Controller
     protected $route = "alunos";
     protected $model;
 
-    public function __construct()
+    public function __construct(Usuario $model)
     {
+        $this->model = $model;
     }
 
     public function index()
     {
+
+        $alunos = $this->model->get();
         return view(
             $this->view . '.index',
             [
                 'pageTitle' => $this->pageTitle,
                 'view' => $this->view,
                 'route' => $this->route,
+                'model' => $alunos
             ]
         );
     }
