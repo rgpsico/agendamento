@@ -11,13 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('usuarios', function (Blueprint $table) {
+
+        Schema::create('agendamentos', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('nome');
-            $table->string('email')->unique();
-            $table->string('senha');
-            $table->string('tipo_usuario');
+            $table->uuid('aluno_id');
+            $table->uuid('aula_id');
+            $table->timestamp('data_agendamento');
             $table->timestamps();
+
+            $table->foreign('aluno_id')->references('id')->on('alunos');
+            $table->foreign('aula_id')->references('id')->on('aulas');
         });
     }
 
@@ -26,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('usuarios');
+        Schema::dropIfExists('agendamentos');
     }
 };

@@ -3,12 +3,12 @@
         <div class="doctor-widget">
             <div class="doc-info-left">
                 <div class="doctor-img">
-                    <a href="doctor-profile.html">
+                    <a href="{{route('home.show',['id' => 1])}}">
                         <img src="{{asset('template/assets/img/doctors/doctor-thumb-01.jpg')}}" class="img-fluid" alt="User Image">
                     </a>
                 </div>
                 <div class="doc-info-cont">
-                    <h4 class="doc-name"><a href="doctor-profile.html">Dr. Ruby Perrin</a></h4>
+                    <h4 class="doc-name"><a href="{{route('home.show',['id' => 1])}}">Dr. Ruby Perrin</a></h4>
                     <p class="doc-speciality">MDS - Periodontology and Oral Implantology, BDS</p>
                     <h5 class="doc-department"><img src="{{asset('template/assets/img/specialities/specialities-05.png')}}" class="img-fluid" alt="Speciality">Dentist</h5>
                     <div class="rating">

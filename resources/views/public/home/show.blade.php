@@ -99,16 +99,16 @@
 							<nav class="user-tabs mb-4">
 								<ul class="nav nav-tabs nav-tabs-bottom nav-justified" role="tablist">
 									<li class="nav-item" role="presentation">
-										<a class="nav-link active" href="#doc_overview" data-bs-toggle="tab" aria-selected="true" role="tab">Overview</a>
+										<a class="nav-link active" href="#doc_overview" data-bs-toggle="tab" aria-selected="true" role="tab">Sobre nós</a>
 									</li>
 									<li class="nav-item" role="presentation">
-										<a class="nav-link" href="#doc_locations" data-bs-toggle="tab" aria-selected="false" tabindex="-1" role="tab">Locations</a>
+										<a class="nav-link" href="#doc_locations" data-bs-toggle="tab" aria-selected="false" tabindex="-1" role="tab">Localização</a>
 									</li>
 									<li class="nav-item" role="presentation">
-										<a class="nav-link" href="#doc_reviews" data-bs-toggle="tab" aria-selected="false" tabindex="-1" role="tab">Reviews</a>
+										<a class="nav-link" href="#doc_reviews" data-bs-toggle="tab" aria-selected="false" tabindex="-1" role="tab">Feedbacks</a>
 									</li>
 									<li class="nav-item" role="presentation">
-										<a class="nav-link" href="#doc_business_hours" data-bs-toggle="tab" aria-selected="false" tabindex="-1" role="tab">Business Hours</a>
+										<a class="nav-link" href="#doc_business_hours" data-bs-toggle="tab" aria-selected="false" tabindex="-1" role="tab">Horario de funcionamento</a>
 									</li>
 								</ul>
 							</nav>
@@ -124,43 +124,13 @@
 										
 											<!-- About Details -->
 											<div class="widget about-widget">
-												<h4 class="widget-title">About Me</h4>
+												<h4 class="widget-title">Sobre nós</h4>
 												<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
 											</div>
 											<!-- /About Details -->
 										
 											<!-- Education Details -->
-											<div class="widget education-widget">
-												<h4 class="widget-title">Education</h4>
-												<div class="experience-box">
-													<ul class="experience-list">
-														<li>
-															<div class="experience-user">
-																<div class="before-circle"></div>
-															</div>
-															<div class="experience-content">
-																<div class="timeline-content">
-																	<a href="#/" class="name">American Dental Medical University</a>
-																	<div>BDS</div>
-																	<span class="time">1998 - 2003</span>
-																</div>
-															</div>
-														</li>
-														<li>
-															<div class="experience-user">
-																<div class="before-circle"></div>
-															</div>
-															<div class="experience-content">
-																<div class="timeline-content">
-																	<a href="#/" class="name">American Dental Medical University</a>
-																	<div>MDS</div>
-																	<span class="time">2003 - 2005</span>
-																</div>
-															</div>
-														</li>
-													</ul>
-												</div>
-											</div>
+											
 											<!-- /Education Details -->
 									
 											<!-- Experience Details -->
@@ -207,54 +177,12 @@
 											<!-- /Experience Details -->
 								
 											<!-- Awards Details -->
-											<div class="widget awards-widget">
-												<h4 class="widget-title">Awards</h4>
-												<div class="experience-box">
-													<ul class="experience-list">
-														<li>
-															<div class="experience-user">
-																<div class="before-circle"></div>
-															</div>
-															<div class="experience-content">
-																<div class="timeline-content">
-																	<p class="exp-year">July 2019</p>
-																	<h4 class="exp-title">Humanitarian Award</h4>
-																	<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin a ipsum tellus. Interdum et malesuada fames ac ante ipsum primis in faucibus.</p>
-																</div>
-															</div>
-														</li>
-														<li>
-															<div class="experience-user">
-																<div class="before-circle"></div>
-															</div>
-															<div class="experience-content">
-																<div class="timeline-content">
-																	<p class="exp-year">March 2011</p>
-																	<h4 class="exp-title">Certificate for International Volunteer Service</h4>
-																	<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin a ipsum tellus. Interdum et malesuada fames ac ante ipsum primis in faucibus.</p>
-																</div>
-															</div>
-														</li>
-														<li>
-															<div class="experience-user">
-																<div class="before-circle"></div>
-															</div>
-															<div class="experience-content">
-																<div class="timeline-content">
-																	<p class="exp-year">May 2008</p>
-																	<h4 class="exp-title">The Dental Professional of The Year Award</h4>
-																	<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin a ipsum tellus. Interdum et malesuada fames ac ante ipsum primis in faucibus.</p>
-																</div>
-															</div>
-														</li>
-													</ul>
-												</div>
-											</div>
+											
 											<!-- /Awards Details -->
 											
 											<!-- Services List -->
 											<div class="service-list">
-												<h4>Services</h4>
+												<h4>Serviços</h4>
 												<ul class="clearfix">
 													<li>Tooth cleaning </li>
 													<li>Root Canal Therapy</li>
@@ -266,19 +194,7 @@
 											</div>
 											<!-- /Services List -->
 											
-											<!-- Specializations List -->
-											<div class="service-list">
-												<h4>Specializations</h4>
-												<ul class="clearfix">
-													<li>Children Care</li>
-													<li>Dental Care</li>	
-													<li>Oral and Maxillofacial Surgery </li>	
-													<li>Orthodontist</li>	
-													<li>Periodontist</li>	
-													<li>Prosthodontics</li>	
-												</ul>
-											</div>
-											<!-- /Specializations List -->
+											
 
 										</div>
 									</div>
@@ -372,46 +288,7 @@
 										<div class="row">
 										
 											<!-- Clinic Content -->
-											<div class="col-md-6">
-												<div class="clinic-content">
-													<h4 class="clinic-name"><a href="#">The Family Dentistry Clinic</a></h4>
-													<p class="doc-speciality">MDS - Periodontology and Oral Implantology, BDS</p>
-													<div class="rating">
-														<i class="fas fa-star filled"></i>
-														<i class="fas fa-star filled"></i>
-														<i class="fas fa-star filled"></i>
-														<i class="fas fa-star filled"></i>
-														<i class="fas fa-star"></i>
-														<span class="d-inline-block average-rating">(4)</span>
-													</div>
-													<div class="clinic-details mb-0">
-														<p class="clinic-direction"> <i class="fas fa-map-marker-alt"></i> 2883  University Street, Seattle, Texas Washington, 98155 <br><a href="javascript:void(0);">Get Directions</a></p>
-														<ul>
-															<li>
-																<a href="{{asset('template/assets/img/features/feature-01.jpg')}}" data-fancybox="gallery2">
-																	<img src="{{asset('template/assets/img/features/feature-01.jpg')}}" alt="Feature Image">
-																</a>
-															</li>
-															<li>
-																<a href="{{asset('template/assets/img/features/feature-02.jpg')}}" data-fancybox="gallery2">
-																	<img src="{{asset('template/assets/img/features/feature-02.jpg')}}" alt="Feature Image">
-																</a>
-															</li>
-															<li>
-																<a href="{{asset('template/assets/img/features/feature-03.jpg')}}" data-fancybox="gallery2">
-																	<img src="{{asset('template/assets/img/features/feature-03.jpg')}}" alt="Feature Image">
-																</a>
-															</li>
-															<li>
-																<a href="{{asset('template/assets/img/features/feature-04.jpg')}}" data-fancybox="gallery2">
-																	<img src="{{asset('template/assets/img/features/feature-04.jpg')}}" alt="Feature Image">
-																</a>
-															</li>
-														</ul>
-													</div>
-
-												</div>
-											</div>
+											
 											<!-- /Clinic Content -->
 											
 											<!-- Clinic Timing -->
