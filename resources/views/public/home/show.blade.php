@@ -17,8 +17,8 @@
 										<img src="{{asset('template/assets/img/doctors/doctor-thumb-02.jpg')}}" class="img-fluid" alt="User Image">
 									</div>
 									<div class="doc-info-cont">
-										<h4 class="doc-name">Dr. Darren Elder</h4>
-										<p class="doc-speciality">BDS, MDS - Oral &amp; Maxillofacial Surgery</p>
+										<h4 class="doc-name">{{$model->nome}}</h4>
+										<p class="doc-speciality">BDS, MDS - Oral &amp; {{$model->descricao}}</p>
 										<p class="doc-department"><img src="{{asset('template/assets/img/specialities/specialities-05.png')}}" class="img-fluid" alt="Speciality">Dentist</p>
 										<div class="rating">
 											<i class="fas fa-star filled"></i>
@@ -29,7 +29,8 @@
 											<span class="d-inline-block average-rating">(35)</span>
 										</div>
 										<div class="clinic-details">
-											<p class="doc-location"><i class="fas fa-map-marker-alt"></i> Newyork, USA - <a href="javascript:void(0);">Get Directions</a></p>
+											<p class="doc-location">
+												<i class="fas fa-map-marker-alt"></i> {{$model->endereco->endereco ?? 'BR'}}, USA - <a href="javascript:void(0);">Ver localização</a></p>
 											<ul class="clinic-gallery">
 												<li>
 													<a href="{{asset('template/assets/img/features/feature-01.jpg')}}" data-fancybox="gallery">

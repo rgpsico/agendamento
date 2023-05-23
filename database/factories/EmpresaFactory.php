@@ -20,7 +20,7 @@ class EmpresaFactory extends Factory
     public function definition(): array
     {
         return [
-            'id' => Str::uuid(),
+            'uuid' => Str::uuid(),
             'avatar' => 'avatardefault.png',
             'nome' => $this->faker->company,
             'descricao' => $this->faker->text(200),

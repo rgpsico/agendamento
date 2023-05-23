@@ -3,13 +3,13 @@
         <div class="doctor-widget">
             <div class="doc-info-left">
                 <div class="doctor-img">
-                    <a href="{{route('home.show',['id' => 1])}}">
+                    <a href="{{route('home.show',['id' => $value->uuid])}}">
                         <img src="{{asset('template/assets/img/doctors/doctor-thumb-01.jpg')}}" class="img-fluid" alt="User Image">
                     </a>
                 </div>
                 <div class="doc-info-cont">
-                    <h4 class="doc-name"><a href="{{route('home.show',['id' => 1])}}">Dr. Ruby Perrin</a></h4>
-                    <p class="doc-speciality">MDS - Periodontology and Oral Implantology, BDS</p>
+                    <h4 class="doc-name"><a href="{{route('home.show',['id' =>$value->uuid])}}">{{$value->nome}}</a></h4>
+                    <p class="doc-speciality">{{$value->descricao}}</p>
                     <h5 class="doc-department"><img src="{{asset('template/assets/img/specialities/specialities-05.png')}}" class="img-fluid" alt="Speciality">Dentist</h5>
                     <div class="rating">
                         <i class="fas fa-star filled"></i>
@@ -21,7 +21,7 @@
                     </div>
                     <div class="clinic-details">
                         <p class="doc-location"><i class="fas fa-map-marker-alt">
-                            </i> Florida, USA</p>
+                            </i> {{$value->endereco->pais ?? ''}}, {{$value->endereco->cidade ?? ''}}</p>
                         <ul class="clinic-gallery">
                             <li>
                                 <a href="{{asset('template/assets/img/features/feature-01.jpg')}}" data-fancybox="gallery">

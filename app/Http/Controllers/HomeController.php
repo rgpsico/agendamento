@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Empresa;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -11,26 +12,38 @@ class HomeController extends Controller
     protected $route = "alunos";
     protected $model;
 
+    public function __construct(Empresa $empresa)
+    {
+        $this->model = $empresa;
+    }
+
     public function index()
     {
+
         return view(
             $this->view . '.index',
             [
                 'pageTitle' => $this->pageTitle,
                 'view' => $this->view,
                 'route' => $this->route,
+                'model' => $this->model::with('endereco')->get()
             ]
         );
     }
 
     public function show($id)
     {
+
+
+        $empresa = $this->model->where('uuid', $id)->first();
+
         return view(
             $this->view . '.show',
             [
                 'pageTitle' => $this->pageTitle,
                 'view' => $this->view,
                 'route' => $this->route,
+                'model' => $empresa
             ]
         );
     }

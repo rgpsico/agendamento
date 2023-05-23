@@ -18,13 +18,17 @@
 						<div class="col-md-12 col-lg-8 col-xl-9">
 
 							<!-- Doctor Widget -->
-							@for ($c = 0; $c < 10; $c++)
-								
+					
 							
-							<x-home.cardprofissional/>
+								
+							@foreach ($model as $value )							
+						
+							<x-home.cardprofissional :value="$value"/>
+
+							@endforeach
 							<!-- /Doctor Widget -->
 
-							@endfor
+							
 
 
 							<div class="load-more text-center">
