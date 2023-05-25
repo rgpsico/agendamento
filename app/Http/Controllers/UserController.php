@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Usuario;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
@@ -18,6 +18,12 @@ class UserController extends Controller
     public function create()
     {
         return view('users.create');
+    }
+
+    public function logout()
+    {
+        Auth::logout();
+        return redirect()->route('home.index');
     }
 
     public function store(Request $request)
