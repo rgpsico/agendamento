@@ -49,7 +49,7 @@
 									<span></span>
 								</span>
 							</a>
-							<a href="{{route("home.index")}}" class="navbar-brand logo">
+							<a href="" class="navbar-brand logo">
 								<img src="{{asset('template/assets/img/logo.png')}}" class="img-fluid" alt="Logo">
 							</a>
 						</div>
@@ -64,7 +64,7 @@
 							</div>
 							<ul class="main-nav">
 								<li class="has-submenu ">
-									<a href="{{route("home.index")}}">Home <i class="fas fa-chevron-down"></i></a>
+									<a href="">Home <i class="fas fa-chevron-down"></i></a>
 									
 								</li>
 								

@@ -4,7 +4,12 @@ use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\AlunosController;
 use App\Http\Controllers\DashBoardController;
 use App\Http\Controllers\EmpresaController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
+
+Route::prefix('usuario')->group(function () {
+    Route::post('/', [UserController::class, 'store'])->name('user.store');
+});
 
 Route::prefix('admin')->group(function () {
     Route::group(['prefix' => '/dashboard'], function () {

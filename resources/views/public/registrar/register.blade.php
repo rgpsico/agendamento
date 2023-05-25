@@ -16,30 +16,33 @@
 									</div>
 									<div class="col-md-12 col-lg-6 login-right">
 										<div class="login-header">
-											<h3>Patient Register <a href="doctor-register.html">Are you a Doctor?</a></h3>
+											<h3>Registrar 
+												<a href="">Você é um Professor</a>
+											</h3>
 										</div>
 										
 										<!-- Register Form -->
-										<form action="patient-register-step1.html">
+										<form action="{{route('user.store')}}" method="POST">
+											@csrf
 											<div class="form-group form-focus">
-												<input type="text" class="form-control floating">
-												<label class="focus-label">Name</label>
+												<input type="text" class="form-control floating" name="nome" value="roger">
+												<label class="focus-label">Nome</label>
 											</div>
 											<div class="form-group form-focus">
-												<input type="text" class="form-control floating">
-												<label class="focus-label">Mobile Number</label>
+												<input type="text" name="email" class="form-control floating" value="rgyr2010@hotmail.com">
+												<label class="focus-label">E-mail</label>
 											</div>
 											<div class="form-group form-focus">
-												<input type="password" class="form-control floating">
-												<label class="focus-label">Create Password</label>
+												<input type="password" name="senha" class="form-control floating">
+												<label class="focus-label">Senha</label>
 											</div>
 											<div class="text-end">
-												<a class="forgot-link" href="{{route('home.login')}}">Already have an account?</a>
+												<a class="forgot-link" href="{{route('home.login')}}">Você ja tem uma Conta ?</a>
 											</div>
-											<button class="btn btn-primary w-100 btn-lg login-btn" type="submit">Signup</button>
+											<button class="btn btn-primary w-100 btn-lg login-btn" type="submit">Entrar</button>
 											<div class="login-or">
 												<span class="or-line"></span>
-												<span class="span-or">or</span>
+												<span class="span-or">Ou</span>
 											</div>
 											<div class="row form-row social-login">
 												<div class="col-6">
