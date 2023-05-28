@@ -19,12 +19,13 @@ class UsuarioFactory extends Factory
      */
     public function definition(): array
     {
+        $tipos = ['professor', 'aluno'];
         return [
             'id' => rand(1, 1909),
             'nome' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
-            'senha' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
-            'tipo_usuario' => 'professor',
+            'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
+            'tipo_usuario' =>  $tipos[array_rand($tipos)]
 
         ];
     }

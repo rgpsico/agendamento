@@ -15,7 +15,7 @@
                                 <table class="datatable table table-hover table-center mb-0">
                                     <thead>
                                         <tr>
-                                            <th>id</th>
+                                          
                                             <th>Aluno</th>
                                             <th>Email</th>
                                             <th>Telefone</th>
@@ -27,7 +27,7 @@
                                             
                                     
                                         <tr>
-                                            <td>{{$value->id}}</td>
+                                          
                                             <td>
                                                 <h2 class="table-avatar">
                                                     <a href="{{route('alunos.show',['id' => $value->id ])}}" class="avatar avatar-sm me-2">
@@ -45,7 +45,7 @@
                                                         <i class="fe fe-pencil"></i> Edit
                                                     </a>
 
-                                                    <a class="btn btn-sm bg-info" href="{{route('alunos.show',['id' => 1])}}">
+                                                    <a class="btn btn-sm bg-info" href="{{route('alunos.show',['id' => $value->id])}}">
                                                         <i class="fe fe-eye"></i> Ver
 
                                                     </a>

@@ -31,9 +31,9 @@ class Usuario extends Authenticatable
     protected $fillable = [
         'nome',
         'email',
-        'senha',
+        'password',
         'tipo_usuario',
-        'senha',
+
     ];
 
 
@@ -45,6 +45,43 @@ class Usuario extends Authenticatable
             $model->{$model->getKeyName()} = (string) Str::uuid();
         });
     }
+
+    /**
+     * Scope a query to only include students (alunos).
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeAlunos($query)
+    {
+        return $query->where('tipo_usuario', 'aluno');
+    }
+
+    public function scopeProfessores($query)
+    {
+        return $query->where('tipo_usuario', 'professor');
+    }
+
+    public static function getActiveSchools()
+    {
+        return self::professores()->where('status', 'active')->count();
+    }
+
+    public static function getInactiveSchools()
+    {
+        return self::professores()->where('status', 'inactive')->count();
+    }
+
+    public static function getCancelledSchools()
+    {
+        return self::professores()->where('status', 'cancelled')->count();
+    }
+
+    public static function getTotalRevenue()
+    {
+        return self::professores()->sum('revenue');
+    }
+
 
 
     /**

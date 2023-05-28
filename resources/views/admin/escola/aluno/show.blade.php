@@ -5,6 +5,7 @@
            <x-header.titulo pageTitle="TETE"/>
         
             
+           
             <div class="row">
                 <div class="col-md-12">
                     <div class="profile-header">
@@ -15,10 +16,13 @@
                                 </a>
                             </div>
                             <div class="col ml-md-n2 profile-user-info">
-                                <h4 class="user-name mb-0">Professor Marcelo</h4>
-                                <h6 class="text-muted">marcelo@admin.comaaa</h6>
-                                <div class="user-Location"><i class="fa fa-map-marker"></i> Florida, United States</div>
-                                <div class="about-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</div>
+                                <h4 class="user-name mb-0">{{$model->nome ?? ''}}</h4>
+                                <h6 class="text-muted">{{$model->email ?? ''}}</h6>
+                                <div class="user-Location">
+                                    <i class="fa fa-map-marker"></i> {{$model->endereco ?? ''}}, {{$model->endereco->pais ?? ''}}</div>
+                                <div class="about-text">
+                                    {{$model->description ?? ''}}
+                                </div>
                             </div>
                             <div class="col-auto profile-btn">                                
                                 <a href="" class="btn btn-primary">

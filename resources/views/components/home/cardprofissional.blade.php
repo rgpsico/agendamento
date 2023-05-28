@@ -61,8 +61,8 @@
                     </ul>
                 </div>
                 <div class="clinic-booking">
-                    <a class="view-pro-btn" href="{{route('home.show',['id' => 1])}}">Ver Escola</a>
-                    <a class="apt-btn" href="{{route('home.booking',['id' => 1])}}">Agendar Aula</a>
+                    <a class="view-pro-btn" href="{{route('home.show',['id' => $value->uuid])}}">Ver Escola</a>
+                    <a class="apt-btn" href="{{route('home.booking',['id' => $value->uuid])}}">Agendar Aula</a>
                 </div>
             </div>
         </div>

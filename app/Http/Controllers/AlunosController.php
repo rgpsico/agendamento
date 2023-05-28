@@ -21,7 +21,7 @@ class AlunosController extends Controller
     public function index()
     {
 
-        $alunos = $this->model->get();
+        $alunos = $this->model::alunos()->get();
         return view(
             $this->view . '.index',
             [
@@ -44,9 +44,14 @@ class AlunosController extends Controller
 
     public function show($id)
     {
+        $model = $this->model::findOrFail($id);
+
         return view(
             $this->view . '.show',
-            ['pageTitle' => $this->pageTitle]
+            [
+                'pageTitle' => $this->pageTitle,
+                'model' => $model
+            ]
         );
     }
 }
