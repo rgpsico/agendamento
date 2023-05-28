@@ -22,7 +22,7 @@
 										</div>
 										
 										<!-- Register Form -->
-										<form action="{{route('user.store')}}" method="POST">
+										<form action="{{route('user.store')}}" method="POST" enctype="multipart/form-data">
 											@csrf
 											<div class="form-group form-focus">
 												<input type="text" class="form-control floating" name="nome" value="roger">

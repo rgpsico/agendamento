@@ -20,14 +20,15 @@
 										<div class="login-header">
 											<h3>Login <span>Doccure</span></h3>
 										</div>
-										<form action="index.html">
+										<form action="{{route('user.login')}}" method="POST">
+											@csrf
 											<div class="form-group form-focus">
-												<input type="email" class="form-control floating">
+												<input type="email" name="email" class="form-control floating">
 												<label class="focus-label">Email</label>
 											</div>
 											<div class="form-group form-focus">
-												<input type="password" class="form-control floating">
-												<label class="focus-label">Password</label>
+												<input type="password" name="senha" class="form-control floating">
+												<label class="focus-label">Senha</label>
 											</div>
 											<div class="text-end">
 												<a class="forgot-link" href="forgot-password.html">Forgot Password ?</a>
@@ -35,7 +36,7 @@
 											<button class="btn btn-primary w-100 btn-lg login-btn" type="submit">Login</button>
 											<div class="login-or">
 												<span class="or-line"></span>
-												<span class="span-or">or</span>
+												<span class="span-or">Ou</span>
 											</div>
 											<div class="row form-row social-login">
 												<div class="col-6">

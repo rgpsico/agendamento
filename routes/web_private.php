@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('usuario')->group(function () {
     Route::post('/', [UserController::class, 'store'])->name('user.store');
     Route::get('/', [UserController::class, 'logout'])->name('user.logout');
+    Route::post('/login', [UserController::class, 'login'])->name('user.login');
 });
 
 Route::prefix('admin')->group(function () {

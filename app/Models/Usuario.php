@@ -13,11 +13,14 @@ class Usuario extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
+    protected $table = "usuarios";
+
     protected $primaryKey = 'id';
 
     protected $keyType = 'string';
 
     public $incrementing = false;
+
 
 
     /**

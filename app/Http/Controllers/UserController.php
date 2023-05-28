@@ -28,23 +28,47 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
+
         $request->validate([
             'nome' => 'required',
-            'email' => 'required|unique:users,email',
+            'email' => 'required|unique:usuarios,email',
             'senha' => 'required',
         ]);
+
 
 
         $user = new Usuario;
         $user->nome = $request->nome;
         $user->email = $request->email;
-        $user->senha = Hash::make($request->senha); // Hashing password
+        $user->password = Hash::make($request->senha); // Hashing password
         $user->tipo_usuario = 'professor';
 
         $user->save();
 
         return redirect()->route('escola.dashboard')->with('success', 'Usuário criado com sucesso!');
     }
+
+
+    public function login(Request $request)
+    {
+        // Validate the form data
+        $request->validate([
+            'email' => 'required|email',
+            'senha' => 'required|min:6'
+        ]);
+
+
+
+        // Attempt to log the user in
+        if (Auth::attempt(['email' => $request->email, 'password' => $request->senha])) { // Changed 'senha' to 'password'
+            // If successful, redirect to their intended location
+            return redirect()->intended(route('escola.dashboard'));
+        }
+        dd($request->all());
+        // If unsuccessful, redirect back to the login with the form data
+        return redirect()->back()->withInput($request->only('email'))->withErrors(['Senha inválida']);
+    }
+
 
     public function show($id)
     {
