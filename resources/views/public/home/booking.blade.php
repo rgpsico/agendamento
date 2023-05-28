@@ -14,7 +14,7 @@
 									<img src="{{asset('template/assets/img/doctors/doctor-thumb-02.jpg')}}" alt="User Image">
 								</a>
 								<div class="booking-info">
-									<h4><a href="doctor-profile.html">Dr. Darren Elder</a></h4>
+									<h4><a href="doctor-profile.html">{{$model->nome}}</a></h4>
 									<div class="rating">
 										<i class="fas fa-star filled"></i>
 										<i class="fas fa-star filled"></i>
@@ -23,7 +23,7 @@
 										<i class="fas fa-star"></i>
 										<span class="d-inline-block average-rating">35</span>
 									</div>
-									<p class="text-muted mb-0"><i class="fas fa-map-marker-alt"></i> Newyork, USA</p>
+									<p class="text-muted mb-0"><i class="fas fa-map-marker-alt"></i> {{$model->endereco->cidade ?? ''}}, {{$model->endereco->nacionalidade ?? ''}}</p>
 								</div>
 							</div>
 						</div>
@@ -198,7 +198,8 @@
 					
 					<!-- Submit Section -->
 					<div class="submit-section proceed-btn text-end">
-						<a href="{{route('home.checkout',['id' => 1])}}" class="btn btn-primary submit-btn">Agendar e Pagar</a>
+						<a href="{{route('home.checkout',['id' => 1])}}" 
+							class="btn btn-primary submit-btn">Agendar e Pagar</a>
 					</div>
 					<!-- /Submit Section -->
 					

@@ -34,8 +34,7 @@ class HomeController extends Controller
     public function show($id)
     {
 
-
-        $empresa = $this->model->where('uuid', $id)->first();
+        $model = $this->model->where('uuid', $id)->first();
 
         return view(
             $this->view . '.show',
@@ -43,7 +42,7 @@ class HomeController extends Controller
                 'pageTitle' => $this->pageTitle,
                 'view' => $this->view,
                 'route' => $this->route,
-                'model' => $empresa
+                'model' => $model
             ]
         );
     }
@@ -51,12 +50,14 @@ class HomeController extends Controller
 
     public function booking($id)
     {
+        $model = $this->model->where('uuid', $id)->first();
         return view(
             $this->view . '.booking',
             [
                 'pageTitle' => $this->pageTitle,
                 'view' => $this->view,
                 'route' => $this->route,
+                'model' => $model
             ]
         );
     }

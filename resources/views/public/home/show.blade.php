@@ -84,7 +84,7 @@
 										</a>
 									</div>
 									<div class="clinic-booking">
-										<a class="apt-btn" href="{{route('home.booking',['id' => 1])}}">Agendar</a>
+										<a class="apt-btn" href="{{route('home.booking',['id' => $model->uuid])}}">Agendar</a>
 									</div>
 								</div>
 							</div>

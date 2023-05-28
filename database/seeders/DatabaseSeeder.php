@@ -20,7 +20,8 @@ class DatabaseSeeder extends Seeder
         // ]);
 
         // \App\Models\Empresa::factory(10)->create();
-        \App\Models\EmpresaEndereco::factory(10)->create();
-        \App\Models\Usuario::factory(10)->create();
+        // \App\Models\EmpresaEndereco::factory(10)->create();
+        // \App\Models\Usuario::factory(10)->create();
+        \App\Models\Aulas::factory(10)->create();
     }
 }
