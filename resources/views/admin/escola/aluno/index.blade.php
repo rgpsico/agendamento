@@ -1,4 +1,7 @@
 <x-admin.layout title="Listar Alunos">
+
+    <x-modal-delete/>
+    <x-modal-editar-usuario/>
     <div class="page-wrapper">
         <div class="content container-fluid">
         
@@ -26,7 +29,7 @@
                                         @foreach ($model as $value )
                                             
                                     
-                                        <tr>
+                                        <tr class="linha_aluno-{{$value->id}}">
                                           
                                             <td>
                                                 <h2 class="table-avatar">
@@ -41,16 +44,17 @@
                                             <td class="text-center">
                                                 <div class="actions">
                                                     <a class="btn btn-sm bg-info-light" 
-                                                    data-bs-toggle="modal" href="#edit_specialities_details">
-                                                        <i class="fe fe-pencil"></i> Edit
+                                                        data-data="{{$model}}"
+                                                         id="editar_aluno">
+                                                        <i class="fe fe-pencil"></i> Editar
                                                     </a>
 
-                                                    <a class="btn btn-sm bg-info" href="{{route('alunos.show',['id' => $value->id])}}">
+                                                    <a class="btn btn-sm bg-info " href="{{route('alunos.show',['id' => $value->id])}}">
                                                         <i class="fe fe-eye"></i> Ver
 
                                                     </a>
-                                                    <a data-bs-toggle="modal" href="#delete_modal" class="btn btn-sm bg-danger-light">
-                                                        <i class="fe fe-trash"></i> Delete
+                                                    <a data-bs-toggle="modal" href="#delete_modal" data-id="{{$value->id}}" class="btn btn-sm bg-danger-light bt_excluir_aluno">
+                                                        <i class="fe fe-trash"></i> Excluir
                                                     </a>
                                                 </div>
                                             </td>
@@ -67,5 +71,32 @@
             
         </div>			
     </div>
-    <!-- /Page Wrapper -->
+  
+    <script src="{{asset('request.js')}}"></script>
+
+   <script>
+    $(document).ready(function(){
+        $(document).on("click", ".bt_excluir_aluno", function() {
+        var id = $(this).data('id');
+         $('.confirmar_exclusao').data('id_aluno', id);
+         $(".delete_modal").modal('show');
+    });
+
+    $(document).on("click", ".confirmar_exclusao", function() {
+        var id_aluno = $(this).data('id_aluno');
+        var token = "seu_token_aqui"; // substitua com o seu token
+    deleteUser( '/api/users/','.linha_aluno-'+id_aluno, id_aluno, token);
+    });
+
+
+    $(document).on("click", "#editar_aluno", function() {
+        $("#modal_editar_aluno").modal('show');
+    });
+
+
+
+})
+    
+   </script>
+
 </x-layoutsadmin>

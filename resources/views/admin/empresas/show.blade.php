@@ -18,7 +18,8 @@
                                 <h4 class="user-name mb-0">{{$model->name ?? 'Escola de surf'}}</h4>
                                 <h6 class="text-muted">{{$model->email ?? 'Escola de surf'}}</h6>
                                 <div class="user-Location">
-                                    <i class="fa fa-map-marker"></i> {{$model->endereco->cidade ?? 'Rio de Janeiro'}}, {{$model->endereco->nacionalidade ?? 'Brasil'}}</div>
+                                    <i class="fa fa-map-marker"></i> {{$model->endereco->cidade ?? 'Rio de Janeiro'}},
+                                     {{$model->endereco->nacionalidade ?? 'Brasil'}}</div>
                                 <div class="about-text">
                                     {{$model->descricao ?? ''}}
                                 </div>

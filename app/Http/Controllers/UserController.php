@@ -64,7 +64,7 @@ class UserController extends Controller
             // If successful, redirect to their intended location
             return redirect()->intended(route('escola.dashboard'));
         }
-        dd($request->all());
+
         // If unsuccessful, redirect back to the login with the form data
         return redirect()->back()->withInput($request->only('email'))->withErrors(['Senha inválida']);
     }

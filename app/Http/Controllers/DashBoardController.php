@@ -34,7 +34,7 @@ class DashBoardController extends Controller
         return view(
             'admin.dashboard.index',
             [
-                'pageTitle' => $this->pageTitle . ' ' . strtoupper(Auth::user()->nome)
+                'pageTitle' => $this->pageTitle . ' ' . strtoupper(Auth::user()->nome ?? '')
             ]
         );
     }
