@@ -90,8 +90,20 @@
 
 
     $(document).on("click", "#editar_aluno", function() {
-        $("#modal_editar_aluno").modal('show');
-    });
+    $("#modal_editar_aluno").modal('show');
+    var data = $(this).data('data')[0];
+        console.log(data)
+    // Preencher os valores dos inputs com os dados obtidos
+    $("#nome").val(data.nome);
+    $("#sobreNome").val(data.sobreNome);
+    $("#nascimento").val(data.nascimento);
+    $("#email").val(data.email);
+    $("#cep").val(data.cep);
+    $("#rua").val(data.rua);
+    $("#cidade").val(data.cidade);
+    $("#estado").val(data.estado);
+    $("#numero").val(data.numero);
+});
 
 
 

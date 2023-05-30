@@ -16,11 +16,13 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->uuid('aluno_id');
             $table->uuid('aula_id');
+            $table->uuid('professor_id');
             $table->timestamp('data_agendamento');
-            $table->timestamps();
 
             $table->foreign('aluno_id')->references('id')->on('alunos');
             $table->foreign('aula_id')->references('id')->on('aulas');
+            $table->foreign('professor_id')->references('id')->on('professores');
+            $table->timestamps();
         });
     }
 

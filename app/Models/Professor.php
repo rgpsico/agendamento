@@ -6,22 +6,29 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
-class Aulas extends Model
+class Professor extends Model
 {
     use HasFactory;
 
-    protected $table = "aulas";
+    protected $table = "professores";
 
     protected $primaryKey = 'id';
     public $incrementing = false; // Set to false because we're not using auto-incrementing IDs
     protected $keyType = 'string';
 
     protected $fillable = [
-        'professor_id',
-        'data_hora',
-        'local',
-        'capacidade'
+        'id',
+        'usuario_id',
+        'especialidade'
     ];
+
+
+
+    public function aulas()
+    {
+        return $this->hasMany(Aulas::class, 'professor_id');
+    }
+
 
     protected static function boot()
     {
@@ -30,10 +37,5 @@ class Aulas extends Model
         static::creating(function ($model) {
             $model->{$model->getKeyName()} = (string) Str::uuid();
         });
-    }
-
-    public function professor()
-    {
-        return $this->belongsTo(Professor::class, 'professor_id');
     }
 }

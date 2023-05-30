@@ -20,8 +20,8 @@ class AulasFactory extends Factory
     public function definition()
     {
         return [
-            'id' => Str::uuid(),
-            'professor_id' => 1, // Você pode querer substituir isso por um professor_id existente.
+            'id' => rand(1, 90),
+            'professor_id' => '8b2f7bf6-8d86-4969-a6db-54e2efb73230', // Você pode querer substituir isso por um professor_id existente.
             'data_hora' => $this->faker->dateTime,
             'local' => $this->faker->sentence,
             'capacidade' => $this->faker->numberBetween(1, 50),

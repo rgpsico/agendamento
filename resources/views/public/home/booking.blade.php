@@ -58,31 +58,41 @@
 												</a>
 											</li>
 											<li>
-												<span>Mon</span>
-												<span class="slot-date">11 Nov <small class="slot-year">2019</small></span>
+												<span>Segunda</span>
+												<span class="slot-date">11 Nov 
+													<small class="slot-year">2019</small>
+												</span>
 											</li>
 											<li>
-												<span>Tue</span>
-												<span class="slot-date">12 Nov <small class="slot-year">2019</small></span>
+												<span>Terça</span>
+												<span class="slot-date">12 Nov 
+													<small class="slot-year">2019</small>
+												</span>
 											</li>
 											<li>
-												<span>Wed</span>
-												<span class="slot-date">13 Nov <small class="slot-year">2019</small></span>
+												<span>Quarta</span>
+												<span class="slot-date">13 Nov 
+													<small class="slot-year">2019</small>
+												</span>
 											</li>
 											<li>
-												<span>Thu</span>
-												<span class="slot-date">14 Nov <small class="slot-year">2019</small></span>
+												<span>Quinta</span>
+												<span class="slot-date">14 Nov 
+													<small class="slot-year">2019</small>
+												</span>
 											</li>
 											<li>
-												<span>Fri</span>
-												<span class="slot-date">15 Nov <small class="slot-year">2019</small></span>
+												<span>Sexta</span>
+												<span class="slot-date">15 Nov 
+													<small class="slot-year">2019</small>
+												</span>
 											</li>
 											<li>
-												<span>Sat</span>
+												<span>Sabado</span>
 												<span class="slot-date">16 Nov <small class="slot-year">2019</small></span>
 											</li>
 											<li>
-												<span>Sun</span>
+												<span>Domingo</span>
 												<span class="slot-date">17 Nov <small class="slot-year">2019</small></span>
 											</li>
 											<li class="right-arrow">
@@ -198,7 +208,7 @@
 					
 					<!-- Submit Section -->
 					<div class="submit-section proceed-btn text-end">
-						<a href="{{route('home.checkout',['id' => 1])}}" 
+						<a href="{{route('home.checkout',['id' =>$model->uuid])}}" 
 							class="btn btn-primary submit-btn">Agendar e Pagar</a>
 					</div>
 					<!-- /Submit Section -->
