@@ -28,19 +28,23 @@
 							</div>
 						</div>
 					</div>
-					<div class="row">
-						<div class="col-12 col-sm-4 col-md-6">
-							<h4 class="mb-1">11 November 2019</h4>
-							<p class="text-muted">Monday</p>
-						</div>
-						<div class="col-12 col-sm-8 col-md-6 text-sm-end">
-							<div class="bookingrange btn btn-white btn-sm mb-3">
-								<i class="far fa-calendar-alt me-2"></i>
-								<span>May 15, 2023 - May 21, 2023</span>
-								<i class="fas fa-chevron-down ms-2"></i>
-							</div>
-						</div>
+					@php
+    					\Carbon\Carbon::setLocale('pt_BR');
+					@endphp
+
+			<div class="row">
+				<div class="col-12 col-sm-4 col-md-6">
+					<h4 class="mb-1">{{ \Carbon\Carbon::now()->isoFormat('D MMMM YYYY') }}</h4>
+					<p class="text-muted">{{ \Carbon\Carbon::now()->isoFormat('dddd') }}</p>
+				</div>
+				<div class="col-12 col-sm-8 col-md-6 text-sm-end">
+					<div class="bookingrange btn btn-white btn-sm mb-3">
+						<i class="far fa-calendar-alt me-2"></i>
+						<span>{{ \Carbon\Carbon::now()->isoFormat('MMMM D, YYYY') }} - {{ \Carbon\Carbon::now()->addWeek()->isoFormat('MMMM D, YYYY') }}</span>
+						<i class="fas fa-chevron-down ms-2"></i>
 					</div>
+				</div>
+			</div>
 					<!-- Schedule Widget -->
 					<div class="card booking-schedule schedule-widget">
 					
@@ -217,4 +221,52 @@
 			</div>
 		</div>
 			<!-- /Page Content -->
+			<script>
+			// Primeiro, vamos definir a data inicial como a data atual em Brasília.
+let currentDate = new Date();
+let offset = currentDate.getTimezoneOffset() + (3 * 60); // Brasília está 3 horas atrás do UTC
+currentDate = new Date(currentDate.getTime() + (offset * 60 * 1000));
+
+// Nomes dos dias da semana em português.
+let daysOfWeek = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sabado'];
+
+// Função para atualizar o calendário.
+function updateCalendar() {
+    let calendarDays = document.querySelectorAll('.slot-date');
+    let dayNames = document.querySelectorAll('.day-slot ul li span:first-child');
+    for (let i = 0; i < 7; i++) {
+        let date = new Date(currentDate);
+        date.setDate(currentDate.getDate() + i);
+        calendarDays[i].textContent = date.toLocaleDateString('pt-BR');
+        dayNames[i].textContent = daysOfWeek[date.getDay()];
+    }
+}
+
+// Função para avançar uma semana.
+function nextWeek() {
+    currentDate.setDate(currentDate.getDate() + 7);
+    updateCalendar();
+}
+
+// Função para retroceder uma semana.
+function previousWeek() {
+    currentDate.setDate(currentDate.getDate() - 7);
+    updateCalendar();
+}
+
+// Adicionar event listeners para os botões de seta.
+document.querySelector('.right-arrow').addEventListener('click', function(event) {
+    event.preventDefault();
+    nextWeek();
+});
+
+document.querySelector('.left-arrow').addEventListener('click', function(event) {
+    event.preventDefault();
+    previousWeek();
+});
+
+// Atualizar o calendário pela primeira vez.
+updateCalendar();
+
+			</script>
 </x-layoutsadmin>

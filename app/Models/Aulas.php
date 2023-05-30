@@ -18,6 +18,7 @@ class Aulas extends Model
 
     protected $fillable = [
         'professor_id',
+        'dia_id',
         'data_hora',
         'local',
         'capacidade'
@@ -35,5 +36,10 @@ class Aulas extends Model
     public function professor()
     {
         return $this->belongsTo(Professor::class, 'professor_id');
+    }
+
+    public function dia()
+    {
+        return $this->belongsTo(DiaDaSemana::class, 'dia_id');
     }
 }

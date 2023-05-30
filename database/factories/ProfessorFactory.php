@@ -12,7 +12,7 @@ use Illuminate\Foundation\Auth\User;
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Aulas>
  */
-class AulasFactory extends Factory
+class ProfessorFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -22,14 +22,10 @@ class AulasFactory extends Factory
     public function definition()
     {
         return [
-            'id' => rand(1, 90),
-            'professor_id' => Usuario::inRandomOrder()->first()->id, // Você pode querer substituir isso por um professor_id existente.
-            'data_hora' => $this->faker->dateTime,
-            'dia_id' => rand(0, 6),
-            'local' => $this->faker->sentence,
-            'capacidade' => $this->faker->numberBetween(1, 50),
-            'created_at' => now(),
-            'updated_at' => now(),
+            'usuario_id' => function () {
+                return Usuario::inRandomOrder()->first()->id;
+            },
+            'especialidade' => 'surf'
         ];
     }
 }
