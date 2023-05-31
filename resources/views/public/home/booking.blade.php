@@ -94,7 +94,7 @@
 									<div class="time-slot">
 										<ul class="clearfix">
 											@foreach ($horarios as $dia => $horas)
-											<li>
+											<li data-dia="{{$dia}}">
 												@foreach ($horas as $hora)
 													<a class="timing" href="#">
 														<span>{{ $hora }}</span> <span>{{$hora < 12 ? 'AM' : 'PM'}}</span>
@@ -139,12 +139,19 @@ let daysOfWeek = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', '
 function updateCalendar() {
     let calendarDays = document.querySelectorAll('.slot-date');
     let dayNames = document.querySelectorAll('.day-slot ul li span:first-child');
-    for (let i = 0; i < 7; i++) {
+
+	try {
+		for (let i = 0; i < 7; i++) {
         let date = new Date(currentDate);
         date.setDate(currentDate.getDate() + i);
         calendarDays[i].textContent = date.toLocaleDateString('pt-BR');
         dayNames[i].textContent = daysOfWeek[date.getDay()];
     }
+		
+	} catch (error) {
+		
+	}
+ 
 }
 
 // Função para avançar uma semana.
@@ -170,41 +177,20 @@ document.querySelector('.left-arrow').addEventListener('click', function(event) 
     previousWeek();
 });
 
-// Função para atualizar os slots de aula.
-function updateLessonSlots(professor_id) {// Função para atualizar os slots de aula.
-    // Fazer uma solicitação GET para a API.
-    fetch('/api/aulas')
-        .then(response => response.json())
-        .then(lessons => {
-            // Limpar todos os slots de aula existentes.
-            $('.timing').removeClass('selected');
 
-            // Loop através das aulas retornadas pela API.
-            for (let i = 0; i < lessons.length; i++) {
-                // Obter a data e hora da aula.
-                let lessonDateTime = new Date(lessons[i].data_hora);
-
-                // Selecionar o slot de aula correspondente.
-                let slot = $('.timing').filter(function() {
-                    return $(this).text().trim() === lessonDateTime.getHours() + ':00';
-                });
-
-                // Marcar o slot de aula como selecionado.
-                slot.addClass('selected');
-            }
-        });
-}
-
-updateLessonSlots('55bcd45e-4a26-4584-b871-9b1cffdda2a7');
-// Atualizar os slots de aula pela primeira vez.
 
 
 // Atualizar os slots de aula pela primeira vez.
-
 
 
 // Atualizar o calendário pela primeira vez.
 updateCalendar();
+
+
+
+
+
+
 
 			</script>
 </x-layoutsadmin>
