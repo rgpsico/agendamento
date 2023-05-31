@@ -14,7 +14,7 @@
 									<img src="{{asset('template/assets/img/doctors/doctor-thumb-02.jpg')}}" alt="User Image">
 								</a>
 								<div class="booking-info">
-									<h4><a href="doctor-profile.html">{{$model->nome}}</a></h4>
+									<h4><a href="doctor-profile.html">{{$model->professor->nome ?? ''}}</a></h4>
 									<div class="rating">
 										<i class="fas fa-star filled"></i>
 										<i class="fas fa-star filled"></i>
@@ -61,44 +61,14 @@
 													<i class="fa fa-chevron-left"></i>
 												</a>
 											</li>
-											<li>
-												<span>Segunda</span>
-												<span class="slot-date">11 Nov 
-													<small class="slot-year">2019</small>
-												</span>
-											</li>
-											<li>
-												<span>Terça</span>
-												<span class="slot-date">12 Nov 
-													<small class="slot-year">2019</small>
-												</span>
-											</li>
-											<li>
-												<span>Quarta</span>
-												<span class="slot-date">13 Nov 
-													<small class="slot-year">2019</small>
-												</span>
-											</li>
-											<li>
-												<span>Quinta</span>
-												<span class="slot-date">14 Nov 
-													<small class="slot-year">2019</small>
-												</span>
-											</li>
-											<li>
-												<span>Sexta</span>
-												<span class="slot-date">15 Nov 
-													<small class="slot-year">2019</small>
-												</span>
-											</li>
-											<li>
-												<span>Sabado</span>
-												<span class="slot-date">16 Nov <small class="slot-year">2019</small></span>
-											</li>
-											<li>
-												<span>Domingo</span>
-												<span class="slot-date">17 Nov <small class="slot-year">2019</small></span>
-											</li>
+											@foreach ($aulasDias as $aula)
+												<li>
+													<span>{{ $aula->dia_id }}</span>
+													<span class="slot-date">11 Nov 
+														<small class="slot-year">2019</small>
+													</span>
+												</li>
+											@endforeach
 											<li class="right-arrow">
 												<a href="">
 													<i class="fa fa-chevron-right"></i>
@@ -119,87 +89,22 @@
 								<div class="col-md-12">
 								
 									<!-- Time Slot -->
+									
+									
 									<div class="time-slot">
 										<ul class="clearfix">
+											@foreach ($horarios as $dia => $horas)
 											<li>
-												<a class="timing" href="#">
-													<span>9:00</span> <span>AM</span>
-												</a>
-												<a class="timing" href="#">
-													<span>10:00</span> <span>AM</span>
-												</a>
-												<a class="timing" href="#">
-													<span>11:00</span> <span>AM</span>
-												</a>
+												@foreach ($horas as $hora)
+													<a class="timing" href="#">
+														<span>{{ $hora }}</span> <span>{{$hora < 12 ? 'AM' : 'PM'}}</span>
+													</a>	
+												@endforeach
 											</li>
-											<li>
-												<a class="timing" href="#">
-													<span>9:00</span> <span>AM</span>
-												</a>
-												<a class="timing" href="#">
-													<span>10:00</span> <span>AM</span>
-												</a>
-												<a class="timing" href="#">
-													<span>11:00</span> <span>AM</span>
-												</a>
-											</li>
-											<li>
-												<a class="timing" href="#">
-													<span>9:00</span> <span>AM</span>
-												</a>
-												<a class="timing" href="#">
-													<span>10:00</span> <span>AM</span>
-												</a>
-												<a class="timing" href="#">
-													<span>11:00</span> <span>AM</span>
-												</a>
-											</li>
-											<li>
-												<a class="timing" href="#">
-													<span>9:00</span> <span>AM</span>
-												</a>
-												<a class="timing" href="#">
-													<span>10:00</span> <span>AM</span>
-												</a>
-												<a class="timing" href="#">
-													<span>11:00</span> <span>AM</span>
-												</a>
-											</li>
-											<li>
-												<a class="timing" href="#">
-													<span>9:00</span> <span>AM</span>
-												</a>
-												<a class="timing selected" href="#">
-													<span>10:00</span> <span>AM</span>
-												</a>
-												<a class="timing" href="#">
-													<span>11:00</span> <span>AM</span>
-												</a>
-											</li>
-											<li>
-												<a class="timing" href="#">
-													<span>9:00</span> <span>AM</span>
-												</a>
-												<a class="timing" href="#">
-													<span>10:00</span> <span>AM</span>
-												</a>
-												<a class="timing" href="#">
-													<span>11:00</span> <span>AM</span>
-												</a>
-											</li>
-											<li>
-												<a class="timing" href="#">
-													<span>9:00</span> <span>AM</span>
-												</a>
-												<a class="timing" href="#">
-													<span>10:00</span> <span>AM</span>
-												</a>
-												<a class="timing" href="#">
-													<span>11:00</span> <span>AM</span>
-												</a>
-											</li>
+											@endforeach
 										</ul>
 									</div>
+								
 									<!-- /Time Slot -->
 									
 								</div>
@@ -212,7 +117,7 @@
 					
 					<!-- Submit Section -->
 					<div class="submit-section proceed-btn text-end">
-						<a href="{{route('home.checkout',['id' =>$model->uuid])}}" 
+						<a href="{{route('home.checkout',['id' =>1])}}" 
 							class="btn btn-primary submit-btn">Agendar e Pagar</a>
 					</div>
 					<!-- /Submit Section -->
@@ -264,6 +169,39 @@ document.querySelector('.left-arrow').addEventListener('click', function(event) 
     event.preventDefault();
     previousWeek();
 });
+
+// Função para atualizar os slots de aula.
+function updateLessonSlots(professor_id) {// Função para atualizar os slots de aula.
+    // Fazer uma solicitação GET para a API.
+    fetch('/api/aulas')
+        .then(response => response.json())
+        .then(lessons => {
+            // Limpar todos os slots de aula existentes.
+            $('.timing').removeClass('selected');
+
+            // Loop através das aulas retornadas pela API.
+            for (let i = 0; i < lessons.length; i++) {
+                // Obter a data e hora da aula.
+                let lessonDateTime = new Date(lessons[i].data_hora);
+
+                // Selecionar o slot de aula correspondente.
+                let slot = $('.timing').filter(function() {
+                    return $(this).text().trim() === lessonDateTime.getHours() + ':00';
+                });
+
+                // Marcar o slot de aula como selecionado.
+                slot.addClass('selected');
+            }
+        });
+}
+
+updateLessonSlots('55bcd45e-4a26-4584-b871-9b1cffdda2a7');
+// Atualizar os slots de aula pela primeira vez.
+
+
+// Atualizar os slots de aula pela primeira vez.
+
+
 
 // Atualizar o calendário pela primeira vez.
 updateCalendar();
