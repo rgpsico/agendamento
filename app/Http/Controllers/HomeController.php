@@ -41,7 +41,7 @@ class HomeController extends Controller
                 'pageTitle' => $this->pageTitle,
                 'view' => $this->view,
                 'route' => $this->route,
-                'model' => $this->model::with('endereco')->get()
+                'model' => $this->model::with('usuarios')->get()
             ]
         );
     }
@@ -49,7 +49,7 @@ class HomeController extends Controller
     public function show($id)
     {
 
-        $model = $this->model->where('uuid', $id)->first();
+        $model = $this->model->where('id', $id)->first();
 
         return view(
             $this->view . '.show',

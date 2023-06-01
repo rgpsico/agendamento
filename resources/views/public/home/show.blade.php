@@ -17,7 +17,7 @@
 										<img src="{{asset('template/assets/img/doctors/doctor-thumb-02.jpg')}}" class="img-fluid" alt="User Image">
 									</div>
 									<div class="doc-info-cont">
-										<h4 class="doc-name">{{$model->nome}}</h4>
+										<h4 class="doc-name">{{$model->usuarios->nome}}</h4>
 										<p class="doc-speciality">BDS, MDS - Oral &amp; {{$model->descricao}}</p>
 										<p class="doc-department"><img src="{{asset('template/assets/img/specialities/specialities-05.png')}}" class="img-fluid" alt="Speciality">Dentist</p>
 										<div class="rating">
@@ -84,7 +84,7 @@
 										</a>
 									</div>
 									<div class="clinic-booking">
-										<a class="apt-btn" href="{{route('home.booking',['id' => $model->uuid])}}">Agendar</a>
+										<a class="apt-btn" href="{{route('home.booking',['id' => $model->id])}}">Agendar</a>
 									</div>
 								</div>
 							</div>

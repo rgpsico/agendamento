@@ -29,6 +29,11 @@ class Professor extends Model
         return $this->hasMany(Aulas::class, 'professor_id');
     }
 
+    public function usuarios()
+    {
+        return $this->hasOne(Usuario::class, 'id', 'usuario_id');
+    }
+
 
     protected static function boot()
     {

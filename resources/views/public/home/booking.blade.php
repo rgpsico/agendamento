@@ -3,6 +3,8 @@
     <!-- Breadcrumb -->
 		<x-home.breadcrumb title="TESTE"/>
 			<!-- /Breadcrumb -->
+
+			@include('admin.empresas._partials.modal')
 			<div class="container">
 			<div class="row">
 				<div class="col-12">
@@ -14,7 +16,7 @@
 									<img src="{{asset('template/assets/img/doctors/doctor-thumb-02.jpg')}}" alt="User Image">
 								</a>
 								<div class="booking-info">
-									<h4><a href="doctor-profile.html">{{$model->professor->nome ?? ''}}</a></h4>
+									<h4><a href="doctor-profile.html">{{$model->usuarios->nome ?? ''}}</a></h4>
 									<div class="rating">
 										<i class="fas fa-star filled"></i>
 										<i class="fas fa-star filled"></i>
@@ -94,9 +96,9 @@
 									<div class="time-slot">
 										<ul class="clearfix">
 											@foreach ($horarios as $dia => $horas)
-											<li data-dia="{{$dia}}">
+											<li data-dia="{{$dia}}"   id="">
 												@foreach ($horas as $hora)
-													<a class="timing" href="#">
+													<a class="timing agendarAulas" href="#" data-hora="{{ $hora }}">
 														<span>{{ $hora }}</span> <span>{{$hora < 12 ? 'AM' : 'PM'}}</span>
 													</a>	
 												@endforeach
@@ -126,6 +128,8 @@
 			</div>
 		</div>
 			<!-- /Page Content -->
+			<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
 			<script>
 			// Primeiro, vamos definir a data inicial como a data atual em Brasília.
 let currentDate = new Date();
@@ -186,8 +190,31 @@ document.querySelector('.left-arrow').addEventListener('click', function(event) 
 // Atualizar o calendário pela primeira vez.
 updateCalendar();
 
+var form = 
+`<form>
+                    <div class="row form-row">
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label>Data da Aula</label>
+                                <input type="date" id="data_aula" class="form-control" value="John">
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label>Hora</label>
+                                <input type="time" id="hora" class="form-control hora" value="">
+                            </div>
+                        </div>
+                       <button type="submit" class="btn btn-primary w-100">Agendar Aula</button>
+                </form>`;
 
-
+$(".agendarAulas").on("click", function(e) {
+	e.preventDefault()
+	$('.modal').modal('show')
+	$('.modal-title').text('Agendar Aula')
+	$('.modal-body').html(form)
+	$('.hora').val($(this).data('hora'))
+});
 
 
 
