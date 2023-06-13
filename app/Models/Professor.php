@@ -12,7 +12,7 @@ class Professor extends Model
 
     protected $table = "professores";
 
-    protected $primaryKey = 'id';
+    protected $primaryKey = 'usuario_id';
     public $incrementing = false; // Set to false because we're not using auto-incrementing IDs
     protected $keyType = 'string';
 

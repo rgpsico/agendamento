@@ -10,7 +10,7 @@
                     <h4 class="card-title">Geral </h4>
                 </div>
                 <div class="card-body">
-                    <form action="{{route('empresa.update',['id' => 1])}}" method="POST" enctype="multipart/form-data">
+                    <form action="{{route('empresa.update',['id' => Auth::user()->id])}}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="form-group">
                             <label>Nome da Escola de Surf</label>

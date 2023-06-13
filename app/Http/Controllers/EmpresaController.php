@@ -32,7 +32,7 @@ class EmpresaController extends Controller
     public function update($id, Request $request)
     {
 
-        // $professor = Professor::findOrFail('c8c3e5db-6e72-4d48-8517-d9232759b19b');
+        $professor = Professor::findOrFail($id);
 
         $data = $request->validate([
             'nome_escola' => 'required|max:255',
@@ -51,9 +51,11 @@ class EmpresaController extends Controller
 
 
 
-        // $professor->update($data);
+        $professor->update($data);
 
-        return redirect()->route('empresa.index')->with('success', 'Empresa atualizada com sucesso');
+
+
+        return redirect()->route('empresa.configuracao')->with('success', 'Empresa atualizada com sucesso');
     }
 
     public function index()
