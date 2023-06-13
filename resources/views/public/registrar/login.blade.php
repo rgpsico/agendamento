@@ -14,24 +14,32 @@
 								<div class="row align-items-center justify-content-center">
 									<div class="col-md-7 col-lg-6 login-left">
 										<img src="{{asset('template/assets/img/login-banner.png')}}"
-										 class="img-fluid" alt="Doccure Login">	
+										 class="img-fluid" alt="Login Professor">	
 									</div>
 									<div class="col-md-12 col-lg-6 login-right">
 										<div class="login-header">
-											<h3>Login <span>Doccure</span></h3>
+											<h3>Login <span>Professor</span></h3>
 										</div>
 										<form action="{{route('user.login')}}" method="POST">
 											@csrf
 											<div class="form-group form-focus">
 												<input type="email" name="email" class="form-control floating">
 												<label class="focus-label">Email</label>
+												@error('email')
+												<span class="text-danger">{{ $message }}</span>
+												@enderror
 											</div>
+											
 											<div class="form-group form-focus">
 												<input type="password" name="senha" class="form-control floating">
 												<label class="focus-label">Senha</label>
+												@error('senha')
+												<span class="text-danger">{{ $message }}</span>
+												@enderror
 											</div>
+											
 											<div class="text-end">
-												<a class="forgot-link" href="forgot-password.html">Forgot Password ?</a>
+												<a class="forgot-link" href="l">Esqueceu a Senha ?</a>
 											</div>
 											<button class="btn btn-primary w-100 btn-lg login-btn" type="submit">Login</button>
 											<div class="login-or">

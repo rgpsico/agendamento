@@ -19,11 +19,11 @@
                 </li>
                 
 
-                {{-- <li> 
+                <li> 
                     <a href="{{route('empresa.configuracao')}}">
                         <i class="fe fe-layout"></i><span>Configuração</span>
                     </a>
-                </li> --}}
+                </li>
                
                 
             </ul>

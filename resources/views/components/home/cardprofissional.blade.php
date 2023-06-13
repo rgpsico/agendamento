@@ -7,9 +7,10 @@
                         <img src="{{asset('template/assets/img/doctors/doctor-thumb-01.jpg')}}" class="img-fluid" alt="User Image">
                     </a>
                 </div>
-               
+
+              
                 <div class="doc-info-cont">
-                    <h4 class="doc-name"><a href="{{route('home.show',['id' =>$value->id])}}">{{$value->usuarios->nome}}</a></h4>
+                    <h4 class="doc-name"><a href="{{route('home.show',['id' =>$value->usuario_id])}}">{{$value->usuarios->nome}}</a></h4>
                     <p class="doc-speciality">{{$value->nome}}</p>
                     <h5 class="doc-department"><img src="{{asset('template/assets/img/specialities/specialities-05.png')}}" class="img-fluid" alt="Speciality">Dentist</h5>
                     <x-avaliacao-home/>

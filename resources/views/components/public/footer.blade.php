@@ -16,7 +16,7 @@
 				</div>
 				<div class="col-lg-2 col-md-4">
 					<div class="footer-widget footer-menu">
-						<h2 class="footer-title">For Patients</h2>
+						<h2 class="footer-title">Alunos</h2>
 						<ul>
 							<li><a href="search.html">Search for Doctors</a></li>
 							<li><a href="login.html">Login</a></li>
@@ -26,7 +26,7 @@
 				</div>
 				<div class="col-lg-2 col-md-4">
 					<div class="footer-widget footer-menu">
-						<h2 class="footer-title">For Doctors</h2>
+						<h2 class="footer-title">Professores</h2>
 						<ul>
 							<li><a href="appointments.html">Appointments</a></li>
 							<li><a href="chat.html">Chat</a></li>
@@ -36,7 +36,7 @@
 				</div>
 				<div class="col-lg-2 col-md-5">
 					<div class="footer-widget footer-contact">
-						<h2 class="footer-title">Contact Us</h2>
+						<h2 class="footer-title">Ligue pra gente</h2>
 						<div class="footer-contact-info">
 							<div class="footer-address">
 								<p><i class="feather-map-pin"></i> 3556 Beech Street, USA</p>
@@ -52,7 +52,7 @@
 				</div>
 				<div class="col-lg-3 col-md-7">
 					<div class="footer-widget">
-						<h2 class="footer-title">Join Our Newsletter</h2>
+						<h2 class="footer-title">Envie um E-mail</h2>
 						<div class="subscribe-form">
 							<form action="#">
 								<input type="email" class="form-control" placeholder="Enter Email">

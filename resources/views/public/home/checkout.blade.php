@@ -16,17 +16,17 @@
 									
 										<!-- Personal Information -->
 										<div class="info-widget">
-											<h4 class="card-title">Personal Information</h4>
+											<h4 class="card-title">Informações</h4>
 											<div class="row">
 												<div class="col-md-6 col-sm-12">
 													<div class="form-group card-label">
-														<label>First Name</label>
+														<label>Nome</label>
 														<input class="form-control" type="text">
 													</div>
 												</div>
 												<div class="col-md-6 col-sm-12">
 													<div class="form-group card-label">
-														<label>Last Name</label>
+														<label>Sobre Nome</label>
 														<input class="form-control" type="text">
 													</div>
 												</div>
@@ -38,47 +38,47 @@
 												</div>
 												<div class="col-md-6 col-sm-12">
 													<div class="form-group card-label">
-														<label>Phone</label>
+														<label>Telefone</label>
 														<input class="form-control" type="text">
 													</div>
 												</div>
 											</div>
-											<div class="exist-customer">Existing Customer? <a href="#">Click here to login</a></div>
+											<div class="exist-customer">Sou cliente? <a href="#">Click aqui para fazer login</a></div>
 										</div>
 										<!-- /Personal Information -->
 										
 										<div class="payment-widget">
-											<h4 class="card-title">Payment Method</h4>
+											<h4 class="card-title">Metodos de Pagamento</h4>
 											
 											<!-- Credit Card Payment -->
 											<div class="payment-list">
 												<label class="payment-radio credit-card-option">
 													<input type="radio" name="radio" checked="">
 													<span class="checkmark"></span>
-													Credit card
+													Cartão de credito
 												</label>
 												<div class="row">
 													<div class="col-md-6">
 														<div class="form-group card-label">
-															<label for="card_name">Name on Card</label>
+															<label for="card_name">Nome no Cartão</label>
 															<input class="form-control" id="card_name" type="text">
 														</div>
 													</div>
 													<div class="col-md-6">
 														<div class="form-group card-label">
-															<label for="card_number">Card Number</label>
+															<label for="card_number">Numero do Cartão</label>
 															<input class="form-control" id="card_number" placeholder="1234  5678  9876  5432" type="text">
 														</div>
 													</div>
 													<div class="col-md-4">
 														<div class="form-group card-label">
-															<label for="expiry_month">Expiry Month</label>
+															<label for="expiry_month">Mês de vencimento</label>
 															<input class="form-control" id="expiry_month" placeholder="MM" type="text">
 														</div>
 													</div>
 													<div class="col-md-4">
 														<div class="form-group card-label">
-															<label for="expiry_year">Expiry Year</label>
+															<label for="expiry_year">Ano de Vencimento </label>
 															<input class="form-control" id="expiry_year" placeholder="YY" type="text">
 														</div>
 													</div>
@@ -106,7 +106,7 @@
 											<div class="terms-accept">
 												<div class="custom-checkbox">
 												   <input type="checkbox" id="terms_accept">
-												   <label for="terms_accept">I have read and accept <a href="#">Terms &amp; Conditions</a></label>
+												   <label for="terms_accept">Eu aceito os termos <a href="#">Termos &amp; Condição</a></label>
 												</div>
 											</div>
 											<!-- /Terms Accept -->
@@ -126,65 +126,8 @@
 							
 						</div>
 						
-						<div class="col-md-5 col-lg-4 theiaStickySidebar" style="position: relative; overflow: visible; box-sizing: border-box; min-height: 1px;">
 						
-							<!-- Booking Summary -->
-							
-							<!-- /Booking Summary -->
-							
-						<div class="theiaStickySidebar" style="padding-top: 0px; padding-bottom: 1px; position: static; transform: none;"><div class="card booking-card">
-								<div class="card-header">
-									<h4 class="card-title">Booking Summary</h4>
-								</div>
-								<div class="card-body">
-								
-									<!-- Booking Doctor Info -->
-									<div class="booking-doc-info">
-										<a href="doctor-profile.html" class="booking-doc-img">
-											<img src="{{asset('template/assets/img/doctors/doctor-thumb-02.jpg')}}" alt="User Image">
-										</a>
-										<div class="booking-info">
-											<h4><a href="doctor-profile.html">Dr. Darren Elder</a></h4>
-											<div class="rating">
-												<i class="fas fa-star filled"></i>
-												<i class="fas fa-star filled"></i>
-												<i class="fas fa-star filled"></i>
-												<i class="fas fa-star filled"></i>
-												<i class="fas fa-star"></i>
-												<span class="d-inline-block average-rating">35</span>
-											</div>
-											<div class="clinic-details">
-												<p class="doc-location"><i class="fas fa-map-marker-alt"></i> Newyork, USA</p>
-											</div>
-										</div>
-									</div>
-									<!-- Booking Doctor Info -->
-									
-									<div class="booking-summary">
-										<div class="booking-item-wrap">
-											<ul class="booking-date">
-												<li>Date <span>16 Nov 2019</span></li>
-												<li>Time <span>10:00 AM</span></li>
-											</ul>
-											<ul class="booking-fee">
-												<li>Consulting Fee <span>$100</span></li>
-												<li>Booking Fee <span>$10</span></li>
-												<li>Video Call <span>$50</span></li>
-											</ul>
-											<div class="booking-total">
-												<ul class="booking-total-list">
-													<li>
-														<span>Total</span>
-														<span class="total-cost">$160</span>
-													</li>
-												</ul>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div><div class="resize-sensor" style="position: absolute; inset: 0px; overflow: hidden; z-index: -1; visibility: hidden;"><div class="resize-sensor-expand" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; overflow: hidden; z-index: -1; visibility: hidden;"><div style="position: absolute; left: 0px; top: 0px; transition: all 0s ease 0s; width: 390px; height: 752px;"></div></div><div class="resize-sensor-shrink" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; overflow: hidden; z-index: -1; visibility: hidden;"><div style="position: absolute; left: 0; top: 0; transition: 0s; width: 200%; height: 200%"></div></div></div></div></div>
-					</div>
-
+						<x-detalhes-agendamento-confirm/>
 				</div>
 
 			</div>

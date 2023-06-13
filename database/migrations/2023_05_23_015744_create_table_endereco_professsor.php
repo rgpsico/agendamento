@@ -11,17 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('empresa_endereco', function (Blueprint $table) {
+        Schema::create('professor_endereco', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->uuid('empresa_uuid');
+            $table->uuid('professor_id');
             $table->string('endereco')->default(null);
             $table->string('cidade')->default(null);
             $table->string('estado')->default(null);
             $table->string('cep')->default(null);
             $table->string('uf')->default(null);
             $table->string('pais')->default(null);
-            $table->timestamps();
-            $table->foreign('empresa_uuid')->references('uuid')->on('empresa');
+            $table->foreign('professor_id')->references('id')->on('professores');
         });
     }
 

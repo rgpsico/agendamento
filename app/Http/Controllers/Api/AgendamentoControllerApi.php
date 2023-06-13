@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Agendamento;
 use App\Models\Aulas;
 use Illuminate\Http\Request;
 
@@ -18,9 +19,8 @@ class AgendamentoControllerApi extends Controller
     // Criar um novo usuário
     public function store(Request $request)
     {
-
+        dd($request->all());
         $user = Agendamento::create($request->all());
-
         return response()->json($user, 201);
     }
 

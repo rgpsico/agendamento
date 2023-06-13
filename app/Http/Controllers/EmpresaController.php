@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Empresa;
+use App\Models\Professor;
 use Illuminate\Http\Request;
 
 class EmpresaController extends Controller
@@ -26,6 +28,34 @@ class EmpresaController extends Controller
         return view('admin.' . $this->view . '.' . $viewSuffix, $mergedData);
     }
 
+
+    public function update($id, Request $request)
+    {
+
+        // $professor = Professor::findOrFail('c8c3e5db-6e72-4d48-8517-d9232759b19b');
+
+        $data = $request->validate([
+            'nome_escola' => 'required|max:255',
+            'descricao' => 'required',
+            'telefone' => 'required',
+            'cep' => 'required',
+            'rua' => 'required',
+            'numero' => 'required',
+            'logo' => 'nullable|image|max:2048',
+        ]);
+
+        if ($request->hasFile('logo')) {
+            $path = $request->file('logo')->store('logos', 'public');
+            $data['logo'] = $path;
+        }
+
+
+
+        // $professor->update($data);
+
+        return redirect()->route('empresa.index')->with('success', 'Empresa atualizada com sucesso');
+    }
+
     public function index()
     {
 
@@ -44,6 +74,9 @@ class EmpresaController extends Controller
 
     public function configuracao()
     {
-        return $this->loadView('configuracao');
+        return view(
+            'admin.empresas.configuracao',
+            ['pageTitle' =>  'Configuração']
+        );
     }
 }

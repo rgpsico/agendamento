@@ -135,46 +135,7 @@
 											<!-- /Education Details -->
 									
 											<!-- Experience Details -->
-											<div class="widget experience-widget">
-												<h4 class="widget-title">Work &amp; Experience</h4>
-												<div class="experience-box">
-													<ul class="experience-list">
-														<li>
-															<div class="experience-user">
-																<div class="before-circle"></div>
-															</div>
-															<div class="experience-content">
-																<div class="timeline-content">
-																	<a href="#/" class="name">Glowing Smiles Family Dental Clinic</a>
-																	<span class="time">2010 - Present (5 years)</span>
-																</div>
-															</div>
-														</li>
-														<li>
-															<div class="experience-user">
-																<div class="before-circle"></div>
-															</div>
-															<div class="experience-content">
-																<div class="timeline-content">
-																	<a href="#/" class="name">Comfort Care Dental Clinic</a>
-																	<span class="time">2007 - 2010 (3 years)</span>
-																</div>
-															</div>
-														</li>
-														<li>
-															<div class="experience-user">
-																<div class="before-circle"></div>
-															</div>
-															<div class="experience-content">
-																<div class="timeline-content">
-																	<a href="#/" class="name">Dream Smile Dental Practice</a>
-																	<span class="time">2005 - 2007 (2 years)</span>
-																</div>
-															</div>
-														</li>
-													</ul>
-												</div>
-											</div>
+											
 											<!-- /Experience Details -->
 								
 											<!-- Awards Details -->
@@ -182,17 +143,7 @@
 											<!-- /Awards Details -->
 											
 											<!-- Services List -->
-											<div class="service-list">
-												<h4>Serviços</h4>
-												<ul class="clearfix">
-													<li>Tooth cleaning </li>
-													<li>Root Canal Therapy</li>
-													<li>Implants</li>
-													<li>Composite Bonding</li>
-													<li>Fissure Sealants</li>
-													<li>Surgical Extractions</li>
-												</ul>
-											</div>
+											
 											<!-- /Services List -->
 											
 											
@@ -293,35 +244,10 @@
 											<!-- /Clinic Content -->
 											
 											<!-- Clinic Timing -->
-											<div class="col-md-4">
-												<div class="clinic-timing">
-													<div>
-														<p class="timings-days">
-															<span> Tue - Fri </span>
-														</p>
-														<p class="timings-times">
-															<span>11:00 AM - 1:00 PM</span>
-															<span>6:00 PM - 11:00 PM</span>
-														</p>
-													</div>
-													<div>
-														<p class="timings-days">
-															<span>Sat - Sun</span>
-														</p>
-														<p class="timings-times">
-															<span>8:00 AM - 10:00 AM</span>
-															<span>3:00 PM - 7:00 PM</span>
-														</p>
-													</div>
-												</div>
-											</div>
+											
 											<!-- /Clinic Timing -->
 											
-											<div class="col-md-2">
-												<div class="consult-price">
-													$350
-												</div>
-											</div>
+										
 										</div>
 									</div>
 									<!-- /Location List -->

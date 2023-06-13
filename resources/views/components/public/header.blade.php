@@ -42,14 +42,14 @@
 				<div class="container">
 					<nav class="navbar navbar-expand-lg header-nav">
 						<div class="navbar-header">
-							<a id="mobile_btn" href="javascript:void(0);">
+							<a id="mobile_btn" href="{{route('home.index')}}">
 								<span class="bar-icon">
 									<span></span>
 									<span></span>
 									<span></span>
 								</span>
 							</a>
-							<a href="" class="navbar-brand logo">
+							<a href="{{route('home.index')}}" class="navbar-brand logo">
 								<img src="{{asset('template/assets/img/logo.png')}}" class="img-fluid" alt="Logo">
 							</a>
 						</div>

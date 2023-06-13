@@ -51,17 +51,14 @@ class UserController extends Controller
 
     public function login(Request $request)
     {
-        // Validate the form data
         $request->validate([
             'email' => 'required|email',
-            'senha' => 'required|min:6'
+            'senha' => 'required|min:1'
         ]);
 
 
 
-        // Attempt to log the user in
         if (Auth::attempt(['email' => $request->email, 'password' => $request->senha])) { // Changed 'senha' to 'password'
-            // If successful, redirect to their intended location
             return redirect()->intended(route('escola.dashboard'));
         }
 

@@ -5,20 +5,22 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class EmpresaEndereco extends Model
+class ProfessorEndereco extends Model
 {
-    protected $table = 'empresa_endereco';
+    protected $table = 'professor_endereco';
 
     use HasFactory;
 
     protected $primaryKey = 'id';
+
     public $incrementing = false;
+
     protected $keyType = 'string';
 
-    protected $fillable = ['id', 'empresa_uuid', 'endereco', 'cidade', 'estado', 'cep'];
+    protected $fillable = ['id', 'professsor_id', 'endereco', 'cidade', 'estado', 'cep'];
 
-    public function empresa()
+    public function professor()
     {
-        return $this->belongsTo(Empresa::class, 'empresa_uuid', 'uuid');
+        return $this->belongsTo(Professor::class, 'professor_id', 'id');
     }
 }

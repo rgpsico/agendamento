@@ -34,6 +34,11 @@ class Professor extends Model
         return $this->hasOne(Usuario::class, 'id', 'usuario_id');
     }
 
+    public function endereco()
+    {
+        return $this->hasOne(ProfessorEndereco::class, 'id', 'professor_id');
+    }
+
 
     protected static function boot()
     {

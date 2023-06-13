@@ -30,7 +30,7 @@ Route::prefix('admin')->group(function () {
     });
 });
 
-Route::prefix('admin')->group(function () {
+Route::prefix('admin')->middleware('auth')->group(function () {
     Route::group(['prefix' => '/escola'], function () {
         Route::group(['prefix' => '/alunos'], function () {
             Route::get('/', [AlunosController::class, 'index'])->name('alunos.index');

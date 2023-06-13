@@ -33,7 +33,7 @@
 				<div class="container">
 					<nav class="navbar navbar-expand-lg header-nav">
 						<div class="navbar-header">
-							<a id="mobile_btn" href="javascript:void(0);">
+							<a id="mobile_btn" href="{{route('home.index')}}">
 								<span class="bar-icon">
 									<span></span>
 									<span></span>

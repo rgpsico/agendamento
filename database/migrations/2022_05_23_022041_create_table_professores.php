@@ -15,8 +15,8 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->uuid('usuario_id');
             $table->string('especialidade');
-            $table->timestamps();
-
+            $table->string('sobre')->default(null);
+            $table->string('avatar', 200)->default(null);
             $table->foreign('usuario_id')->references('id')->on('usuarios');
         });
     }

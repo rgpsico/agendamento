@@ -23,47 +23,9 @@
             </label>
         </div>
     </div>
-    <div class="filter-widget">
-        <h4>Select Specialist</h4>
-        <div>
-            <label class="custom_check">
-                <input type="checkbox" name="select_specialist" checked>
-                <span class="checkmark"></span> Urology
-            </label>
-        </div>
-        <div>
-            <label class="custom_check">
-                <input type="checkbox" name="select_specialist" checked>
-                <span class="checkmark"></span> Neurology
-            </label>
-        </div>
-        <div>
-            <label class="custom_check">
-                <input type="checkbox" name="select_specialist">
-                <span class="checkmark"></span> Dentist
-            </label>
-        </div>
-        <div>
-            <label class="custom_check">
-                <input type="checkbox" name="select_specialist">
-                <span class="checkmark"></span> Orthopedic
-            </label>
-        </div>
-        <div>
-            <label class="custom_check">
-                <input type="checkbox" name="select_specialist">
-                <span class="checkmark"></span> Cardiologist
-            </label>
-        </div>
-        <div>
-            <label class="custom_check">
-                <input type="checkbox" name="select_specialist">
-                <span class="checkmark"></span> Cardiologist
-            </label>
-        </div>
-    </div>
+   
         <div class="btn-search">
-            <button type="button" class="btn w-100">Search</button>
+            <button type="button" class="btn w-100">Buscar</button>
         </div>	
     </div>
 </div>
