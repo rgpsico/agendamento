@@ -77,7 +77,7 @@ class EmpresaController extends Controller
     public function configuracao()
     {
         return view(
-            'admin.empresas.configuracao',
+            'admin.empresas.treinoform',
             ['pageTitle' =>  'Configuração']
         );
     }
