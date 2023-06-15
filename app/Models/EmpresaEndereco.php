@@ -12,7 +12,7 @@ class EmpresaEndereco extends Model
     public $timestamps = false;
     use HasFactory;
 
-    protected $primaryKey = 'id';
+    protected $primaryKey = 'empresa_id';
 
     public $incrementing = false;
 

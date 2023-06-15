@@ -20,7 +20,7 @@ class HomeController extends Controller
     protected $agendamento;
 
     public function __construct(
-        Professor $model,
+        Empresa $model,
         Aulas $aulas,
         Disponibilidade $disponibilidade,
         Agendamento $agendamento
@@ -34,14 +34,14 @@ class HomeController extends Controller
 
     public function index()
     {
-
+        $model = $this->model::with('endereco')->get();
         return view(
             $this->view . '.index',
             [
                 'pageTitle' => $this->pageTitle,
                 'view' => $this->view,
                 'route' => $this->route,
-                'model' => $this->model::with('usuarios')->get()
+                'model' =>  $model
             ]
         );
     }

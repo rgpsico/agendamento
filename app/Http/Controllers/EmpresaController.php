@@ -41,16 +41,26 @@ class EmpresaController extends Controller
 
         $data = $request->all();
 
+
+
         $data['user_id'] = $request->user_id;
-        // Processar o arquivo de avatar, se houver
+
+
+        // Processar o arquivo de avatar, se houver 
+
         if ($request->hasFile('avatar')) {
-            $path = $request->file('avatar')->store('avatars', 'public');
-            $data['avatar'] = $path;
+            $file = $request->file('avatar');
+            $filename = time() . '.' . $file->getClientOriginalExtension();
+            $path = public_path('/avatar');
+            $file->move($path, $filename);
+            $data['avatar'] = $filename;
         }
+
+
 
         // Atualizar a empresa existente ou criar uma nova
         $empresa = Empresa::updateOrCreate(
-            ['id' => $data['id'] ?? ''],
+            ['user_id' => $data['user_id']],
             $data
         );
 
@@ -58,13 +68,11 @@ class EmpresaController extends Controller
             ['empresa_id' => $empresa->id],
             [
                 'cep' => $data['cep'],
-                'rua' => $data['rua'],
-                'numero' => $data['numero'],
-                'endereco' => $data['numero'],
-                'cidade' => $data['numero'],
-                'estado' => $data['estado'] ?? 'RJ',
-                'uf' => $data['numero'] ?? 'UF',
-                'pais' => $data['numero'] ?? '200',
+
+                'cidade' => $data['cidade'],
+                'estado' => $data['estado'],
+                'uf' => $data['uf'],
+                'pais' => $data['pais'],
             ]
         );
 

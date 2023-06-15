@@ -1,6 +1,8 @@
 <div class="clinic-details">
-    <p class="doc-location"><i class="fas fa-map-marker-alt">
-        </i> {{$value->endereco->pais ?? ''}}, {{$value->endereco->cidade ?? ''}}</p>
+    <p class="doc-location">
+        {{$value->uf ?? ''}}, {{$value->cep ?? ''}}</p>
+      
+      
     <ul class="clinic-gallery">
         <li>
             <a href="{{asset('template/assets/img/features/feature-01.jpg')}}" data-fancybox="gallery">
@@ -24,7 +26,7 @@
         </li>
     </ul>
 </div>
-<div class="clinic-services">
+{{-- <div class="clinic-services">
     <span>Dental Fillings</span>
     <span> Whitneing</span>
-</div>
+</div> --}}

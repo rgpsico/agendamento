@@ -11,8 +11,10 @@ class Empresa extends Model
 
     use HasFactory;
 
-    protected $primaryKey = 'id';
+    protected $primaryKey = 'user_id';
+
     public $incrementing = true;
+
     protected $keyType = 'string';
 
     protected $fillable = ['id', 'user_id', 'avatar', 'nome', 'descricao', 'telefone', 'cnpj'];
