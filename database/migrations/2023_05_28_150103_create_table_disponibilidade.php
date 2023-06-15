@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('disponibilidade', function (Blueprint $table) {
             $table->id();
-            $table->uuid('id_professores');
+            $table->unsignedBigInteger('id_professores');
             $table->unsignedBigInteger('id_dia');
             $table->time('hora_inicio');
             $table->time('hora_fim');

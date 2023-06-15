@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('aulas', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->uuid('professor_id');
+            $table->id();
+            $table->unsignedBigInteger('professor_id');
             $table->unsignedBigInteger('dia_id');
             $table->timestamp('data_hora');
             $table->string('local');
@@ -21,8 +21,8 @@ return new class extends Migration
             $table->timestamps();
 
 
-            $table->foreign('dia_id')->references('id')->on('dias_da_semana');
-            $table->foreign('professor_id')->references('id')->on('professores');
+            // $table->foreign('dia_id')->references('id')->on('dias_da_semana');
+            // $table->foreign('professor_id')->references('id')->on('professores');
         });
     }
 

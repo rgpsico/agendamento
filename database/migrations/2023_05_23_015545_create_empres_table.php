@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('empresa', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->uuid('user_id');
+            $table->id();
+            $table->unsignedBigInteger('user_id');
             $table->string('avatar')->default('avatardefault.png');
             $table->string('nome');
             $table->string('descricao')->default(null);
@@ -24,7 +24,7 @@ return new class extends Migration
         });
 
         Schema::create('empresa_endereco', function (Blueprint $table) {
-            $table->uuid('empresa_id');
+            $table->unsignedBigInteger('empresa_id');
             $table->string('endereco')->default(null);
             $table->string('cidade')->default(null);
             $table->string('estado')->default(null);

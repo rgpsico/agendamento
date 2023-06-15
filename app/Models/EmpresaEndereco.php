@@ -18,7 +18,7 @@ class EmpresaEndereco extends Model
 
     protected $keyType = 'string';
 
-    protected $fillable = ['id', 'empresa_id', 'endereco', 'cidade', 'estado', 'cep', 'uf', 'pais'];
+    protected $fillable = ['empresa_id', 'endereco', 'cidade', 'estado', 'cep', 'uf', 'pais'];
 
     public function Empresa()
     {

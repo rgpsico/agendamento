@@ -13,10 +13,10 @@ return new class extends Migration
     {
 
         Schema::create('agendamentos', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->uuid('aluno_id');
-            $table->uuid('aula_id');
-            $table->uuid('professor_id');
+            $table->id();
+            $table->unsignedBigInteger('aluno_id');
+            $table->unsignedBigInteger('aula_id');
+            $table->unsignedBigInteger('professor_id');
             $table->timestamp('data_agendamento');
 
             $table->foreign('aluno_id')->references('id')->on('alunos');

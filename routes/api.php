@@ -28,6 +28,7 @@ Route::resource('agendamento', AgendamentoControllerApi::class);
 
 Route::resource('professor', ProfessoresControllerApi::class);
 
+Route::resource('empresas', ProfessoresControllerApi::class);
 Route::get('professor/{id}/aulas', [ProfessoresControllerApi::class, 'aulas']);
 
 

@@ -12,8 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('professor_endereco', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->uuid('professor_id');
+            $table->unsignedBigInteger('professor_id');
             $table->string('endereco')->default(null);
             $table->string('cidade')->default(null);
             $table->string('estado')->default(null);
