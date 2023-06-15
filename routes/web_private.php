@@ -26,7 +26,7 @@ Route::prefix('admin')->middleware('auth')->group(function () {
         Route::post('update', [EmpresaController::class, 'update'])->name('empresa.update');
         Route::post('/post', [EmpresaController::class, 'store'])->name('empresa.store');
         Route::delete('/{id}/destroy', [EmpresaController::class, 'destroy'])->name('empresa.destroy');
-        Route::get('/config', [EmpresaController::class, 'configuracao'])->name('empresa.configuracao');
+        Route::get('/{userId}/config', [EmpresaController::class, 'configuracao'])->name('empresa.configuracao');
     });
 });
 

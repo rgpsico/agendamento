@@ -11,14 +11,14 @@ class Empresa extends Model
 
     use HasFactory;
 
-    protected $primaryKey = 'uuid';
+    protected $primaryKey = 'id';
     public $incrementing = true;
     protected $keyType = 'string';
 
-    protected $fillable = ['uuid', 'user_id', 'avatar', 'nome', 'descricao', 'telefone', 'cnpj'];
+    protected $fillable = ['id', 'user_id', 'avatar', 'nome', 'descricao', 'telefone', 'cnpj'];
 
     public function endereco()
     {
-        return $this->hasOne(EmpresaEndereco::class, 'empresa_uuid', 'uuid');
+        return $this->hasOne(EmpresaEndereco::class, 'empresa_id', 'id');
     }
 }

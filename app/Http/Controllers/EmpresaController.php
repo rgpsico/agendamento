@@ -49,13 +49,27 @@ class EmpresaController extends Controller
         }
 
         // Atualizar a empresa existente ou criar uma nova
-        Empresa::updateOrCreate(
-            ['uuid' => $data['uuid'] ?? ''],
+        $empresa = Empresa::updateOrCreate(
+            ['id' => $data['id'] ?? ''],
             $data
         );
 
+        $empresa->endereco()->updateOrCreate(
+            ['empresa_id' => $empresa->id],
+            [
+                'cep' => $data['cep'],
+                'rua' => $data['rua'],
+                'numero' => $data['numero'],
+                'endereco' => $data['numero'],
+                'cidade' => $data['numero'],
+                'estado' => $data['estado'] ?? 'RJ',
+                'uf' => $data['numero'] ?? 'UF',
+                'pais' => $data['numero'] ?? '200',
+            ]
+        );
 
-        return redirect()->route('empresa.configuracao')->with('success', 'Empresa atualizada ou criada com sucesso');
+
+        return redirect()->route('empresa.configuracao', ['userId' => $request->user_id])->with('success', 'Empresa atualizada ou criada com sucesso');
     }
 
 
@@ -75,11 +89,15 @@ class EmpresaController extends Controller
         return $this->loadView('show');
     }
 
-    public function configuracao()
+    public function configuracao($userId)
     {
+        $model = Empresa::where('user_id', $userId)->first();
         return view(
             'admin.empresas.treinoform',
-            ['pageTitle' =>  'Configuração']
+            [
+                'pageTitle' =>  'Configuração',
+                'model' => $model
+            ]
         );
     }
 }

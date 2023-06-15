@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ProfessorEndereco extends Model
+class EmpresaEndereco extends Model
 {
-    protected $table = 'professor_endereco';
+    protected $table = 'empresa_endereco';
 
+    public $timestamps = false;
     use HasFactory;
 
     protected $primaryKey = 'id';
@@ -17,10 +18,10 @@ class ProfessorEndereco extends Model
 
     protected $keyType = 'string';
 
-    protected $fillable = ['id', 'professsor_id', 'endereco', 'cidade', 'estado', 'cep'];
+    protected $fillable = ['id', 'empresa_id', 'endereco', 'cidade', 'estado', 'cep', 'uf', 'pais'];
 
-    public function professor()
+    public function Empresa()
     {
-        return $this->belongsTo(Professor::class, 'professor_id', 'id');
+        return $this->belongsTo(Empresa::class, 'empresa_id', 'id');
     }
 }

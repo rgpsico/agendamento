@@ -12,9 +12,9 @@
                 <div class="card-body">
                     <form action="{{route('empresa.update')}}" method="POST" enctype="multipart/form-data">
                         @csrf
-                        <x-text-input name="nome" size="30" label="Nome Completo" />
+                        <x-text-input name="nome" size="30" label="Nome Completo" :value="$model"/>
 
-                        <input type="text" class="" name="user_id" value="{{Auth::user()->id}}">
+                        <input type="hidden" class="" name="user_id" value="{{Auth::user()->id}}">
                         
                         <div class="form-group">
                             <label>Descrição da Escola Surf</label>
@@ -25,17 +25,17 @@
                         </div>
 
 
-                        <x-text-input name="telefone" size="30" label="Telefone" />
+                        <x-text-input name="telefone" size="30" label="Telefone" :value="$model" />
                         
                        
-                        <x-text-input name="cep" size="30" label="Cep" />
+                        <x-text-input name="cep" size="30" label="Cep" :value="$model" />
 
                         
-                        <x-text-input name="rua" size="30" label="Rua" />
+                        <x-text-input name="rua" size="30" label="Rua" :value="$model" />
                     
-                        <x-text-input name="numero" size="30" label="Numero" />
+                        <x-text-input name="numero" size="30" label="Numero" :value="$model" />
                        
-                        <x-text-input name="cnpj" size="30" label="Cnpj" />
+                        <x-text-input name="cnpj" size="30" label="Cnpj" :value="$model" />
 
                         <div class="form-group">                         
                             <div class="mb-3">

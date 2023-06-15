@@ -24,7 +24,7 @@
                 </li>    
                 
                 <li> 
-                    <a href="{{route('empresa.configuracao')}}">
+                    <a href="{{route('empresa.configuracao',['userId' => Auth::user()->id])}}">
                         <i class="fe fe-layout"></i><span>Configuração</span>
                     </a>
                 </li>  
