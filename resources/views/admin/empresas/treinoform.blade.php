@@ -10,11 +10,11 @@
                     <h4 class="card-title">Geral </h4>
                 </div>
                 <div class="card-body">
-                    <form action="{{route('empresa.update',['id' => Auth::user()->id])}}" method="POST" enctype="multipart/form-data">
+                    <form action="{{route('empresa.update')}}" method="POST" enctype="multipart/form-data">
                         @csrf
-                        <x-text-input name="nome_escola" size="30" label="Nome Completo" />
+                        <x-text-input name="nome" size="30" label="Nome Completo" />
 
-                        
+                        <input type="text" class="" name="user_id" value="{{Auth::user()->id}}">
                         
                         <div class="form-group">
                             <label>Descrição da Escola Surf</label>
@@ -35,7 +35,7 @@
                     
                         <x-text-input name="numero" size="30" label="Numero" />
                        
-                        
+                        <x-text-input name="cnpj" size="30" label="Cnpj" />
 
                         <div class="form-group">                         
                             <div class="mb-3">

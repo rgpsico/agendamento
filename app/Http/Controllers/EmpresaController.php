@@ -29,34 +29,35 @@ class EmpresaController extends Controller
     }
 
 
-    public function update($id, Request $request)
+    public function update(Request $request)
     {
+        // $data = $request->validate([
+        //     'avatar' => 'nullable|image|max:2048',
+        //     'nome' => 'required|max:255',
+        //     'descricao' => 'required',
+        //     'telefone' => 'required',
+        //     'cnpj' => 'required',
+        // ]);
 
-        $professor = Professor::findOrFail($id);
+        $data = $request->all();
 
-        $data = $request->validate([
-            'nome_escola' => 'required|max:255',
-            'descricao' => 'required',
-            'telefone' => 'required',
-            'cep' => 'required',
-            'rua' => 'required',
-            'numero' => 'required',
-            'logo' => 'nullable|image|max:2048',
-        ]);
-
-        if ($request->hasFile('logo')) {
-            $path = $request->file('logo')->store('logos', 'public');
-            $data['logo'] = $path;
+        $data['user_id'] = $request->user_id;
+        // Processar o arquivo de avatar, se houver
+        if ($request->hasFile('avatar')) {
+            $path = $request->file('avatar')->store('avatars', 'public');
+            $data['avatar'] = $path;
         }
 
+        // Atualizar a empresa existente ou criar uma nova
+        Empresa::updateOrCreate(
+            ['uuid' => $data['uuid'] ?? ''],
+            $data
+        );
 
 
-        $professor->update($data);
-
-
-
-        return redirect()->route('empresa.configuracao')->with('success', 'Empresa atualizada com sucesso');
+        return redirect()->route('empresa.configuracao')->with('success', 'Empresa atualizada ou criada com sucesso');
     }
+
 
     public function index()
     {

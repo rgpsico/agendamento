@@ -13,11 +13,13 @@ return new class extends Migration
     {
         Schema::create('empresa', function (Blueprint $table) {
             $table->uuid('uuid')->primary();
+            $table->uuid('user_id');
             $table->string('avatar')->default('avatardefault.png');
             $table->string('nome');
             $table->string('descricao')->default(null);
             $table->string('telefone');
             $table->string('cnpj')->default(null);
+            $table->foreign('user_id')->references('id')->on('usuarios');
             $table->timestamps();
         });
     }
