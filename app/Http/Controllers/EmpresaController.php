@@ -31,13 +31,25 @@ class EmpresaController extends Controller
 
     public function update(Request $request)
     {
-        // $data = $request->validate([
-        //     'avatar' => 'nullable|image|max:2048',
-        //     'nome' => 'required|max:255',
-        //     'descricao' => 'required',
-        //     'telefone' => 'required',
-        //     'cnpj' => 'required',
-        // ]);
+        $data = $request->validate([
+            'avatar' => 'nullable|image|max:2048',
+            'nome' => 'required|max:255',
+            'descricao' => 'required',
+            'telefone' => 'required',
+            'cnpj' => 'required',
+            'endereco' => 'required',
+            'cidade' =>  'required',
+            'estado' => 'required',
+            'uf' => 'required',
+            'pais' => 'required'
+
+        ]);
+
+
+
+
+
+
 
         $data = $request->all();
 
@@ -70,8 +82,9 @@ class EmpresaController extends Controller
             [
                 'cep' => $data['cep'],
 
-                'cidade' => $data['cidade'],
-                'estado' => $data['estado'],
+                'endereco' => $data['endereco'] ?? 'End',
+                'cidade' => $data['cidade'] ?? 'cit',
+                'estado' => $data['estado'] ?? 'es',
                 'uf' => $data['uf'],
                 'pais' => $data['pais'],
             ]

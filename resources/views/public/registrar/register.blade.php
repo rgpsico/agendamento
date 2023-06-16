@@ -7,14 +7,18 @@
 					
 					<div class="row">
 						<div class="col-md-8 offset-md-2">
-								
-							<!-- Register Content -->
+						
+						
+							
 							<div class="account-content">
-								<div class="row align-items-center justify-content-center">
+                         		<div class="row align-items-center justify-content-center">
+									
 									<div class="col-md-7 col-lg-6 login-left">
-										<img src="{{asset('template/assets/img/login-banner.png')}}" class="img-fluid" alt="Doccure Register">	
+										
+										<img src="{{asset('admin/img/register.png')}}" class="img-fluid" alt="Doccure Register">	
 									</div>
 									<div class="col-md-12 col-lg-6 login-right">
+										<x-alert/>
 										<div class="login-header">
 											<h3>Registrar 
 												<a href="">Você é um Professor</a>

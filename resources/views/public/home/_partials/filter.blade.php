@@ -5,7 +5,7 @@
     <div class="card-body">
     <div class="filter-widget">
         <div class="cal-icon">
-            <input type="text" class="form-control datetimepicker" placeholder="Select Date">
+            <input type="text" class="form-control" placeholder="Buscar Escola">
         </div>			
     </div>
     <div class="filter-widget">
@@ -13,13 +13,13 @@
         <div>
             <label class="custom_check">
                 <input type="checkbox" name="gender_type" checked>
-                <span class="checkmark"></span> Male Doctor
+                <span class="checkmark"></span> Surf
             </label>
         </div>
         <div>
             <label class="custom_check">
                 <input type="checkbox" name="gender_type">
-                <span class="checkmark"></span> Female Doctor
+                <span class="checkmark"></span>Altinha
             </label>
         </div>
     </div>

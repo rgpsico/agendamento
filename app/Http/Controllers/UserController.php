@@ -45,7 +45,11 @@ class UserController extends Controller
 
         $user->save();
 
-        return redirect()->route('escola.dashboard')->with('success', 'Usuário criado com sucesso!');
+        if ($user) {
+            Auth::login($user);
+        }
+
+        return redirect()->route('agenda.index')->with('success', 'Usuário criado com sucesso!');
     }
 
 

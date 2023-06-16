@@ -40,6 +40,7 @@
 
                         <x-text-input name="cidade" size="30" label="Cidade" :value="$model->endereco ?? ''" />
         
+                            <x-text-input name="endereco" size="30" label="Endereco" :value="$model->endereco ?? ''" />
                         <div class="form-group">                         
                                <div class="mb-3">
                                 @isset($model->avatar)

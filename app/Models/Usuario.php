@@ -15,11 +15,8 @@ class Usuario extends Authenticatable
 
     protected $table = "usuarios";
 
-    protected $primaryKey = 'id';
 
-    protected $keyType = 'string';
 
-    public $incrementing = false;
 
 
 
@@ -37,14 +34,7 @@ class Usuario extends Authenticatable
     ];
 
 
-    protected static function boot()
-    {
-        parent::boot();
 
-        static::creating(function ($model) {
-            $model->{$model->getKeyName()} = (string) Str::uuid();
-        });
-    }
 
     /**
      * Scope a query to only include students (alunos).
