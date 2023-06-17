@@ -3,6 +3,8 @@
 use App\Http\Controllers\Api\AulasControllerApi;
 use App\Http\Controllers\Api\DiaDaSemanaControllerApi;
 use App\Http\Controllers\Api\DisponibilidadeControllerApi;
+use App\Http\Controllers\Api\EmpresaController;
+use App\Http\Controllers\Api\EmpresaControllerApi;
 use App\Http\Controllers\Api\ProfessoresControllerApi;
 use App\Http\Controllers\Api\UserControllerApi;
 use Illuminate\Http\Request;
@@ -28,7 +30,7 @@ Route::resource('agendamento', AgendamentoControllerApi::class);
 
 Route::resource('professor', ProfessoresControllerApi::class);
 
-Route::resource('empresas', ProfessoresControllerApi::class);
+Route::resource('empresas', EmpresaControllerApi::class);
 Route::get('professor/{id}/aulas', [ProfessoresControllerApi::class, 'aulas']);
 
 

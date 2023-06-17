@@ -38,20 +38,22 @@
 var empresas = ['Empresa 1', 'Empresa 2', 'Empresa 3']; // Exemplo de dados do loop
 
 var container = document.querySelector('.listar_empresas'); // Seleciona o elemento com a classe "listar_empresas"
-
-empresas.forEach(function (empresa) {
+fetch('api/empresas')
+    .then(response => response.json())
+    .then(dadosApi => {
+        dadosApi.forEach(function (empresa) {
     var row = `<div class="card">
                     <div class="card-body">
                         <div class="doctor-widget">
                             <div class="doc-info-left">
                                 <div class="doctor-img">
                                     <a href="">
-                                        <img src="http://127.0.0.1:8000/avatar/1686888205.jpg" class="img-fluid" alt="Usuario Image">
+                                        <img src="avatar/${empresa.avatar}" class="img-fluid" alt="${empresa.nome}">
                                     </a>
                                 </div>
                                 <div class="doc-info-cont">
                                     <h4 class="doc-name">
-                                        <a href="http://127.0.0.1:8000/9/profissional">roger neves</a>
+                                        <a href="${empresa.id}/profissional">${empresa.nome}</a>
                                     </h4>
                                     <div class="rating">
                                         <i class="fas fa-star filled"></i>
@@ -107,9 +109,9 @@ empresas.forEach(function (empresa) {
 
 	
 	-marker-alt"></i> RJ, BR</li>
-                                        <li><i class="far fa-money-bill-alt"></i> $300 - $1000
+                                        <li><i class="far fa-money-bill-alt"></i> R$ ${empresa.valor_aula_de} - R$ ${empresa.valor_aula_ate}
                                             <i class="fas fa-info-circle" data-bs-toggle="tooltip"
-                                                aria-label="Lorem Ipsum" data-bs-original-title="Lorem Ipsum"></i>
+                                                aria-label="${empresa.nome}" data-bs-original-title="${empresa.nome}"></i>
                                         </li>
                                     </ul>
                                 </div>
@@ -121,6 +123,7 @@ empresas.forEach(function (empresa) {
     container.innerHTML += row; // Adiciona a template string ao conteúdo do elemento selecionado
 });
 
-
     })
+
+    });
 </script>

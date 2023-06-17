@@ -6,11 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Models\Empresa;
 use Illuminate\Http\Request;
 
-class EmpresaController extends Controller
+class EmpresaControllerApi extends Controller
 {
     public function index()
     {
-        return Empresa::all();
+
+        return $empresas = Empresa::with('endereco', 'galeria', 'avaliacao')->get();
     }
 
     public function store(Request $request)

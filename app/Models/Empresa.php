@@ -33,4 +33,9 @@ class Empresa extends Model
     {
         return $this->hasMany(EmpresaGaleria::class, 'empresa_id', 'id');
     }
+
+    public function avaliacao()
+    {
+        return $this->hasMany(EmpresaAvaliacao::class, 'empresa_id', 'id');
+    }
 }

@@ -14,7 +14,7 @@ class galleryHome extends Component
     /**
      * Create a new component instance.
      */
-    public function __construct($value, $model = null)
+    public function __construct($value, $model)
     {
         $this->value = $value;
         $this->model = $model;
