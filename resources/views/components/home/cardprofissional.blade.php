@@ -11,7 +11,7 @@
                     <h4 class="doc-name"><a href="{{route('home.show',['id' =>$value->user_id])}}">{{$value->nome}}</a></h4>
                      <x-avaliacao-home/>
 
-                    <x-gallery-home :value="$value"  />
+                    {{-- <x-gallery-home :value="$value"  /> --}}
                    
                 </div>
             </div>

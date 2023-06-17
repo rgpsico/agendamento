@@ -20,15 +20,14 @@ class EmpresaEnderecoFactory extends Factory
     public function definition(): array
     {
         return [
-            'id' => Str::uuid(),
-            'empresa_uuid' => function () {
+            'empresa_id' => function () {
                 // Primeiro, verifica se já existe alguma empresa. Se existir, retorna o id de uma empresa aleatória.
                 if (\App\Models\Empresa::all()->count()) {
-                    return \App\Models\Empresa::all()->random()->uuid;
+                    return \App\Models\Empresa::all()->random()->id;
                 }
                 // Se não existir nenhuma empresa, cria uma nova e retorna o seu id.
                 else {
-                    return \App\Models\Empresa::factory()->create()->uuid;
+                    return \App\Models\Empresa::factory()->create()->id;
                 }
             },
             'endereco' => $this->faker->streetAddress,

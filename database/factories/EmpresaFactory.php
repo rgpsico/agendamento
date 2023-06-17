@@ -23,7 +23,7 @@ class EmpresaFactory extends Factory
     {
         return [
             'user_id' => function () {
-                return Usuario::all()->random(); // Aqui, um usuário aleatório é atribuído a cada empresa. Se essa não for a lógica desejada, substitua conforme necessário.
+                return Usuario::all()->random()->id;
             },
             'avatar' => 'avatardefault.png',
             'nome' => $this->faker->company,

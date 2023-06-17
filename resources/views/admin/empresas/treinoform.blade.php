@@ -10,6 +10,7 @@
                     <h4 class="card-title">Geral </h4>
                 </div>
                 <div class="card-body">
+                    <x-alert/>
                     <form action="{{route('empresa.update')}}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <input type="hidden" class="" name="user_id" value="{{Auth::user()->id}}" />
