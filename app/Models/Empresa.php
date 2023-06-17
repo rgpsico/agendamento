@@ -24,6 +24,11 @@ class Empresa extends Model
         return $this->hasOne(EmpresaEndereco::class, 'empresa_id', 'id');
     }
 
+    public function user()
+    {
+        return $this->belongsTo(Usuario::class, 'user_id', 'id');
+    }
+
     public function galeria()
     {
         return $this->hasMany(EmpresaGaleria::class, 'empresa_id', 'id');

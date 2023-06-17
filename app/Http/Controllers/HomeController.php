@@ -36,6 +36,7 @@ class HomeController extends Controller
     {
         $model = $this->model::with('endereco', 'galeria')->get();
 
+
         return view(
             $this->view . '.index',
             [
@@ -50,7 +51,6 @@ class HomeController extends Controller
     public function show($id)
     {
         $model = $this->model->where('user_id', $id)->first();
-
 
         return view(
             $this->view . '.show',
@@ -118,10 +118,6 @@ class HomeController extends Controller
             ]
         );
     }
-
-
-
-
 
     public function checkout($id)
     {

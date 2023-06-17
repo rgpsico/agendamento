@@ -2,8 +2,8 @@
     <p class="doc-location">
         {{$value->endereco->uf ?? ''}}, {{$value->endereco->cep ?? ''}}</p>
       
-         
-  {{$value->galeria}}
+     
+
     <ul class="clinic-gallery">
         @foreach ($value->galeria as $gal)
         <li>

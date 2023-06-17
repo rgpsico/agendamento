@@ -11,26 +11,11 @@
                     <h4 class="doc-name"><a href="{{route('home.show',['id' =>$value->user_id])}}">{{$value->nome}}</a></h4>
                      <x-avaliacao-home/>
 
-                     <div class="clinic-details">
-                        <p class="doc-location">
-                            {{$value->endereco->uf ?? ''}}, {{$value->endereco->cep ?? ''}}</p>
-                          
-                             
-                    {{$value->galeria}}
-                        <ul class="clinic-gallery">
-                            @foreach ($value->galeria as $gal)
-                            <li>
-                                <a href="{{ asset('galeria_escola/' . $gal->image) }}" data-fancybox="gallery">
-                                    <img src="{{ asset('galeria_escola/' . $gal->image) }}" alt="Feature">
-                                </a>
-                            </li>
-                            @endforeach  
-                        </ul>
-                    </div>
+                    <x-gallery-home :value="$value"  />
                    
                 </div>
             </div>
-          <x-right-card-home :value="$value->uuid"/>
+          <x-right-card-home :value="$value"/>
         </div>
     </div>
 </div>

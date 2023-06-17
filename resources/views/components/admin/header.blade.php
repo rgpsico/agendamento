@@ -42,11 +42,16 @@
             <div class="header">
 			
 				<!-- Logo -->
+				@php 
+					$user = Auth::user(); // pega o usuário autenticado
+					$empresa = $user->empresa;
+					$avatar = $empresa->avatar ?? '';
+				@endphp
                 <div class="header-left">
-                    <a href="index.html" class="logo">
-						<img src="{{asset('admin/img/logo.png')}}" alt="Logo">
+                    <a href="{{route('home.index')}}" class="logo">
+						<x-logo-tipo imagem="{{$avatar}}" largura="154" altura="80" />
 					</a>
-					<a href="index.html" class="logo logo-small">
+					<a href="{{route('home.index')}}" class="logo logo-small">
 						<img src="{{asset('admin/img/logo-small.png')}}" alt="Logo" width="30" height="30">
 					</a>
                 </div>
