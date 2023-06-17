@@ -5,10 +5,10 @@
      
 
     <ul class="clinic-gallery">
-        @foreach ($value->galeria as $gal)
+        @foreach ($model->galeria as $gal)
         <li>
             <a href="{{ asset('galeria_escola/' . $gal->image) }}" data-fancybox="gallery">
-                <img src="{{ asset('galeria_escola/' . $gal->image) }}" alt="Feature">
+                <img src="{{ asset('galeria_escola/' . $gal->image) }}" alt="Feature" class="img-fluid">
             </a>
         </li>
         @endforeach  

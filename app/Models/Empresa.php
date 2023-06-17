@@ -38,4 +38,9 @@ class Empresa extends Model
     {
         return $this->hasMany(EmpresaAvaliacao::class, 'empresa_id', 'id');
     }
+
+    public function avaliacaoMedia()
+    {
+        return 10;
+    }
 }

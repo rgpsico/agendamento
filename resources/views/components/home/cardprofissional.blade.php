@@ -9,9 +9,10 @@
                 </div>              
                 <div class="doc-info-cont">
                     <h4 class="doc-name"><a href="{{route('home.show',['id' =>$value->user_id])}}">{{$value->nome}}</a></h4>
-                     <x-avaliacao-home/>
+                   
+                    <x-avaliacao-home :model="$value" />
 
-                    {{-- <x-gallery-home :value="$value"  /> --}}
+                    <x-gallery-home :model="$value"  />
                    
                 </div>
             </div>

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('avaliacao', function (Blueprint $table) {
+        Schema::create('empresa_avaliacao', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('empresa_id');
             $table->unsignedBigInteger('user_id')->nullable(); // adicione essa linha se quiser rastrear o usuário que fez a avaliação

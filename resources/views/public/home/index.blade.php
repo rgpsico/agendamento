@@ -18,13 +18,14 @@
 						<div class="col-md-12 col-lg-8 col-xl-9 listar_empresas">
 
 							<!-- Doctor Widget -->
-					
+				
 							
 								
 							@foreach ($model as $value )							
 						
 								<x-home.cardprofissional :value="$value"/>
 
+								
 							@endforeach
 							<!-- /Doctor Widget -->
 

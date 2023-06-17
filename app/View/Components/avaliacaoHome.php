@@ -8,12 +8,14 @@ use Illuminate\View\Component;
 
 class avaliacaoHome extends Component
 {
+    public $model;
+
     /**
      * Create a new component instance.
      */
-    public function __construct()
+    public function __construct($model)
     {
-        //
+        $this->model = $model;
     }
 
     /**
