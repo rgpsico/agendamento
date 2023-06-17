@@ -29,6 +29,7 @@ Route::prefix('admin')->middleware('auth')->group(function () {
         Route::get('/{userId}/config', [EmpresaController::class, 'configuracao'])->name('empresa.configuracao');
         Route::get('/{userId}/fotos', [EmpresaController::class, 'fotos'])->name('empresa.fotos');
         Route::post('/uploadEmpresa', [EmpresaController::class, 'uploadImage'])->name('empresa.upload');
+        Route::delete('/{id}/excluirImagens', [EmpresaController::class, 'destroy'])->name('gallery.destroy');
     });
 });
 

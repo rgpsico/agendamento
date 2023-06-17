@@ -128,8 +128,7 @@ class EmpresaController extends Controller
 
     public function fotos($userId)
     {
-        $model = Empresa::where('user_id', $userId)->first();
-
+        $model = EmpresaGaleria::where('empresa_id', $userId)->get();
         return view(
             'admin.empresas.fotos',
             [
@@ -142,24 +141,57 @@ class EmpresaController extends Controller
 
     public function uploadImage(Request $request, EmpresaGaleria $empresaGaleria)
     {
-        $request->validate([
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        ]);
 
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $name = time() . '.' . $image->getClientOriginalExtension();
-            $destinationPath = public_path('/galeria_escola');
-            $image->move($destinationPath, $name);
+        $images = $request->file('image');
 
-            // Aqui você salva o nome da imagem no registro da empresa no banco de dados
-            $empresaGaleria->image = $name;
-            $empresaGaleria->empresa_id = $request->empresa_id;
-            $empresaGaleria->save();
+        // Limita a quantidade de fotos a 5
+        if (count($images) > 5) {
+            return back()->with('error', 'Você pode enviar no máximo 5 imagens.');
         }
 
+
+        $numeroDeImagens = EmpresaGaleria::where('empresa_id', $request->empresa_id)->count();
+
+        if ($numeroDeImagens >= 5) {
+            return back()->with('error', 'O maximo de imagens que voce pode ter são cinco imagens');
+        }
+
+        if ($request->hasfile('image')) {
+
+            foreach ($request->file('image') as $key => $image) {
+                $name = time() . $key . '.' . $image->getClientOriginalExtension();
+                $destinationPath = public_path('/galeria_escola');
+                $image->move($destinationPath, $name);
+
+                $empresaGaleria = new EmpresaGaleria();  // supondo que EmpresaGaleria é seu modelo para a galeria
+                $empresaGaleria->image = $name;
+                $empresaGaleria->empresa_id = $request->empresa_id;
+                $empresaGaleria->save();
+            }
+        }
+
+
         return back()
-            ->with('success', 'Image Upload successful')
-            ->with('imageName', $name);
+            ->with('success', 'Image Enviada com sucesso');
+    }
+
+    public function destroy($id)
+    {
+        $image = EmpresaGaleria::find($id);
+
+        if ($image) {
+            // Remove o arquivo de imagem do servidor
+            $imagePath = public_path('galeria_escola/' . $image->image);
+            if (file_exists($imagePath)) {
+                unlink($imagePath);
+            }
+
+            // Exclui a imagem do banco de dados
+            $image->delete();
+
+            return back()->with('success', 'Imagem excluída com sucesso.');
+        } else {
+            return back()->with('error', 'Imagem não encontrada.');
+        }
     }
 }

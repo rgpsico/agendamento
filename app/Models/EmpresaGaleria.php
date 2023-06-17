@@ -12,6 +12,7 @@ class EmpresaGaleria extends Model
     public $table = 'empresa_galeria';
     protected $fillable = ['empresa_id', 'image'];
 
+
     public function empresa()
     {
         return $this->belongsTo(Empresa::class);
