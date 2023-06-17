@@ -10,12 +10,14 @@ class galleryHome extends Component
 {
 
     public $value;
+    public $model;
     /**
      * Create a new component instance.
      */
-    public function __construct($value)
+    public function __construct($value, $model = null)
     {
         $this->value = $value;
+        $this->model = $model;
     }
 
     /**
@@ -23,6 +25,7 @@ class galleryHome extends Component
      */
     public function render(): View|Closure|string
     {
+
         return view('components.gallery-home');
     }
 }

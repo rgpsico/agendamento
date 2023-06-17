@@ -23,7 +23,7 @@
 								
 							@foreach ($model as $value )							
 						
-							<x-home.cardprofissional :value="$value"/>
+								<x-home.cardprofissional :value="$value"/>
 
 							@endforeach
 							<!-- /Doctor Widget -->

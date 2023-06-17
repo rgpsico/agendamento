@@ -1,29 +1,17 @@
 <div class="clinic-details">
     <p class="doc-location">
-        {{$value->uf ?? ''}}, {{$value->cep ?? ''}}</p>
+        {{$value->endereco->uf ?? ''}}, {{$value->endereco->cep ?? ''}}</p>
       
-      
+         
+  {{$value->galeria}}
     <ul class="clinic-gallery">
+        @foreach ($value->galeria as $gal)
         <li>
-            <a href="{{asset('template/assets/img/features/feature-01.jpg')}}" data-fancybox="gallery">
-                <img src="{{asset('template/assets/img/features/feature-01.jpg')}}" alt="Feature">
+            <a href="{{ asset('galeria_escola/' . $gal->image) }}" data-fancybox="gallery">
+                <img src="{{ asset('galeria_escola/' . $gal->image) }}" alt="Feature">
             </a>
         </li>
-        <li>
-            <a href="{{asset('template/assets/img/features/feature-02.jpg')}}" data-fancybox="gallery">
-                <img  src="{{asset('template/assets/img/features/feature-02.jpg')}}" alt="Feature">
-            </a>
-        </li>
-        <li>
-            <a href="{{asset('template/assets/img/features/feature-03.jpg')}}" data-fancybox="gallery">
-                <img src="{{asset('template/assets/img/features/feature-03.jpg')}}" alt="Feature">
-            </a>
-        </li>
-        <li>
-            <a href="{{asset('template/assets/img/features/feature-04.jpg')}}" data-fancybox="gallery">
-                <img src="{{asset('template/assets/img/features/feature-04.jpg')}}" alt="Feature">
-            </a>
-        </li>
+        @endforeach  
     </ul>
 </div>
 {{-- <div class="clinic-services">

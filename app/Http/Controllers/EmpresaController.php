@@ -149,7 +149,6 @@ class EmpresaController extends Controller
             return back()->with('error', 'Você pode enviar no máximo 5 imagens.');
         }
 
-
         $numeroDeImagens = EmpresaGaleria::where('empresa_id', $request->empresa_id)->count();
 
         if ($numeroDeImagens >= 5) {
@@ -170,9 +169,7 @@ class EmpresaController extends Controller
             }
         }
 
-
-        return back()
-            ->with('success', 'Image Enviada com sucesso');
+        return back()->with('success', 'Image Enviada com sucesso');
     }
 
     public function destroy($id)

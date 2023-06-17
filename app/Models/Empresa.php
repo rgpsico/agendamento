@@ -24,8 +24,8 @@ class Empresa extends Model
         return $this->hasOne(EmpresaEndereco::class, 'empresa_id', 'id');
     }
 
-    public function gallery()
+    public function galeria()
     {
-        return $this->hasMany(EmpresaGaleria::class);
+        return $this->hasMany(EmpresaGaleria::class, 'empresa_id', 'id');
     }
 }

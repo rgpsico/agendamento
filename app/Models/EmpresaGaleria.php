@@ -10,11 +10,12 @@ class EmpresaGaleria extends Model
     use HasFactory;
 
     public $table = 'empresa_galeria';
+
     protected $fillable = ['empresa_id', 'image'];
 
 
     public function empresa()
     {
-        return $this->belongsTo(Empresa::class);
+        return $this->belongsTo(Empresa::class, 'empresa_id', 'id');
     }
 }
