@@ -15,7 +15,7 @@
 									
 									<div class="col-md-7 col-lg-6 login-left">
 										
-										<img src="{{asset('admin/img/register.png')}}" class="img-fluid" alt="Doccure Register">	
+										<img src="{{asset('admin/img/register.png')}}" class="img-fluid" alt="Doccure Register" height="400px">	
 									</div>
 									<div class="col-md-12 col-lg-6 login-right">
 										<x-alert/>

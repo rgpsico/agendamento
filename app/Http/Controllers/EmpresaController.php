@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Empresa;
+use App\Models\EmpresaGaleria;
 use App\Models\Professor;
 use Illuminate\Http\Request;
 
@@ -41,7 +42,9 @@ class EmpresaController extends Controller
             'cidade' =>  'required',
             'estado' => 'required',
             'uf' => 'required',
-            'pais' => 'required'
+            'pais' => 'required',
+            'valor_aula_de' => 'required',
+            'valor_aula_ate' => 'required'
 
         ]);
 
@@ -121,5 +124,42 @@ class EmpresaController extends Controller
                 'model' => $model
             ]
         );
+    }
+
+    public function fotos($userId)
+    {
+        $model = Empresa::where('user_id', $userId)->first();
+
+        return view(
+            'admin.empresas.fotos',
+            [
+                'pageTitle' =>  'Fotos',
+                'model' => $model
+            ]
+        );
+    }
+
+
+    public function uploadImage(Request $request, EmpresaGaleria $empresaGaleria)
+    {
+        $request->validate([
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
+
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $name = time() . '.' . $image->getClientOriginalExtension();
+            $destinationPath = public_path('/galeria_escola');
+            $image->move($destinationPath, $name);
+
+            // Aqui você salva o nome da imagem no registro da empresa no banco de dados
+            $empresaGaleria->image = $name;
+            $empresaGaleria->empresa_id = $request->empresa_id;
+            $empresaGaleria->save();
+        }
+
+        return back()
+            ->with('success', 'Image Upload successful')
+            ->with('imageName', $name);
     }
 }

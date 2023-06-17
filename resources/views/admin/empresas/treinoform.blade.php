@@ -18,18 +18,10 @@
                                                 
                         <x-text-input name="cnpj" size="30" label="Cnpj" :value="$model" />
 
-                        <div class="form-group">
-                            <label>Descrição da Escola Surf</label>
-                            <textarea id="" cols="30" rows="10" name="descricao" class="form-control descricao">{{ old('descricao', $model->descricao ?? '') }}</textarea>
-                            @error('descricao')
-                            <span class="text-danger">{{$message}}</span>
-                            @enderror
-                        </div>
+                        <x-text-area name="descricao" label="Descrição" :model="$model" />
 
-
-                        <x-text-input name="telefone" size="30" label="Telefone" :value="$model" />
-                        
-                       
+                        <x-text-input name="telefone" size="30" label="Telefone" :value="$model" />                
+                
                         <x-text-input name="cep" size="30" label="Cep" :value="$model->endereco ?? '' " />
                            
                         <x-text-input name="estado" size="30" label="Estado" :value="$model->endereco ?? '' " />
@@ -40,19 +32,15 @@
 
                         <x-text-input name="cidade" size="30" label="Cidade" :value="$model->endereco ?? ''" />
         
-                            <x-text-input name="endereco" size="30" label="Endereco" :value="$model->endereco ?? ''" />
-                        <div class="form-group">                         
-                               <div class="mb-3">
-                                @isset($model->avatar)
-                                    <img src="{{ asset('avatar/' . $model->avatar) }}" width="150" height="150" alt="Logo da Escola de Surf">
-                                @endisset
-                                </div>
-                                <label>Logo da Escola de surf </label>
-                                <input type="file" class="form-control" name="avatar">
-                                <small class="text-secondary">Tamanho recomendado <b>150px x 150px</b></small>
-                            </div>
-                        </div>
-               
+                        <x-text-input name="endereco" size="30" label="Endereco" :value="$model->endereco ?? ''" />
+                       
+                        <x-text-input name="valor_aula_de" size="30" label="Preço Minimo aula" :value="$model->valor_aula_de ?? ''" placeholder="Valor Aula" />
+                       
+                        <x-text-input name="valor_aula_ate" size="30" label="Preço Maximo aula" :value="$model->valor_aula_ate ?? ''" placeholder="Valor Aula" />
+                       
+                        <x-avatar-component label="Logo da Escola " :model="$model"/>
+                    </div>
+                                       
                         <div class="card-footer d-flex">
                     <button class="btn btn-success justify-content-right" >Salvar</button>
                 </div>

@@ -21,7 +21,7 @@ Route::get('/register', [HomeController::class, 'register'])->name('home.registe
 Route::get('/login', [HomeController::class, 'login'])->name('home.login');
 
 Route::get('/', [HomeController::class, 'index'])->name('home.index');
-Route::get('/{id}/profissional', [HomeController::class, 'show'])->name('home.show');
+Route::get('/{id}/empresa', [HomeController::class, 'show'])->name('home.show');
 Route::get('/{id}/bokking', [HomeController::class, 'booking'])->name('home.booking');
 Route::get('/{id}/checkout', [HomeController::class, 'checkout'])->name('home.checkout');
 Route::get('/{id}/checkoutsucesso', [HomeController::class, 'checkoutSucesso'])->name('home.checkoutsucesso');

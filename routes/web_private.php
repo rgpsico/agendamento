@@ -27,6 +27,8 @@ Route::prefix('admin')->middleware('auth')->group(function () {
         Route::post('/post', [EmpresaController::class, 'store'])->name('empresa.store');
         Route::delete('/{id}/destroy', [EmpresaController::class, 'destroy'])->name('empresa.destroy');
         Route::get('/{userId}/config', [EmpresaController::class, 'configuracao'])->name('empresa.configuracao');
+        Route::get('/{userId}/fotos', [EmpresaController::class, 'fotos'])->name('empresa.fotos');
+        Route::post('/uploadEmpresa', [EmpresaController::class, 'uploadImage'])->name('empresa.upload');
     });
 });
 

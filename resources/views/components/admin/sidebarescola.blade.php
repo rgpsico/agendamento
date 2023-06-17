@@ -22,6 +22,12 @@
                         <i class="fe fe-layout"></i><span>Agenda</span>
                     </a>
                 </li>    
+
+                <li> 
+                    <a href="{{route('empresa.fotos',['userId' => Auth::user()->id])}}">
+                        <i class="fe fe-layout"></i><span>Fotos</span>
+                    </a>
+                </li>
                 
                 <li> 
                     <a href="{{route('empresa.configuracao',['userId' => Auth::user()->id])}}">

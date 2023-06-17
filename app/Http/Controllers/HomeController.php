@@ -48,9 +48,8 @@ class HomeController extends Controller
 
     public function show($id)
     {
+        $model = $this->model->where('user_id', $id)->first();
 
-
-        $model = $this->model->where('id', $id)->first();
 
         return view(
             $this->view . '.show',

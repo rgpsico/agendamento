@@ -15,7 +15,7 @@
 								<!-- Search Filter -->
 						</div>
 						
-						<div class="col-md-12 col-lg-8 col-xl-9">
+						<div class="col-md-12 col-lg-8 col-xl-9 listar_empresas">
 
 							<!-- Doctor Widget -->
 					
@@ -42,3 +42,4 @@
 			</div>		
 			<!-- /Page Content -->
 </x-layoutsadmin>
+
