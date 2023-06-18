@@ -25,13 +25,14 @@ class EmpresaFactory extends Factory
             'user_id' => function () {
                 return Usuario::all()->random()->id;
             },
-            'avatar' => 'avatardefault.png',
+            'avatar' => 'avatardefault.jpg',
             'nome' => $this->faker->company,
             'descricao' => $this->faker->text(200),
             'telefone' => $this->faker->phoneNumber,
-            'cnpj' => $this->faker->randomNumber(8) . '/' . $this->faker->randomNumber(4) . '-' . $this->faker->randomNumber(2), // isso é apenas um número aleatório, não um CNPJ real
-            'valor_aula_de' => $this->faker->randomFloat(2, 0, 1000), // Aqui, gera-se um valor aleatório com duas casas decimais entre 0 e 1000. Ajuste conforme necessário.
-            'valor_aula_ate' => $this->faker->randomFloat(2, 0, 1000), // Aqui, gera-se um valor aleatório com duas casas decimais entre 0 e 1000. Ajuste conforme necessário.
+            'tipo' => $this->faker->randomElement(['futevolei', 'bodyboard', 'surf', 'personal', 'corrida']),
+            'cnpj' => $this->faker->randomNumber(8) . '/' . $this->faker->randomNumber(4) . '-' . $this->faker->randomNumber(2),
+            'valor_aula_de' => $this->faker->randomFloat(2, 0, 1000),
+            'valor_aula_ate' => $this->faker->randomFloat(2, 0, 1000),
         ];
     }
 }

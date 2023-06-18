@@ -5,27 +5,34 @@
     <div class="card-body">
     <div class="filter-widget">
         <div class="cal-icon">
-            <input type="text" class="form-control" placeholder="Buscar Escola">
+            <input type="text" class="form-control" id="nome_empresa" placeholder="Buscar Escola">
         </div>			
     </div>
     <div class="filter-widget">
         <h4>Modalidade</h4>
         <div>
             <label class="custom_check">
-                <input type="checkbox" name="gender_type" checked class="teste2">
+                <input type="checkbox" name="gender_type" data-type='Surf' checked class="filter_empresa">
                 <span class="checkmark"></span> Surf
             </label>
         </div>
         <div>
             <label class="custom_check">
-                <input type="checkbox" name="gender_type">
-                <span class="checkmark"></span> Female Doctor
+                <input type="checkbox" name="gender_type" data-type="Bodyboard" class="filter_empresa">
+                <span class="checkmark"></span> Bodyboard 
+            </label>
+        </div>
+
+        <div>
+            <label class="custom_check">
+                <input type="checkbox" name="gender_type" data-type="Corrida" class="filter_empresa">
+                <span class="checkmark"></span> Corrida 
             </label>
         </div>
     </div>
    
         <div class="btn-search">
-            <button type="button" class="btn w-100">Buscar</button>
+            <button type="button" class="btn w-100 buscar_empresa" id="buscar_empresa">Buscar</button>
         </div>	
     </div>
 </div>
@@ -33,15 +40,25 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
-   $(document).on('click', ".teste2", function() {
-    $('.listar_empresas').empty()
+    $(document).on('click', ".buscar_empresa", function() {
+        $('.listar_empresas').empty();
+        
+        // busca todos os checkboxes que foram marcados
+        var tipos_empresa = [];
+        $('.filter_empresa:checked').each(function() {
+            tipos_empresa.push($(this).data('type'));
+        });
+  
+        var nome_empresa = $("#nome_empresa").val(); // obtenha o valor do campo de entrada
 
-    fetch('api/empresas')
+
+        
+    fetch('api/search/empresa?tipo='+tipos_empresa+'&nome_empresa='+nome_empresa)
         .then(response => response.json())
         .then(dadosApi => {
             dadosApi.forEach(function(empresa) {
 
-                // Calcule a média das avaliações
+                // Calcule a média das avaliações\
                 let sum = 0;
                 empresa.avaliacao.forEach(function(avaliacao) {
                     sum += avaliacao.avaliacao;
@@ -113,5 +130,6 @@
             });
         });
 });
+  
 
 </script>

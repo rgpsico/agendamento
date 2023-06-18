@@ -14,6 +14,28 @@ class EmpresaControllerApi extends Controller
         return $empresas = Empresa::with('endereco', 'galeria', 'avaliacao')->get();
     }
 
+    public function search(Request $request)
+    {
+        $tipos = $request->input('tipo');
+
+        $nome = $request->input('nome_empresa');
+
+        $query = Empresa::with('endereco', 'galeria', 'avaliacao');
+
+        if ($tipos) {
+            $tipos = explode(',', $tipos); // divide a string em um array
+            $query = $query->whereIn('tipo', $tipos); // filtra por todos os tipos
+        }
+
+        if ($nome) {
+            $query = $query->where('nome', 'like', "%{$nome}%"); // pesquisa por empresas cujo nome contém a string fornecida
+        }
+
+        return $query->get();
+    }
+
+
+
     public function store(Request $request)
     {
         $empresa = Empresa::create($request->all());

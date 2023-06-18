@@ -14,11 +14,12 @@ return new class extends Migration
         Schema::create('empresa', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->string('avatar')->default('avatardefault.png');
+            $table->string('avatar')->default('avatar-01.jpg');
             $table->string('nome');
             $table->string('descricao')->default(null);
             $table->string('telefone');
             $table->string('cnpj')->default(null);
+            $table->string('tipo')->default(1);
             $table->foreign('user_id')->references('id')->on('usuarios');
             $table->timestamps();
         });
