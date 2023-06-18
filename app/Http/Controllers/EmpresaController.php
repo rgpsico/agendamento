@@ -88,8 +88,8 @@ class EmpresaController extends Controller
                 'endereco' => $data['endereco'] ?? 'End',
                 'cidade' => $data['cidade'] ?? 'cit',
                 'estado' => $data['estado'] ?? 'es',
-                'uf' => $data['uf'],
-                'pais' => $data['pais'],
+                'uf' => $data['uf'] ?? 'RJ',
+                'pais' => $data['pais'] ?? 'BR',
             ]
         );
 

@@ -29,7 +29,7 @@ class EmpresaFactory extends Factory
             'nome' => $this->faker->company,
             'descricao' => $this->faker->text(200),
             'telefone' => $this->faker->phoneNumber,
-            'tipo' => $this->faker->randomElement(['futevolei', 'bodyboard', 'surf', 'personal', 'corrida']),
+            'modalidade' => $this->faker->randomElement(['futevolei', 'bodyboard', 'surf', 'personal', 'corrida']),
             'cnpj' => $this->faker->randomNumber(8) . '/' . $this->faker->randomNumber(4) . '-' . $this->faker->randomNumber(2),
             'valor_aula_de' => $this->faker->randomFloat(2, 0, 1000),
             'valor_aula_ate' => $this->faker->randomFloat(2, 0, 1000),

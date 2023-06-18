@@ -15,8 +15,11 @@
                         @csrf
                         <input type="hidden" class="" name="user_id" value="{{Auth::user()->id}}" />
                                       
+                      
                         <x-text-input name="nome" size="30" label="Nome Completo" :value="$model"/>
-                                                
+
+                        <x-select-modalidade  label="Modalidade" />
+                                                                        
                         <x-text-input name="cnpj" size="30" label="Cnpj" :value="$model" />
 
                         <x-text-area name="descricao" label="Descrição" :model="$model" />

@@ -23,7 +23,7 @@ class DatabaseSeeder extends Seeder
         \App\Models\DiaDaSemana::factory(10)->create();
         \App\Models\Empresa::factory(10)->create();
         \App\Models\EmpresaEndereco::factory(10)->create();
-
+        \App\Models\Modalidade::factory(10)->create();
         //\App\Models\Aulas::factory(10)->create();
     }
 }

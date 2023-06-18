@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('descricao')->default(null);
             $table->string('telefone');
             $table->string('cnpj')->default(null);
-            $table->string('tipo')->default(1);
+            $table->string('modalidade')->default(1);
             $table->foreign('user_id')->references('id')->on('usuarios');
             $table->timestamps();
         });
