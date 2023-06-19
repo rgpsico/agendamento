@@ -4,6 +4,7 @@ use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\AlunosController;
 use App\Http\Controllers\DashBoardController;
 use App\Http\Controllers\EmpresaController;
+use App\Http\Controllers\PagamentoController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -13,7 +14,14 @@ Route::prefix('usuario')->group(function () {
     Route::post('/login', [UserController::class, 'login'])->name('user.login');
 });
 
+Route::prefix('pagamento')->middleware('auth')->group(function () {
+    Route::post('/stripe', [PagamentoController::class, 'pagamentoStripe'])->name('pagamento.stripe');
+});
 Route::prefix('admin')->middleware('auth')->group(function () {
+
+    Route::get('/', [EmpresaController::class, 'index'])->name('agenda.index');
+
+
     Route::group(['prefix' => '/dashboard'], function () {
         Route::get('/', [DashBoardController::class, 'dashboard'])->name('dashboard');
     });

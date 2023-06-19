@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PaymentRequest;
+use App\Models\Alunos;
+use App\Models\Empresa;
+use App\Models\Usuario;
 use Illuminate\Http\Request;
 
 class AgendaController extends Controller
@@ -41,6 +45,27 @@ class AgendaController extends Controller
             $this->view . '.create',
             ['pageTitle' => $this->pageTitle]
         );
+    }
+
+    public function store(PaymentRequest $request)
+    {
+        // Se a validação falhar, o usuário será redirecionado de volta ao formulário com erros de validação.
+
+        // Crie o novo usuário
+        $user = new Usuario();
+        $user->nome = $request->nome;
+        // $user->sobre_nome = $request->sobre_nome;
+        $user->email = $request->email;
+        $user->password = '12456';
+        $user->tipo_usuario = '1';
+        // $user->telefone = $request->telefone;
+        $user->save();
+
+        $alunos = new Alunos();
+        $alunos->usuario_id = $user->id;
+        $alunos->save();
+
+        return redirect()->back()->with(['success' => 'Feito com Sucesso']);
     }
 
     public function show($id)

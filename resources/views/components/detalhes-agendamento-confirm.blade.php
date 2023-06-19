@@ -1,16 +1,13 @@
 <div class="col-md-5 col-lg-4 theiaStickySidebar" style="position: relative; overflow: visible; box-sizing: border-box; min-height: 1px;">
 						
-    <!-- Booking Summary -->
-    
-    <!-- /Booking Summary -->
-    
+ 
     <div class="theiaStickySidebar" style="padding-top: 0px; padding-bottom: 1px; position: static; transform: none;"><div class="card booking-card">
         <div class="card-header">
             <h4 class="card-title">Detalhes do Agendamento</h4>
         </div>
         <div class="card-body">
         
-            <!-- Booking Doctor Info -->
+            
             <div class="booking-doc-info">
                 <a href="doctor-profile.html" class="booking-doc-img">
                     <img src="{{asset('template/assets/img/doctors/doctor-thumb-02.jpg')}}" alt="User Image">
@@ -26,7 +23,10 @@
                         <span class="d-inline-block average-rating">35</span>
                     </div>
                     <div class="clinic-details">
-                        <p class="doc-location"><i class="fas fa-map-marker-alt"></i> Newyork, USA</p>
+                        <p class="doc-location">
+                            <i class="fas fa-map-marker-alt">
+                                </i> Newyork, USA
+                            </p>
                     </div>
                 </div>
             </div>
@@ -35,12 +35,16 @@
             <div class="booking-summary">
                 <div class="booking-item-wrap">
                     <ul class="booking-date">
-                        <li class="mr-4"><b>Data:</b> <span> 16 Nov 2019  As 12:00 Horas</span></li>
-                     
+                        <li class="mr-4"><b>Data:</b> 
+                            <span> 16 Nov 2019  As 12:00 Horas</span>
+                        </li>                     
                     </ul>
                     <ul class="booking-fee">
-                        <li>Valor da Aula <span>R$200</span></li>
+                        <li>Valor da Aula
+                            <span>R$200</span>
+                        </li>
                     </ul>
+                    
                     <div class="booking-total">
                         <ul class="booking-total-list">
                             <li>

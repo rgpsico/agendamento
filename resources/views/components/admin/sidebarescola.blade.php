@@ -13,6 +13,12 @@
                 </li>
 
                 <li> 
+                    <a href="{{route('escola.dashboard')}}">
+                        <i class="fe fe-home"></i> <span>Cadastrar Aulas</span>
+                    </a>
+                </li>
+
+                <li> 
                     <a href="{{route('alunos.index')}}">
                         <i class="fe fe-layout"></i><span>Alunos</span>
                     </a>

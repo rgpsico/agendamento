@@ -86,6 +86,7 @@
                                                         ${galleryHTML}
                                                     </ul>
                                                 </div>
+                                                <span class="badge bg-primary" style="font-size: 1.2em; text-transform: capitalize;">${empresa.modalidade}</span>
                                             </div>
                                         </div>
                                         <div class="doc-info-right">

@@ -12,11 +12,12 @@ class selectModalidade extends Component
     public $modalidades;
     public $label;
     public $showCol;
-
-    public function __construct(Modalidade $modalidade, $label)
+    public $model;
+    public function __construct(Modalidade $modalidade, $label, $model)
     {
         $this->modalidades = $modalidade->select('nome')->distinct()->get();
         $this->label = $label;
+        $this->model = $model;;
     }
 
     public function render()

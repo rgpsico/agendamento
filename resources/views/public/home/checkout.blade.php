@@ -10,46 +10,57 @@
 						<div class="col-md-7 col-lg-8">
 							<div class="card">
 								<div class="card-body">
-								
+								<x-alert/>
 									<!-- Checkout Form -->
-									<form action="booking-success.html">
-									
-										<!-- Personal Information -->
+									<form action="{{route('agendamento.pagamento')}}" method="POST">
+										@csrf
 										<div class="info-widget">
 											<h4 class="card-title">Informações</h4>
 											<div class="row">
 												<div class="col-md-6 col-sm-12">
 													<div class="form-group card-label">
 														<label>Nome</label>
-														<input class="form-control" type="text">
+														<input class="form-control @error('nome') is-invalid @enderror" name="nome" value="{{ old('nome') }}" type="text">
+														@error('nome')
+															<div class="invalid-feedback">{{ $message }}</div>
+														@enderror
 													</div>
 												</div>
 												<div class="col-md-6 col-sm-12">
 													<div class="form-group card-label">
 														<label>Sobre Nome</label>
-														<input class="form-control" type="text">
+														<input class="form-control @error('sobre_nome') is-invalid @enderror" name="sobre_nome" value="{{ old('sobre_nome') }}" type="text">
+														@error('sobre_nome')
+															<div class="invalid-feedback">{{ $message }}</div>
+														@enderror
 													</div>
 												</div>
 												<div class="col-md-6 col-sm-12">
 													<div class="form-group card-label">
 														<label>Email</label>
-														<input class="form-control" type="email">
+														<input class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" type="email">
+														@error('email')
+															<div class="invalid-feedback">{{ $message }}</div>
+														@enderror
 													</div>
 												</div>
 												<div class="col-md-6 col-sm-12">
 													<div class="form-group card-label">
 														<label>Telefone</label>
-														<input class="form-control" type="text">
+														<input class="form-control @error('telefone') is-invalid @enderror" name="telefone" value="{{ old('telefone') }}" type="text">
+														@error('telefone')
+															<div class="invalid-feedback">{{ $message }}</div>
+														@enderror
 													</div>
-												</div>
+												
 											</div>
 											<div class="exist-customer">Sou cliente? <a href="#">Click aqui para fazer login</a></div>
 										</div>
 										<!-- /Personal Information -->
-										
+									
 										<div class="payment-widget">
 											<h4 class="card-title">Metodos de Pagamento</h4>
-											
+									
 											<!-- Credit Card Payment -->
 											<div class="payment-list">
 												<label class="payment-radio credit-card-option">
@@ -61,37 +72,57 @@
 													<div class="col-md-6">
 														<div class="form-group card-label">
 															<label for="card_name">Nome no Cartão</label>
-															<input class="form-control" id="card_name" type="text">
+															<input class="form-control @error('nome_cartao') is-invalid @enderror" name="nome_cartao" id="card_name" value="{{ old('nome_cartao') }}" type="text">
+															@error('nome_cartao')
+																<div class="invalid-feedback">{{ $message }}</div>
+															@enderror
 														</div>
 													</div>
 													<div class="col-md-6">
 														<div class="form-group card-label">
 															<label for="card_number">Numero do Cartão</label>
-															<input class="form-control" id="card_number" placeholder="1234  5678  9876  5432" type="text">
+															<input 
+															class="form-control @error('numero_cartao') is-invalid @enderror" 
+															name="numero_cartao" 
+															id="card_number" 
+															value="{{ old('numero_cartao') }}" 
+															placeholder="1234  5678  9876  5432" 
+															type="text">
+															@error('numero_cartao')
+																<div class="invalid-feedback">{{ $message }}</div>
+															@enderror
 														</div>
 													</div>
 													<div class="col-md-4">
 														<div class="form-group card-label">
 															<label for="expiry_month">Mês de vencimento</label>
-															<input class="form-control" id="expiry_month" placeholder="MM" type="text">
+															<input class="form-control @error('mes_vencimento') is-invalid @enderror" name="mes_vencimento" id="expiry_month" value="{{ old('mes_vencimento') }}" placeholder="MM" type="text">
+															@error('mes_vencimento')
+																<div class="invalid-feedback">{{ $message }}</div>
+															@enderror
 														</div>
 													</div>
 													<div class="col-md-4">
 														<div class="form-group card-label">
 															<label for="expiry_year">Ano de Vencimento </label>
-															<input class="form-control" id="expiry_year" placeholder="YY" type="text">
+															<input class="form-control @error('ano_vencimento') is-invalid @enderror" name="ano_vencimento" id="expiry_year" value="{{ old('ano_vencimento') }}" placeholder="YY" type="text">
+															@error('ano_vencimento')
+																<div class="invalid-feedback">{{ $message }}</div>
+															@enderror
 														</div>
 													</div>
 													<div class="col-md-4">
 														<div class="form-group card-label">
 															<label for="cvv">CVV</label>
-															<input class="form-control" id="cvv" type="text">
+															<input class="form-control @error('cvv') is-invalid @enderror" name="cvv" id="cvv" value="{{ old('cvv') }}" type="text">
+															@error('cvv')
+																<div class="invalid-feedback">{{ $message }}</div>
+															@enderror
 														</div>
 													</div>
 												</div>
 											</div>
 											<!-- /Credit Card Payment -->
-											
 											<!-- Paypal Payment -->
 											<div class="payment-list">
 												<label class="payment-radio paypal-option">
@@ -101,24 +132,26 @@
 												</label>
 											</div>
 											<!-- /Paypal Payment -->
-											
 											<!-- Terms Accept -->
 											<div class="terms-accept">
 												<div class="custom-checkbox">
-												   <input type="checkbox" id="terms_accept">
-												   <label for="terms_accept">Eu aceito os termos <a href="#">Termos &amp; Condição</a></label>
+													<input type="checkbox" id="terms_accept" name="terms_accept">
+													<label for="terms_accept">Eu aceito os termos 
+														<a href="#">Termos &amp; Condição</a></label>
 												</div>
 											</div>
 											<!-- /Terms Accept -->
-											
 											<!-- Submit Section -->
 											<div class="submit-section mt-4">
-												<a href="{{route('home.checkoutsucesso',['id' => 1])}}" class="btn btn-primary submit-btn">Confirmar Pagamento</a>
+												<button type="submit"  class="btn btn-primary submit-btn">Confirmar Pagamento</button>
 											</div>
+										</div>
+									</form>
+									
 											<!-- /Submit Section -->
 											
 										</div>
-									</form>
+								
 									<!-- /Checkout Form -->
 									
 								</div>

@@ -6,6 +6,8 @@ use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Stripe\Stripe;
+use Stripe\Charge;
 
 class UserController extends Controller
 {
@@ -34,6 +36,25 @@ class UserController extends Controller
             'email' => 'required|unique:usuarios,email',
             'senha' => 'required',
         ]);
+
+        // Stripe::setApiKey(env('STRIPE_SECRET'));
+
+
+        // $account = \Stripe\Account::create([
+        //     'type' => 'standard',
+        //     'country' => 'US',
+        //     'email' => 'rgdogalo10@hotmail.com',
+        //     'business_type' => 'individual',
+        //     'individual' => [
+        //         'first_name' => 'roger',
+        //         'last_name' => 'neves',
+        //     ],
+        // ]);
+
+        // $accountId = $account->id;
+        // dd($accountId);
+
+
 
 
 

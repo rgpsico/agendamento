@@ -18,8 +18,8 @@
                       
                         <x-text-input name="nome" size="30" label="Nome Completo" :value="$model"/>
 
-                        <x-select-modalidade  label="Modalidade" />
-                                                                        
+                        <x-select-modalidade  label="Modalidade"  :model="$model"/>  
+                                                                      
                         <x-text-input name="cnpj" size="30" label="Cnpj" :value="$model" />
 
                         <x-text-area name="descricao" label="Descrição" :model="$model" />

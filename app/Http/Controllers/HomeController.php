@@ -131,6 +131,18 @@ class HomeController extends Controller
         );
     }
 
+    public function checkoutAuth($id)
+    {
+        return view(
+            $this->view . '.checkoutAuth',
+            [
+                'pageTitle' => $this->pageTitle,
+                'view' => $this->view,
+                'route' => $this->route,
+            ]
+        );
+    }
+
     public function checkoutSucesso($id)
     {
         return view(
