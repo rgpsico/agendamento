@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\DisponibilidadeControllerApi;
 use App\Http\Controllers\Api\EmpresaController;
 use App\Http\Controllers\Api\EmpresaControllerApi;
 use App\Http\Controllers\Api\ProfessoresControllerApi;
+use App\Http\Controllers\Api\ServicoControllerApi;
 use App\Http\Controllers\Api\UserControllerApi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -34,7 +35,7 @@ Route::resource('empresas', EmpresaControllerApi::class);
 Route::get('search/empresa', [EmpresaControllerApi::class, 'search'])->name('empresa.search');
 
 
-
+Route::resource('servicos', ServicoControllerApi::class);
 
 Route::get('professor/{id}/aulas', [ProfessoresControllerApi::class, 'aulas']);
 

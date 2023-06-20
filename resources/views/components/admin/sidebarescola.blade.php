@@ -12,10 +12,16 @@
                     </a>
                 </li>
 
-                <li> 
-                    <a href="{{route('escola.dashboard')}}">
-                        <i class="fe fe-home"></i> <span>Cadastrar Aulas</span>
+                <li class="submenu">
+                    <a href="" class="">
+                        <i class="fe fe-document"></i> 
+                        <span> Serviços</span> 
+                        <span class="menu-arrow"></span>
                     </a>
+                    <ul style="display: none;">
+                        <li><a href="{{route('admin.servico.index')}}">Listar Serviços</a></li>
+                        <li><a href="{{route('admin.servico.create')}}">Cadastrar Serviços</a></li>
+                    </ul>
                 </li>
 
                 <li> 

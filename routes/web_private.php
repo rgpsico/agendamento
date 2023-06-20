@@ -5,6 +5,7 @@ use App\Http\Controllers\AlunosController;
 use App\Http\Controllers\DashBoardController;
 use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\PagamentoController;
+use App\Http\Controllers\ServicoController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -20,6 +21,17 @@ Route::prefix('pagamento')->middleware('auth')->group(function () {
 Route::prefix('admin')->middleware('auth')->group(function () {
 
     Route::get('/', [EmpresaController::class, 'index'])->name('agenda.index');
+
+
+    Route::group(['prefix' => '/servicos'], function () {
+        Route::get('/', [ServicoController::class, 'index'])->name('admin.servico.index');
+        Route::get('/{id}/servico', [ServicoController::class, 'show'])->name('admin.servico.show');
+        Route::get('/create', [ServicoController::class, 'create'])->name('admin.servico.create');
+        Route::get('/{id}/edit', [ServicoController::class, 'edit'])->name('admin.servico.edit');
+        Route::post('/store', [ServicoController::class, 'store'])->name('admin.servico.store');
+        Route::delete('/{id}/delete', [ServicoController::class, 'destroy'])->name('admin.servico.destroy');
+        Route::put('/{id}/update', [ServicoController::class, 'update'])->name('admin.servico.update');
+    });
 
 
     Route::group(['prefix' => '/dashboard'], function () {

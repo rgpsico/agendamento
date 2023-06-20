@@ -222,42 +222,78 @@
 			<!-- /Page Content -->
 			<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
-			<script>
-		
+				<script>
+					var currentStartIndex = 0;
+const dates = getNext29Days();
 
+function getNext29Days() {
+  const dates = [];
+  for (let i = 0; i < 29; i++) {
+    const date = new Date();
+    date.setDate(date.getDate() + i);
+    dates.push({
+      day: date.toLocaleString('default', { weekday: 'short' }),
+      date: date.getDate(),
+      month: date.toLocaleString('default', { month: 'short' }),
+      year: date.getFullYear()
+    });
+  }
+  return dates;
+}
 
-var form = 
-`<form>
-                    <div class="row form-row">
-						<input type="text" id="professor_id" class="form-control" value="">
-						<input type="text" id="user_id" class="form-control" value="">
-                        <div class="col-12 col-sm-6">
-                            <div class="form-group">
-                                <label>Data da Aula</label>
-                                <input type="date" id="data_aula" class="form-control" value="John">
-                            </div>
-                        </div>
-                        <div class="col-12 col-sm-6">
-                            <div class="form-group">
-                                <label>Hora</label>
-                                <input type="time" id="hora" class="form-control hora" value="">
-                            </div>
-                        </div>
-                       <button type="submit" class="btn btn-primary w-100">Agendar Aula</button>
-                </form>`;
+function renderDates() {
+  const $daySlot = $('.day-slot ul');
+  $daySlot.empty();
+  $daySlot.append('<li class="left-arrow"><a href=""><i class="fa fa-chevron-left"></i></a></li>');
+  
+  for (let i = currentStartIndex; i < currentStartIndex + 7; i++) {
+    const dateObj = dates[i];
+    const $li = $(`
+      <li>
+        <span>${dateObj.day}</span>
+        <span class="slot-date">${dateObj.date} ${dateObj.month} <small class="slot-year">${dateObj.year}</small></span>
+      </li>
+    `);
+    $daySlot.append($li);
+  }
 
-$(".agendarAulas").on("click", function(e) {
-	e.preventDefault()
-	$('.modal').modal('show')
-	$('.modal-title').text('Agendar Aula')
-	$('.modal-body').html(form)
-	$('.hora').val($(this).data('hora'))
+  $daySlot.append('<li class="right-arrow"><a href=""><i class="fa fa-chevron-right"></i></a></li>');
+}
+
+$(document).ready(function() {
+  // Render inicial das datas
+  renderDates();
+
+  // Manipuladores de eventos para as setas
+  $(document).on('click', '.day-slot .left-arrow', function(e) {
+    e.preventDefault();
+    if (currentStartIndex > 0) {
+      currentStartIndex--;
+      renderDates();
+    }
+  });
+
+  $(document).on('click', '.day-slot .right-arrow', function(e) {
+    e.preventDefault();
+    if (currentStartIndex < dates.length - 7) {
+      currentStartIndex++;
+      renderDates();
+    }
+  });
 });
 
-$(".pegarData").on("click", function(e) {
-
+$(document).on('click', '.day-slot li', function(e) {
+  e.preventDefault();
+  
+  // Verifique se o item clicado não é uma seta
+  if (!$(this).hasClass('left-arrow') && !$(this).hasClass('right-arrow')) {
+    const dayOfWeek = $(this).find('span:first').text();
+    const date = $(this).find('.slot-date').text();
+    console.log('Dia da semana:', dayOfWeek);
+    console.log('Data:', date);
+  }
 });
 
 
-			</script>
+				</script>
 </x-layoutsadmin>
