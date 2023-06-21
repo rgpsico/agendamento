@@ -93,6 +93,15 @@ class ServicoController extends Controller
         $servicos->preco = $preco;
         $servicos->tempo_de_aula = $tempo_de_aula;
 
+
+        if ($request->hasFile('imagem')) {
+            $file = $request->file('imagem');
+            $filename = time() . '.' . $file->getClientOriginalExtension();
+            $path = public_path('/servico');
+            $file->move($path, $filename);
+            $servicos->imagem  = $filename;
+        }
+
         $servicos->save();
 
         return redirect()->route('admin.servico.edit', ['id' => $servicos->id]);

@@ -15,14 +15,14 @@ Route::prefix('usuario')->group(function () {
     Route::post('/login', [UserController::class, 'login'])->name('user.login');
 });
 
+
 Route::prefix('pagamento')->middleware('auth')->group(function () {
     Route::post('/stripe', [PagamentoController::class, 'pagamentoStripe'])->name('pagamento.stripe');
 });
+
+
 Route::prefix('admin')->middleware('auth')->group(function () {
-
     Route::get('/', [EmpresaController::class, 'index'])->name('agenda.index');
-
-
     Route::group(['prefix' => '/servicos'], function () {
         Route::get('/', [ServicoController::class, 'index'])->name('admin.servico.index');
         Route::get('/{id}/servico', [ServicoController::class, 'show'])->name('admin.servico.show');
@@ -30,7 +30,7 @@ Route::prefix('admin')->middleware('auth')->group(function () {
         Route::get('/{id}/edit', [ServicoController::class, 'edit'])->name('admin.servico.edit');
         Route::post('/store', [ServicoController::class, 'store'])->name('admin.servico.store');
         Route::delete('/{id}/delete', [ServicoController::class, 'destroy'])->name('admin.servico.destroy');
-        Route::put('/{id}/update', [ServicoController::class, 'update'])->name('admin.servico.update');
+        Route::post('/{id}/update', [ServicoController::class, 'update'])->name('admin.servico.update');
     });
 
 

@@ -46,10 +46,10 @@
                                                         <i class="fe fe-pencil"></i> Editar
                                                     </a>
 
-                                                    <a class="btn btn-sm bg-info " href="{{route($route.'.show',['id' => $value->id])}}">
+                                                    {{-- <a class="btn btn-sm bg-info " href="{{route($route.'.show',['id' => $value->id])}}">
                                                         <i class="fe fe-eye"></i> Ver
 
-                                                    </a>
+                                                    </a> --}}
                                                     <a data-bs-toggle="modal" href="#delete_modal" data-id="{{$value->id}}" class="btn btn-sm bg-danger-light bt_excluir">
                                                         <i class="fe fe-trash"></i> Excluir
                                                     </a>

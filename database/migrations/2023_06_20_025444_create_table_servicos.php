@@ -18,6 +18,7 @@ return new class extends Migration
             $table->text('descricao')->nullable();
             $table->decimal('preco', 8, 2);
             $table->integer('tempo_de_aula');
+            $table->string('imagem')->default(null);
             $table->timestamps();
             $table->foreign('empresa_id')->references('id')->on('empresa')->onDelete('cascade');
         });

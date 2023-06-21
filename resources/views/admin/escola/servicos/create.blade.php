@@ -28,23 +28,23 @@
 									<div class="card-body">
 										<div class="card-body">
                                             <x-alert/>
-                                            <form action="{{route('admin.servico.store')}}" method="POST" enctype="multipart/form-data">
-                                                @csrf
-                                                <input type="hidden" class="" name="empresa_id" value="{{Auth::user()->id}}" />                                                              
-                                              
-                                                <x-text-input name="titulo" size="30" label="Titulo" :value="$model ?? ''"/>
-                        
-                                                <x-text-area name="descricao" label="Descrição" :model="$model ?? ''" />                                                                                       
-                                                
-                                                <x-text-input name="preco" size="30" label="Preço" :value="$model ?? '' ?? ''" />
-                        
-                                                <x-text-input name="tempo_de_aula" size="30" label="Tempo de Aula" :value="$model ?? '' ?? ''" />
-                                                
+											@if(isset($model))
+											<form action="{{route('admin.servico.update',['id' =>$model->id])}}" method="POST" enctype="multipart/form-data">
+                                         
+											@else 
+											<form action="{{route('admin.servico.store')}}" method="POST" enctype="multipart/form-data">
+                                            @endif
+                                            @csrf
                                             
-                                            </div>
-                                                               
+											@include('admin.escola.servicos._partials.form')  
+											
+											@if(isset($model))
                                                 <div class="card-footer d-flex">
-                                            <button class="btn btn-success justify-content-right" >Salvar</button>
+                                            <button class="btn btn-success justify-content-right" >Atualizar</button>
+											@else 
+											<div class="card-footer d-flex">
+												<button class="btn btn-success justify-content-right" >Salvar</button>
+											@endif
                                         </div>
 									</div>
 								</div>
