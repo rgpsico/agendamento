@@ -25,7 +25,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home.index');
 Route::get('/{id}/empresa', [HomeController::class, 'show'])->name('home.show');
 Route::get('/{id}/bokking', [HomeController::class, 'booking'])->name('home.booking');
 Route::get('/{id}/checkout', [HomeController::class, 'checkout'])->name('home.checkout');
-Route::get('/{id}/checkoutAuth', [HomeController::class, 'checkoutAuth'])->name('home.checkoutAuth')->middleware('auth');
+Route::get('/{user_id}/checkoutAuth', [HomeController::class, 'checkoutAuth'])->name('home.checkoutAuth')->middleware('auth');
 Route::get('/{id}/checkoutsucesso', [HomeController::class, 'checkoutSucesso'])->name('home.checkoutsucesso');
 
 

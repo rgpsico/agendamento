@@ -1,7 +1,10 @@
 <input type="hidden" class="" name="empresa_id" value="{{Auth::user()->id}}" />                                                              
 												
 												
-												<img class=""  src="{{ asset('servico/' . $model->imagem ?? '') }}" width="100px" height="100px" alt="Imagem do serviço">
+												
+@isset($model->imagem)
+    <img class=""  src="{{ asset('servico/' . $model->imagem ?? '') }}" width="100px" height="100px" alt="Imagem do serviço">
+@endisset()
 
 												<div class="form-group">
 													<label for="">Imagem da Aula</label>

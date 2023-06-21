@@ -65,21 +65,34 @@
 							<ul class="main-nav">
 								<li class="has-submenu ">
 									<a href="">Home <i class="fas fa-chevron-down"></i></a>
+								</li>
+							
+								@if(auth()->check())
+									<li class="my-3">
+										<a href="{{route('admin.servico.index')}}" class="btn reg-btn">Admin</a>										
+									</li>
+									<li class="my-3">
+										<a href="{{route('user.logout')}}" class="btn reg-btn">Sair</a>										
+									</li>
+
 									
-								</li>
-								
-								<li class="login-link">
-									<a href="{{route('home.login')}}">Login / Cadastrar</a></li>
-								<li class="register-btn">
-									<a href="{{route('home.register')}}" class="btn reg-btn">
-										<i class="feather-user">
-											</i>Registrar</a>
-								</li>
-								<li class="register-btn">
-									<a href="{{route('home.login')}}" class="btn btn-primary log-btn">
-										<i class="feather-lock"></i>Login</a>
-								</li>
+								@else
+									<li class="login-link">
+										<a href="{{route('home.login')}}">Login / Cadastrar</a>
+									</li>
+									<li class="register-btn">
+										<a href="{{route('home.register')}}" class="btn reg-btn">
+											<i class="feather-user"></i>Registrar
+										</a>
+									</li>
+									<li class="register-btn">
+										<a href="{{route('home.login')}}" class="btn btn-primary log-btn">
+											<i class="feather-lock"></i>Login
+										</a>
+									</li>
+								@endif
 							</ul>
+							
 						</div>
 					</nav>
 				</div>

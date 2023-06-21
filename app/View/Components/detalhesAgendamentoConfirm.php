@@ -11,9 +11,11 @@ class detalhesAgendamentoConfirm extends Component
     /**
      * Create a new component instance.
      */
-    public function __construct()
+    public $model;
+
+    public function __construct($model)
     {
-        //
+        $this->model = $model;
     }
 
     /**

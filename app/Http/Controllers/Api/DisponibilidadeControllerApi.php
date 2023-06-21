@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\DiaDaSemana;
 use App\Models\Disponibilidade;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class DisponibilidadeControllerApi extends Controller
@@ -15,6 +16,28 @@ class DisponibilidadeControllerApi extends Controller
         $users = Disponibilidade::all();
         return response()->json($users);
     }
+
+    public function disponibilidade(Request $request)
+    {
+        $day = $request->input('day');
+
+        // procure os horários disponíveis para o dia
+        $schedules = Disponibilidade::where('id_dia', $day)->get();
+
+        $timeslots = [];
+
+        foreach ($schedules as $schedule) {
+            $start = Carbon::parse($schedule->hora_inicio);
+            $end = Carbon::parse($schedule->hora_fim);
+
+            for ($time = $start; $time->lessThan($end); $time->addHour()) {
+                $timeslots[] = $time->format('H:i');
+            }
+        }
+
+        return response()->json($timeslots);
+    }
+
 
     // Criar um novo usuário
     public function store(Request $request)

@@ -4,6 +4,14 @@
 		<x-home.breadcrumb title="TESTE"/>
 			<!-- /Breadcrumb -->
 
+			<style>
+				.selected-date {
+					background-color: #42c0fb;
+    				border: 1px solid #42c0fb;
+    				color: #ffffff;
+				}
+
+			</style>
 
 			@include('admin.empresas._partials.modal')
 			<div class="container">
@@ -13,37 +21,28 @@
 						<div class="card">
 							<div class="card-body">
 								<div class="booking-doc-info">
-									<a href="doctor-profile.html" class="booking-doc-img">
-										<img src="assets/img/doctors/doctor-thumb-02.jpg" alt="User Image">
+									<a href="" class="booking-doc-img">
+										  <img src="{{ asset('avatar/' . $model->avatar) }}" class="img-fluid" alt="Usuario Image">
 									</a>
 									<div class="booking-info">
-										<h4><a href="doctor-profile.html">Dr. Darren Elder</a></h4>
-										<div class="rating">
-											<i class="fas fa-star filled"></i>
-											<i class="fas fa-star filled"></i>
-											<i class="fas fa-star filled"></i>
-											<i class="fas fa-star filled"></i>
-											<i class="fas fa-star"></i>
-											<span class="d-inline-block average-rating">35</span>
-										</div>
-										<p class="text-muted mb-0"><i class="fas fa-map-marker-alt"></i> Newyork, USA</p>
+										<h4><a href="">{{$model->nome}}</a></h4>
+										<x-avaliacao-home :model="$model" />
+										<p class="text-muted mb-0"><i class="fas fa-map-marker-alt"></i> {{$model->endereco->cidade}}, {{$model->endereco->pais}}</p>
 									</div>
 								</div>
 							</div>
 						</div>
 						<div class="row">
 							<div class="col-12 col-sm-4 col-md-6">
-								<h4 class="mb-1">11 November 2019</h4>
-								<p class="text-muted">Monday</p>
+								<h4 class="mb-1">{{ \Carbon\Carbon::now()->format('d F Y') }}</h4>
+								<p class="text-muted">{{ \Carbon\Carbon::now()->isoFormat('dddd') }}</p>
 							</div>
-							<div class="col-12 col-sm-8 col-md-6 text-sm-end">
-								<div class="bookingrange btn btn-white btn-sm mb-3">
-									<i class="far fa-calendar-alt me-2"></i>
-									<span>June 12, 2023 - June 18, 2023</span>
-									<i class="fas fa-chevron-down ms-2"></i>
-								</div>
-							</div>
+							
+							
 						</div>
+						<input type="text" class="dia_da_semana">
+						<input type="text" class="data">
+						<input type="text" class="hora_da_aula">
 						<!-- Schedule Widget -->
 						<div class="card booking-schedule schedule-widget">
 						
@@ -60,34 +59,7 @@
 														<i class="fa fa-chevron-left"></i>
 													</a>
 												</li>
-												<li>
-													<span>Mon</span>
-													<span class="slot-date">11 Nov <small class="slot-year">2019</small></span>
-												</li>
-												<li>
-													<span>Tue</span>
-													<span class="slot-date">12 Nov <small class="slot-year">2019</small></span>
-												</li>
-												<li>
-													<span>Wed</span>
-													<span class="slot-date">13 Nov <small class="slot-year">2019</small></span>
-												</li>
-												<li>
-													<span>Thu</span>
-													<span class="slot-date">14 Nov <small class="slot-year">2019</small></span>
-												</li>
-												<li>
-													<span>Fri</span>
-													<span class="slot-date">15 Nov <small class="slot-year">2019</small></span>
-												</li>
-												<li>
-													<span>Sat</span>
-													<span class="slot-date">16 Nov <small class="slot-year">2019</small></span>
-												</li>
-												<li>
-													<span>Sun</span>
-													<span class="slot-date">17 Nov <small class="slot-year">2019</small></span>
-												</li>
+												
 												<li class="right-arrow">
 													<a href="">
 														<i class="fa fa-chevron-right"></i>
@@ -203,10 +175,10 @@
 						<div class="submit-section proceed-btn text-end">
 							@if(Auth::check())
 								<!-- Se o usuário estiver autenticado, redireciona para a rota desejada -->
-								<a href="{{ route('home.checkoutAuth',['id' =>1]) }}" class="btn btn-primary submit-btn">Agendar e Pagar</a>
+								<a href="{{ route('home.checkoutAuth',['user_id' =>$model->user_id]) }}" class="btn btn-primary submit-btn">Agendar e Pagar</a>
 							@else
 								<!-- Se o usuário não estiver autenticado, redireciona para a rota de checkout -->
-								<a href="{{ route('home.checkout', ['id' =>1]) }}" class="btn btn-primary submit-btn">Agendar e Pagar</a>
+								<a href="{{ route('home.checkout', ['id' =>$model->user_id]) }}" class="btn btn-primary submit-btn">Agendar e Pagar</a>
 							@endif
 						</div>
 						<!-- /Submit Section -->
@@ -287,13 +259,101 @@ $(document).on('click', '.day-slot li', function(e) {
   
   // Verifique se o item clicado não é uma seta
   if (!$(this).hasClass('left-arrow') && !$(this).hasClass('right-arrow')) {
+    // Remove a classe 'selected-date' de qualquer li que a possua
+    $('.day-slot li').removeClass('selected-date');
+
+    // Adiciona a classe 'selected-date' ao li clicado
+    $(this).addClass('selected-date');
+
     const dayOfWeek = $(this).find('span:first').text();
     const date = $(this).find('.slot-date').text();
-    console.log('Dia da semana:', dayOfWeek);
+
+	$('.dia_da_semana').val(dayOfWeek)
+	$('.data').val(date)
+    
+	console.log('Dia da semana:', dayOfWeek);
     console.log('Data:', date);
   }
 });
 
+
+$(document).on('click', '.day-slot li', function(e) {
+  e.preventDefault();
+  
+  if (!$(this).hasClass('left-arrow') && !$(this).hasClass('right-arrow')) {
+    $('.day-slot li').removeClass('selected-date');
+    $(this).addClass('selected-date');
+
+    const dayOfWeek = $(this).find('span:first').text();
+    const dayMapping = {
+      'seg.': 1,
+      'ter.': 2,
+      'qua.': 3,
+      'qui.': 4,
+      'sex.': 5,
+      'sáb.': 6,
+      'dom.': 7
+    };
+
+    const dayNumber = dayMapping[dayOfWeek];
+	console.log(dayNumber)
+    $.ajax({
+      url: '/api/disponibilidade', 
+      method: 'GET',
+      data: {
+        day: dayNumber // enviar o número do dia
+      },
+      success: function(response) {
+        $('.time-slot ul').html(''); 
+
+		
+        response.forEach(function(time) {
+    const timeElement = `<li>
+      <a class="timing" href="#">
+        <span>${time}</span>
+      </a>
+    </li>`;
+    $('.time-slot ul').append(timeElement);
+  });
+
+      }
+    });
+  }
+});
+
+
+$(document).on('click', '.timing', function(e) {
+  e.preventDefault();
+  
+  // Remove a classe "selected" de qualquer outra marcação de tempo
+  $('.timing').removeClass('selected');
+  
+  // Adiciona a classe "selected" ao elemento clicado
+  $(this).addClass('selected');
+  
+  // Pega a hora do elemento clicado
+  const time = $(this).find('span').text();
+  
+  // Coloca a hora no input
+  $('.hora_da_aula').val(time);
+});
+
+
+$('.submit-btn').on('click', function(e) {
+  // Previne o evento padrão (navegação) até que os dados sejam salvos
+  e.preventDefault();
+
+  // Obtém os valores dos inputs e os armazena no localStorage
+  var diaDaSemana = $('.dia_da_semana').val();
+  var data = $('.data').val();
+  var horaDaAula = $('.hora_da_aula').val();
+  localStorage.setItem('diaDaSemana', diaDaSemana);
+  localStorage.setItem('data', data);
+  localStorage.setItem('horaDaAula', horaDaAula);
+
+  // Permite que o evento de clique prossiga (navegação)
+  window.location.href = $(this).attr('href');
+});
 
 				</script>
 </x-layoutsadmin>

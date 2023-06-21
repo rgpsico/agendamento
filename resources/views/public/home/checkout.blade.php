@@ -160,7 +160,7 @@
 						</div>
 						
 						
-						<x-detalhes-agendamento-confirm/>
+						<x-detalhes-agendamento-confirm :model="$model" />
 				</div>
 
 			</div>
