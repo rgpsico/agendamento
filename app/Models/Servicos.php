@@ -12,4 +12,9 @@ class Servicos extends Model
     protected $table = 'servicos';
 
     protected $fillable = ['empresa_id', 'titulo', 'descricao', 'preco', 'tempo_de_aula'];
+
+    public function servicos()
+    {
+        return $this->belongsTo(Servicos::class, 'empresa_id', 'id');
+    }
 }

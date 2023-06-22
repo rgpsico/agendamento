@@ -59,9 +59,21 @@ class ServicoController extends Controller
     public function update(ServicoRequest $request, $id)
     {
         $model = $this->model->find($id);
+
+
         if ($model) {
+            if ($request->hasFile('imagem')) {
+                $file = $request->file('imagem');
+
+                $filename = time() . '.' . $file->getClientOriginalExtension();
+                $path = public_path('/servico');
+                $file->move($path, $filename);
+
+                $request['imagem'] = $filename;
+            }
+
             $model->update($request->all());
-            return redirect()->route($this->route . '.index')->with('success', 'Serviço atualizado com sucesso!');
+            return redirect()->route($this->route . '.edit', ['id' => $id])->with('success', 'Serviço atualizado com sucesso!');
         } else {
             return redirect()->route($this->route . '.index')->with('error', 'Serviço não encontrado.');
         }

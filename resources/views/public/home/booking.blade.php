@@ -11,6 +11,11 @@
     				color: #ffffff;
 				}
 
+				.card-selected {
+   				 background-color: #007bff;
+    			color: #fff;
+				}
+
 			</style>
 
 			@include('admin.empresas._partials.modal')
@@ -31,6 +36,25 @@
 									</div>
 								</div>
 							</div>
+						</div>
+						<div class="row">
+						@foreach ($model->servicos as $serv )						
+						<div class="col-md-3">
+							
+							<div class="card card_servicos" data-servico_preco="{{$serv->preco}}" data-servico_id="{{$serv->id}}" data-servico_titulo="{{$serv->titulo}}" style="border: 1px solid #ddd; border-radius: 10px; box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2); transition: 0.3s;">
+							   <img class="img-fluid" style="border-radius: 10px 10px 0 0;" src="{{ asset('servico/' . $serv->imagem ?? 'admin/img/doctors/Thumbs.db') }}" width="100%" height="100%" alt="Imagem do serviço">
+							   <div class="card-body" style="padding: 15px;">
+								  <h5 class="card-title" style="font-weight: bold; font-size: 18px;">{{$serv->titulo}}</h5>
+								  <p class="card-text" style="color: #777; font-size: 14px;">{{$serv->descricao}}</p>
+								  <p class="card-text" style="color: #333; font-size: 16px;">{{$serv->preco}}</p>
+								  <a href="#" class="btn btn-primary" style="background-color: #007bff; border: none; color: white; 
+								  padding: 10px 24px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer;
+								  ">Escolher</a>
+							   </div>
+							</div>
+						 </div>
+
+						 @endforeach 
 						</div>
 						<div class="row">
 							<div class="col-12 col-sm-4 col-md-6">
@@ -82,83 +106,7 @@
 										<!-- Time Slot -->
 										<div class="time-slot">
 											<ul class="clearfix">
-												<li>
-													<a class="timing" href="#">
-														<span>9:00</span> <span>AM</span>
-													</a>
-													<a class="timing" href="#">
-														<span>10:00</span> <span>AM</span>
-													</a>
-													<a class="timing" href="#">
-														<span>11:00</span> <span>AM</span>
-													</a>
-												</li>
-												<li>
-													<a class="timing" href="#">
-														<span>9:00</span> <span>AM</span>
-													</a>
-													<a class="timing" href="#">
-														<span>10:00</span> <span>AM</span>
-													</a>
-													<a class="timing" href="#">
-														<span>11:00</span> <span>AM</span>
-													</a>
-												</li>
-												<li>
-													<a class="timing" href="#">
-														<span>9:00</span> <span>AM</span>
-													</a>
-													<a class="timing" href="#">
-														<span>10:00</span> <span>AM</span>
-													</a>
-													<a class="timing" href="#">
-														<span>11:00</span> <span>AM</span>
-													</a>
-												</li>
-												<li>
-													<a class="timing" href="#">
-														<span>9:00</span> <span>AM</span>
-													</a>
-													<a class="timing" href="#">
-														<span>10:00</span> <span>AM</span>
-													</a>
-													<a class="timing" href="#">
-														<span>11:00</span> <span>AM</span>
-													</a>
-												</li>
-												<li>
-													<a class="timing" href="#">
-														<span>9:00</span> <span>AM</span>
-													</a>
-													<a class="timing selected" href="#">
-														<span>10:00</span> <span>AM</span>
-													</a>
-													<a class="timing" href="#">
-														<span>11:00</span> <span>AM</span>
-													</a>
-												</li>
-												<li>
-													<a class="timing" href="#">
-														<span>9:00</span> <span>AM</span>
-													</a>
-													<a class="timing" href="#">
-														<span>10:00</span> <span>AM</span>
-													</a>
-													<a class="timing" href="#">
-														<span>11:00</span> <span>AM</span>
-													</a>
-												</li>
-												<li>
-													<a class="timing" href="#">
-														<span>9:00</span> <span>AM</span>
-													</a>
-													<a class="timing" href="#">
-														<span>10:00</span> <span>AM</span>
-													</a>
-													<a class="timing" href="#">
-														<span>11:00</span> <span>AM</span>
-													</a>
-												</li>
+											
 											</ul>
 										</div>
 										<!-- /Time Slot -->
@@ -354,6 +302,68 @@ $('.submit-btn').on('click', function(e) {
   // Permite que o evento de clique prossiga (navegação)
   window.location.href = $(this).attr('href');
 });
+
+$(document).ready(function() {
+    $('.card_servicos').on('click', function() {
+        $(this).toggleClass('card-selected');
+        
+        const servico = {
+            id: $(this).data('servico_id'),
+            titulo: $(this).data('servico_titulo'),
+            preco: $(this).data('servico_preco')
+        };
+
+        toggleServico(servico);
+    });
+});
+
+function calcularPrecoTotal() {
+    let servicos = localStorage.getItem('servicos');
+    
+    if (servicos) {
+        servicos = JSON.parse(servicos);
+    } else {
+        servicos = [];
+    }
+
+    let total = 0;
+
+    for (let servico of servicos) {
+        total += servico.preco;
+    }
+
+    return total;
+}
+
+
+function toggleServico(servico) {
+    // Pega a lista de serviços do localStorage
+    let servicos = localStorage.getItem('servicos');
+
+    // Se não tem nada no localStorage, inicializa uma lista vazia
+    if (!servicos) {
+        servicos = [];
+    } else {
+        // Converte a string de volta em uma lista
+        servicos = JSON.parse(servicos);
+    }
+
+    // Procura pelo serviço na lista
+    const index = servicos.findIndex(s => s.id === servico.id);
+
+    if (index === -1) {
+        // Se o serviço não está na lista, adiciona
+        servicos.push(servico);
+    } else {
+        // Se o serviço está na lista, remove
+        servicos.splice(index, 1);
+    }
+
+    // Salva a lista atualizada no localStorage
+    localStorage.setItem('servicos', JSON.stringify(servicos));
+}
+
+
 
 				</script>
 </x-layoutsadmin>

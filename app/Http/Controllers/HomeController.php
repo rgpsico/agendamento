@@ -66,7 +66,8 @@ class HomeController extends Controller
 
     public function booking($id)
     {
-        $model = $this->model->where('user_id', $id)->first();
+        $model = $this->model::with('servicos')->where('user_id', $id)->first();
+
 
         $aulas = $this->aulas->where('professor_id', $id)->get();
 
@@ -84,28 +85,7 @@ class HomeController extends Controller
             $horarios[$dia] = [];
         }
 
-        // Buscar a disponibilidade do professor para cada dia da semana
-        foreach ($diasDaSemana as $index => $dia) {
-            // $disponibilidade = $this->disponibilidade->where('id_professores', $id)->where('id_dia', $index + 1)->first();
 
-            //     if ($disponibilidade) {
-            //         $horaInicio = intval(substr($disponibilidade->hora_inicio, 0, 2));
-            //         $horaFim = intval(substr($disponibilidade->hora_fim, 0, 2));
-
-            //         // Gerar os horários entre a hora de início e a hora de fim
-            //         if ($horaInicio <= $horaFim) {
-            //             for ($i = $horaInicio; $i <= $horaFim; $i++) {
-            //                 // Verificar se a aula já foi reservada
-            //                 $reserva = $this->agendamento->where('professor_id', $id)->where('data_hora', $i . ':00')->first();
-            //                 if (!$reserva) {
-            //                     // Se a aula não foi reservada, incluir o horário na lista
-            //                     $horarios[$dia][] = $i . ':00';
-            //                 }
-            //             }
-            //         }
-            //     }
-            // }
-        }
         return view(
             $this->view . '.booking',
             [

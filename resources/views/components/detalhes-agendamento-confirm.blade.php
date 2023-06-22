@@ -5,15 +5,14 @@
         <div class="card-header">
             <h4 class="card-title">Detalhes do Agendamento</h4>
         </div>
-        <div class="card-body">
-        
-            
+        <div class="card-body">       
             <div class="booking-doc-info">
                 <a href="doctor-profile.html" class="booking-doc-img">
                     <img src="{{ asset('avatar/' . $model->avatar) }}" class="img-fluid" alt="Usuario Image">
                       </a>
                 <div class="booking-info">
-                    <h4><a href="doctor-profile.html">{{$model->nome}}</a></h4>
+                    <h4>
+                        <a href="doctor-profile.html">{{$model->nome}}</a></h4>
                     
                     <div class="clinic-details">
                         <p class="doc-location">
@@ -36,8 +35,10 @@
                       </ul>
                       
                     <ul class="booking-fee">
-                        <li>Valor da Aula
-                            <span>R$200</span>
+                        <li>Produto 1 
+                            Descricao
+                            
+                            <span class="valor_total">R$200</span>
                         </li>
                     </ul>
                     
@@ -65,4 +66,76 @@
       $('#savedDate').text('   ' + diaDaSemana + '  ' + data + ' As ' + horaDaAula + ' Horas');
    
     });
+
+    function calcularPrecoTotal() {
+    // Acessa os serviços armazenados no LocalStorage
+    let servicos = localStorage.getItem('servicos');
+
+    // Converte para uma lista, se houver algo armazenado
+    if (servicos) {
+        servicos = JSON.parse(servicos);
+    } else {
+        servicos = [];
+    }
+
+    // Inicia o total com 0
+    let total = 0;
+
+    // Adiciona o preço de cada serviço ao total
+    for (let servico of servicos) {
+        // Certifique-se de que o preço é tratado como um número
+        total += parseFloat(servico.preco);
+    }
+
+    // Retorna o total
+    return total;
+}
+
+// Calcula o preço total dos serviços
+let total = calcularPrecoTotal();
+
+// Acessa o elemento HTML onde o total será exibido
+let totalCost = document.querySelector('.total-cost');
+
+// Exibe o total no elemento HTML
+totalCost.textContent = 'R$' + total.toFixed(2); // Aqui também adicionamos o método toFixed() para garantir que o total seja sempre exibido com duas casas decimais
+
+
+// Calcula o preço total dos serviços
+
+
+// $('.valor_total').text(calcularPrecoTotal() )
+
+
+// Acessa os serviços armazenados no LocalStorage
+let servicos = localStorage.getItem('servicos');
+
+// Converte para uma lista, se houver algo armazenado
+if (servicos) {
+    servicos = JSON.parse(servicos);
+} else {
+    servicos = [];
+}
+
+// Acessa o elemento HTML onde os serviços serão listados
+let bookingFee = document.querySelector('.booking-fee');
+
+// Limpa qualquer conteúdo prévio
+bookingFee.innerHTML = '';
+
+// Itera sobre a lista de serviços
+for (let servico of servicos) {
+    // Cria um novo item de lista para cada serviço
+    let li = document.createElement('li');
+
+    // Define o conteúdo do item de lista
+    li.innerHTML = `
+        ${servico.titulo}
+        <span class="valor_total">R$${servico.preco}</span>
+    `;
+
+    // Adiciona o item de lista à lista de serviços
+    bookingFee.appendChild(li);
+}
+
   </script>
