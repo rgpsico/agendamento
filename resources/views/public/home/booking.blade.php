@@ -64,9 +64,9 @@
 							
 							
 						</div>
-						<input type="text" class="dia_da_semana">
-						<input type="text" class="data">
-						<input type="text" class="hora_da_aula">
+						<input type="hidden" class="dia_da_semana" >
+						<input type="hidden" class="data">
+						<input type="hidden" class="hora_da_aula">
 						<!-- Schedule Widget -->
 						<div class="card booking-schedule schedule-widget">
 						

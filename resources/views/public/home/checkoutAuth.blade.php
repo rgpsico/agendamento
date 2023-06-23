@@ -18,9 +18,9 @@
 											<div class="payment-widget">
 												<h4 class="card-title">Metodos de Pagamento</h4>
 									
-												<input type="text" name="user_id" value="{{Auth::user()->id}}">
-												<input type="text" id="data_aula" name="data_aula" value="">
-												<input type="text" id="hora_aula" name="hora_aula" value="">
+												<input type="hidden" name="user_id" value="{{Auth::user()->id}}">
+												<input type="hidden" id="data_aula" name="data_aula" value="">
+												<input type="hidden" id="hora_aula" name="hora_aula" value="">
 												<!-- Credit Card Payment -->
 												<div class="payment-list">
 													<label class="payment-radio credit-card-option">
