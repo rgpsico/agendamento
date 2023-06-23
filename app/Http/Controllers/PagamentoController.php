@@ -10,10 +10,14 @@ class PagamentoController extends Controller
 {
     public function pagamentoStripe(Request $request)
     {
+
         Stripe::setApiKey(env('STRIPE_SECRET'));
 
         $token = $request->stripeToken;
         $amount = $request->amount; // obter a quantia da sessão, banco de dados, etc.
+        $user_id = $request->user_id;
+
+
 
         try {
             $charge = \Stripe\Charge::create([
@@ -27,7 +31,7 @@ class PagamentoController extends Controller
             // Você pode verificar se a cobrança foi bem-sucedida assim:
             if ($charge->paid == true) {
                 // Aqui você pode redirecionar o usuário para uma página de agradecimento, por exemplo
-                return redirect()->route('home.checkoutsucesso', ['id' => 1]);
+                return redirect()->route('home.checkoutsucesso', ['id' =>  $user_id]);
             } else {
                 // Aqui você pode redirecionar o usuário para uma página de erro, por exemplo
                 return redirect()->route('erroPagamento');

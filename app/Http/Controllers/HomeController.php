@@ -116,27 +116,30 @@ class HomeController extends Controller
         );
     }
 
-    public function checkoutAuth($id)
+    public function checkoutAuth($user_id)
     {
-
+        $model = $this->model->where('user_id', $user_id)->first();
         return view(
             $this->view . '.checkoutAuth',
             [
                 'pageTitle' => $this->pageTitle,
                 'view' => $this->view,
                 'route' => $this->route,
+                'model'  => $model
             ]
         );
     }
 
-    public function checkoutSucesso($id)
+    public function checkoutSucesso($user_id)
     {
+        $model = $this->model->where('user_id', $user_id)->first();
         return view(
             $this->view . '.checkoutsucesso',
             [
                 'pageTitle' => $this->pageTitle,
                 'view' => $this->view,
-                'route' => $this->route
+                'route' => $this->route,
+                'model'  => $model
             ]
         );
     }

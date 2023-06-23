@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\EmpresaControllerApi;
 use App\Http\Controllers\Api\ProfessoresControllerApi;
 use App\Http\Controllers\Api\ServicoControllerApi;
 use App\Http\Controllers\Api\UserControllerApi;
+use App\Http\Controllers\StripeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -47,3 +48,4 @@ Route::resource('aulas', AulasControllerApi::class);
 Route::resource('disponibilidade', DisponibilidadeControllerApi::class);
 Route::get('disponibilidade', [DisponibilidadeControllerApi::class, 'disponibilidade']);
 Route::resource('dias', DiaDaSemanaControllerApi::class);
+Route::post('/pagamento', [StripeController::class, 'pagamento'])->name('stripe.pagamento');

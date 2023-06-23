@@ -18,6 +18,9 @@
 											<div class="payment-widget">
 												<h4 class="card-title">Metodos de Pagamento</h4>
 									
+												<input type="text" name="user_id" value="{{Auth::user()->id}}">
+												<input type="text" id="data_aula" name="data_aula" value="">
+												<input type="text" id="hora_aula" name="hora_aula" value="">
 												<!-- Credit Card Payment -->
 												<div class="payment-list">
 													<label class="payment-radio credit-card-option">
@@ -38,7 +41,8 @@
 											</div>
 										</div>
 									</form>
-									
+									<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
 									<script src="https://js.stripe.com/v3/"></script>
 									<script>
 										var stripe = Stripe('pk_test_51JDFv2BOmvZWJe0xeu2cwxUHl3Fw92cGWXoDlUpLQfJlY8K2yhk6LKs0GNtDP7GBmRgSs8aOySLTFlkAJJ7hb1Yr00q73EhugI');
@@ -82,6 +86,14 @@
 									
 											form.submit();
 										}
+
+										$(document).ready(function() {
+      var diaDaSemana = localStorage.getItem('diaDaSemana');
+      var data = localStorage.getItem('data');
+      var horaDaAula = localStorage.getItem('horaDaAula');
+      $('#data_aula').val(data);
+      $('#hora_aula').val(horaDaAula);
+    });
 									</script>
 									
 									
@@ -97,7 +109,7 @@
 						</div>
 						
 						
-						<x-detalhes-agendamento-confirm/>
+						<x-detalhes-agendamento-confirm :model="$model"/>
 				</div>
 
 			</div>

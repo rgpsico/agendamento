@@ -12,7 +12,7 @@
 								<div class="card-body">
 								<x-alert/>
 									<!-- Checkout Form -->
-									<form action="{{route('agendamento.pagamento')}}" method="POST">
+									<form id="paymentForm" action="{{route('agendamento.pagamento')}}" method="POST">
 										@csrf
 										<div class="info-widget">
 											<h4 class="card-title">Informações</h4>
@@ -164,5 +164,42 @@
 				</div>
 
 			</div>
+			<script>
+	$("#paymentForm").on('submit', function(e) {
+    e.preventDefault(); // para impedir o envio padrão do formulário
+
+    // Pega os dados do formulário
+    var formData = $(this).serializeArray(); 
+
+    // Adiciona os dados do localStorage
+    var servicos = localStorage.getItem('servicos');
+    formData.push({name: "servicos", value: servicos});
+    
+    // Converta formData em um objeto para podermos manipulá-lo facilmente
+    var data = {};
+    $(formData).each(function(index, obj){
+        data[obj.name] = obj.value;
+    });
+
+    // Faz a solicitação POST para a API
+    $.ajax({
+        url: '/api/pagamento', // A URL da API que você está chamando
+        type: 'post', // O tipo de solicitação que você está fazendo (GET, POST, etc.)
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Para proteção contra falsificação de solicitação entre sites (CSRF)
+        },
+        data: data, // Os dados que você está enviando para a API
+        success: function (response) {
+            // O que acontecerá se a chamada à API for bem-sucedida
+            console.log(response);
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            // O que acontecerá se a chamada à API falhar
+            console.log(textStatus, errorThrown);
+        }
+    });
+});
+
+			</script>
 			<!-- /Page Content -->
 </x-layoutsadmin>
