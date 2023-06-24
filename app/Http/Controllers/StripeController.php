@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\TreinoStripeRequest;
+use App\Models\Usuario;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Stripe\Charge;
 use Stripe\StripeClient;
 
@@ -60,10 +63,18 @@ class StripeController extends Controller
     }
 
 
-    public function treinoStripe()
+    public function treinoStripe(TreinoStripeRequest $request)
     {
-        dd('aaa');
+
         $stripe = new StripeClient(env('STRIPE_SECRET'));
+
+        $user = new Usuario();
+        $user->nome = $request->nome;
+        $user->email = $request->email;
+        $user->tipo_usuario = 'Aluno';
+        $user->password = Hash::make('senha');
+        $user->save();
+
 
         $res = $stripe->tokens->create([
             'card' => [
@@ -71,13 +82,8 @@ class StripeController extends Controller
                 'exp_month' => '07',
                 'exp_year' => '2025',
                 'cvc' => '123',
-                'name' => 'Fabi revendedora da Silva',
-                'address_line1' => 'Av. Pa;ulista, 1000',
-                'address_line2' => 'Apto 123',
-                'address_city' => 'São Paulo',
-                'address_state' => 'SP',
-                'address_zip' => '01310-100',
-                'address_country' => 'BR'
+                'name' => 'Fabi revendedora da Silva'
+
             ]
         ]);
 
@@ -91,7 +97,7 @@ class StripeController extends Controller
         ]);
 
         if ($response->status === 'succeeded') {
-            return redirect()->route('home.checkoutsucesso');
+            return  response(['content' =>  $response]);
         } else {
             // Lógica para tratamento de erro, caso o pagamento não tenha sido bem-sucedido
         }

@@ -9,6 +9,7 @@
 					background-color: #42c0fb;
     				border: 1px solid #42c0fb;
     				color: #ffffff;
+            cursor: pointer;
 				}
 
 				.card-selected {
@@ -60,17 +61,14 @@
 							<div class="col-12 col-sm-4 col-md-6">
 								<h4 class="mb-1">{{ \Carbon\Carbon::now()->format('d F Y') }}</h4>
 								<p class="text-muted">{{ \Carbon\Carbon::now()->isoFormat('dddd') }}</p>
-							</div>
-							
-							
+							</div>						
 						</div>
 						<input type="hidden" class="dia_da_semana" >
 						<input type="hidden" class="data">
 						<input type="hidden" class="hora_da_aula">
 						<!-- Schedule Widget -->
 						<div class="card booking-schedule schedule-widget">
-						
-							<!-- Schedule Header -->
+					  	<!-- Schedule Header -->
 							<div class="schedule-header">
 								<div class="row">
 									<div class="col-md-12">
@@ -169,7 +167,7 @@ function renderDates() {
   for (let i = currentStartIndex; i < currentStartIndex + 7; i++) {
     const dateObj = dates[i];
     const $li = $(`
-      <li>
+      <li style='cursor:pointer'>
         <span>${dateObj.day}</span>
         <span class="slot-date">${dateObj.date} ${dateObj.month} <small class="slot-year">${dateObj.year}</small></span>
       </li>
@@ -295,13 +293,21 @@ $('.submit-btn').on('click', function(e) {
   var diaDaSemana = $('.dia_da_semana').val();
   var data = $('.data').val();
   var horaDaAula = $('.hora_da_aula').val();
-  localStorage.setItem('diaDaSemana', diaDaSemana);
-  localStorage.setItem('data', data);
-  localStorage.setItem('horaDaAula', horaDaAula);
+  
+  // Verifica se a data e a horaDaAula estão preenchidas
+  if (data && horaDaAula) {
+    localStorage.setItem('diaDaSemana', diaDaSemana);
+    localStorage.setItem('data', data);
+    localStorage.setItem('horaDaAula', horaDaAula);
 
-  // Permite que o evento de clique prossiga (navegação)
-  window.location.href = $(this).attr('href');
+    // Permite que o evento de clique prossiga (navegação)
+    window.location.href = $(this).attr('href');
+  } else {
+    // Exibe uma mensagem de erro ou realiza alguma ação para indicar que os campos estão vazios
+    alert('Por favor, preencha a data e a hora da aula.');
+  }
 });
+
 
 $(document).ready(function() {
     $('.card_servicos').on('click', function() {

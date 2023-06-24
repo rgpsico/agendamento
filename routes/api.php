@@ -48,4 +48,4 @@ Route::resource('aulas', AulasControllerApi::class);
 Route::resource('disponibilidade', DisponibilidadeControllerApi::class);
 Route::get('disponibilidade', [DisponibilidadeControllerApi::class, 'disponibilidade']);
 Route::resource('dias', DiaDaSemanaControllerApi::class);
-Route::post('/pagamento', [StripeController::class, 'pagamento'])->name('stripe.pagamento');
+Route::post('/pagamento', [StripeController::class, 'treinoStripe'])->name('stripe.pagamento');

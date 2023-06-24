@@ -1,4 +1,9 @@
 <x-public.layout title="HOME">
+	<style>
+		.error {
+    color: red;
+}
+	</style>
    
     <!-- Breadcrumb -->
 		<x-home.breadcrumb title="TESTE"/>
@@ -12,7 +17,9 @@
 								<div class="card-body">
 								<x-alert/>
 									<!-- Checkout Form -->
-									<form id="paymentForm" action="{{route('agendamento.pagamento')}}" method="POST">
+									<script src="https://js.stripe.com/v3/"></script>
+									<div id="payment-form"></div>
+									<form id="paymentForm" action="{{route('agendamento.pagamento')}}" method="POST" id="">
 										@csrf
 										<div class="info-widget">
 											<h4 class="card-title">Informações</h4>
@@ -20,37 +27,33 @@
 												<div class="col-md-6 col-sm-12">
 													<div class="form-group card-label">
 														<label>Nome</label>
-														<input class="form-control @error('nome') is-invalid @enderror" name="nome" value="{{ old('nome') }}" type="text">
-														@error('nome')
-															<div class="invalid-feedback">{{ $message }}</div>
-														@enderror
+														<input class="form-control @error('nome') is-invalid @enderror" id="nome" name="nome" value="{{ old('nome') }}" type="text">
+													     <div class="invalid-feedback" style='none' id="nome_erro"></div>
+													
 													</div>
 												</div>
 												<div class="col-md-6 col-sm-12">
 													<div class="form-group card-label">
 														<label>Sobre Nome</label>
-														<input class="form-control @error('sobre_nome') is-invalid @enderror" name="sobre_nome" value="{{ old('sobre_nome') }}" type="text">
-														@error('sobre_nome')
-															<div class="invalid-feedback">{{ $message }}</div>
-														@enderror
+														<input type="text" class="form-control" id="sobre_nome" name="sobre_nome" value="{{ old('sobre_nome') }}" ">
+														<div class="invalid-feedback"  id="sobre_nome_erro"></div>
+													
 													</div>
 												</div>
 												<div class="col-md-6 col-sm-12">
 													<div class="form-group card-label">
 														<label>Email</label>
-														<input class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" type="email">
-														@error('email')
-															<div class="invalid-feedback">{{ $message }}</div>
-														@enderror
+														<input class="form-control" id="email" name="email" value="{{ old('email') }}" type="email">
+														 <div class="invalid-feedback"  id="email_erro"></div>
+														
 													</div>
 												</div>
 												<div class="col-md-6 col-sm-12">
 													<div class="form-group card-label">
 														<label>Telefone</label>
-														<input class="form-control @error('telefone') is-invalid @enderror" name="telefone" value="{{ old('telefone') }}" type="text">
-														@error('telefone')
-															<div class="invalid-feedback">{{ $message }}</div>
-														@enderror
+														<input class="form-control @error('telefone') is-invalid @enderror" id="telefone" name="telefone" value="{{ old('telefone') }}" type="text">
+														<div class="invalid-feedback"  id="telefone_erro"></div>
+													
 													</div>
 												
 											</div>
@@ -62,64 +65,30 @@
 											<h4 class="card-title">Metodos de Pagamento</h4>
 									
 											<!-- Credit Card Payment -->
-											<div class="payment-list">
-												<label class="payment-radio credit-card-option">
+										
+											<div class="payment-list" id="">
+												{{-- <label class="payment-radio credit-card-option">
 													<input type="radio" name="radio" checked="">
 													<span class="checkmark"></span>
 													Cartão de credito
-												</label>
+													
+												</label> --}}
+												
 												<div class="row">
-													<div class="col-md-6">
-														<div class="form-group card-label">
-															<label for="card_name">Nome no Cartão</label>
-															<input class="form-control @error('nome_cartao') is-invalid @enderror" name="nome_cartao" id="card_name" value="{{ old('nome_cartao') }}" type="text">
-															@error('nome_cartao')
-																<div class="invalid-feedback">{{ $message }}</div>
-															@enderror
-														</div>
-													</div>
-													<div class="col-md-6">
-														<div class="form-group card-label">
-															<label for="card_number">Numero do Cartão</label>
-															<input 
-															class="form-control @error('numero_cartao') is-invalid @enderror" 
-															name="numero_cartao" 
-															id="card_number" 
-															value="{{ old('numero_cartao') }}" 
-															placeholder="1234  5678  9876  5432" 
-															type="text">
-															@error('numero_cartao')
-																<div class="invalid-feedback">{{ $message }}</div>
-															@enderror
-														</div>
-													</div>
-													<div class="col-md-4">
-														<div class="form-group card-label">
-															<label for="expiry_month">Mês de vencimento</label>
-															<input class="form-control @error('mes_vencimento') is-invalid @enderror" name="mes_vencimento" id="expiry_month" value="{{ old('mes_vencimento') }}" placeholder="MM" type="text">
-															@error('mes_vencimento')
-																<div class="invalid-feedback">{{ $message }}</div>
-															@enderror
-														</div>
-													</div>
-													<div class="col-md-4">
-														<div class="form-group card-label">
-															<label for="expiry_year">Ano de Vencimento </label>
-															<input class="form-control @error('ano_vencimento') is-invalid @enderror" name="ano_vencimento" id="expiry_year" value="{{ old('ano_vencimento') }}" placeholder="YY" type="text">
-															@error('ano_vencimento')
-																<div class="invalid-feedback">{{ $message }}</div>
-															@enderror
-														</div>
-													</div>
-													<div class="col-md-4">
-														<div class="form-group card-label">
-															<label for="cvv">CVV</label>
-															<input class="form-control @error('cvv') is-invalid @enderror" name="cvv" id="cvv" value="{{ old('cvv') }}" type="text">
-															@error('cvv')
-																<div class="invalid-feedback">{{ $message }}</div>
-															@enderror
-														</div>
-													</div>
+													
+												
+													<x-input-api-validation name="nome_cartao" col="6" placeholder="Ex: Roger Silva" label="Nome no Cartão" />												
+													
+													<x-input-api-validation name="numero_cartao" col="6" placeholder="1234  5678  9876  5432" label="Numero do Cartão" />
+													 
+													<x-input-api-validation name="mes_vencimento" col="4" placeholder="Mês de vencimento" label="Mês de vencimento" />
+													
+													<x-input-api-validation name="ano_vencimento" col="4" placeholder="Ano Vencimento" label="Ano Vencimento" />
+													
+													
+													<x-input-api-validation name="cvv" col="4" placeholder="124" label="CVV" />
+													
+													
 												</div>
 											</div>
 											<!-- /Credit Card Payment -->
@@ -193,11 +162,53 @@
             // O que acontecerá se a chamada à API for bem-sucedida
             console.log(response);
         },
-        error: function (jqXHR, textStatus, errorThrown) {
-            // O que acontecerá se a chamada à API falhar
-            console.log(textStatus, errorThrown);
-        }
+        error: function(response) {
+        let errors = response.responseJSON.errors;
+        $.each(errors, function(key, values) {
+            let errorMessages = '';
+            $.each(values, function(index, value) {
+                errorMessages += '<span class="error">' + value + '</span><br>';
+            });
+			
+			$('#' + key).addClass('is-invalid');
+			$('#' + key+'_erro').show()
+            $('#' + key+'_erro').append(errorMessages);
+        });
+    }
     });
+});
+
+
+// Configure sua chave pública do Stripe
+var stripe = Stripe('pk_test_51JDFv2BOmvZWJe0xeu2cwxUHl3Fw92cGWXoDlUpLQfJlY8K2yhk6LKs0GNtDP7GBmRgSs8aOySLTFlkAJJ7hb1Yr00q73EhugI');
+								
+
+// Selecione o formulário de pagamento
+var form = document.getElementById('payment-form');
+
+// Adicione um manipulador de eventos para o envio do formulário
+form.addEventListener('submit', function(event) {
+  event.preventDefault();
+
+  // Crie o token do Stripe ao enviar o formulário
+  stripe.createToken('card', {
+    name: document.getElementById('card_name').value
+    // Outros detalhes do cartão, se necessário
+  }).then(function(result) {
+    if (result.error) {
+      // Se houver um erro ao criar o token, exiba a mensagem de erro
+      console.log(result.error.message);
+    } else {
+      // Se o token for criado com sucesso, você pode acessar o token através de result.token.id
+      var token = result.token.id;
+
+      // Faça o que você precisa com o token (por exemplo, enviar para o backend para criar uma cobrança)
+      // ...
+
+      // Envie o formulário para o backend (ou faça qualquer outra ação desejada)
+      form.submit();
+    }
+  });
 });
 
 			</script>
