@@ -69,7 +69,7 @@
 						<!-- Schedule Widget -->
 						<div class="card booking-schedule schedule-widget">
 					  	<!-- Schedule Header -->
-							<div class="schedule-header">
+							<div class="schedule-header" style="display:none;">
 								<div class="row">
 									<div class="col-md-12">
 									
@@ -319,6 +319,7 @@ $(document).ready(function() {
             preco: $(this).data('servico_preco')
         };
 
+        $(".schedule-header").show()
         toggleServico(servico);
     });
 });

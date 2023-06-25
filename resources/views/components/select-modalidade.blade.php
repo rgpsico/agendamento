@@ -4,12 +4,8 @@
         <option value="">Selecione</option>
         @foreach($modalidades as $modalidade)
             <option value="{{ $modalidade->nome }}"                         
-                {{ (old('modalidade')) == $modalidade->nome ? 'selected' : '' }}>
-                {{ Str::ucfirst($modalidade->nome) }}
-
-                @isset( $model->modalidade)
-                    {{$modalidade->nome == $model->modalidade ? 'selected' : ''}}    
-                @endisset 
+                {{ (old('modalidade') == $modalidade->nome || isset($model->modalidade) && $model->modalidade == $modalidade->nome) ? 'selected' : '' }}>
+                {{$modalidade->nome}}
             </option>
         @endforeach
     </select>

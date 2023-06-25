@@ -72,6 +72,15 @@ class EmpresaController extends Controller
             $data['avatar'] = $filename;
         }
 
+        if ($request->hasFile('banner')) {
+
+            $file = $request->file('banner');
+            $filenameBanners = time() . '.' . $file->getClientOriginalExtension();
+            $path = public_path('/banner');
+            $file->move($path, $filenameBanners);
+            $data['banners'] = $filenameBanners;
+        }
+
 
 
         // Atualizar a empresa existente ou criar uma nova

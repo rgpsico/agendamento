@@ -14,45 +14,45 @@
                             </div>
                         </div>
                         <div class="listing-day">
-                            <div class="day">Monday</div>
+                            <div class="day">Segunda</div>
                             <div class="time-items">
                                 <span class="time">07:00 AM - 09:00 PM</span>
                             </div>
                         </div>
                         <div class="listing-day">
-                            <div class="day">Tuesday</div>
+                            <div class="day">Terça</div>
                             <div class="time-items">
                                 <span class="time">07:00 AM - 09:00 PM</span>
                             </div>
                         </div>
                         <div class="listing-day">
-                            <div class="day">Wednesday</div>
+                            <div class="day">Quarta</div>
                             <div class="time-items">
                                 <span class="time">07:00 AM - 09:00 PM</span>
                             </div>
                         </div>
                         <div class="listing-day">
-                            <div class="day">Thursday</div>
+                            <div class="day">Quinta</div>
                             <div class="time-items">
                                 <span class="time">07:00 AM - 09:00 PM</span>
                             </div>
                         </div>
                         <div class="listing-day">
-                            <div class="day">Friday</div>
+                            <div class="day">Sexta</div>
                             <div class="time-items">
                                 <span class="time">07:00 AM - 09:00 PM</span>
                             </div>
                         </div>
                         <div class="listing-day">
-                            <div class="day">Saturday</div>
+                            <div class="day">Sabado</div>
                             <div class="time-items">
                                 <span class="time">07:00 AM - 09:00 PM</span>
                             </div>
                         </div>
                         <div class="listing-day closed">
-                            <div class="day">Sunday</div>
+                            <div class="day">Domingo</div>
                             <div class="time-items">
-                                <span class="time"><span class="badge bg-danger-light">Closed</span></span>
+                                <span class="time"><span class="badge bg-danger-light">Fechado</span></span>
                             </div>
                         </div>
                     </div>

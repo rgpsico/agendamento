@@ -1,7 +1,7 @@
 <x-public.layout title="HOME">
    
     <!-- Breadcrumb -->
-		<x-home.breadcrumb title="AQUI"/>
+		<x-home.breadcrumb title="Schols Surfs"/>
 			<!-- /Breadcrumb -->
 			
 			<!-- Page Content -->
@@ -22,11 +22,8 @@
 							
 								
 							@foreach ($model as $value )							
-						
 								<x-home.cardprofissional :value="$value"/>
-
-								
-							@endforeach
+                            @endforeach
 							<!-- /Doctor Widget -->
 
 							

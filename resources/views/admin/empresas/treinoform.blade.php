@@ -43,6 +43,18 @@
                         <x-text-input name="valor_aula_ate" size="30" label="Preço Maximo aula" :value="$model->valor_aula_ate ?? ''" placeholder="Valor Aula" />
                        
                         <x-avatar-component label="Logo da Escola " :model="$model"/>
+
+                        <div class="form-group">                         
+                            <div class="mb-3">      
+                                @isset($model->banners)
+                                    <img src="{{ asset('banner/' . $model->banners) }}" width="150" height="150" alt="Logo da Escola de Surf">
+                                @endisset
+                            </div>
+                            <label>{{$label ?? 'Banners da Empresa'}}</label>
+                            <input type="file" class="form-control" name="banner">
+                            <small class="text-secondary">Tamanho recomendado <b>1116px x 400px</b></small>
+                        </div>
+                        
                     </div>
                                        
                         <div class="card-footer d-flex">

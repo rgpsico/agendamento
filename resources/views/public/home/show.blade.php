@@ -1,7 +1,7 @@
 <x-public.layout title="HOME">
    
     <!-- Breadcrumb -->
-		<x-home.breadcrumb title="Empresa - {{$model->nome}}"/>
+		<x-home.breadcrumb title="{{$model->nome}}"  :model="$model" />
 			<!-- /Breadcrumb -->
 			
 			<!-- Page Content -->
@@ -108,13 +108,23 @@
 							</nav>
 							<!-- /Tab Menu -->
 							
+							<style>
+								.gallery-image {
+								  width: 100%;
+								  height: 100px;
+								}
+							  
+								.card {
+								  margin-bottom: 15px;
+								}
+							  </style>
 							<!-- Tab Content -->
 							<div class="tab-content pt-0">
 							
 								<!-- Overview Content -->
 								<div role="tabpanel" id="doc_overview" class="tab-pane fade show active">
 									<div class="row">
-										<div class="col-md-12 col-lg-9">
+										<div class="col-md-6 col-lg-6">
 										
 											<!-- About Details -->
 											<div class="widget about-widget">
@@ -122,6 +132,23 @@
 												<p>{{$model->descricao}}</p>
 											</div>											
 										</div>
+										<div class="col-6">
+											<div class="widget about-widget">
+											  <h4 class="widget-title">Galeria</h4>
+											  <div class="row">
+												@foreach ($model->galeria as $gal)
+												<div class="col-md-4">
+												  <div class="card">
+													<img class="card-img-top gallery-image" src="{{ asset('galeria_escola/' . $gal->image) }}" alt="Imagem do serviço">
+												  </div>
+												</div>
+												@endforeach
+											  </div>
+											</div>
+										  </div>
+										 
+										  
+										  
 									</div>
 								</div>
 								<div role="tabpanel" id="doc_locations" class="tab-pane fade">
@@ -161,19 +188,19 @@
 												<div class="clinic-timing">
 													<div>
 														<p class="timings-days">
-															<span> Mon - Sat </span>
+															<span> Seg à Seg </span>
 														</p>
 														<p class="timings-times">
-															<span>10:00 AM - 2:00 PM</span>
-															<span>4:00 PM - 9:00 PM</span>
+															<span>07:00 Am 19:00 PM</span>
+															
 														</p>
 													</div>
 													<div>
 													<p class="timings-days">
-														<span>Sun</span>
+														<span>Domingo</span>
 													</p>
 													<p class="timings-times">
-														<span>10:00 AM - 2:00 PM</span>
+														<span>07:00 AM - 19:00 PM</span>
 													</p>
 													</div>
 												</div>
