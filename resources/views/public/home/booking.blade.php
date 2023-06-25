@@ -17,6 +17,8 @@
     			color: #fff;
 				}
 
+        
+
 			</style>
 
 			@include('admin.empresas._partials.modal')
