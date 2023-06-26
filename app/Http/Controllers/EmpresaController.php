@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Empresa;
+use App\Models\EmpresaEndereco;
 use App\Models\EmpresaGaleria;
 use App\Models\Professor;
 use Illuminate\Http\Request;
@@ -12,9 +13,10 @@ class EmpresaController extends Controller
     protected $pageTitle = "Empresa TESTE";
     protected $view = "empresas";
     protected $route = "empresa";
-
-    public function __construct()
+    protected $model;
+    public function __construct(Empresa $model)
     {
+        $this->model = $model;
     }
 
     private function loadView($viewSuffix = 'index', $data = [])
@@ -49,18 +51,9 @@ class EmpresaController extends Controller
         ]);
 
 
-
-
-
-
-
         $data = $request->all();
 
-
-
-
         $data['user_id'] = $request->user_id;
-
 
         // Processar o arquivo de avatar, se houver 
 
@@ -82,28 +75,47 @@ class EmpresaController extends Controller
         }
 
 
-
         // Atualizar a empresa existente ou criar uma nova
         $empresa = Empresa::updateOrCreate(
             ['user_id' => $data['user_id']],
             $data
         );
 
-        $empresa->endereco()->updateOrCreate(
-            ['empresa_id' => $empresa->id],
-            [
-                'cep' => $data['cep'],
-
-                'endereco' => $data['endereco'] ?? 'End',
-                'cidade' => $data['cidade'] ?? 'cit',
-                'estado' => $data['estado'] ?? 'es',
-                'uf' => $data['uf'] ?? 'RJ',
-                'pais' => $data['pais'] ?? 'BR',
-            ]
-        );
 
 
         return redirect()->route('empresa.configuracao', ['userId' => $request->user_id])->with('success', 'Empresa atualizada ou criada com sucesso');
+    }
+
+    public function endereco_update(Request $request)
+    {
+        $data = $request->validate([
+            'empresa_id' => 'required',
+            'cep' => 'required',
+            'endereco' => 'required',
+            'cidade' =>  'required',
+            'estado' => 'required',
+            'uf' => 'required',
+            'pais' => 'required',
+
+        ]);
+
+
+
+
+        $data = $request->all();
+        $data['empresa_id'] = $request->empresa_id;
+
+
+
+        $empresa = EmpresaEndereco::updateOrCreate(
+            ['empresa_id' => $data['empresa_id']],
+            $data
+        );
+
+
+
+
+        return redirect()->back()->with('success', 'Endereço atualizado com sucesso');
     }
 
 
@@ -134,6 +146,19 @@ class EmpresaController extends Controller
             ]
         );
     }
+
+    public function endereco($userId)
+    {
+        $model = Empresa::where('user_id', $userId)->first();
+        return view(
+            'admin.empresas.endereco',
+            [
+                'pageTitle' =>  'Editar Endereço',
+                'model' => $model
+            ]
+        );
+    }
+
 
     public function fotos($userId)
     {

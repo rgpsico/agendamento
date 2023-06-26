@@ -12,6 +12,9 @@
                 <div class="card-body">
                     <form action="{{route('empresa.update',['id' => Auth::user()->id])}}" method="POST" enctype="multipart/form-data">
                         @csrf
+                        
+                        <input type="text" class="form-control" name="user_id" value="{{Auth::user()->id}}">
+                     
                         <div class="form-group">
                             <label>Nome da Escola de Surf</label>
                             <input type="text" class="form-control" name="nome_escola" value="{{ old('nome_escola', $model->name ?? '') }}">

@@ -60,8 +60,8 @@
 											<li><i class="far fa-thumbs-up"></i> {{ round(($model->avaliacao->avg('avaliacao') / 5) * 100) }}%</li>
 
 											<li><i class="far fa-comment"></i> {{$model->avaliacao->count() ?? ''}} Feedback</li>
-											<li><i class="fas fa-map-marker-alt"></i> {{$model->endereco->cidade}}, {{$model->endereco->pais}}</li>
-											<li><i class="far fa-money-bill-alt"></i> {{$model->valor_aula_de}} Até {{$model->valor_aula_ate}}</li>
+											<li><i class="fas fa-map-marker-alt"></i> {{$model->endereco->cidade ?? ''}}, {{$model->endereco->pais ?? ''}}</li>
+											<li><i class="far fa-money-bill-alt"></i> {{$model->valor_aula_de ?? ''}} Até {{$model->valor_aula_ate ?? ''}}</li>
 										</ul>
 									</div>
 									<div class="doctor-action">
@@ -166,7 +166,7 @@
 													<x-avaliacao-home :model="$model"/>
 													<div class="clinic-details mb-0">
 														<h5 class="clinic-direction"> <i class="fas fa-map-marker-alt">
-															</i> {{$model->endereco->numero}}  {{$model->endereco->bairro ?? ''}}, {{$model->endereco->cidade}}, {{$model->endereco->cep}} {{$model->endereco->pais}} <br>
+															</i> {{$model->endereco->numero ?? ''}}  {{$model->endereco->bairro ?? ''}}, {{$model->endereco->cidade ?? ''}}, {{$model->endereco->cep ?? ''}} {{$model->endereco->pais ?? ''}} <br>
 															<a href="javascript:void(0);">Ver Mapa</a></h5>
 														<ul>
 															@foreach ($model->galeria as $gal )

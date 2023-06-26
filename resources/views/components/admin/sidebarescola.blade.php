@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.css">
+
 <div class="sidebar" id="sidebar">
     <div class="sidebar-inner slimscroll">
         <div id="sidebar-menu" class="sidebar-menu">
@@ -5,16 +7,16 @@
                 <li class="menu-title"> 
                     <span>Menu</span>
                 </li>
-
+            
                 <li> 
                     <a href="{{route('escola.dashboard')}}">
                         <i class="fe fe-home"></i> <span>Dashboard</span>
                     </a>
                 </li>
-
+            
                 <li class="submenu">
                     <a href="" class="">
-                        <i class="fe fe-document"></i> 
+                        <i class="fe fe-activity"></i>
                         <span> Serviços</span> 
                         <span class="menu-arrow"></span>
                     </a>
@@ -23,39 +25,49 @@
                         <li><a href="{{route('admin.servico.create')}}">Cadastrar Serviços</a></li>
                     </ul>
                 </li>
-
+            
                 <li> 
                     <a href="{{route('alunos.index')}}">
-                        <i class="fe fe-layout"></i><span>Alunos</span>
+                        <i class="fe fe-users"></i><span>Alunos</span>
                     </a>
                 </li>
                 <li> 
                     <a href="{{route('agenda.index')}}">
-                        <i class="fe fe-layout"></i><span>Agenda</span>
+                        <i class="fe fe-calendar"></i><span>Agenda</span>
                     </a>
                 </li>    
-
+            
                 <li> 
                     <a href="{{route('empresa.fotos',['userId' => Auth::user()->id])}}">
-                        <i class="fe fe-layout"></i><span>Fotos</span>
+                        <i class="fe fe-camera"></i>
+                        <span>Fotos</span>
                     </a>
                 </li>
                 
                 <li> 
                     <a href="{{route('empresa.configuracao',['userId' => Auth::user()->id])}}">
-                        <i class="fe fe-layout"></i><span>Configuração</span>
+                        <i class="fe fe-vector"></i>
+                        <span>Configuração</span>
                     </a>
                 </li>  
-                
-
-                {{-- <li> 
-                    <a href="{{route('empresa.configuracao')}}">
-                        <i class="fe fe-layout"></i><span>Configuração</span>
+            
+                <li class="submenu">
+                    <a href="" class="">
+                        <i class="fe fe-file"></i>
+                        <span> Dados Cadastrais</span> 
+                        <span class="menu-arrow"></span>
                     </a>
-                </li> --}}
-               
-                
-            </ul>
-        </div>
+                    <ul style="display: none;">
+                        <li> 
+                            <a href="{{route('empresa.configuracao',['userId' => Auth::user()->id])}}">
+                                <i class="fe fe-briefcase"></i><span> Empresa</span>
+                            </a>
+                        </li>  
+                        <li> 
+                            <a href="{{route('empresa.endereco',['userId' => Auth::user()->id])}}">
+                               <i class="fe fe-map-pin"></i><span> Endereço</span>
+                            </a>
+                        </li>
+                    </div>
     </div>
 </div>

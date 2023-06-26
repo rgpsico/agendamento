@@ -13,9 +13,8 @@
                     <x-alert/>
                     <form action="{{route('empresa.update')}}" method="POST" enctype="multipart/form-data">
                         @csrf
-                        <input type="hidden" class="" name="user_id" value="{{Auth::user()->id}}" />
-                                      
-                      
+                        <input type="hidden"  name="user_id" value="{{Auth::user()->id}}" />
+
                         <x-text-input name="nome" size="30" label="Nome Completo" :value="$model"/>
 
                         <x-select-modalidade  label="Modalidade"  :model="$model"/>  

@@ -17,7 +17,7 @@
                     <div class="clinic-details">
                         <p class="doc-location">
                             <i class="fas fa-map-marker-alt">
-                                </i> {{$model->endereco->cidade}}, {{$model->endereco->pais}}
+                                </i> {{$model->endereco->cidade ?? 'Rio de Janeiro'}}, {{$model->endereco->pais ?? 'Brasil'}}
                             </p>
                     </div>
                 </div>
