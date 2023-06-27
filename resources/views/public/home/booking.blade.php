@@ -30,18 +30,24 @@
 							<div class="card-body">
 								<div class="booking-doc-info">
 									<a href="" class="booking-doc-img">
+                    @isset($model->avatar)
 										  <img src="{{ asset('avatar/' . $model->avatar) }}" class="img-fluid" alt="Usuario Image">
-									</a>
+                    @endisset
+                    </a>
 									<div class="booking-info">
-										<h4><a href="">{{$model->nome}}</a></h4>
-										<x-avaliacao-home :model="$model" />
-										<p class="text-muted mb-0"><i class="fas fa-map-marker-alt"></i> {{$model->endereco->cidade}}, {{$model->endereco->pais}}</p>
+										<h4><a href="">{{$model->nome ?? 'sEM nOME'}}</a></h4>
+									
+                    @isset($model)                              
+                      <x-avaliacao-home :model="$model" />
+                    @endisset
+										<p class="text-muted mb-0"><i class="fas fa-map-marker-alt"></i> {{$model->endereco->cidade ?? ''}}, {{$model->endereco->pais ?? ''}}</p>
 									</div>
 								</div>
 							</div>
 						</div>
 						<div class="row">
-						@foreach ($model->servicos as $serv )						
+            @isset($model->servicos)              
+         			@foreach ($model->servicos as $serv )						
 						<div class="col-md-3">
 							
 							<div class="card card_servicos" data-servico_preco="{{$serv->preco}}" data-servico_id="{{$serv->id}}" data-servico_titulo="{{$serv->titulo}}" style="border: 1px solid #ddd; border-radius: 10px; box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2); transition: 0.3s;">
@@ -58,7 +64,8 @@
 						 </div>
 
 						 @endforeach 
-						</div>
+             @endisset  
+            </div>
 						<div class="row">
 							<div class="col-12 col-sm-4 col-md-6">
 								<h4 class="mb-1">{{ \Carbon\Carbon::now()->format('d F Y') }}</h4>

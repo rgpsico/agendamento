@@ -23,13 +23,13 @@ class PaymentRequest extends FormRequest
     {
         return [
             'nome' => 'required|string|max:255',
-            // 'sobre_nome' => 'required|string|max:255',
+            'sobre_nome' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:usuarios,email',
             'telefone' => 'required|string|max:20',
             'nome_cartao' => 'required|string|max:255',
             'numero_cartao' => 'required|string|max:19',
             'mes_vencimento' => 'required|string|max:2',
-            'ano_vencimento' => 'required|string|max:2',
+            'ano_vencimento' => 'required|string|min:2',
             'cvv' => 'required|string|max:3',
             'terms_accept' => 'required|accepted',
         ];

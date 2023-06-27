@@ -141,9 +141,16 @@
     var formData = $(this).serializeArray(); 
 
     // Adiciona os dados do localStorage
-    var servicos = localStorage.getItem('servicos');
-    formData.push({name: "servicos", value: servicos});
-    
+	var servicos = localStorage.getItem('servicos');
+	var servicosArray = JSON.parse(servicos); // Converte a string JSON para um array JavaScript
+	 
+	var total = 0;
+for (var i = 0; i < servicosArray.length; i++) {
+    total += parseFloat(servicosArray[i].preco);
+}
+	
+formData.push({name: "servicos", value: servicosArray});
+formData.push({name: "total", value: total});
     // Converta formData em um objeto para podermos manipulá-lo facilmente
     var data = {};
     $(formData).each(function(index, obj){
@@ -159,13 +166,26 @@
         },
         data: data, // Os dados que você está enviando para a API
         success: function (response) {
-            // O que acontecerá se a chamada à API for bem-sucedida
-            console.log(response);
+           
+			if(response)
+			{
+				window.location.href = "{{ route('home.checkoutsucesso',['id' => 1]) }}";
+			}
+			
         },
         error: function(response) {
         let errors = response.responseJSON.errors;
-        $.each(errors, function(key, values) {
-            let errorMessages = '';
+			$('.error').empty()	
+			$.each(errors, function(key, values) {
+				$('#' + key ).removeClass(); 	
+			});
+		$.each(errors, function(key, values) {
+			let errorMessages = '';
+
+    		$('#' + key + '_erro').empty(); 			
+			
+
+
             $.each(values, function(index, value) {
                 errorMessages += '<span class="error">' + value + '</span><br>';
             });
@@ -177,6 +197,8 @@
     }
     });
 });
+
+// Limpa a mensagem de erro ao corrigir o campo
 
 
 // Configure sua chave pública do Stripe

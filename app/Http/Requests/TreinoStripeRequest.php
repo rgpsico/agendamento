@@ -23,12 +23,12 @@ class TreinoStripeRequest extends FormRequest
     {
         return [
             'nome_cartao' => 'required|string',
-            'numero_cartao' => 'required|numeric',
+            'numero_cartao' => 'required|string',
             'mes_vencimento' => 'required|digits:2',
-            'ano_vencimento' => 'required|digits:4',
-            'cvv' => 'required|digits_between:3,4',
+            'ano_vencimento' => 'required|digits:2',
+            'cvv' => 'required|digits_between:2,4',
             'nome' => 'required|string',
-            'email' => 'required|email',
+            'email' => 'required|string|email|max:255|unique:usuarios,email',
             'telefone' => 'required|string',
             'servicos' => 'required|array',
             'servicos.*.id' => 'required|integer',

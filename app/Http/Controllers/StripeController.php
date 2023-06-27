@@ -22,6 +22,8 @@ class StripeController extends Controller
 
     public function pagamento(Request $request)
     {
+
+        dd($request->all());
         // Usamos json_decode porque os dados estão em uma string JSON
         $servicos = json_decode($request->servicos, true);
 
@@ -65,43 +67,43 @@ class StripeController extends Controller
 
     public function treinoStripe(TreinoStripeRequest $request)
     {
-
         $stripe = new StripeClient(env('STRIPE_SECRET'));
 
-        $user = new Usuario();
-        $user->nome = $request->nome;
-        $user->email = $request->email;
-        $user->tipo_usuario = 'Aluno';
-        $user->password = Hash::make('senha');
-        $user->save();
 
 
         $res = $stripe->tokens->create([
             'card' => [
-                'number' => '4242424242424242',
-                'exp_month' => '07',
-                'exp_year' => '2025',
-                'cvc' => '123',
-                'name' => 'Fabi revendedora da Silva'
-
+                'number' => $request->numero_cartao,
+                'exp_month' => $request->mes_vencimento,
+                'exp_year' => $request->ano_vencimento,
+                'cvc' => $request->cvv,
+                'name' => $request->nome_cartao
             ]
         ]);
 
         \Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
-        // Criar um pagamento com um cliente existente
-        $response =  $stripe->charges->create([
-            'amount' => 1000, // valor em centavos
-            'currency' => 'usd',
-            'source' => $res->id, // substitua pelo token de cartão válido
-            'description' => 'Exemplo de pagamento com cartão de crédito',
+
+        $response = $stripe->charges->create([
+            'amount' => $request->total, // Valor em centavos, substitua pelo valor correto
+            'currency' => 'usd', // Substitua pela moeda correta
+            'source' => $res->id,
+            'description' => $request->description
         ]);
 
         if ($response->status === 'succeeded') {
-            return  response(['content' =>  $response]);
+            $user = new Usuario();
+            $user->nome = $request->nome;
+            $user->email = $request->email;
+            $user->tipo_usuario = 'Aluno';
+            $user->password = Hash::make('senha');
+            $user->save();
+
+            return response(['content' => $response]);
         } else {
             // Lógica para tratamento de erro, caso o pagamento não tenha sido bem-sucedido
         }
     }
+
 
     public function all()
     {
