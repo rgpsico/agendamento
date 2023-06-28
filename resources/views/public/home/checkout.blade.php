@@ -24,41 +24,20 @@
 										<div class="info-widget">
 											<h4 class="card-title">Informações</h4>
 											<div class="row">
-												<div class="col-md-6 col-sm-12">
-													<div class="form-group card-label">
-														<label>Nome</label>
-														<input class="form-control @error('nome') is-invalid @enderror" id="nome" name="nome" value="{{ old('nome') }}" type="text">
-													     <div class="invalid-feedback" style='none' id="nome_erro"></div>
-													
+												   <input type="hidden" name="professor_id" id="professor_id" value="{{$model->id}}">	
+													<x-input-api-validation name="nome" col="6" placeholder="Ex: Roger Silva" label="Nome" value="Roger Neves" />
+
+													<x-input-api-validation name="sobre_nome" col="6" placeholder="Ex: Neves" label="Sobrenome" value="Neves" />
+
+													<x-input-api-validation name="email" col="6" placeholder="Ex: exemplo@email.com" label="Email" value="rgyr2010@hotmail.com" />
+
+													<x-input-api-validation name="telefone" col="6" placeholder="Ex: (00) 12345-6789" label="Telefone" value="21 990271287" />
+											
+													<div class="exist-customer my-4 mb-4">
+														Sou cliente? 
+														<a href="{{route('home.login')}}" >Click aqui para fazer login</a>
 													</div>
-												</div>
-												<div class="col-md-6 col-sm-12">
-													<div class="form-group card-label">
-														<label>Sobre Nome</label>
-														<input type="text" class="form-control" id="sobre_nome" name="sobre_nome" value="{{ old('sobre_nome') }}" ">
-														<div class="invalid-feedback"  id="sobre_nome_erro"></div>
-													
-													</div>
-												</div>
-												<div class="col-md-6 col-sm-12">
-													<div class="form-group card-label">
-														<label>Email</label>
-														<input class="form-control" id="email" name="email" value="{{ old('email') }}" type="email">
-														 <div class="invalid-feedback"  id="email_erro"></div>
-														
-													</div>
-												</div>
-												<div class="col-md-6 col-sm-12">
-													<div class="form-group card-label">
-														<label>Telefone</label>
-														<input class="form-control @error('telefone') is-invalid @enderror" id="telefone" name="telefone" value="{{ old('telefone') }}" type="text">
-														<div class="invalid-feedback"  id="telefone_erro"></div>
-													
-													</div>
-												
 											</div>
-											<div class="exist-customer">Sou cliente? <a href="#">Click aqui para fazer login</a></div>
-										</div>
 										<!-- /Personal Information -->
 									
 										<div class="payment-widget">
@@ -74,31 +53,26 @@
 													
 												</label> --}}
 												
-												<div class="row">
+												<div class="row">													
+													<x-input-api-validation name="nome_cartao" col="6" placeholder="Ex: Roger Silva" label="Nome no Cartão"  value="Roger Neves" />												
 													
-												
-													<x-input-api-validation name="nome_cartao" col="6" placeholder="Ex: Roger Silva" label="Nome no Cartão" />												
-													
-													<x-input-api-validation name="numero_cartao" col="6" placeholder="1234  5678  9876  5432" label="Numero do Cartão" />
+													<x-input-api-validation name="numero_cartao" col="6" placeholder="1234  5678  9876  5432" label="Numero do Cartão" value="4242 4242 4242 4242" />
 													 
-													<x-input-api-validation name="mes_vencimento" col="4" placeholder="Mês de vencimento" label="Mês de vencimento" />
+													<x-input-api-validation name="mes_vencimento" col="4" placeholder="Mês de vencimento" label="Mês de vencimento"  value="12" />
 													
-													<x-input-api-validation name="ano_vencimento" col="4" placeholder="Ano Vencimento" label="Ano Vencimento" />
+													<x-input-api-validation name="ano_vencimento" col="4" placeholder="Ano Vencimento" label="Ano Vencimento" value="28" />
 													
-													
-													<x-input-api-validation name="cvv" col="4" placeholder="124" label="CVV" />
-													
-													
+													<x-input-api-validation name="cvv" col="4" placeholder="124" label="CVV"  value="124" />
 												</div>
 											</div>
 											<!-- /Credit Card Payment -->
 											<!-- Paypal Payment -->
 											<div class="payment-list">
-												<label class="payment-radio paypal-option">
+												{{-- <label class="payment-radio paypal-option">
 													<input type="radio" name="radio">
 													<span class="checkmark"></span>
 													Paypal
-												</label>
+												</label> --}}
 											</div>
 											<!-- /Paypal Payment -->
 											<!-- Terms Accept -->
@@ -148,9 +122,14 @@
 for (var i = 0; i < servicosArray.length; i++) {
     total += parseFloat(servicosArray[i].preco);
 }
-	
-formData.push({name: "servicos", value: servicosArray});
-formData.push({name: "total", value: total});
+
+var data = localStorage.getItem('data');
+var horaAula = localStorage.getItem('horaAula');
+
+formData.push({ name: "servicos", value: servicosArray });
+formData.push({ name: "total", value: total });
+formData.push({ name: "data_aula", value: data });
+formData.push({ name: "hora_aula", value: horaAula });
     // Converta formData em um objeto para podermos manipulá-lo facilmente
     var data = {};
     $(formData).each(function(index, obj){

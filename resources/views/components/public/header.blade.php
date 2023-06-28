@@ -81,7 +81,7 @@
 										<a href="{{route('home.login')}}">Login / Cadastrar</a>
 									</li>
 									<li class="register-btn">
-										<a href="{{route('home.register')}}" class="btn reg-btn">
+										<a href="{{route('home.registerProf')}}" class="btn reg-btn">
 											<i class="feather-user"></i>Registrar
 										</a>
 									</li>

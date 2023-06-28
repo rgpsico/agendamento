@@ -4,9 +4,14 @@ use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/register', function () {
-    return view('auth.register');
+Route::get('/registerprof', function () {
+    return view('auth.registerProf');
 });
+
+Route::get('/registeraluno', function () {
+    return view('auth.registerAluno');
+});
+
 
 Route::get('/login', function () {
     return view('auth.login');
@@ -18,7 +23,9 @@ Route::get('/', function () {
 });
 
 
-Route::get('/register', [HomeController::class, 'register'])->name('home.register');
+Route::get('/registerProf', [HomeController::class, 'registerProf'])->name('home.registerProf');
+Route::get('/registerAluno', [HomeController::class, 'registerAluno'])->name('home.registerAluno');
+
 Route::get('/login', [HomeController::class, 'login'])->name('home.login');
 
 Route::get('/', [HomeController::class, 'index'])->name('home.index');

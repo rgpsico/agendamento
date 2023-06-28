@@ -61,7 +61,7 @@
 												</div>
 											</div>
 											<div class="text-center dont-have">Não tenho conta ainda 
-												<a href="{{route('home.register')}}">Registrar</a></div>
+												<a href="{{route('home.registerProf')}}">Registrar</a></div>
 										</form>
 									</div>
 								</div>

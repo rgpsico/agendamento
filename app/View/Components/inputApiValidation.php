@@ -12,13 +12,15 @@ class inputApiValidation extends Component
      * Create a new component instance.
      */
 
-    public $name, $label, $placeholder, $col;
-    public function __construct($name, $label, $placeholder, $col = '4')
+    public $name, $label, $placeholder, $col, $value;
+
+    public function __construct($name, $label, $placeholder, $col = '4', $value)
     {
         $this->name = $name;
         $this->label = $label;
         $this->placeholder  = $placeholder;
         $this->col = $col;
+        $this->value = $value;
     }
 
     /**

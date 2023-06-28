@@ -144,10 +144,22 @@ class HomeController extends Controller
         );
     }
 
-    public function register()
+    public function registerProf()
     {
         return view(
-            'public.registrar.register',
+            'public.registrar.registerProf',
+            [
+                'pageTitle' => $this->pageTitle,
+                'view' => $this->view,
+                'route' => $this->route
+            ]
+        );
+    }
+
+    public function registerAluno()
+    {
+        return view(
+            'public.registrar.registerAluno',
             [
                 'pageTitle' => $this->pageTitle,
                 'view' => $this->view,

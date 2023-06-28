@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\TreinoStripeRequest;
+use App\Models\Agendamento;
 use App\Models\Usuario;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -70,6 +72,27 @@ class StripeController extends Controller
         $stripe = new StripeClient(env('STRIPE_SECRET'));
 
 
+        $user = new Usuario();
+        $user->nome = $request->nome;
+        $user->email = $request->email;
+        $user->tipo_usuario = 'Aluno';
+        $user->password = Hash::make('senha');
+        $user->save();
+
+        $user_id = $user->id;
+        $data_agendamento = $request->data_aula;
+        $hora_agendamento = $request->hora_aula;
+        $professor_id = $request->professor_id;
+        $aula_id = $request->aula_id ??  1;
+
+        $data_agendamento_formato_eua = Carbon::createFromFormat('j M. Y', $data_agendamento)->format('Y-m-d');
+
+        $agendamento = Agendamento::create([
+            'aluno_id' => 1,
+            'aula_id' => $aula_id,
+            'professor_id' => $professor_id,
+            'data_agendamento' => $data_agendamento_formato_eua . ' ' . $hora_agendamento,
+        ]);
 
         $res = $stripe->tokens->create([
             'card' => [
@@ -91,12 +114,7 @@ class StripeController extends Controller
         ]);
 
         if ($response->status === 'succeeded') {
-            $user = new Usuario();
-            $user->nome = $request->nome;
-            $user->email = $request->email;
-            $user->tipo_usuario = 'Aluno';
-            $user->password = Hash::make('senha');
-            $user->save();
+
 
             return response(['content' => $response]);
         } else {

@@ -133,7 +133,7 @@
 								<a href="{{ route('home.checkoutAuth',['user_id' =>$model->user_id]) }}" class="btn btn-primary submit-btn">Agendar e Pagar</a>
 							@else
 								<!-- Se o usuário não estiver autenticado, redireciona para a rota de checkout -->
-								<a href="{{ route('home.checkout', ['id' =>$model->user_id]) }}" class="btn btn-primary submit-btn">Agendar e Pagar</a>
+								<a href="{{ route('home.checkout', ['id' =>1]) }}" class="btn btn-primary submit-btn">Agendar e Pagar</a>
 							@endif
 						</div>
 						<!-- /Submit Section -->

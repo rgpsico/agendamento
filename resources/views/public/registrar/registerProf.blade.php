@@ -20,14 +20,15 @@
 									<div class="col-md-12 col-lg-6 login-right">
 										<x-alert/>
 										<div class="login-header">
-											<h3>Registrar 
-												<a href="">Você é um Professor</a>
+											<h3>Registrar Aluno
+												<a href="{{route('home.registerAluno')}}">Sou um Aluno</a>
 											</h3>
 										</div>
 										
 										<!-- Register Form -->
 										<form action="{{route('user.store')}}" method="POST" enctype="multipart/form-data">
 											@csrf
+											<input type="hidden" class="form-control" name="tipo_usuario" value="Professor">
 											<div class="form-group form-focus">
 												<input type="text" class="form-control floating" name="nome" value="roger">
 												<label class="focus-label">Nome</label>
