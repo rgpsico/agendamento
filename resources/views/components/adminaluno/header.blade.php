@@ -9,7 +9,7 @@
         <link rel="shortcut icon" type="image/x-icon" href="{{asset('admin/img/favicon.png')}}">
 		
 		<!-- Bootstrap CSS -->
-        <link rel="stylesheet" href="{{asset('admin/css/bootstrap.min.css')}}">
+        <link rel="stylesheet" href="{{asset('admin/css/bootstrap.css')}}">
 		
 		<!-- Fontawesome CSS -->
         <link rel="stylesheet" href="{{asset('admin/css/font-awesome.min.css')}}">
@@ -43,14 +43,13 @@
 			
 				<!-- Logo -->
 				@php 
-					$user = Auth::user(); // pega o usuário autenticado
-					$empresa = $user->empresa ?? 	'';
+					$user = Auth::user() ?? ''; // pega o usuário autenticado
+					$empresa = $user->empresa ?? '';
 					$avatar = $empresa->avatar ?? '';
 				@endphp
                 <div class="header-left">
                     <a href="{{route('home.index')}}" class="logo">
-						<x-logo-tipo imagem="{{$avatar}}" largura="154" altura="80" />
-					</a>
+						<img src="{{asset('admin/img/logo.png')}}" width="150" height="150" alt="Logo da Escola de Surf">		</a>
 					<a href="{{route('home.index')}}" class="logo logo-small">
 						<img src="{{asset('admin/img/logo-small.png')}}" alt="Logo" width="30" height="30">
 					</a>
@@ -175,13 +174,6 @@
 					<!-- /User Menu -->
 					
 				</ul>
-				<!-- /Header Right Menu -->
-				
-            </div>
-			<!-- /Header -->
-			
-			<!-- Sidebar -->
-         {{-- <x-admin.sidebar/> --}}
-		 <x-admin.sidebarescola/>
+			 <x-adminaluno.sidebarescola/>
 			<!-- /Sidebar -->
 			

@@ -1,3 +1,4 @@
+
 <div class="sidebar" id="sidebar">
     <div class="sidebar-inner slimscroll">
         <div id="sidebar-menu" class="sidebar-menu">
@@ -8,14 +9,14 @@
             
                 <li> 
                     <a href="{{route('escola.dashboard')}}">
-                        <i class="fe fe-home"></i> <span>Dashboard</span>
+                        <i class="fe fe-home"></i> <span>Escola</span>
                     </a>
                 </li>
             
                 <li class="submenu">
                     <a href="" class="">
                         <i class="fe fe-activity"></i>
-                        <span> Serviços</span> 
+                        <span> sss</span> 
                         <span class="menu-arrow"></span>
                     </a>
                     <ul style="display: none;">

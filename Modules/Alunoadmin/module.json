@@ -1,0 +1,11 @@
+{
+    "name": "Alunoadmin",
+    "alias": "alunoadmin",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Alunoadmin\\Providers\\AlunoadminServiceProvider"
+    ],
+    "files": []
+}
