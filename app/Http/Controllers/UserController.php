@@ -68,9 +68,15 @@ class UserController extends Controller
 
         if ($user) {
             Auth::login($user);
-        }
 
-        return redirect()->route('agenda.index')->with('success', 'Usuário criado com sucesso!');
+
+            if ($user->tipo_usuario  == 'Professor') {
+                return redirect()->route('agenda.index')->with('success', 'Usuário criado com sucesso!');
+            }
+
+            return redirect()->route('alunos.aulas')->with('success', 'Usuário criado com sucesso!');
+        }
+        return redirect()->back();
     }
 
 
@@ -84,7 +90,12 @@ class UserController extends Controller
 
 
         if (Auth::attempt(['email' => $request->email, 'password' => $request->senha])) { // Changed 'senha' to 'password'
-            return redirect()->intended(route('escola.dashboard'));
+
+            if (Auth::user()->tipo_usuario == 'Professor') {
+                return redirect()->intended(route('escola.dashboard'));
+            }
+
+            return redirect()->intended(route('alunos.aulas'));
         }
 
         // If unsuccessful, redirect back to the login with the form data

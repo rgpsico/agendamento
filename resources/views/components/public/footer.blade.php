@@ -18,9 +18,9 @@
 					<div class="footer-widget footer-menu">
 						<h2 class="footer-title">Alunos</h2>
 						<ul>
-							<li><a href="search.html">Search for Doctors</a></li>
-							<li><a href="login.html">Login</a></li>
-							<li><a href="register.html">Register</a></li>
+							<li><a href="search.html">Buscar Professores</a></li>
+							<li><a href="{{route('home.login')}}">Login</a></li>
+							<li><a href="{{route('home.registerAluno')}}">Registrar</a></li>
 						</ul>
 					</div>
 				</div>
@@ -28,9 +28,9 @@
 					<div class="footer-widget footer-menu">
 						<h2 class="footer-title">Professores</h2>
 						<ul>
-							<li><a href="appointments.html">Appointments</a></li>
-							<li><a href="chat.html">Chat</a></li>
-							<li><a href="login.html">Login</a></li>
+							<li><a href="{{route('home.registerProf')}}">Cadastrar</a></li>
+							<li><a href="">Whatssap</a></li>
+							<li><a href="">Login</a></li>
 						</ul>
 					</div>
 				</div>
@@ -39,24 +39,24 @@
 						<h2 class="footer-title">Ligue pra gente</h2>
 						<div class="footer-contact-info">
 							<div class="footer-address">
-								<p><i class="feather-map-pin"></i> 3556 Beech Street, USA</p>
+								<p><i class="feather-map-pin"></i> Rua saint roman 200, Brasil , RJ</p>
 							</div>
 							<div class="footer-address">
-								<p><i class="feather-phone-call"></i> +1 315 369 5943</p>
+								<p><i class="feather-phone-call"></i> +21 990271287</p>
 							</div>
 							<div class="footer-address mb-0">
-								<p><i class="feather-mail"></i> doccure@example.com</p>
+								<p><i class="feather-mail"></i> rjpasseios@gamil.com</p>
 							</div>
 						</div>
 					</div>
 				</div>
 				<div class="col-lg-3 col-md-7">
 					<div class="footer-widget">
-						<h2 class="footer-title">Envie um E-mail</h2>
+						<h2 class="footer-title">Envie um e-mail</h2>
 						<div class="subscribe-form">
 							<form action="#">
-								<input type="email" class="form-control" placeholder="Enter Email">
-								<button type="submit" class="btn">Submit</button>
+								<input type="email" class="form-control" placeholder="Email">
+								<button type="submit" class="btn">Enviar</button>
 							</form>
 						</div>
 						<div class="social-icon">
@@ -95,8 +95,8 @@
 						<!-- Copyright Menu -->
 						<div class="copyright-menu">
 							<ul class="policy-menu">
-								<li><a href="privacy-policy.html">Privacy Policy</a></li>
-								<li><a href="terms-condition.html">Terms and Conditions</a></li>
+								<li><a href="">Privacy Policy</a></li>
+								<li><a href="">Terms and Conditions</a></li>
 							</ul>
 						</div>
 						<!-- /Copyright Menu -->
