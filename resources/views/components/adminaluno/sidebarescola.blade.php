@@ -7,23 +7,19 @@
                 <li class="menu-title"> 
                     <span>Menu</span>
                 </li>            
+                 
                 <li> 
-                    <a href="{{route('alunos.dashboard', ['id' => 1])}}">
-                        <i class="fas fa-chart-pie"></i> <span>Dashboard</span>
-                    </a>
-                </li>  
-                <li> 
-                    <a href="{{route('alunos.aulas',['id' => 1])}}">
+                    <a href="{{route('alunos.aulas',['id' => Auth::user()->id])}}">
                         <i class="fas fa-book"></i> <span>Aulas</span>
                     </a>
                 </li> 
                 <li> 
-                    <a href="{{route('alunos.fotos', ['id' => 1])}}">
+                    <a href="{{route('alunos.fotos', ['id' => Auth::user()->id])}}">
                         <i class="fas fa-camera"></i> <span>Fotos</span>
                     </a>
                 </li> 
                 <li> 
-                    <a href="{{route('alunos.perfil', ['id' => 1])}}">
+                    <a href="{{route('alunos.perfil', ['id' => Auth::user()->id])}}">
                         <i class="fas fa-user"></i> <span>Perfil</span>
                     </a>
                 </li>

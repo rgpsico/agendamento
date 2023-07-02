@@ -12,8 +12,7 @@
 */
 
 Route::prefix('alunoadmin')->group(function () {
-    Route::get('/dashboard', 'AlunoadminController@dashboard')->name('alunos.dashboard');
     Route::get('/', 'AlunoadminController@index')->name('alunos.aulas');
-    Route::get('/fotos', 'AlunoadminController@fotos')->name('alunos.fotos');
-    Route::get('/perfil', 'AlunoadminController@perfil')->name('alunos.perfil');
+    Route::get('/{id}/fotos', 'AlunoadminController@fotos')->name('alunos.fotos');
+    Route::get('/{id}/perfil', 'AlunoadminController@perfil')->name('alunos.perfil');
 });

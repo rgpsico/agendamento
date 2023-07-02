@@ -3,6 +3,7 @@
 namespace Modules\Alunoadmin\Http\Controllers;
 
 use App\Models\Alunos;
+use App\Models\Usuario;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -11,7 +12,7 @@ class AlunoadminController extends Controller
 {
     protected $model;
 
-    public function __construct(Alunos $model)
+    public function __construct(Usuario $model)
     {
         $this->model = $model;
     }
@@ -37,9 +38,9 @@ class AlunoadminController extends Controller
 
     public function perfil($id)
     {
-        $model = $this->model->firstOrFail($id);
+
         $title = 'Perfil';
-        return view('alunoadmin::alunos.perfil', compact('title', 'model'));
+        return view('alunoadmin::alunos.perfil', ['title' => 'Perfil']);
     }
 
     public function dashboard()

@@ -17,10 +17,10 @@
                             </a>
                         </div>
                         <div class="col ml-md-n2 profile-user-info">
-                            <h4 class="user-name mb-0">{{$model->nome}}</h4>
-                            <h6 class="text-muted">{{$model->email}}</h6>
-                            <div class="user-Location"><i class="fa fa-map-marker"></i> {{$model->endereco->uf}}, {{$model->endereco->cidade}}</div>
-                            <div class="about-text">{{$model->descricao}}</div>
+                            <h4 class="user-name mb-0">{{$model->nome ?? ''}}</h4>
+                            <h6 class="text-muted">{{$model->email ?? ''}}</h6>
+                            <div class="user-Location"><i class="fa fa-map-marker"></i> {{$model->endereco->uf ?? ''}}, {{$model->endereco->cidade ?? ''}}</div>
+                            <div class="about-text">{{$model->descricao ?? ''}}</div>
                         </div>
                         <div class="col-auto profile-btn">
                             
