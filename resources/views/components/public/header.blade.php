@@ -81,8 +81,14 @@
 										<a href="{{route('home.login')}}">Login / Cadastrar</a>
 									</li>
 									<li class="register-btn">
-										<a href="{{route('home.registerProf')}}" class="btn reg-btn">
-											<i class="feather-user"></i>Registrar
+										<a href="{{route('home.registerProf')}}" target="_blank" class="btn reg-btn">
+											<i class="feather-user"></i>Registrar Professor
+										</a>
+									</li>
+
+									<li class="register-btn">
+										<a href="{{route('home.registerAluno')}}" class="btn reg-btn">
+											<i class="feather-user"></i>Registrar Aluno
 										</a>
 									</li>
 									<li class="register-btn">

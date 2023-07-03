@@ -5,9 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Alunos extends Model
+class AlunoEndereco extends Model
 {
     use HasFactory;
+
+    protected $table = 'alunos_enderecos';
+
     protected $fillable = ['usuario_id'];
 
     public function usuario()
@@ -23,6 +26,6 @@ class Alunos extends Model
 
     public function endereco()
     {
-        return $this->hasOne(AlunoEndereco::class, 'aluno_id', 'id');
+        return $this->hasOne(AlunosEndereco::class, 'empresa_id', 'id');
     }
 }

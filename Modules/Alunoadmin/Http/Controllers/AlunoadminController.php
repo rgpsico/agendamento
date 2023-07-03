@@ -2,6 +2,8 @@
 
 namespace Modules\Alunoadmin\Http\Controllers;
 
+use App\Models\Agendamento;
+use App\Models\Aluno_galeria;
 use App\Models\Alunos;
 use App\Models\Usuario;
 use Illuminate\Contracts\Support\Renderable;
@@ -23,8 +25,21 @@ class AlunoadminController extends Controller
     public function index()
     {
         $title = 'Alunos';
-        return view('alunoadmin::alunos.index', compact('title'));
+
+        // Obter o aluno ligado ao usuário autenticado
+        $id = auth()->user()->aluno->id;
+
+
+
+        // Obter os agendamentos para o aluno
+        $agendamentos = Agendamento::with('professor')->where('aluno_id', $id)->get();
+
+        return view('alunoadmin::alunos.index', compact('title', 'agendamentos'));
     }
+
+
+
+
 
     /**
      * Show the form for creating a new resource.
@@ -33,14 +48,21 @@ class AlunoadminController extends Controller
     public function fotos()
     {
         $title = 'Fotos';
-        return view('alunoadmin::alunos.fotos', compact('title'));
+        $user_id = auth()->user()->aluno->id;
+        $model = Aluno_galeria::where('usuario_id', $user_id)->get();
+
+        return view('alunoadmin::alunos.fotos', compact('title', 'model'));
     }
+
 
     public function perfil($id)
     {
-
         $title = 'Perfil';
-        return view('alunoadmin::alunos.perfil', ['title' => 'Perfil']);
+        $user_id = auth()->user()->aluno->id;
+        $model = Alunos::with('usuario', 'endereco')->where('id', $user_id)->first();
+
+
+        return view('alunoadmin::alunos.perfil', compact('title', 'model'));
     }
 
     public function dashboard()

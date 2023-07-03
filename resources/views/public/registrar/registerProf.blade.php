@@ -1,76 +1,61 @@
-<x-public.layout title="HOME">
-   
-   
-			<!-- Page Content -->
-			<div class="content top-space">
-				<div class="container">
-					
-					<div class="row">
-						<div class="col-md-8 offset-md-2">
-						
-						
-							
-							<div class="account-content">
-                         		<div class="row align-items-center justify-content-center">
-									
-									<div class="col-md-7 col-lg-6 login-left">
-										
-										<img src="{{asset('admin/img/register.png')}}" class="img-fluid" alt="Doccure Register" height="400px">	
-									</div>
-									<div class="col-md-12 col-lg-6 login-right">
-										<x-alert/>
-										<div class="login-header">
-											<h3>Registrar Aluno
-												<a href="{{route('home.registerAluno')}}">Sou um Aluno</a>
-											</h3>
-										</div>
-										
-										<!-- Register Form -->
-										<form action="{{route('user.store')}}" method="POST" enctype="multipart/form-data">
-											@csrf
-											<input type="hidden" class="form-control" name="tipo_usuario" value="Professor">
-											<div class="form-group form-focus">
-												<input type="text" class="form-control floating" name="nome" value="roger">
-												<label class="focus-label">Nome</label>
-											</div>
-											<div class="form-group form-focus">
-												<input type="text" name="email" class="form-control floating" value="rgyr2010@hotmail.com">
-												<label class="focus-label">E-mail</label>
-											</div>
-											<div class="form-group form-focus">
-												<input type="password" name="senha" class="form-control floating">
-												<label class="focus-label">Senha</label>
-											</div>
-											<div class="text-end">
-												<a class="forgot-link" href="{{route('home.login')}}">Você ja tem uma Conta ?</a>
-											</div>
-											<button class="btn btn-primary w-100 btn-lg login-btn" type="submit">Entrar</button>
-											<div class="login-or">
-												<span class="or-line"></span>
-												<span class="span-or">Ou</span>
-											</div>
-											<div class="row form-row social-login">
-												<div class="col-6">
-													<a href="#" class="btn btn-facebook w-100"><i class="fab fa-facebook-f me-1"></i> Login</a>
-												</div>
-												<div class="col-6">
-													<a href="#" class="btn btn-google w-100"><i class="fab fa-google me-1"></i> Login</a>
-												</div>
-											</div>
-										</form>
-										<!-- /Register Form -->
-										
-									</div>
-								</div>
-							</div>
-							<!-- /Register Content -->
-								
-						</div>
-					</div>
+<link rel="stylesheet" href="{{asset('admin/css/custom.css')}}">
 
+<link rel="stylesheet" href="{{asset('admin/css/bootstrap.css')}}">
+		
+<!-- Fontawesome CSS -->
+<link rel="stylesheet" href="{{asset('admin/css/font-awesome.min.css')}}">
+
+<!-- Main CSS -->
+<link rel="stylesheet" href="{{asset('admin/css/custom.css')}}">
+<div class="main-wrapper login-body">
+	<div class="login-wrapper">
+		<div class="container">
+			<div class="loginbox">
+				<div class="login-left">
+					<img class="img-fluid" src="{{asset('admin/img/logo-white.png')}}" alt="Logo">
 				</div>
-
-			</div>		
-			<!-- /Page Content -->
-			<!-- /Page Content -->
-</x-layoutsadmin>
+				<div class="login-right">
+					<div class="login-right-wrap">
+						<h1>Registrar Escola de surf</h1>
+						<p class="account-subtitle">Acessar seu painel administrativo</p>
+						
+						<!-- Form -->
+						<form action="{{route('user.store')}}">
+							
+							<input type="hidden" name="tipo_usuario" value="professor">
+							<x-text-input name="nome" size="30" label="Nome"  />
+                           
+							<x-text-input name="email" size="30" label="Email"  />
+								
+						    <x-text-input name="password" size="30" label="Senha"  />
+							<x-text-input name="password" size="30" label="Repetir Senha"  />
+							<div class="form-group mb-0">
+								<button class="btn btn-primary w-100" type="submit">Registrar</button>
+							</div>
+						</form>
+						<!-- /Form -->
+						
+						<div class="login-or">
+							<span class="or-line"></span>
+							<span class="span-or">Ou</span>
+						</div>
+						
+						<!-- Social Login -->
+						<div class="social-login">
+							<span>Registrar Com</span>
+							<a href="#" class="facebook">
+								<i class="fa fa-facebook"></i></a>
+								<a href="#" class="google">
+								<i class="fa fa-google"></i>
+							</a>
+						</div>
+						<!-- /Social Login -->
+						
+						<div class="text-center dont-have">Eu ja tenho uma conta? 
+							<a href="{{route('home.login')}}">Login</a></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

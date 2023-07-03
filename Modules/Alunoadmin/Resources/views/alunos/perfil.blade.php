@@ -17,10 +17,10 @@
                             </a>
                         </div>
                         <div class="col ml-md-n2 profile-user-info">
-                            <h4 class="user-name mb-0">{{$model->nome ?? ''}}</h4>
-                            <h6 class="text-muted">{{$model->email ?? ''}}</h6>
+                            <h4 class="user-name mb-0">{{$model->usuario->nome ?? ''}}</h4>
+                            <h6 class="text-muted">{{$model->usuario->email ?? ''}}</h6>
                             <div class="user-Location"><i class="fa fa-map-marker"></i> {{$model->endereco->uf ?? ''}}, {{$model->endereco->cidade ?? ''}}</div>
-                            <div class="about-text">{{$model->descricao ?? ''}}</div>
+                            <div class="about-text">{{$model->usuario->descricao ?? ''}}</div>
                         </div>
                         <div class="col-auto profile-btn">
                             
@@ -51,33 +51,35 @@
                                 <div class="card">
                                     <div class="card-body">
                                         <h5 class="card-title d-flex justify-content-between">
-                                            <span>Personal Details</span> 
-                                            <a class="edit-link" data-bs-toggle="modal" href="#edit_personal_details"><i class="fa fa-edit me-1"></i>Edit</a>
+                                            <span>Detalhes Pessoais</span> 
+                                            <a class="edit-link" data-bs-toggle="modal" href="#edit_personal_details">
+                                                <i class="fa fa-edit me-1"></i>Editar</a>
                                         </h5>
                                         <div class="row">
-                                            <p class="col-sm-2 text-muted text-sm-end mb-0 mb-sm-3">Name</p>
-                                            <p class="col-sm-10">John Doe</p>
+                                            <p class="col-sm-2 text-muted text-sm-end mb-0 mb-sm-3">Nome</p>
+                                            <p class="col-sm-10">{{ $model->usuario->nome }}</p>
                                         </div>
                                         <div class="row">
-                                            <p class="col-sm-2 text-muted text-sm-end mb-0 mb-sm-3">Date of Birth</p>
-                                            <p class="col-sm-10">24 Jul 1983</p>
+                                            <p class="col-sm-2 text-muted text-sm-end mb-0 mb-sm-3">Data de Nascimento</p>
+                                            <p class="col-sm-10">{{ $model->data_de_nascimento  ?? ''}}</p>
                                         </div>
                                         <div class="row">
-                                            <p class="col-sm-2 text-muted text-sm-end mb-0 mb-sm-3">Email ID</p>
-                                            <p class="col-sm-10">johndoe@example.com</p>
+                                            <p class="col-sm-2 text-muted text-sm-end mb-0 mb-sm-3">Email</p>
+                                            <p class="col-sm-10">{{ $model->usuario->email ?? '' }}</p>
                                         </div>
                                         <div class="row">
-                                            <p class="col-sm-2 text-muted text-sm-end mb-0 mb-sm-3">Mobile</p>
-                                            <p class="col-sm-10">305-310-5857</p>
+                                            <p class="col-sm-2 text-muted text-sm-end mb-0 mb-sm-3">Celular</p>
+                                            <p class="col-sm-10">{{ $model->endereco->celular ?? '' }}</p>
                                         </div>
                                         <div class="row">
-                                            <p class="col-sm-2 text-muted text-sm-end mb-0">Address</p>
-                                            <p class="col-sm-10 mb-0">4663  Agriculture Lane,<br>
-                                            Miami,<br>
-                                            Florida - 33165,<br>
-                                            United States.</p>
+                                            <p class="col-sm-2 text-muted text-sm-end mb-0">Endereço</p>
+                                            <p class="col-sm-10 mb-0">{{ $model->endereco->endereco ?? ''}},<br>
+                                            {{ $model->endereco->cidade ?? '' }},<br>
+                                            {{ $model->endereco->estado ?? ''}} - {{ $model->cep  ?? ''}},<br>
+                                            {{ $model->endereco->pais ?? ''}}.</p>
                                         </div>
                                     </div>
+                                    
                                 </div>
                                 
                                 <!-- Edit Details Modal -->
@@ -89,76 +91,79 @@
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
                                             <div class="modal-body">
-                                                <form>
-                                                    <div class="row form-row">
-                                                        <div class="col-12 col-sm-6">
-                                                            <div class="form-group">
-                                                                <label>First Name</label>
-                                                                <input type="text" class="form-control" value="John">
+                                                <div class="modal-body">
+                                                    <form>
+                                                        <div class="row form-row">
+                                                            <div class="col-12 col-sm-6">
+                                                                <div class="form-group">
+                                                                    <label>Primeiro Nome</label>
+                                                                    <input type="text" class="form-control" value="John">
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                        <div class="col-12 col-sm-6">
-                                                            <div class="form-group">
-                                                                <label>Last Name</label>
-                                                                <input type="text" class="form-control" value="Doe">
+                                                            <div class="col-12 col-sm-6">
+                                                                <div class="form-group">
+                                                                    <label>Último Nome</label>
+                                                                    <input type="text" class="form-control" value="Doe">
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                        <div class="col-12">
-                                                            <div class="form-group">
-                                                                <label>Date of Birth</label>
-                                                                <div class="cal-icon">
-                                                                    <input type="text" class="form-control datetimepicker" value="24-07-1983">
+                                                            <div class="col-12">
+                                                                <div class="form-group">
+                                                                    <label>Data de Nascimento</label>
+                                                                    <div class="cal-icon">
+                                                                        <input type="text" class="form-control datetimepicker" value="24-07-1983">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-12 col-sm-6">
+                                                                <div class="form-group">
+                                                                    <label>Email</label>
+                                                                    <input type="email" class="form-control" value="johndoe@example.com">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-12 col-sm-6">
+                                                                <div class="form-group">
+                                                                    <label>Celular</label>
+                                                                    <input type="text" value="+1 202-555-0125" class="form-control">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-12">
+                                                                <h5 class="form-title"><span>Endereço</span></h5>
+                                                            </div>
+                                                            <div class="col-12">
+                                                                <div class="form-group">
+                                                                    <label>Endereço</label>
+                                                                    <input type="text" class="form-control" value="4663 Agriculture Lane">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-12 col-sm-6">
+                                                                <div class="form-group">
+                                                                    <label>Cidade</label>
+                                                                    <input type="text" class="form-control" value="Miami">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-12 col-sm-6">
+                                                                <div class="form-group">
+                                                                    <label>Estado</label>
+                                                                    <input type="text" class="form-control" value="Florida">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-12 col-sm-6">
+                                                                <div class="form-group">
+                                                                    <label>CEP</label>
+                                                                    <input type="text" class="form-control" value="22434">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-12 col-sm-6">
+                                                                <div class="form-group">
+                                                                    <label>País</label>
+                                                                    <input type="text" class="form-control" value="United States">
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div class="col-12 col-sm-6">
-                                                            <div class="form-group">
-                                                                <label>Email ID</label>
-                                                                <input type="email" class="form-control" value="johndoe@example.com">
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-12 col-sm-6">
-                                                            <div class="form-group">
-                                                                <label>Mobile</label>
-                                                                <input type="text" value="+1 202-555-0125" class="form-control">
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-12">
-                                                            <h5 class="form-title"><span>Address</span></h5>
-                                                        </div>
-                                                        <div class="col-12">
-                                                            <div class="form-group">
-                                                            <label>Address</label>
-                                                                <input type="text" class="form-control" value="4663 Agriculture Lane">
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-12 col-sm-6">
-                                                            <div class="form-group">
-                                                                <label>City</label>
-                                                                <input type="text" class="form-control" value="Miami">
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-12 col-sm-6">
-                                                            <div class="form-group">
-                                                                <label>State</label>
-                                                                <input type="text" class="form-control" value="Florida">
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-12 col-sm-6">
-                                                            <div class="form-group">
-                                                                <label>Zip Code</label>
-                                                                <input type="text" class="form-control" value="22434">
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-12 col-sm-6">
-                                                            <div class="form-group">
-                                                                <label>Country</label>
-                                                                <input type="text" class="form-control" value="United States">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <button type="submit" class="btn btn-primary w-100">Save Changes</button>
-                                                </form>
+                                                        <button type="submit" class="btn btn-primary w-100">Salvar Alterações</button>
+                                                    </form>
+                                                </div>
+                                                
                                             </div>
                                         </div>
                                     </div>
@@ -179,32 +184,48 @@
                     
                         <div class="card">
                             <div class="card-body">
-                                <h5 class="card-title">Change Password</h5>
+                                <h5 class="card-title">Alterar Senha</h5>
                                 <div class="row">
                                     <div class="col-md-10 col-lg-6">
                                         <form>
                                             <div class="form-group">
-                                                <label>Old Password</label>
+                                                <label>Senha Antiga</label>
                                                 <input type="password" class="form-control">
                                             </div>
                                             <div class="form-group">
-                                                <label>New Password</label>
+                                                <label>Nova Senha</label>
                                                 <input type="password" class="form-control">
                                             </div>
                                             <div class="form-group">
-                                                <label>Confirm Password</label>
+                                                <label>Confirmar Senha</label>
                                                 <input type="password" class="form-control">
                                             </div>
-                                            <button class="btn btn-primary" type="submit">Save Changes</button>
+                                            <button class="btn btn-primary" type="submit">Salvar Alterações</button>
                                         </form>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        
                     </div>
                     <!-- /Change Password Tab -->
                     
                 </div>
             </div>
         </div>  
+
+        <script src="{{asset('admin/js/jquery-3.6.4.min.js')}}"></script>
+		
+		<!-- Bootstrap Core JS -->
+        <script src="{{asset('admin/js/bootstrap.bundle.min.js')}}"></script>
+		
+		<!-- Slimscroll JS -->
+        <script src="{{asset('admin/plugins/slimscroll/jquery.slimscroll.min.js')}}"></script>
+
+        <!-- Bootstrap Datetimepicker JS -->
+        <script  src="{{asset('admin/js/moment.min.js')}}"></script>
+		<script  src="{{asset('admin/js/bootstrap-datetimepicker.min.js')}}"></script>
+		
+		<!-- Custom JS -->
+		<script  src="{{asset('admin/js/script.js')}}"></script>
 @endsection

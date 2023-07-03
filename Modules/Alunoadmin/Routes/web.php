@@ -11,7 +11,7 @@
 |
 */
 
-Route::prefix('alunoadmin')->group(function () {
+Route::prefix('alunoadmin')->middleware('auth')->group(function () {
     Route::get('/', 'AlunoadminController@index')->name('alunos.aulas');
     Route::get('/{id}/fotos', 'AlunoadminController@fotos')->name('alunos.fotos');
     Route::get('/{id}/perfil', 'AlunoadminController@perfil')->name('alunos.perfil');

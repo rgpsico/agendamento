@@ -12,10 +12,30 @@ class Agendamento extends Model
 
     protected $fillable = ['aluno_id', 'aula_id', 'professor_id', 'data_agendamento'];
 
-    public $timestamps = false;
+    protected $dates = ['data_da_aula'];
 
     public function disponibilidades()
     {
         return $this->hasMany(Disponibilidade::class, 'id_dia');
+    }
+
+    public function aluno()
+    {
+        return $this->belongsTo(Alunos::class);
+    }
+
+    public function aula()
+    {
+        return $this->belongsTo(Aulas::class);
+    }
+
+    public function professor()
+    {
+        return $this->belongsTo(Professor::class, 'professor_id', 'id');
+    }
+
+    public function modalidade()
+    {
+        return $this->belongsTo(Modalidade::class, 'modalidade_id', 'id');
     }
 }

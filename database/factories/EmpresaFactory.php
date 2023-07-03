@@ -25,7 +25,7 @@ class EmpresaFactory extends Factory
             'user_id' => function () {
                 return Usuario::all()->random()->id;
             },
-            'avatar' => 'avatardefault.jpg',
+            'avatar' => $this->faker->image('public/avatar', 290, 200, null, false),
             'nome' => $this->faker->company,
             'descricao' => $this->faker->text(200),
             'telefone' => $this->faker->phoneNumber,

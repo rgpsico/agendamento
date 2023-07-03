@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Alunos;
+use App\Models\Professor;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -69,12 +71,24 @@ class UserController extends Controller
         if ($user) {
             Auth::login($user);
 
+            if ($user->tipo_usuario == 'Professor') {
+                // Crie um professor associado ao usuário.
+                Professor::create([
+                    'usuario_id' => $user->id,
+                    'especialidade' => 'TESTE',
+                ]);
 
-            if ($user->tipo_usuario  == 'Professor') {
                 return redirect()->route('agenda.index')->with('success', 'Usuário criado com sucesso!');
             }
 
-            return redirect()->route('alunos.aulas')->with('success', 'Usuário criado com sucesso!');
+            if ($user->tipo_usuario == 'Aluno') {
+                // Crie um aluno associado ao usuário.
+                Alunos::create([
+                    'usuario_id' => $user->id,
+                ]);
+
+                return redirect()->route('alunos.aulas')->with('success', 'Usuário criado com sucesso!');
+            }
         }
         return redirect()->back();
     }

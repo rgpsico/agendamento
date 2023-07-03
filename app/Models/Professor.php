@@ -12,15 +12,15 @@ class Professor extends Model
 
     protected $table = "professores";
 
-    protected $primaryKey = 'usuario_id';
-    public $incrementing = false; // Set to false because we're not using auto-incrementing IDs
-    protected $keyType = 'string';
 
     protected $fillable = [
-        'id',
         'usuario_id',
-        'especialidade'
+        'especialidade',
+        'sobre',
+        'avatar'
     ];
+
+    public $timestamps = false;
 
 
 
@@ -29,7 +29,7 @@ class Professor extends Model
         return $this->hasMany(Aulas::class, 'professor_id');
     }
 
-    public function usuarios()
+    public function usuario()
     {
         return $this->hasOne(Usuario::class, 'id', 'usuario_id');
     }
@@ -40,12 +40,12 @@ class Professor extends Model
     }
 
 
-    protected static function boot()
-    {
-        parent::boot();
+    // protected static function boot()
+    // {
+    //     parent::boot();
 
-        static::creating(function ($model) {
-            $model->{$model->getKeyName()} = (string) Str::uuid();
-        });
-    }
+    //     static::creating(function ($model) {
+    //         $model->{$model->getKeyName()} = (string) Str::uuid();
+    //     });
+    // }
 }
