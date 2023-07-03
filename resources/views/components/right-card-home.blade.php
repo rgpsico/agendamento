@@ -12,10 +12,10 @@
                             </li>
                     </ul>
                 </div>
-                <div class="clinic-booking">
+                <div class="clinic-booking">s
                     @isset($value)                       
-                    <a class="view-pro-btn" href="{{route('home.show',['id' => $value->id])}}">Ver Escola</a>
-                    <a class="apt-btn" href="{{route('home.booking',['id' => $value->id])}}">Agendar Aula</a>
+                    <a class="view-pro-btn" href="{{route('home.show',['id' => $value->user_id])}}">Ver Escola</a>
+                    <a class="apt-btn" href="{{route('home.booking',['id' => $value->user_id])}}">Agendar Aula</a>
                     @endisset
                 </div>
             </div>
