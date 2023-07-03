@@ -20,15 +20,16 @@
 						<p class="account-subtitle">Acessar seu painel administrativo</p>
 						
 						<!-- Form -->
-						<form action="{{route('user.store')}}">
+						<form action="{{route('user.store')}}" method="POST">
+							@csrf
 							
-							<input type="hidden" name="tipo_usuario" value="professor">
+							<input type="hidden" name="tipo_usuario" value="Professor">
 							<x-text-input name="nome" size="30" label="Nome"  />
                            
 							<x-text-input name="email" size="30" label="Email"  />
 								
-						    <x-text-input name="password" size="30" label="Senha"  />
-							<x-text-input name="password" size="30" label="Repetir Senha"  />
+						    <x-text-input name="senha" size="30" label="Senha"  />
+							<x-text-input name="senha" size="30" label="Repetir Senha"  />
 							<div class="form-group mb-0">
 								<button class="btn btn-primary w-100" type="submit">Registrar</button>
 							</div>

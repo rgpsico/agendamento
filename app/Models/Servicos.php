@@ -11,7 +11,7 @@ class Servicos extends Model
 
     protected $table = 'servicos';
 
-    protected $fillable = ['empresa_id', 'titulo', 'descricao', 'preco', 'tempo_de_aula'];
+    protected $fillable = ['empresa_id', 'imagem', 'titulo', 'descricao', 'preco', 'tempo_de_aula'];
 
     public function servicos()
     {

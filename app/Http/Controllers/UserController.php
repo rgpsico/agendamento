@@ -33,6 +33,7 @@ class UserController extends Controller
     public function store(Request $request)
     {
 
+
         $request->validate([
             'nome' => 'required',
             'email' => 'required|unique:usuarios,email',
@@ -72,13 +73,16 @@ class UserController extends Controller
             Auth::login($user);
 
             if ($user->tipo_usuario == 'Professor') {
+
                 // Crie um professor associado ao usuário.
                 Professor::create([
                     'usuario_id' => $user->id,
                     'especialidade' => 'TESTE',
+                    'sobre' => 'SObre default',
+                    'avatar' => 'AVATAR'
                 ]);
 
-                return redirect()->route('agenda.index')->with('success', 'Usuário criado com sucesso!');
+                return redirect()->route('agenda.index')->with('success', 'Professor criado com sucesso!');
             }
 
             if ($user->tipo_usuario == 'Aluno') {

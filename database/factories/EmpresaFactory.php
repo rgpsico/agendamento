@@ -23,7 +23,15 @@ class EmpresaFactory extends Factory
     {
         return [
             'user_id' => function () {
-                return Usuario::all()->random()->id;
+                if (Usuario::count() > 0) {
+                    return Usuario::all()->random()->id;
+                } else {
+                    // Create a new user
+                    $user = Usuario::create([
+                        // ... specify necessary data for a new user
+                    ]);
+                    return $user->id;
+                }
             },
             'avatar' => $this->faker->image('public/avatar', 290, 200, null, false),
             'nome' => $this->faker->company,
