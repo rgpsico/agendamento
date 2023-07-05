@@ -1,4 +1,4 @@
-<input type="hidden" class="" name="empresa_id" value="{{Auth::user()->id}}" />                                                              
+<input type="text" class="" name="empresa_id" value="{{Auth::user()->id}}" />                                                              
 												
 												
 												

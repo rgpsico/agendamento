@@ -21,8 +21,9 @@ class ServicoRequest extends FormRequest
      */
     public function rules(): array
     {
+
         return [
-            'empresa_id' => 'required|integer|exists:empresa,id',
+            'empresa_id' => 'required|integer',
             'titulo' => 'required|string|max:255',
             'descricao' => 'nullable|string',
             'preco' => 'required|numeric',

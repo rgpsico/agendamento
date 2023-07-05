@@ -62,17 +62,22 @@ class ServicoController extends Controller
 
 
         if ($model) {
+            $model->empresa_id = $request->empresa_id;
+            $model->titulo = $request->titulo;
+            $model->descricao = $request->descricao;
+            $model->preco = $request->preco;
+            $model->tempo_de_aula = $request->tempo_de_aula;
+
+            // Se a imagem foi carregada, atualize o atributo da imagem
             if ($request->hasFile('imagem')) {
                 $file = $request->file('imagem');
-
                 $filename = time() . '.' . $file->getClientOriginalExtension();
                 $path = public_path('/servico');
                 $file->move($path, $filename);
-
-                $request['imagem'] = $filename;
+                $model->imagem  = $filename;
             }
 
-            $model->update($request->all());
+            $model->save();
             return redirect()->route($this->route . '.edit', ['id' => $id])->with('success', 'Serviço atualizado com sucesso!');
         } else {
             return redirect()->route($this->route . '.index')->with('error', 'Serviço não encontrado.');
@@ -106,6 +111,7 @@ class ServicoController extends Controller
         $servicos->tempo_de_aula = $tempo_de_aula;
 
 
+
         if ($request->hasFile('imagem')) {
             $file = $request->file('imagem');
             $filename = time() . '.' . $file->getClientOriginalExtension();
@@ -113,6 +119,7 @@ class ServicoController extends Controller
             $file->move($path, $filename);
             $servicos->imagem  = $filename;
         }
+
 
         $servicos->save();
 

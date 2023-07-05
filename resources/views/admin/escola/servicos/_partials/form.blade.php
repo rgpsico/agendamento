@@ -1,4 +1,4 @@
-<input type="hidden" class="" name="empresa_id" value="{{Auth::user()->id}}" />                                                              
+                                                        
 												
 												
 												
@@ -11,6 +11,7 @@
 													<input type="file" name="imagem">
 												</div>
 
+                                                <input type="hidden" class="" name="empresa_id" value="{{Auth::user()->empresa->id}}" />      
                                                 <x-text-input name="titulo" size="30" label="Titulo" :value="$model ?? ''"/>
                         
                                                 <x-text-area name="descricao" label="Descrição" :model="$model ?? ''" />                                                                                       
