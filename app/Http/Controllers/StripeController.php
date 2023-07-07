@@ -93,7 +93,7 @@ class StripeController extends Controller
         $professor_id = $request->professor_id;
         $modalidade_id = $request->aula_id ??  1;
 
-        $professor = Professor::where('usuario_id', $professor_id)->first();
+        $professor = Professor::with('usuario')->where('usuario_id', $professor_id)->first();
 
         if (!$professor) {
             // Você pode retornar um erro ou redirecionar de volta com uma mensagem de erro
@@ -129,10 +129,11 @@ class StripeController extends Controller
             'description' => $request->description
         ]);
 
+        $nome_do_professor = $professor->usuario->nome;
+
         if ($response->status === 'succeeded') {
 
-
-            return response(['content' => $response]);
+            return view('public.home.checkoutsucesso', ['nome_professor' => $nome_do_professor]);
         } else {
             // Lógica para tratamento de erro, caso o pagamento não tenha sido bem-sucedido
         }
