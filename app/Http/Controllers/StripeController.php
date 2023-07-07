@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\TreinoStripeRequest;
 use App\Models\Agendamento;
+use App\Models\Alunos;
+use App\Models\Professor;
 use App\Models\Usuario;
 use Carbon\Carbon;
 use Exception;
@@ -25,7 +27,7 @@ class StripeController extends Controller
     public function pagamento(Request $request)
     {
 
-        dd($request->all());
+
         // Usamos json_decode porque os dados estão em uma string JSON
         $servicos = json_decode($request->servicos, true);
 
@@ -72,6 +74,7 @@ class StripeController extends Controller
         $stripe = new StripeClient(env('STRIPE_SECRET'));
 
 
+
         $user = new Usuario();
         $user->nome = $request->nome;
         $user->email = $request->email;
@@ -79,19 +82,32 @@ class StripeController extends Controller
         $user->password = Hash::make('senha');
         $user->save();
 
-        $user_id = $user->id;
+        $aluno = new Alunos();
+        $aluno->usuario_id = $user->id;
+
+        $aluno->save();
+
+        $aluno_id = $aluno->id;
         $data_agendamento = $request->data_aula;
         $hora_agendamento = $request->hora_aula;
         $professor_id = $request->professor_id;
-        $aula_id = $request->aula_id ??  1;
+        $modalidade_id = $request->aula_id ??  1;
+
+        $professor = Professor::where('usuario_id', $professor_id)->first();
+
+        if (!$professor) {
+            // Você pode retornar um erro ou redirecionar de volta com uma mensagem de erro
+            return redirect()->back()->with('erro', 'Professor não encontrado');
+        }
 
         $data_agendamento_formato_eua = Carbon::createFromFormat('j M. Y', $data_agendamento)->format('Y-m-d');
 
         $agendamento = Agendamento::create([
-            'aluno_id' => 1,
-            'aula_id' => $aula_id,
-            'professor_id' => $professor_id,
-            'data_agendamento' => $data_agendamento_formato_eua . ' ' . $hora_agendamento,
+            'aluno_id' => $aluno_id,
+            'modalidade_id' => $modalidade_id,
+            'professor_id' => $professor->id, // Aqui você deve usar o id do professor, não o usuario_id
+            'data_da_aula' => $data_agendamento_formato_eua . ' ' . $hora_agendamento,
+            'valor_aula' => $request->total
         ]);
 
         $res = $stripe->tokens->create([
@@ -107,8 +123,8 @@ class StripeController extends Controller
         \Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
 
         $response = $stripe->charges->create([
-            'amount' => $request->total, // Valor em centavos, substitua pelo valor correto
-            'currency' => 'usd', // Substitua pela moeda correta
+            'amount' => $request->total * 100, // Convertendo o valor para centavos
+            'currency' => 'brl', // Usando a moeda correta
             'source' => $res->id,
             'description' => $request->description
         ]);

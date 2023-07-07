@@ -23,6 +23,12 @@
                         <li><a href="{{route('admin.servico.create')}}">Cadastrar Serviços</a></li>
                     </ul>
                 </li>
+                
+                <li> 
+                    <a href="{{route('empresa.disponibilidade')}}">
+                        <i class="fe fe-users"></i><span>Disponbilidade</span>
+                    </a>
+                </li>
             
                 <li> 
                     <a href="{{route('alunos.index')}}">

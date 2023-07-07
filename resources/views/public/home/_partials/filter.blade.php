@@ -34,7 +34,7 @@
         .then(response => response.json())
         .then(dadosApi => {
             dadosApi.forEach(function(empresa) {
-
+                console.log(empresa)
                 // Calcule a média das avaliações\
                 let sum = 0;
                 empresa.avaliacao.forEach(function(avaliacao) {
@@ -69,7 +69,7 @@
                                     <div class="doctor-widget">
                                         <div class="doc-info-left">
                                             <div class="doctor-img">
-                                                <a href="">
+                                                <a href="${empresa.user_id}/empresa">
                                                     <img src="avatar/${empresa.avatar}" class="img-fluid" alt="${empresa.nome}">
                                                 </a>
                                             </div>
@@ -99,7 +99,11 @@
                                                     </li>
                                                 </ul>
                                             </div>
-                                            <div class="clinic-booking"></div>
+                                            <div class="clinic-booking">
+                                           
+                                           <a class="view-pro-btn" href="${empresa.user_id}/empresa">Ver Escola</a>
+                                           <a class="apt-btn" href="${empresa.user_id}/bokking">Agendar Aula</a>
+                                                           </div>
                                         </div>
                                     </div>
                                 </div>

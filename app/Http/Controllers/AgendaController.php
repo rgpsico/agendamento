@@ -49,6 +49,8 @@ class AgendaController extends Controller
 
     public function store(PaymentRequest $request)
     {
+
+        dd("aaa");
         // Se a validação falhar, o usuário será redirecionado de volta ao formulário com erros de validação.
 
         // Crie o novo usuário

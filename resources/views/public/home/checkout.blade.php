@@ -24,7 +24,7 @@
 										<div class="info-widget">
 											<h4 class="card-title">Informações</h4>
 											<div class="row">
-												   <input type="hidden" name="professor_id" id="professor_id" value="{{$model->id}}">	
+												   <input type="hidden" name="professor_id" id="professor_id" value="{{$model->user_id}}">	
 													<x-input-api-validation name="nome" col="6" placeholder="Ex: Roger Silva" label="Nome" value="Roger Neves" />
 
 													<x-input-api-validation name="sobre_nome" col="6" placeholder="Ex: Neves" label="Sobrenome" value="Neves" />
@@ -153,12 +153,16 @@ formData.push({ name: "hora_aula", value: horaAula });
 			
         },
         error: function(response) {
-        let errors = response.responseJSON.errors;
+			try {
+
+				let errors = response.responseJSON.errors;
+				
 			$('.error').empty()	
 			$.each(errors, function(key, values) {
 				$('#' + key ).removeClass(); 	
 			});
-		$.each(errors, function(key, values) {
+
+			$.each(errors, function(key, values) {
 			let errorMessages = '';
 
     		$('#' + key + '_erro').empty(); 			
@@ -173,6 +177,12 @@ formData.push({ name: "hora_aula", value: horaAula });
 			$('#' + key+'_erro').show()
             $('#' + key+'_erro').append(errorMessages);
         });
+				
+			} catch (error) {
+				
+			}
+      
+
     }
     });
 });

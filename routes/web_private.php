@@ -46,6 +46,9 @@ Route::prefix('admin')->middleware('auth')->group(function () {
         Route::post('update', [EmpresaController::class, 'update'])->name('empresa.update');
         Route::post('/post', [EmpresaController::class, 'store'])->name('empresa.store');
         Route::post('/{userId}/endereco_empresa', [EmpresaController::class, 'endereco_update'])->name('empresa.update_endereco');
+        Route::get('/disponibilidade', [EmpresaController::class, 'disponibilidade'])->name('empresa.disponibilidade');
+        Route::post('/disponibilidade', [EmpresaController::class, 'cadastrarDisponibilidade'])->name('empresa.disponibilidade.store');
+
         Route::delete('/{id}/destroy', [EmpresaController::class, 'destroy'])->name('empresa.destroy');
         Route::get('/{userId}/config', [EmpresaController::class, 'configuracao'])->name('empresa.configuracao');
         Route::get('/{userId}/fotos', [EmpresaController::class, 'fotos'])->name('empresa.fotos');

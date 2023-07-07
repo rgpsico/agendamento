@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DiaDaSemana;
+use App\Models\Disponibilidade;
 use App\Models\Empresa;
 use App\Models\EmpresaEndereco;
 use App\Models\EmpresaGaleria;
 use App\Models\Professor;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class EmpresaController extends Controller
 {
@@ -129,6 +132,45 @@ class EmpresaController extends Controller
     {
         return $this->loadView('create');
     }
+
+    public function disponibilidade()
+    {
+        $diaDaSemana = DiaDaSemana::all();
+        $id_professor = Auth::user()->professor->id;
+        $disponibilidades = Disponibilidade::where('id_professores', $id_professor)->get();
+
+        // Busca as disponibilidades do professor
+        return view(
+            'admin.empresas.disponibilidade',
+            [
+                'pageTitle' => 'Disponibilidade',
+                'diaDaSemana' => $diaDaSemana,
+                'disponibilidades' => $disponibilidades
+            ]
+        );
+    }
+
+    public function cadastrarDisponibilidade(Request $request)
+    {
+
+
+        $dias = $request->input('dias');
+        $hora_inicio = $request->input('start');
+        $hora_fim = $request->input('end');
+
+        for ($i = 0; $i < count($dias); $i++) {
+            // verifica se o horário de início e fim estão definidos para o dia atual
+            if (!empty($hora_inicio[$i]) && !empty($hora_fim[$i])) {
+                Disponibilidade::updateOrCreate(
+                    ['id_professores' => $request->input('professor_id'), 'id_dia' => $dias[$i]],
+                    ['hora_inicio' => $hora_inicio[$i], 'hora_fim' => $hora_fim[$i]]
+                );
+            }
+        }
+
+        return back()->with('success', 'Disponibilidade atualizada com sucesso');
+    }
+
 
     public function show($id)
     {
