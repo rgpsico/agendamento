@@ -25,18 +25,7 @@
 
                         <x-text-input name="telefone" size="30" label="Telefone" :value="$model" />                
                 
-                        <x-text-input name="cep" size="30" label="Cep" :value="$model->endereco ?? '' " />
-                           
-                        <x-text-input name="estado" size="30" label="Estado" :value="$model->endereco ?? '' " />
                         
-                        <x-text-input name="uf" size="30" label="Uf" :value="$model->endereco ?? ''" />
-                    
-                        <x-text-input name="pais" size="30" label="Pais" :value="$model->endereco ?? '' " />
-
-                        <x-text-input name="cidade" size="30" label="Cidade" :value="$model->endereco ?? ''" />
-        
-                        <x-text-input name="endereco" size="30" label="Endereco" :value="$model->endereco ?? ''" />
-                       
                         <x-text-input name="valor_aula_de" size="30" label="Preço Minimo aula" :value="$model->valor_aula_de ?? ''" placeholder="Valor Aula" />
                        
                         <x-text-input name="valor_aula_ate" size="30" label="Preço Maximo aula" :value="$model->valor_aula_ate ?? ''" placeholder="Valor Aula" />
