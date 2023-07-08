@@ -12,9 +12,7 @@ class Aulas extends Model
 
     protected $table = "aulas";
 
-    protected $primaryKey = 'id';
-    public $incrementing = false; // Set to false because we're not using auto-incrementing IDs
-    protected $keyType = 'string';
+
 
     protected $fillable = [
         'professor_id',
@@ -24,14 +22,14 @@ class Aulas extends Model
         'capacidade'
     ];
 
-    protected static function boot()
-    {
-        parent::boot();
+    // protected static function boot()
+    // {
+    //     parent::boot();
 
-        static::creating(function ($model) {
-            $model->{$model->getKeyName()} = (string) Str::uuid();
-        });
-    }
+    //     static::creating(function ($model) {
+    //         $model->{$model->getKeyName()} = (string) Str::uuid();
+    //     });
+    // }
 
     public function professor()
     {
