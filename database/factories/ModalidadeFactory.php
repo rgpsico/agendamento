@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\Empresa;
+use App\Models\Modalidade;
 use App\Models\Usuario;
 use Illuminate\Support\Str;
 use Faker\Generator as Faker;
@@ -14,6 +15,8 @@ use Illuminate\Foundation\Auth\User;
  */
 class ModalidadeFactory extends Factory
 {
+
+    protected $model = Modalidade::class;
     /**
      * Define the model's default state.
      *

@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('dias_da_semana', function (Blueprint $table) {
             $table->id();
             $table->integer('dia');
+            $table->string('nome_dia');
         });
     }
 
