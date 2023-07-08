@@ -133,7 +133,7 @@ class StripeController extends Controller
 
         if ($response->status === 'succeeded') {
 
-            return view('public.home.checkoutsucesso', ['nome_professor' => $nome_do_professor]);
+            return response()->json(['content' => $professor]);
         } else {
             // Lógica para tratamento de erro, caso o pagamento não tenha sido bem-sucedido
         }

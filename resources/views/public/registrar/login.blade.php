@@ -7,10 +7,12 @@
 				<div class="container-fluid">
 					
 					<div class="row">
+						
 						<div class="col-md-8 offset-md-2">
 							
 							<!-- Login Tab Content -->
 							<div class="account-content">
+								
 								<div class="row align-items-center justify-content-center">
 									<div class="col-md-7 col-lg-6 login-left">
 										<img src="{{asset('template/assets/img/login-banner.png')}}"
@@ -18,6 +20,7 @@
 									</div>
 									<div class="col-md-12 col-lg-6 login-right">
 										<div class="login-header">
+											<x-alert/>
 											<h3>Login <span>Professor</span></h3>
 										</div>
 										<form action="{{route('user.login')}}" method="POST">

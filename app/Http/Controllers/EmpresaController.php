@@ -84,8 +84,6 @@ class EmpresaController extends Controller
             $data
         );
 
-
-
         return redirect()->route('empresa.configuracao', ['userId' => $request->user_id])->with('success', 'Empresa atualizada ou criada com sucesso');
     }
 
@@ -103,20 +101,13 @@ class EmpresaController extends Controller
         ]);
 
 
-
-
         $data = $request->all();
         $data['empresa_id'] = $request->empresa_id;
-
-
 
         $empresa = EmpresaEndereco::updateOrCreate(
             ['empresa_id' => $data['empresa_id']],
             $data
         );
-
-
-
 
         return redirect()->back()->with('success', 'Endereço atualizado com sucesso');
     }
@@ -152,8 +143,6 @@ class EmpresaController extends Controller
 
     public function cadastrarDisponibilidade(Request $request)
     {
-
-
         $dias = $request->input('dias');
         $hora_inicio = $request->input('start');
         $hora_fim = $request->input('end');

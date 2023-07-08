@@ -145,11 +145,12 @@ formData.push({ name: "hora_aula", value: horaAula });
         },
         data: data, // Os dados que você está enviando para a API
         success: function (response) {
-           
-			if(response)
-			{
-				window.location.href = "{{ route('home.checkoutsucesso',['id' => 1]) }}";
-			}
+          
+			if(response) {
+    const baseRoute = "{{ route('home.checkoutsucesso', ['id' => 'USER_ID']) }}";
+    window.location.href = baseRoute.replace('USER_ID', response.content.usuario.id);
+}
+
 			
         },
         error: function(response) {
