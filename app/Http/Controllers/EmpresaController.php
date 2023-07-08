@@ -124,7 +124,7 @@ class EmpresaController extends Controller
     {
         $diaDaSemana = DiaDaSemana::all();
         $id_professor = Auth::user()->professor->id;
-        $disponibilidades = Disponibilidade::where('id_professores', $id_professor)->get();
+        $disponibilidades = Disponibilidade::where('id_professor', $id_professor)->get();
 
         // Busca as disponibilidades do professor
         return view(
@@ -147,7 +147,7 @@ class EmpresaController extends Controller
             // verifica se o horário de início e fim estão definidos para o dia atual
             if (!empty($hora_inicio[$i]) && !empty($hora_fim[$i])) {
                 Disponibilidade::updateOrCreate(
-                    ['id_professores' => $request->input('professor_id'), 'id_dia' => $dias[$i]],
+                    ['id_professor' => $request->input('professor_id'), 'id_dia' => $dias[$i]],
                     ['hora_inicio' => $hora_inicio[$i], 'hora_fim' => $hora_fim[$i]]
                 );
             }

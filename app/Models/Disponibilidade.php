@@ -8,8 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Disponibilidade extends Model
 {
     use HasFactory;
+
     protected $table = "disponibilidade"; // Ajuste para a tabela correta
-    protected $fillable = ['id_professores', 'id_dia', 'hora_inicio', 'hora_fim'];
+    protected $fillable = ['id_professor', 'id_dia', 'hora_inicio', 'hora_fim'];
 
     public function diaDaSemana()
     {

@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('disponibilidade', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('id_professores');
+            $table->unsignedBigInteger('id_professor');
             $table->unsignedBigInteger('id_dia');
             $table->time('hora_inicio');
             $table->time('hora_fim');
             $table->timestamps();
 
-            $table->foreign('id_professores')->references('id')->on('professores')->onDelete('cascade');
+            $table->foreign('id_professor')->references('id')->on('professores')->onDelete('cascade');
             $table->foreign('id_dia')->references('id')->on('dias_da_semana')->onDelete('cascade');
         });
     }

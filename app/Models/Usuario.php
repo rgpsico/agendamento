@@ -103,7 +103,7 @@ class Usuario extends Authenticatable
 
     public function disponibilidades()
     {
-        return $this->hasMany(Disponibilidade::class, 'id_professores');
+        return $this->hasMany(Disponibilidade::class, 'id_professor');
     }
 
 
