@@ -6,7 +6,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form>
+                <form id="form-update-aluno">
                     <div class="row form-row">
                         <div class="col-12 col-sm-6">
                             <div class="form-group">
@@ -81,3 +81,27 @@
     </div>
 </div>
 <!-- /Edit Details Modal -->
+
+<script>
+    $('#form-update-aluno').on('submit', function(e) {
+    e.preventDefault();
+
+    alert("aaa")
+    var alunoId = $('.aluno_id').val(); 
+
+    var formData = $(this).serialize(); // Obtém os dados do formulário
+
+    $.ajax({
+        url: alunoId + '/aluno/update',
+        type: 'POST',
+        data: formData,
+        success: function(response) {
+            console.log(response);
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.log(textStatus, errorThrown);
+        }
+    });
+});
+
+</script>

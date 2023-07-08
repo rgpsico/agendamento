@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AlunosController;
 use App\Http\Controllers\Api\AulasControllerApi;
 use App\Http\Controllers\Api\DiaDaSemanaControllerApi;
 use App\Http\Controllers\Api\DisponibilidadeControllerApi;
@@ -49,3 +50,7 @@ Route::resource('disponibilidade', DisponibilidadeControllerApi::class);
 Route::get('disponibilidade', [DisponibilidadeControllerApi::class, 'disponibilidade']);
 Route::resource('dias', DiaDaSemanaControllerApi::class);
 Route::post('/pagamento', [StripeController::class, 'treinoStripe'])->name('stripe.pagamento');
+
+
+
+Route::post('/aluno/{id}/update', [AlunosController::class, 'update']);

@@ -15,14 +15,11 @@ Route::prefix('usuario')->group(function () {
     Route::post('/login', [UserController::class, 'login'])->name('user.login');
 });
 
-
 Route::prefix('pagamento')->middleware('auth')->group(function () {
     Route::post('/stripe', [PagamentoController::class, 'pagamentoStripe'])->name('pagamento.stripe');
 });
 
-
 Route::prefix('admin')->middleware('auth')->group(function () {
-    Route::get('/', [EmpresaController::class, 'index'])->name('agenda.index');
     Route::group(['prefix' => '/servicos'], function () {
         Route::get('/', [ServicoController::class, 'index'])->name('admin.servico.index');
         Route::get('/{id}/servico', [ServicoController::class, 'show'])->name('admin.servico.show');
@@ -33,6 +30,7 @@ Route::prefix('admin')->middleware('auth')->group(function () {
         Route::post('/{id}/update', [ServicoController::class, 'update'])->name('admin.servico.update');
     });
 
+    Route::get('/', [EmpresaController::class, 'index'])->name('agenda.index');
 
     Route::group(['prefix' => '/dashboard'], function () {
         Route::get('/', [DashBoardController::class, 'dashboard'])->name('dashboard');
@@ -56,9 +54,7 @@ Route::prefix('admin')->middleware('auth')->group(function () {
         Route::post('/uploadEmpresa', [EmpresaController::class, 'uploadImage'])->name('empresa.upload');
         Route::delete('/{id}/excluirImagens', [EmpresaController::class, 'destroy'])->name('gallery.destroy');
     });
-});
 
-Route::prefix('admin')->middleware('auth')->group(function () {
     Route::group(['prefix' => '/escola'], function () {
         Route::group(['prefix' => '/alunos'], function () {
             Route::get('/', [AlunosController::class, 'index'])->name('alunos.index');
@@ -70,7 +66,6 @@ Route::prefix('admin')->middleware('auth')->group(function () {
             Route::delete('/{id}/destroy', [AlunosController::class, 'destroy'])->name('alunos.destroy');
             Route::get('/config', [AlunosController::class, 'configuracao'])->name('alunos.configuracao');
         });
-
 
         Route::group(['prefix' => '/dashboard'], function () {
             Route::get('/', [DashBoardController::class, 'dashboardAlunos'])->name('escola.dashboard');

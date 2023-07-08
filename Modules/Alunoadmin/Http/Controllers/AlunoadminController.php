@@ -29,8 +29,6 @@ class AlunoadminController extends Controller
         // Obter o aluno ligado ao usuário autenticado
         $id = auth()->user()->aluno->id;
 
-
-
         // Obter os agendamentos para o aluno
         $agendamentos = Agendamento::with('professor')->where('aluno_id', $id)->get();
 

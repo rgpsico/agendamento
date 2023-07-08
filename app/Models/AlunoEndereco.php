@@ -11,7 +11,10 @@ class AlunoEndereco extends Model
 
     protected $table = 'alunos_enderecos';
 
-    protected $fillable = ['usuario_id'];
+    protected $fillable = [
+        'aluno_id', 'endereco', 'cidade',
+        'estado', 'cep'
+    ];
 
     public function usuario()
     {

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Aluno;
+use App\Models\AlunoEndereco;
+use App\Models\Alunos;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
 
@@ -53,5 +55,30 @@ class AlunosController extends Controller
                 'model' => $model
             ]
         );
+    }
+
+
+    public function update(Request $request, $id)
+    {
+
+        // Updating User
+        $user = Usuario::updateOrCreate(
+            ['id' => $id],
+            $request->only('nome', 'email', 'password', 'tipo_usuario')
+        );
+
+        //Updating or Creating Aluno (Student)
+        $student = Alunos::updateOrCreate(
+            ['usuario_id' => $user->id],
+            $request->only('...')
+        );
+
+        // Updating or Creating AlunoEndereco (StudentAddress)
+        $studentAddress = AlunoEndereco::updateOrCreate(
+            ['aluno_id' => $id],
+            $request->only('endereco', 'cidade', 'estado', 'cep')
+        );
+
+        return response()->json(['message' => 'Dados atualizados com sucesso!']);
     }
 }
