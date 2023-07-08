@@ -21,7 +21,7 @@ class DiaDaSemanaFactory extends Factory
     {
         return [
             'dia' => $this->faker->unique()->numberBetween(1, 7),
-            'nome_dia' => $this->diaNome($this->faker->unique()->numberBetween(1, 7)),
+            'nome_dia' => $this->diaNome($this->faker->numberBetween(1, 7)),
         ];
     }
 
