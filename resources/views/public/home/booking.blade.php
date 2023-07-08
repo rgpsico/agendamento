@@ -17,6 +17,47 @@
     			color: #fff;
 				}
 
+        .card_servicos {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
+    overflow: hidden; /* para garantir que as imagens fiquem contidas no card */
+}
+
+.card_servicos img {
+    width: 100%;
+    height: 80px; /* Ajuste esse valor para o tamanho desejado */
+    object-fit: cover; /* Faz com que as imagens se ajustem ao tamanho especificado sem distorção */
+}
+
+.card_servicos .card-body {
+    padding: 15px;
+}
+
+.card_servicos .card-title {
+    font-weight: bold; 
+    font-size: 18px;
+}
+
+.card_servicos .card-text {
+    color: #777; 
+    font-size: 14px;
+}
+
+.card_servicos .btn-primary {
+    background-color: #007bff;
+    border: none;
+    color: white; 
+    padding: 10px 24px; 
+    text-align: center;
+    text-decoration: none; 
+    display: inline-block; 
+    font-size: 16px; 
+    margin: 4px 2px;
+    cursor: pointer;
+}
+
         
 
 			</style>
@@ -46,25 +87,21 @@
 							</div>
 						</div>
 						<div class="row">
-            @isset($model->servicos)              
-         			@foreach ($model->servicos as $serv )						
-						<div class="col-md-3">
-							
-							<div class="card card_servicos" data-servico_preco="{{$serv->preco}}" data-servico_id="{{$serv->id}}" data-servico_titulo="{{$serv->titulo}}" style="border: 1px solid #ddd; border-radius: 10px; box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2); transition: 0.3s;">
-							   <img class="img-fluid" style="border-radius: 10px 10px 0 0;" src="{{ asset('servico/' . $serv->imagem ?? 'admin/img/doctors/Thumbs.db') }}" width="100%" height="100%" alt="Imagem do serviço">
-							   <div class="card-body" style="padding: 15px;">
-								  <h5 class="card-title" style="font-weight: bold; font-size: 18px;">{{$serv->titulo}}</h5>
-								  <p class="card-text" style="color: #777; font-size: 14px;">{{$serv->descricao}}</p>
-								  <p class="card-text" style="color: #333; font-size: 16px;">{{$serv->preco}}</p>
-								  <a href="#" class="btn btn-primary" style="background-color: #007bff; border: none; color: white; 
-								  padding: 10px 24px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer;
-								  ">Escolher</a>
-							   </div>
-							</div>
-						 </div>
-
-						 @endforeach 
-             @endisset  
+              @isset($model->servicos)              
+              @foreach ($model->servicos as $serv )                        
+                  <div class="col-md-2">            
+                      <div class="card card_servicos" data-servico_preco="{{$serv->preco}}" data-servico_id="{{$serv->id}}" data-servico_titulo="{{$serv->titulo}}">
+                          <img class="img-fluid" src="{{ asset('servico/' . $serv->imagem ?? 'admin/img/doctors/Thumbs.db') }}" alt="Imagem do serviço">
+                          <div class="card-body">
+                              <h5 class="card-title">{{$serv->titulo}}</h5>
+                              <p class="card-text">{{$serv->descricao}}</p>
+                              <p class="card-text" style="color: #333; font-size: 16px;">{{$serv->preco}}</p>
+                              <a href="#" class="btn btn-primary">Escolher</a>
+                          </div>
+                      </div>
+                  </div>
+              @endforeach 
+          @endisset
             </div>
 						<div class="row">
 							<div class="col-12 col-sm-4 col-md-6">
