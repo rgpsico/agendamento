@@ -43,11 +43,7 @@ class EmpresaController extends Controller
             'descricao' => 'required',
             'telefone' => 'required',
             'cnpj' => 'required',
-            'endereco' => 'required',
-            'cidade' =>  'required',
-            'estado' => 'required',
-            'uf' => 'required',
-            'pais' => 'required',
+
             'valor_aula_de' => 'required',
             'valor_aula_ate' => 'required',
             'modalidade' => 'required',
