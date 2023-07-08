@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('usuario_id');
             $table->string('especialidade');
-            $table->string('sobre')->default(null);
+            $table->text('sobre')->default(null);
             $table->string('avatar', 200)->default(null);
             $table->foreign('usuario_id')->references('id')->on('usuarios');
         });
