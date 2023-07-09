@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('modalidade', function (Blueprint $table) {
             $table->id();
-            $table->string('nome');
+            $table->string('nome')->default('Surf');
             $table->timestamps();
         });
     }

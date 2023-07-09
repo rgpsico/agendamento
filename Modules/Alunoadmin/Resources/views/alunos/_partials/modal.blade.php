@@ -109,7 +109,10 @@
         cep: $('#cep').val(),
         pais: $('#pais').val()
     },
-    success: function(response) {
+    success: function(response, status) {
+        if(status == 200){
+            $('.modal').modal('hide')
+        }
         alert(response.message);
     }
 });
