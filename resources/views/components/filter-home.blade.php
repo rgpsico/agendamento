@@ -24,7 +24,7 @@ $modalidade = ['Surf', 'Bodyboard', 'Vôlei de Praia', 'Futebol de Areia', 'Fres
                     </label>
             </div>
             @endforeach
-        @isset
+        @endisset
     
 
     </div>
