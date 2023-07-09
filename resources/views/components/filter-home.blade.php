@@ -19,8 +19,8 @@ $modalidade = ['Surf', 'Bodyboard', 'Vôlei de Praia', 'Futebol de Areia', 'Fres
             @foreach ($modalidade as $value )          
                 <div>
                     <label class="custom_check">
-                        <input type="checkbox" name="gender_type" data-type="{{$value->nome}} " class="filter_empresa">
-                        <span class="checkmark"></span> {{$value->nome}} 
+                        <input type="checkbox" name="gender_type" data-type="{{$value}} " class="filter_empresa">
+                        <span class="checkmark"></span> {{$value}} 
                     </label>
             </div>
             @endforeach
