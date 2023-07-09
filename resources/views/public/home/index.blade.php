@@ -1,7 +1,7 @@
 <x-public.layout title="HOME">
    
     <!-- Breadcrumb -->
-		<x-home.breadcrumb title="Schols Surfs"/>
+		<x-home.breadcrumb title="Schols Surfs aaaaaa"/>
 			<!-- /Breadcrumb -->
 			
 			<!-- Page Content -->
