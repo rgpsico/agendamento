@@ -10,7 +10,7 @@
             </div>			
         </div>
     <div class="filter-widget">
-        <h4>Modalidade</h4>      
+        <h4>Modalidade {{$modalidade}}</h4>      
         
         @isset($modalidade)
             @foreach ($modalidade as $value )          
