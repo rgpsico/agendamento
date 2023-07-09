@@ -11,20 +11,17 @@
         </div>
     <div class="filter-widget">
         <h4>Modalidade</h4>      
-        @php 
-$modalidade = ['Surf', 'Bodyboard', 'Vôlei de Praia', 'Futebol de Areia', 'Frescobol', 'Kitesurf'];
-
-        @endphp
-        @isset($modalidade)
-            @foreach ($modalidade as $value )          
-                <div>
-                    <label class="custom_check">
-                        <input type="checkbox" name="gender_type" data-type="{{$value}} " class="filter_empresa">
-                        <span class="checkmark"></span> {{$value}} 
-                    </label>
-            </div>
-            @endforeach
-        @endisset
+        
+        @if(isset($modalidade))
+        @foreach ($modalidade as $value )          
+            <div>
+                <label class="custom_check">
+                    <input type="checkbox" name="gender_type" data-type="{{$value->nome}} " class="filter_empresa">
+                    <span class="checkmark"></span> {{$value->nome}} 
+                </label>
+           </div>
+        @endforeach
+    @endif
     
 
     </div>
