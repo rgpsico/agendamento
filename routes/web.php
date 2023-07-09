@@ -11,7 +11,7 @@ Route::get('/test', function () {
     return Inertia::render('Test');
 });
 
-Route::get('/deploy', function () {
+Route::post('/deploy', function () {
     $secret = "157121214"; // Use a mesma que foi usada no webhook do GitHub
     $signature = hash_hmac('sha256', file_get_contents("php://input"), $secret);
 
