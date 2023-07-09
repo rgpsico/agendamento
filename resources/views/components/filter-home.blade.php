@@ -10,8 +10,11 @@
             </div>			
         </div>
     <div class="filter-widget">
-        <h4>Modalidade {{$modalidade}}</h4>      
-        
+        <h4>Modalidade</h4>      
+        @php 
+$modalidade = ['Surf', 'Bodyboard', 'Vôlei de Praia', 'Futebol de Areia', 'Frescobol', 'Kitesurf'];
+
+        @endphp
         @isset($modalidade)
             @foreach ($modalidade as $value )          
                 <div>
@@ -21,7 +24,7 @@
                     </label>
             </div>
             @endforeach
-        @endisset
+        @isset
     
 
     </div>
