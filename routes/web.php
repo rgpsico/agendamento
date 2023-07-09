@@ -17,7 +17,7 @@ Route::post('/deploy', function () {
 
     if (hash_equals($signature, $_SERVER['HTTP_X_HUB_SIGNATURE'])) {
         // Se a assinatura do webhook for válida, puxe as atualizações mais recentes
-        shell_exec('cd .. && git reset --hard HEAD && git pull');
+        shell_exec('cd .. && sudo git reset --hard HEAD && sudo git pull');
     }
 
     return ['status' => 'success'];
