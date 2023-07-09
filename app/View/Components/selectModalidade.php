@@ -17,7 +17,7 @@ class selectModalidade extends Component
     {
         $this->modalidades = $modalidade->select('nome')->distinct()->get();
         $this->label = $label;
-        $this->model = $model;;
+        $this->model = $model;
     }
 
     public function render()
