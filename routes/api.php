@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AlunosController;
 use App\Http\Controllers\Api\AulasControllerApi;
+use App\Http\Controllers\Api\AuthControllerApi;
 use App\Http\Controllers\Api\DiaDaSemanaControllerApi;
 use App\Http\Controllers\Api\DisponibilidadeControllerApi;
 use App\Http\Controllers\Api\EmpresaController;
@@ -29,6 +30,12 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 
+Route::middleware('auth:sanctum')->get('/teste', function (Request $request) {
+    return $request->user();
+});
+
+Route::post('/login', [AuthControllerApi::class, 'login']);
+
 Route::resource('agendamento', AgendamentoControllerApi::class);
 
 Route::resource('professor', ProfessoresControllerApi::class);
@@ -50,6 +57,8 @@ Route::resource('disponibilidade', DisponibilidadeControllerApi::class);
 Route::get('disponibilidade', [DisponibilidadeControllerApi::class, 'disponibilidade']);
 Route::resource('dias', DiaDaSemanaControllerApi::class);
 Route::post('/pagamento', [StripeController::class, 'treinoStripe'])->name('stripe.pagamento');
+
+
 
 
 
