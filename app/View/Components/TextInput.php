@@ -10,6 +10,7 @@ class TextInput extends Component
     public $size;
     public $value; // Nova variável
     public $label; // Nova variável
+    public $type; // Nova variável
 
     public $placeholder; // Nova variável
     /**
@@ -17,13 +18,14 @@ class TextInput extends Component
      *
      * @return void
      */
-    public function __construct($label, $name, $size, $value = null, $placeholder = null) // Valor padrão como null
+    public function __construct($label, $name, $size, $value = null, $placeholder = null, $type = 'text') // Valor padrão como null
     {
         $this->name = $name;
         $this->size = $size;
         $this->value = $value;
         $this->label = $label;
         $this->placeholder = $placeholder;
+        $this->type = $type;
     }
 
     /**

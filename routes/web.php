@@ -22,3 +22,6 @@ Route::post('/deploy', function () {
 
     return ['status' => 'success'];
 });
+
+
+Route::get('/logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
