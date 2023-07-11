@@ -1,22 +1,23 @@
 <style>
     .bbicon{
-        display: inline-block;
-  width: 24px;
-  height: 24px;
-  background-image: url({{asset('admin/img/bbicon.png')}});
-    }
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    background-image: url({{asset('admin/img/bbicon.png')}});
+ }
 </style>
 <div class="sidebar" id="sidebar">
     <div class="sidebar-inner slimscroll">
         <div id="sidebar-menu" class="sidebar-menu">
             <ul>
                 <li class="menu-title"> 
-                    <span>Menu</span>
+                    <span>Administrativo</span>
                 </li>
             
                 <li> 
-                    <a href="">
-                        <i class="fe fe-home"></i> <span>Dashboard</span>
+                    <a href="{{route('admin.dashboard')}}">
+                        <i class="fe fe-home"></i> 
+                        <span>Dashboard</span>
                     </a>
                 </li>
 

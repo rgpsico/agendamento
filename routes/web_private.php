@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\AlunosController;
 use App\Http\Controllers\DashBoardController;
@@ -81,5 +82,15 @@ Route::prefix('admin')->middleware('auth')->group(function () {
             Route::post('/post', [AgendaController::class, 'store'])->name('agenda.store');
             Route::delete('/{id}/destroy', [AgendaController::class, 'destroy'])->name('agenda.destroy');
         });
+    });
+});
+
+
+Route::prefix('admin')->middleware('auth')->group(function () {
+    Route::group(['prefix' => '/manager'], function () {
+        Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+        // Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+        // Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+        // Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     });
 });
