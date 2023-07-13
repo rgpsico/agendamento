@@ -10,4 +10,8 @@ class Esporte extends Model
     use HasFactory;
 
     protected $table = 'modalidade';
+
+    protected $fillable = [
+        'nome'
+    ];
 }
