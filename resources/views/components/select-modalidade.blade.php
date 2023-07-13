@@ -3,7 +3,7 @@
     <select class="form-control" name="modalidade">
         <option value="">Selecione</option>
     
-            @foreach($modalidades as $modalidade)
+            @foreach($model as $modalidade)
                 <option value="{{ $modalidade->nome }}"                         
                     {{ (old('modalidade') == $modalidade->nome || isset($model->modalidade) && $model->modalidade == $modalidade->nome) ? 'selected' : '' }}>
                     {{$modalidade->nome}}
