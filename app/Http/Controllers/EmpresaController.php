@@ -7,6 +7,7 @@ use App\Models\Disponibilidade;
 use App\Models\Empresa;
 use App\Models\EmpresaEndereco;
 use App\Models\EmpresaGaleria;
+use App\Models\Modalidade;
 use App\Models\Professor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -165,11 +166,13 @@ class EmpresaController extends Controller
     public function configuracao($userId)
     {
         $model = Empresa::where('user_id', $userId)->first();
+        $modalidades = Modalidade::all();
         return view(
             'admin.empresas.treinoform',
             [
                 'pageTitle' =>  'Configuração',
-                'model' => $model
+                'model' => $model,
+                'modalidades' => $modalidades
             ]
         );
     }
