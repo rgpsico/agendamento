@@ -17,7 +17,7 @@
 
                         <x-text-input name="nome" size="30" label="Nome Completo" :value="$model"/>
 
-                        <x-select-modalidade  label="Modalidade"  :model="$model"/>  
+                        <x-select-modalidade  label="Modalidade"  :model="$model" :modalidades="$modalidades"/>  
                                                                       
                         <x-text-input name="cnpj" size="30" label="Cnpj" :value="$model" />
 

@@ -9,13 +9,13 @@ use Illuminate\View\Component;
 
 class filterHome extends Component
 {
-    public $modalidades;
+    protected $modalidade;
     /**
      * Create a new component instance.
      */
-    public function __construct(Modalidade $modalidades)
+    public function __construct(Modalidade $modalidade)
     {
-        $this->modalidades = $modalidades;
+        $this->modalidade = $modalidade;
     }
 
 
@@ -25,11 +25,11 @@ class filterHome extends Component
      */
     public function render(): View|Closure|string
     {
-        $modalidades = $this->modalidades->all();
 
+        $modalidade = $this->modalidade->all()->unique('nome');
         return view(
             'components.filter-home',
-            ['modalidade' => $modalidades]
+            ['modalidade' => $modalidade]
         );
     }
 }
