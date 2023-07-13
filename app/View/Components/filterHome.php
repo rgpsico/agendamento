@@ -30,7 +30,7 @@ class filterHome extends Component
         $modalidade = $this->modalidade->all()->unique('nome');
 
         return view(
-            'components.filter-home'
+            'components.filterHome'
         );
     }
 }

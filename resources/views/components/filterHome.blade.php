@@ -12,7 +12,7 @@
     <div class="filter-widget">
         <h4>Modalidade</h4>      
         
-       
+        @if(isset($modalidade))
         @foreach ($modalidade as $value )          
             <div>
                 <label class="custom_check">
@@ -21,7 +21,7 @@
                 </label>
            </div>
         @endforeach
-    
+    @endif
     
 
     </div>
