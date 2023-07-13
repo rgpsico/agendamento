@@ -2,6 +2,7 @@
 
 namespace App\View\Components;
 
+use App\Models\Esporte;
 use App\Models\Modalidade;
 use Closure;
 use Illuminate\Contracts\View\View;
@@ -13,7 +14,7 @@ class selectModalidade extends Component
     public $label;
     public $showCol;
     public $model;
-    public function __construct(Modalidade $modalidade, $label, $model)
+    public function __construct(Esporte $modalidade, $label, $model)
     {
         $this->modalidades = $modalidade->select('nome')->distinct()->get();
         $this->label = $label;

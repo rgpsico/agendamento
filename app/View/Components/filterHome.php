@@ -2,6 +2,7 @@
 
 namespace App\View\Components;
 
+use App\Models\Esporte;
 use App\Models\Modalidade;
 use Closure;
 use Illuminate\Contracts\View\View;
@@ -13,7 +14,7 @@ class filterHome extends Component
     /**
      * Create a new component instance.
      */
-    public function __construct(Modalidade $modalidade)
+    public function __construct(Esporte $modalidade)
     {
         $this->modalidade = $modalidade;
     }

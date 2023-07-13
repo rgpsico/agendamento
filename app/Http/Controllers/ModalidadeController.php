@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Esporte;
 use App\Models\Modalidade;
 use Illuminate\Http\Request;
 
@@ -9,7 +10,7 @@ class ModalidadeController extends Controller
 {
     protected $pageTitle, $model;
 
-    public function __construct(Modalidade $model)
+    public function __construct(Esporte $model)
     {
         $this->model = $model;
         $this->pageTitle = 'Listar Modalidade';
