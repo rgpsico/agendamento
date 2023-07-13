@@ -12,8 +12,8 @@
     <div class="filter-widget">
         <h4>Modalidade</h4>      
         
-        @if(isset($modalidade))
-        @foreach ($modalidade as $value )          
+        @if(isset($modalidades))
+        @foreach ($modalidades as $value )          
             <div>
                 <label class="custom_check">
                     <input type="checkbox" name="gender_type" data-type="{{$value->nome}} " class="filter_empresa">
