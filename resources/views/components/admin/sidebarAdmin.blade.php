@@ -28,7 +28,8 @@
                         <span class="menu-arrow"></span>
                     </a>
                     <ul style="display: none;">
-                        <li><a href="">Cadastrar</a></li>
+                        <li><a href="{{route('modalidade.index')}}">Listar</a></li>
+                        <li><a href="{{route('modalidade.create')}}">Cadastrar</a></li>
                   
                     </ul>
                 </li>

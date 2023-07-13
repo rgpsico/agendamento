@@ -55,6 +55,19 @@
                         <span>Configuração</span>
                     </a>
                 </li>  
+
+                <li class="submenu">
+                    <a href="" class="">
+                        <i class="fe bbicon"></i>
+                        <span> Modalidade</span> 
+                        <span class="menu-arrow"></span>
+                    </a>
+                    <ul style="display: none;">
+                        <li><a href="{{route('modalidade.index')}}">Listar</a></li>
+                        <li><a href="{{route('modalidade.create')}}">Cadastrar</a></li>
+                  
+                    </ul>
+                </li>
             
                 <li class="submenu">
                     <a href="" class="">
@@ -75,7 +88,5 @@
                         </li>
                     </div>
     </div>
-</div>
+</div> 
 
-
-{{-- @include('components.admin.sidebarAdmin') --}}

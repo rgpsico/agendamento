@@ -5,6 +5,7 @@ use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\AlunosController;
 use App\Http\Controllers\DashBoardController;
 use App\Http\Controllers\EmpresaController;
+use App\Http\Controllers\ModalidadeController;
 use App\Http\Controllers\PagamentoController;
 use App\Http\Controllers\ServicoController;
 use App\Http\Controllers\UserController;
@@ -81,6 +82,15 @@ Route::prefix('admin')->middleware('auth')->group(function () {
             Route::post('/{id}/update', [AgendaController::class, 'update'])->name('agenda.update');
             Route::post('/post', [AgendaController::class, 'store'])->name('agenda.store');
             Route::delete('/{id}/destroy', [AgendaController::class, 'destroy'])->name('agenda.destroy');
+        });
+
+
+        Route::group(['prefix' => '/modalidade'], function () {
+            Route::get('/', [ModalidadeController::class, 'index'])->name('modalidade.index');
+            Route::get('/create', [ModalidadeController::class, 'create'])->name('modalidade.create');
+            Route::post('/{id}/update', [ModalidadeController::class, 'update'])->name('modalidade.update');
+            Route::post('/{id}/show', [ModalidadeController::class, 'show'])->name('modalidade.show');
+            Route::post('store', [ModalidadeController::class, 'store'])->name('modalidade.store');
         });
     });
 });

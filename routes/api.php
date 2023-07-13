@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\EmpresaControllerApi;
 use App\Http\Controllers\Api\ProfessoresControllerApi;
 use App\Http\Controllers\Api\ServicoControllerApi;
 use App\Http\Controllers\Api\UserControllerApi;
+use App\Http\Controllers\ModalidadeController;
 use App\Http\Controllers\StripeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -59,7 +60,7 @@ Route::resource('dias', DiaDaSemanaControllerApi::class);
 Route::post('/pagamento', [StripeController::class, 'treinoStripe'])->name('stripe.pagamento');
 
 
-
+Route::delete('modalidade/{id}', [ModalidadeController::class, 'destroy'])->name('modalidade.destroy');
 
 
 Route::post('/aluno/{id}/update', [AlunosController::class, 'update']);

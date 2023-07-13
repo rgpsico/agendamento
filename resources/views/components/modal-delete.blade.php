@@ -4,7 +4,7 @@
             <div class="modal-body">
                 <div class="form-content p-2">
                     <h4 class="modal-title">Excluir</h4>
-                    <p class="mb-4">Seseja Excluir Esse Aluno?</p>
+                    <p class="mb-4">Deseja Excluir Essa Modalidade ?</p>
                     <button type="button" class="btn btn-primary confirmar_exclusao">Confirmar </button>
                     <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
                 </div>
