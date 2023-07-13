@@ -14,7 +14,6 @@ class selectModalidade extends Component
     public $showCol;
     public $model;
 
-
     public function __construct(Modalidade $modalidades, $label, $model)
     {
         $this->modalidades = $modalidades->select('nome')->distinct()->get();
@@ -24,6 +23,11 @@ class selectModalidade extends Component
 
     public function render()
     {
-        return view('components.select-modalidade');
+        return view(
+            'components.select-modalidade',
+            [
+                'modalidades' => $this->modalidades
+            ]
+        );
     }
 }
