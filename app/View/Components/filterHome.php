@@ -28,9 +28,9 @@ class filterHome extends Component
     {
 
         $modalidade = $this->modalidade->all()->unique('nome');
+
         return view(
-            'components.filter-home',
-            ['modalidade' => $modalidade]
+            'components.filter-home'
         );
     }
 }
