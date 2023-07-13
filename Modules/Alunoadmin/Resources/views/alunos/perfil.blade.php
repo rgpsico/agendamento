@@ -60,8 +60,8 @@
                                             <p class="col-sm-10">{{ $model->usuario->nome }}</p>
                                         </div>
                                         <div class="row">
-                                            <p class="col-sm-2 text-muted text-sm-end mb-0 mb-sm-3">Data de Nascimento</p>
-                                            <p class="col-sm-10">{{ $model->data_de_nascimento  ?? ''}}</p>
+                                            <p class="col-sm-2 text-muted text-sm-end mb-0 mb-sm-3">Nascimento</p>
+                                            <p class="col-sm-10">{{ $model->usuario->data_nascimento   ?? ''}}</p>
                                         </div>
                                         <div class="row">
                                             <p class="col-sm-2 text-muted text-sm-end mb-0 mb-sm-3">Email</p>
@@ -69,7 +69,7 @@
                                         </div>
                                         <div class="row">
                                             <p class="col-sm-2 text-muted text-sm-end mb-0 mb-sm-3">Celular</p>
-                                            <p class="col-sm-10">{{ $model->endereco->celular ?? '' }}</p>
+                                            <p class="col-sm-10">{{ $model->usuario->telefone ?? '' }}</p>
                                         </div>
                                         <div class="row">
                                             <p class="col-sm-2 text-muted text-sm-end mb-0">Endereço</p>

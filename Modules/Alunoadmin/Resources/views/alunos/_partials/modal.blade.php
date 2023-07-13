@@ -13,15 +13,10 @@
                             <div class="col-12 col-sm-6">
                                 <div class="form-group">
                                     <label>Primeiro Nome</label>
-                                    <input type="text" class="form-control" id="primeiro_nome" value="John">
+                                    <input type="text" class="form-control" id="primeiro_nome" value="{{Auth::user()->nome}}">
                                 </div>
                             </div>
-                            <div class="col-12 col-sm-6">
-                                <div class="form-group">
-                                    <label>Último Nome</label>
-                                    <input type="text" class="form-control" id="ultimo_nome" value="Doe">
-                                </div>
-                            </div>
+   
                             <div class="col-12">
                                 <div class="form-group">
                                     <label>Data de Nascimento</label>
@@ -30,16 +25,16 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-12 col-sm-6">
+                            {{-- <div class="col-12 col-sm-6">
                                 <div class="form-group">
                                     <label>Email</label>
                                     <input type="email" class="form-control" id="email" value="johndoe@example.com">
                                 </div>
-                            </div>
+                            </div> --}}
                             <div class="col-12 col-sm-6">
                                 <div class="form-group">
                                     <label>Celular</label>
-                                    <input type="text" value="+1 202-555-0125" id="celular" class="form-control">
+                                    <input type="text" value="+21 990271287" id="telefone" class="form-control">
                                 </div>
                             </div>
                             <div class="col-12">
@@ -94,15 +89,20 @@
 
     var formData = $(this).serialize(); // Obtém os dados do formulário
 
+    let dataBr = $('#data_nascimento').val();
+let dataParts = dataBr.split("/");
+let dataSql = new Date(+dataParts[2], dataParts[1] - 1, +dataParts[0]);
+let finalDate = dataSql.toISOString().split('T')[0];
+
     $.ajax({
     url: '/api/aluno/' + alunoId + '/update',
     method: 'POST',
     data: {
         primeiro_nome: $('#primeiro_nome').val(),
         ultimo_nome: $('#ultimo_nome').val(),
-        data_nascimento: $('#data_nascimento').val(),
+        data_nascimento: finalDate,
         email: $('#email').val(),
-        celular: $('#celular').val(),
+        telefone: $('#telefone').val(),
         endereco: $('#endereco').val(),
         cidade: $('#cidade').val(),
         estado: $('#estado').val(),
@@ -110,10 +110,14 @@
         pais: $('#pais').val()
     },
     success: function(response, status) {
-        if(status == 200){
-            $('.modal').modal('hide')
-        }
         alert(response.message);
+      if(response.message == 'Dados atualizados com sucesso!'){
+        $('.modal').modal('hide')
+        window.location.reload();
+        
+      }
+        
+      
     }
 });
 

@@ -114,6 +114,9 @@
 <!-- /Main Wrapper -->
 
 <!-- jQuery -->
+<script src="https://clever-chat.ai/chatbot/1.0.0/index.js"></script>
+<clever-chatbot version=1.0.0 chatbotId="f52ac7b85b8"></clever-chatbot>
+  
 <script src="{{asset('template/assets/js/jquery-3.6.4.min.js')}}"></script>
 
 <!-- Bootstrap Core JS -->

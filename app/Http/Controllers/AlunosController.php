@@ -61,10 +61,11 @@ class AlunosController extends Controller
     public function update(Request $request, $id)
     {
 
+
         // Updating User
         $user = Usuario::updateOrCreate(
             ['id' => $id],
-            $request->only('nome', 'email', 'password', 'tipo_usuario')
+            $request->only('nome', 'password', 'tipo_usuario', 'data_nascimento', 'telefone')
         );
 
         //Updating or Creating Aluno (Student)
