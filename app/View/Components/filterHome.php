@@ -26,7 +26,8 @@ class filterHome extends Component
     public function render(): View|Closure|string
     {
 
-        $modalidade = $this->modalidade->all()->unique('nome');
+        $modalidade = $this->modalidade->all();
+
         return view(
             'components.filter-home',
             ['modalidade' => $modalidade]
