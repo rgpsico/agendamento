@@ -11,7 +11,7 @@
         },
         success: function(result) {
             $('.modal').modal('hide');
-            $(button).closest(".linha_aluno-"+id).fadeOut();
+            $(button).closest(".linha_-"+id).fadeOut();
         },
         error: function(request,msg,error) {
             console.log(error);

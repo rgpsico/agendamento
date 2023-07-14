@@ -53,10 +53,20 @@
             
         </div>			
     </div>
+   
+   
   
     <script src="{{asset('request.js')}}"></script>
 
    <script>
+
+$.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
+
     $(document).ready(function(){
         $(document).on("click", ".bt_excluir", function() {
         var id = $(this).data('id');
@@ -69,7 +79,30 @@
         var id = $(this).attr('data_id');
 
         var token = ""; // substitua com o seu token
-    deleteUser( '/api/modalidade/','.linha_id-'+id, id, token);
+        $.ajax({
+        url:'/api/modalidade/' + id,
+        type: 'DELETE',
+        headers: {
+            'Authorization': 'Bearer ' + token,
+        },
+        data:{
+            "_token": "{{ csrf_token() }}"
+        },
+        success: function(result) {
+            console.log(result)
+            window.location.reload
+            $('.modal').modal('hide');
+            $(button).closest(".linha_id-"+id).fadeOut();
+            var modalElement = $('.modal');
+            if (modalElement.length) {
+                modalElement.modal('hide');
+            }
+            $(button).closest(".linha_id-"+id).fadeOut();
+                },
+        error: function(request,msg,error) {
+            console.log(error);
+        }
+    });
     });
 
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Alunos;
+use App\Models\Empresa;
 use App\Models\Professor;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
@@ -22,6 +23,12 @@ class UserController extends Controller
     public function create()
     {
         return view('users.create');
+    }
+
+    public function profile($empresaId)
+    {
+        $model = Empresa::where('empresa_id', $empresaId)->get();
+        return view('users.profile');
     }
 
     public function logout()

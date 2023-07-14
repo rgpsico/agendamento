@@ -29,7 +29,7 @@
                                         @foreach ($model as $value )
                                             
                                     
-                                        <tr class="linha_aluno-{{$value->id}}">
+                                        <tr class="linha_-{{$value->id}}">
                                           
                                             <td>
                                                 <h2 class="table-avatar">
@@ -85,7 +85,7 @@
     $(document).on("click", ".confirmar_exclusao", function() {
         var id_aluno = $(this).data('id_aluno');
         var token = "seu_token_aqui"; // substitua com o seu token
-    deleteUser( '/api/users/','.linha_aluno-'+id_aluno, id_aluno, token);
+    deleteUser( '/api/users/','.linha_-'+id_aluno, id_aluno, token);
     });
 
 

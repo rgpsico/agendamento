@@ -38,9 +38,14 @@ class AlunosController extends Controller
 
     public function create()
     {
+
+
         return view(
             $this->view . '.create',
-            ['pageTitle' => $this->pageTitle]
+            [
+                'pageTitle' => $this->pageTitle,
+                'model' => []
+            ]
         );
     }
 

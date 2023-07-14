@@ -22,6 +22,10 @@ Route::prefix('pagamento')->middleware('auth')->group(function () {
 });
 
 Route::prefix('admin')->middleware('auth')->group(function () {
+
+    Route::get('{id}/profile', [UserController::class, 'profile'])->name('usuario.profile');
+
+
     Route::group(['prefix' => '/servicos'], function () {
         Route::get('/', [ServicoController::class, 'index'])->name('admin.servico.index');
         Route::get('/{id}/servico', [ServicoController::class, 'show'])->name('admin.servico.show');
@@ -48,6 +52,9 @@ Route::prefix('admin')->middleware('auth')->group(function () {
         Route::post('/{userId}/endereco_empresa', [EmpresaController::class, 'endereco_update'])->name('empresa.update_endereco');
         Route::get('/disponibilidade', [EmpresaController::class, 'disponibilidade'])->name('empresa.disponibilidade');
         Route::post('/disponibilidade', [EmpresaController::class, 'cadastrarDisponibilidade'])->name('empresa.disponibilidade.store');
+
+        Route::post('/{userId}/profile', [EmpresaController::class, 'profile'])->name('empresa.profile');
+
 
         Route::delete('/{id}/destroy', [EmpresaController::class, 'destroy'])->name('empresa.destroy');
         Route::get('/{userId}/config', [EmpresaController::class, 'configuracao'])->name('empresa.configuracao');
@@ -91,6 +98,7 @@ Route::prefix('admin')->middleware('auth')->group(function () {
             Route::post('/{id}/update', [ModalidadeController::class, 'update'])->name('modalidade.update');
             Route::post('/{id}/show', [ModalidadeController::class, 'show'])->name('modalidade.show');
             Route::post('store', [ModalidadeController::class, 'store'])->name('modalidade.store');
+            Route::delete('{id}/destroy', [ModalidadeController::class, 'destroy'])->name('admin.modalidade.destroy');
         });
     });
 });
