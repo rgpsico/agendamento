@@ -4,9 +4,7 @@
                    <!-- Page Header -->
            <x-header.titulo pageTitle="{{$pageTitle}}" />
             <!-- /Page Header -->
-            @php 
-            $model = [];
-            @endphp
+           
             @include('admin.empresas._partials.modal')
             <div class="row">
                 <form action="{{route('empresa.update')}}" method="POST" enctype="multipart/form-data">

@@ -24,9 +24,9 @@
                         <input type="checkbox" name="gender_type" data-type="{{$value->nome}} " class="filter_empresa">
                         <span class="checkmark"></span> {{$value->nome}} 
                     </label>
-            </div>
+                </div>
             @endforeach
-    @endif
+        @endif
     
 
     </div>
