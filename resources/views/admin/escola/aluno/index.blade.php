@@ -238,6 +238,9 @@ $(document).ready(function(){
     $(document).on("click", "#editar_aluno", function() {
         $("#modal_editar").modal('show');
         var data = $(this).data('data')[0];
+
+
+        
     
       
         $("#id").val(data.id);
