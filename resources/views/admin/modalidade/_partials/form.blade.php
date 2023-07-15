@@ -1,3 +1,3 @@
 
-<x-text-input name="nome" size="30" label="Nome Completo" :value="$model"/>
+<x-text-input name="nome" size="30" label="Nome Modalidade" :value="$model"/>
 

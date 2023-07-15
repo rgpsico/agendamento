@@ -17,9 +17,9 @@
     <div class="row">
         <div class="col-2 my-4">
             @if(!isset($modal))
-                <a  href="{{route($route.'.create')}}" class="btn btn-success">
+                <button class="btn btn-success Adicionar{{$pageTitle}}">
                     <i class="icon icon-plus">Adicionar {{$pageTitle}}</i>
-                </a>
+                </button>
             @else 
                 <button  class="btn btn-success" id="Adicionar{{$pageTitle}}">
                     <i class="icon icon-plus">Adicionar {{$pageTitle}}</i>
@@ -32,7 +32,7 @@
 
 
 @if(isset($modal))
-<div class="modal fade AdicionarAgenda" id="AdicionarAgenda" aria-hidden="true" role="dialog">
+<div class="modal fade Adicionar{{$pageTitle}}" id="Adicionar{{$pageTitle}}" aria-hidden="true" role="dialog">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">

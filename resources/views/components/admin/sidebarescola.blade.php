@@ -1,3 +1,8 @@
+<head>
+    <!-- Outros links e scripts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  </head>
+
 
 <div class="sidebar" id="sidebar">
     <div class="sidebar-inner slimscroll">
@@ -56,18 +61,20 @@
                     </a>
                 </li>  
 
-                <li class="submenu">
-                    <a href="" class="">
-                        <i class="fe bbicon"></i>
-                        <span> Modalidade</span> 
-                        <span class="menu-arrow"></span>
-                    </a>
-                    <ul style="display: none;">
-                        <li><a href="{{route('modalidade.index')}}">Listar</a></li>
-                        <li><a href="{{route('modalidade.create')}}">Cadastrar</a></li>
-                  
-                    </ul>
-                </li>
+                @if(Auth::user()->isAdmin)
+                    <li class="submenu">
+                        <a href="" class="">
+                            <i class="fas fa-swimmer mr-1" style=""></i> 
+                            <span>  Esportes</span> 
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <ul style="display: none;">
+                            <li><a href="{{route('modalidade.index')}}">Listar</a></li>
+                            <li><a href="{{route('modalidade.create')}}">Cadastrar</a></li>
+                    
+                        </ul>
+                    </li>
+                @endif
             
                 <li class="submenu">
                     <a href="" class="">

@@ -1,4 +1,4 @@
-<div class="modal fade show" id="modal_editar_aluno" role="dialog" aria-modal="true" style="display:none; padding-left: 0px;">
+<div class="modal fade show modal_editar" id="modal_editar" role="dialog" aria-modal="true" style="display:none; padding-left: 0px;">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -69,7 +69,7 @@
                        
                       
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Salvar</button>
+                    <button type="submit" class="btn btn-primary w-100 salvar_aluno" id="salvar_aluno">Salvar</button>
                 </form>
             </div>
         </div>

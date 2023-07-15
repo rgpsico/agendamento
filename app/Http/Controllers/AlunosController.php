@@ -87,4 +87,47 @@ class AlunosController extends Controller
 
         return response()->json(['message' => 'Dados atualizados com sucesso!']);
     }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'nome' => 'required',
+            'sobreNome' => 'required',
+            'nascimento' => 'required|date',
+            'email' => 'required|email',
+            'cep' => 'required',
+            'rua' => 'required',
+            'cidade' => 'required',
+            'estado' => 'required',
+            'numero' => 'required',
+            'password' => 'required'
+        ]);
+
+        $request['tipo_usuario'] = 'Aluno';
+        // Atualizando ou Criando o Usuário
+        $user = Usuario::updateOrCreate(
+            ['email' => $request->email],
+            $request->only('nome', 'sobreNome', 'nascimento', 'password', 'tipo_usuario')
+        );
+
+        // Atualizando ou Criando o Aluno
+        $student = Alunos::updateOrCreate(
+            ['usuario_id' => $user->id],
+            $request->only('...')
+        );
+
+
+        $request['endereco'] = $request->rua . ' ' . $request->numero . ' ' . $request->cidade;
+
+        // Atualizando ou Criando o Endereço do Aluno
+        $studentAddress = AlunoEndereco::updateOrCreate(
+            ['aluno_id' => $student->id],
+            $request->only('rua', 'cidade', 'estado', 'cep', 'numero', 'endereco')
+        );
+
+        return response()->json([
+            'message' => 'Dados inseridos/atualizados com sucesso!',
+            'aluno' => $user // Aqui, estou supondo que $user contém os dados do novo aluno
+        ]);
+    }
 }

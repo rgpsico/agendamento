@@ -65,9 +65,30 @@ class ModalidadeController extends Controller
         return redirect()->route('modalidade.index')->with('success', 'Modalidade atualizada com sucesso!');
     }
 
+
+    public function updateApi(Request $request, $id)
+    {
+        $request->validate([
+            'nome' => 'required',
+        ]);
+
+        $modalidade = Modalidade::findOrFail($id);
+        $modalidade->update($request->all());
+
+        return response()->json([
+            'message' => 'Modalidade atualizada com sucesso!',
+            'modalidade' => $modalidade
+        ], 200);
+    }
+
+
+
     public function destroy($id)
     {
         $this->model::find($id)->delete();
-        return redirect()->route('modalidade.index')->with('success', 'Modalidade excluída com sucesso!');
+        return response()->json([
+            'message' => 'Modalidade Excluida com sucesso!',
+
+        ], 200);
     }
 }

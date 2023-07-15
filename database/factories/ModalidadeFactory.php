@@ -16,7 +16,7 @@ use Illuminate\Foundation\Auth\User;
 class ModalidadeFactory extends Factory
 {
 
-    protected $model = Esporte::class;
+    protected $model = Modalidade::class;
     /**
      * Define the model's default state.
      *

@@ -62,7 +62,8 @@ Route::resource('dias', DiaDaSemanaControllerApi::class);
 Route::post('/pagamento', [StripeController::class, 'treinoStripe'])->name('stripe.pagamento');
 
 
-Route::delete('modalidade/{id}', [ModalidadeController::class, 'destroy'])->name('modalidade.destroy');
+Route::post('modalidade/{id}/update', [ModalidadeController::class, 'updateApi'])->name('modalidade.update');
+Route::delete('modalidade/{id}/destroy', [ModalidadeController::class, 'destroy'])->name('modalidade.destroy');
 
-
+Route::post('/aluno/store', [AlunosController::class, 'store']);
 Route::post('/aluno/{id}/update', [AlunosController::class, 'update']);
