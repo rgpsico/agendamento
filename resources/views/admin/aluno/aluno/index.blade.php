@@ -76,6 +76,7 @@
 
    <script>
     $(document).ready(function(){
+    
         $(document).on("click", ".bt_excluir_aluno", function() {
         var id = $(this).data('id');
          $('.confirmar_exclusao').data('id_aluno', id);
@@ -90,7 +91,7 @@
 
 
     $(document).on("click", "#editar_aluno", function() {
-    $("#modal_editar_aluno").modal('show');
+    $("#modal_editar").modal('show');
     var data = $(this).data('data')[0];
         console.log(data)
     // Preencher os valores dos inputs com os dados obtidos

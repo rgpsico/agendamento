@@ -145,6 +145,19 @@ $(document).ready(function(){
     // Remova quaisquer mensagens de erro existentes antes de fazer uma nova requisição.
     $('.form-group .text-danger').remove();
 
+    var id = $("#id").val(); // Supondo que você tem um campo de entrada oculto com o ID.
+
+        var url, method;
+        if (id) {
+            // Se o ID existe, atualize o aluno.
+            url = '/api/aluno/' + id + '/update';
+            method = 'POST';
+        } else {
+            // Se o ID não existe, insira um novo aluno.
+            url = '/api/aluno/store';
+            method = 'POST';
+        }
+
     var nome = $("#nome").val();
     var sobreNome = $("#sobreNome").val();
 
@@ -167,13 +180,14 @@ $(document).ready(function(){
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
-        url: '/api/aluno/store',  // Substitua '/api/aluno' com a rota correta para a sua API.
-        method: 'POST',             
+        url: url,  // Substitua '/api/aluno' com a rota correta para a sua API.
+        method: method,             
         data: {
             nome: nome,
             sobreNome: sobreNome,
             nascimento: nascimentoFormatado,
             email: email,
+            endereco:rua+' '+cidade+''+numero,
             cep: cep,
             rua: rua,
             password:'12',
@@ -184,10 +198,11 @@ $(document).ready(function(){
         success: function(response) {
             alert(response.message); // Dados inseridos/atualizados com sucesso!
             $(".modal_editar").modal('hide');
-    
-    // Agora, response.aluno contém o novo aluno. Adicione-o à tabela:
             let newRowHTML = getNewRowHTML(response.aluno);
             $('table tbody').append(newRowHTML);
+            if(id){
+                window.location.reload()
+            }
                 
             // Aqui, você pode adicionar qualquer lógica que queira executar após o sucesso da requisição.
         },
@@ -221,14 +236,16 @@ $(document).ready(function(){
 
 
     $(document).on("click", "#editar_aluno", function() {
-        $("#modal_editar_aluno").modal('show');
+        $("#modal_editar").modal('show');
         var data = $(this).data('data')[0];
-          
-       
+    
+      
+        $("#id").val(data.id);
         $("#nome").val(data.nome);
         $("#sobreNome").val(data.sobreNome);
         $("#nascimento").val(data.nascimento);
         $("#email").val(data.email);
+        
         $("#cep").val(data.cep);
         $("#rua").val(data.rua);
         $("#cidade").val(data.cidade);

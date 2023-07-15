@@ -32,7 +32,8 @@
                 
                 <li> 
                     <a href="{{route('empresa.disponibilidade')}}">
-                        <i class="fe fe-users"></i><span>Disponbilidade</span>
+                        <i class="fe fe-clock "></i>
+                            <span>Disponbilidade</span>
                     </a>
                 </li>
             

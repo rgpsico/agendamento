@@ -22,9 +22,10 @@ class ServicoController extends Controller
     public function index()
     {
         $model = $this->model->all();
+
         return view($this->view . '.index', [
             'pageTitle' => $this->pageTitle,
-            'model' => $model,
+            'model' => $model ?? '',
             'view' => $this->view,
             'route' => $this->route
         ]);
