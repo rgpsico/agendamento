@@ -8,28 +8,28 @@
                 </li>
 
                 <li> 
-                    <a href="{{route('escola.dashboard')}}">
+                    <a href="{{route('cliente.dashboard')}}">
                         <i class="fe fe-home"></i> 
                         <span>Dashboard</span>
                     </a>
                 </li>
 
                 <li> 
-                    <a href="{{route('escola.dashboard')}}">
+                    <a href="{{route('cliente.dashboard')}}">
                         <i class="fe fe-home"></i> 
                         <span>Escolas de Surf</span>
                     </a>
                 </li>
 
                 <li> 
-                    <a href="{{route('escola.dashboard')}}">
+                    <a href="{{route('cliente.dashboard')}}">
                         <i class="fe fe-home"></i> 
                         <span>Modalidades</span>
                     </a>
                 </li>
 
                 <li> 
-                    <a href="{{route('escola.dashboard')}}">
+                    <a href="{{route('cliente.dashboard')}}">
                         <i class="fe fe-home"></i> 
                         <span>Configuração Sistema</span>
                     </a>
@@ -54,7 +54,7 @@
                 </li>
 
                 <li> 
-                    <a href="{{route('escola.dashboard')}}">
+                    <a href="{{route('cliente.dashboard')}}">
                         <i class="fe fe-home"></i> <span>Dashboard</span>
                     </a>
                 </li>

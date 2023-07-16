@@ -8,7 +8,7 @@
                 </li>
             
                 <li> 
-                    <a href="{{route('escola.dashboard')}}">
+                    <a href="{{route('cliente.dashboard')}}">
                         <i class="fe fe-home"></i> <span>Escola</span>
                     </a>
                 </li>

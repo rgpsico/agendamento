@@ -17,15 +17,9 @@ Route::prefix('usuario')->group(function () {
     Route::post('/login', [UserController::class, 'login'])->name('user.login');
 });
 
-Route::prefix('pagamento')->middleware('auth')->group(function () {
-    Route::post('/stripe', [PagamentoController::class, 'pagamentoStripe'])->name('pagamento.stripe');
-});
-
-Route::prefix('admin')->middleware('auth')->group(function () {
-
-    Route::get('{id}/profile', [UserController::class, 'profile'])->name('usuario.profile');
 
 
+Route::prefix('cliente')->middleware('auth')->group(function () {
     Route::group(['prefix' => '/servicos'], function () {
         Route::get('/', [ServicoController::class, 'index'])->name('admin.servico.index');
         Route::get('/{id}/servico', [ServicoController::class, 'show'])->name('admin.servico.show');
@@ -34,12 +28,6 @@ Route::prefix('admin')->middleware('auth')->group(function () {
         Route::post('/store', [ServicoController::class, 'store'])->name('admin.servico.store');
         Route::delete('/{id}/delete', [ServicoController::class, 'destroy'])->name('admin.servico.destroy');
         Route::post('/{id}/update', [ServicoController::class, 'update'])->name('admin.servico.update');
-    });
-
-    Route::get('/', [EmpresaController::class, 'index'])->name('agenda.index');
-
-    Route::group(['prefix' => '/dashboard'], function () {
-        Route::get('/', [DashBoardController::class, 'dashboard'])->name('dashboard');
     });
 
     Route::group(['prefix' => '/empresa'], function () {
@@ -52,19 +40,16 @@ Route::prefix('admin')->middleware('auth')->group(function () {
         Route::post('/{userId}/endereco_empresa', [EmpresaController::class, 'endereco_update'])->name('empresa.update_endereco');
         Route::get('/disponibilidade', [EmpresaController::class, 'disponibilidade'])->name('empresa.disponibilidade');
         Route::post('/disponibilidade', [EmpresaController::class, 'cadastrarDisponibilidade'])->name('empresa.disponibilidade.store');
-
+        Route::get('/', [EmpresaController::class, 'index'])->name('agenda.index');
         Route::post('/{userId}/profile', [EmpresaController::class, 'profile'])->name('empresa.profile');
-
-
         Route::delete('/{id}/destroy', [EmpresaController::class, 'destroy'])->name('empresa.destroy');
         Route::get('/{userId}/config', [EmpresaController::class, 'configuracao'])->name('empresa.configuracao');
         Route::get('/{userId}/fotos', [EmpresaController::class, 'fotos'])->name('empresa.fotos');
         Route::get('/{userId}/endereco_empresa', [EmpresaController::class, 'endereco'])->name('empresa.endereco');
         Route::post('/uploadEmpresa', [EmpresaController::class, 'uploadImage'])->name('empresa.upload');
         Route::delete('/{id}/excluirImagens', [EmpresaController::class, 'destroy'])->name('gallery.destroy');
-    });
 
-    Route::group(['prefix' => '/escola'], function () {
+
         Route::group(['prefix' => '/alunos'], function () {
             Route::get('/', [AlunosController::class, 'index'])->name('alunos.index');
             Route::get('/{id}/show', [AlunosController::class, 'show'])->name('alunos.show');
@@ -77,7 +62,7 @@ Route::prefix('admin')->middleware('auth')->group(function () {
         });
 
         Route::group(['prefix' => '/dashboard'], function () {
-            Route::get('/', [DashBoardController::class, 'dashboardAlunos'])->name('escola.dashboard');
+            Route::get('/', [DashBoardController::class, 'dashboardAlunos'])->name('cliente.dashboard');
         });
 
         Route::group(['prefix' => '/agenda'], function () {
@@ -100,8 +85,17 @@ Route::prefix('admin')->middleware('auth')->group(function () {
             Route::post('store', [ModalidadeController::class, 'store'])->name('modalidade.store');
             Route::delete('{id}/destroy', [ModalidadeController::class, 'destroy'])->name('admin.modalidade.destroy');
         });
+
+        Route::get('{id}/profile', [UserController::class, 'profile'])->name('usuario.profile');
     });
 });
+
+
+
+Route::prefix('pagamento')->middleware('auth')->group(function () {
+    Route::post('/stripe', [PagamentoController::class, 'pagamentoStripe'])->name('pagamento.stripe');
+});
+
 
 
 Route::prefix('admin')->middleware('auth')->group(function () {

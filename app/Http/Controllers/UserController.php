@@ -117,7 +117,7 @@ class UserController extends Controller
         if (Auth::attempt(['email' => $request->email, 'password' => $request->senha])) { // Changed 'senha' to 'password'
 
             if (Auth::user()->tipo_usuario == 'Professor') {
-                return redirect()->intended(route('escola.dashboard'));
+                return redirect()->intended(route('cliente.dashboard'));
             }
 
             return redirect()->intended(route('alunos.aulas'));
