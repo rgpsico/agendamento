@@ -84,7 +84,7 @@ class UserController extends Controller
                 // Crie um professor associado ao usuário.
                 Professor::create([
                     'usuario_id' => $user->id,
-                    'especialidade' => 'TESTE',
+                    'modalidade_id' => $request->modalidade_id,
                     'sobre' => 'SObre default',
                     'avatar' => 'AVATAR'
                 ]);

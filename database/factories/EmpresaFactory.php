@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\Empresa;
+use App\Models\Modalidade;
 use App\Models\Usuario;
 use Illuminate\Support\Str;
 use Faker\Generator as Faker;
@@ -37,7 +38,7 @@ class EmpresaFactory extends Factory
             'nome' => $this->faker->company,
             'descricao' => $this->faker->text(200),
             'telefone' => $this->faker->phoneNumber,
-            'modalidade' => $this->faker->randomElement(['futevolei', 'bodyboard', 'surf', 'personal', 'corrida']),
+            'modalidade_id' => Modalidade::inRandomOrder()->first()->id,
             'cnpj' => $this->faker->randomNumber(8) . '/' . $this->faker->randomNumber(4) . '-' . $this->faker->randomNumber(2),
             'valor_aula_de' => $this->faker->randomFloat(2, 0, 1000),
             'valor_aula_ate' => $this->faker->randomFloat(2, 0, 1000),

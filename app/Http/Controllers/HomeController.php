@@ -148,12 +148,14 @@ class HomeController extends Controller
 
     public function registerProf()
     {
+        $modalidade = Modalidade::all();
         return view(
             'public.registrar.registerProf',
             [
                 'pageTitle' => $this->pageTitle,
                 'view' => $this->view,
-                'route' => $this->route
+                'route' => $this->route,
+                'modalidade' => $modalidade
             ]
         );
     }

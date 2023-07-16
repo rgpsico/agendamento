@@ -47,7 +47,7 @@ class EmpresaController extends Controller
 
             'valor_aula_de' => 'required',
             'valor_aula_ate' => 'required',
-            'modalidade' => 'required',
+            'modalidade_id' => 'required',
         ]);
 
 

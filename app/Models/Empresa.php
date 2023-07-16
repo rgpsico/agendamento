@@ -17,11 +17,16 @@ class Empresa extends Model
 
     protected $keyType = 'string';
 
-    protected $fillable = ['user_id', 'avatar', 'nome', 'descricao', 'telefone', 'cnpj', 'valor_aula_de', 'valor_aula_ate', 'modalidade', 'banners'];
+    protected $fillable = ['user_id', 'avatar', 'nome', 'descricao', 'telefone', 'cnpj', 'valor_aula_de', 'valor_aula_ate', 'modalidade_id', 'banners'];
 
     public function endereco()
     {
         return $this->hasOne(EmpresaEndereco::class, 'empresa_id', 'id');
+    }
+
+    public function modalidade()
+    {
+        return $this->hasOne(Modalidade::class, 'modalidade_id', 'id');
     }
 
     public function user()

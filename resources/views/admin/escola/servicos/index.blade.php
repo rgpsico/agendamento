@@ -1,13 +1,42 @@
-<x-admin.layout title="Listar Alunos">
+<x-admin.layout title="{{$pageTitle}}">
 
     <x-modal-delete/>
     <x-modal-editar-usuario/>
     <div class="page-wrapper">
         <div class="content container-fluid">
         
-            <!-- Page Header -->
-           <x-header.titulo pageTitle="{{$pageTitle}}" btAdd="true" route="{{$route}}" />
-            <!-- /Page Header -->
+            <div class="page-header">
+                <div class="row">
+                    <div class="col-10">
+                        <h3 class="page-title">{{$pageTitle ?? ''}}</h3>
+                        <ul class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a href="">Admin</a>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <a href="javascript:(0);">Serviços </a>
+                            </li>
+                      
+                        </ul>
+                    </div>
+                </div>
+                @if(isset($btAdd) && $btAdd ==  'true')
+                <div class="row">
+                    <div class="col-2 my-4">
+                        @if(!isset($modal))
+                            <button class="btn btn-success Adicionar{{$pageTitle}}">
+                                <i class="icon icon-plus">Adicionar {{$pageTitle}}</i>
+                            </button>
+                        @else 
+                            <button  class="btn btn-success" id="Adicionar{{$pageTitle}}">
+                                <i class="icon icon-plus">Adicionar {{$pageTitle}}</i>
+                            </button>
+                        @endif    
+                    </div>
+                </div>
+                @endif
+            </div>
+            
             
             <div class="row">
                 <div class="col-sm-12">

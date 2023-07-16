@@ -32,31 +32,29 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                    <tr role="row" class="odd">
-                                            <td class="sorting_1">
-                                                <h2 class="table-avatar">
-                                                    <a href="profile.html" class="avatar avatar-sm me-2">
-                                                        <img class="avatar-img rounded-circle" 
-                                                        src="{{asset('template/assets/img/doctors/doctor-thumb-02.jpg')}}"
-                                                         alt="User Image"></a>
-                                                    <a href="profile.html">Dr. Darren Elder</a>
-                                                </h2>
-                                            </td>
-                                            <td>Dental</td>
-                                            
-                                            
-                                            <td>5 Nov 2019 <span class="text-primary d-block">11.00 AM - 11.35 AM</span></td>
-                                            <td>
-                                                <div class="status-toggle">
-                                                    <input type="checkbox" id="status_2" class="check" checked="">
-                                                    <label for="status_2" class="checktoggle">checkbox</label>
-                                                </div>
-                                            </td>
-                                            <td class="text-start">
-                                                $300.00
-                                            </td>
-                                        </tr>
+                                        @foreach ($model->agendamentos as $agendamento)
+                                            <tr role="row" class="odd">
+                                                <td class="sorting_1">
+                                                    <h2 class="table-avatar">
+                                                        <a href="" class="avatar avatar-sm me-2">
+                                                            <img class="avatar-img rounded-circle" 
+                                                            src="{{asset('template/assets/img/doctors/doctor-thumb-02.jpg')}}"
+                                                             alt="User Image"></a>
+                                                        <a href="">{{$agendamento->aluno->nome}}</a>
+                                                    </h2>
+                                                </td>
+                                                <td>{{$agendamento->modalidade->nome}}</td>
+                                                <td>{{$agendamento->data_da_aula}}</td>
+                                                <td>
+                                                     <span class="btn btn-success">{{$agendamento->status}}</span>    
+                                                </td>
+                                                <td class="text-start">
+                                                    {{$agendamento->valor_aula}}
+                                                </td>
+                                            </tr>
+                                        @endforeach
                                     </tbody>
+                                    
                                 </table>
                             </div>
                         </div>

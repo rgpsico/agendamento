@@ -44,6 +44,12 @@ class Professor extends Model
         return $this->hasOne(Disponibilidade::class, 'id', 'professor_id');
     }
 
+    public function agendamentos()
+    {
+        return $this->hasMany(Agendamento::class);
+    }
+
+
 
     // protected static function boot()
     // {

@@ -26,41 +26,24 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($model as $value )
-                                            
-                                    
-                                        <tr class="linha_-{{$value->id}}">
-                                          
-                                            <td>
-                                                <h2 class="table-avatar">
-                                                    <a href="{{route('alunos.show',['id' => $value->id ])}}" class="avatar avatar-sm me-2">
-                                                        <img class="avatar-img rounded-circle" src="{{asset('admin/img/patients/patient15.jpg')}}" alt="User Image"></a>
-                                                    <a href="{{route('alunos.show',['id' => $value->id ])}}">{{$value->nome}}</a>
-                                                </h2>
-                                            </td>
-                                   
-                                            <td>{{$value->email ?? ''}}</td>
-                                            <td>{{$value->telefone ?? ''}}</td>
-                                            <td class="text-center">
-                                                <div class="actions">
-                                                    <a class="btn btn-sm bg-info-light" 
-                                                        data-data="{{$model}}"
-                                                         id="editar_aluno">
-                                                        <i class="fe fe-pencil"></i> Editar
-                                                    </a>
-
-                                                    <a class="btn btn-sm bg-info " href="{{route('alunos.show',['id' => $value->id])}}">
-                                                        <i class="fe fe-eye"></i> Ver
-
-                                                    </a>
-                                                    <a data-bs-toggle="modal" href="#delete_modal" data-id="{{$value->id}}" class="btn btn-sm bg-danger-light bt_excluir_aluno">
-                                                        <i class="fe fe-trash"></i> Excluir
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
+                                        
+                                        @foreach ($model as $value)
+                                            <tr class="linha_-{{$value->id}}">
+                                                <td>
+                                                    <h2 class="table-avatar">
+                                                        <a href="{{route('alunos.show',['id' => $value->id ])}}" class="avatar avatar-sm me-2">
+                                                            <img class="avatar-img rounded-circle" src="{{asset('admin/img/patients/patient15.jpg')}}" alt="User Image">
+                                                        </a>
+                                                        <a href="{{route('alunos.show',['id' => $value->id ])}}">{{$value->usuario->nome}}</a>
+                                                    </h2>
+                                                </td>
+                                                <td>{{$value->usuario->email ?? ''}}</td>
+                                                <td>{{$value->usuario->telefone ?? ''}}</td>
+                                                <!-- ... rest of the code ... -->
+                                            </tr>
                                         @endforeach
                                     </tbody>
+                                    
                                 </table>
                             </div>
                             </div>

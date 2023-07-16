@@ -5,9 +5,7 @@
     <div class="page-wrapper">
         <div class="content container-fluid">
         
-            <!-- Page Header -->
-           <x-header.titulo pageTitle="{{$pageTitle}}" btAdd="true" route="{{$route}}" />
-            <!-- /Page Header -->
+          
             
             <div class="row">
                 <div class="col-sm-12">
@@ -22,7 +20,7 @@
                                             <th>Titulo</th>
                                             <th>Descricao</th>
                                             <th>Preço</th>
-                                            <th>Tempo de Aula</th>
+                                            <th>Tempo de Aulasss</th>
                                            <th class="text-center">Ação</th>
                                         </tr>
                                     </thead>

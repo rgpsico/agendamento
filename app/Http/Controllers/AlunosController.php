@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Aluno;
 use App\Models\AlunoEndereco;
 use App\Models\Alunos;
+use App\Models\Professor;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AlunosController extends Controller
 {
@@ -22,8 +24,17 @@ class AlunosController extends Controller
 
     public function index()
     {
+        $professor_id = Auth::user()->professor->id;
 
-        $alunos = $this->model::alunos()->get();
+        $professor = Professor::with('agendamentos.aluno')->find($professor_id);
+
+        $alunos = collect([]);
+        foreach ($professor->agendamentos as $agendamento) {
+            if (!$alunos->contains($agendamento->aluno)) {
+                $alunos->push($agendamento->aluno);
+            }
+        }
+
         return view(
             $this->view . '.index',
             [
@@ -34,6 +45,7 @@ class AlunosController extends Controller
             ]
         );
     }
+
 
 
     public function create()

@@ -64,8 +64,8 @@
                                                 </h2>
                                             </td>
                                    
-                                            <td>{{$value->email ?? ''}}</td>
-                                            <td>{{$value->telefone ?? ''}}</td>
+                                            <td>{{$value->usuario->email ?? ''}}</td>
+                                            <td>{{$value->usuario->telefone ?? ''}}</td>
                                             <td class="text-center">
                                                 <div class="actions">
                                                     <a class="btn btn-sm bg-info-light" 

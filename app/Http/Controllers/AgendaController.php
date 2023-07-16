@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\PaymentRequest;
 use App\Models\Alunos;
 use App\Models\Empresa;
+use App\Models\Professor;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AgendaController extends Controller
 {
@@ -21,15 +23,22 @@ class AgendaController extends Controller
 
     public function index()
     {
+        $professor_id = Auth::user()->professor->id; // suponho que o professor esteja logado.
+
+        // Obtenha o professor junto com seus agendamentos
+        $professor = Professor::with('agendamentos.aluno', 'agendamentos.modalidade')->find($professor_id);
+
         return view(
             $this->view . '.index',
             [
                 'pageTitle' => $this->pageTitle,
                 'view' => $this->view,
                 'route' => $this->route,
+                'model' => $professor
             ]
         );
     }
+
 
     public function form()
     {

@@ -29,7 +29,17 @@
 				  <x-text-input name="email" size="30" label="Email" placeholder="email@124.com" />
 				  <x-text-input type='password' name="senha" size="30" label="Senha" />
 				  <x-text-input type='password' name="senha" size="30" label="Repetir Senha" />
-				  
+				   
+				  <div class="form-group">
+					<label for="">Modalidade</label>
+						<select name="modalidade_id" class="form-control" id="modalidade_id">
+							@foreach ($modalidade as  $value)
+								<option value="{{$value->id}}">{{$value->nome}}</option>
+							@endforeach						
+						</select>
+				  </div>
+				 
+
 				  <div class="form-group mb-0">
 				  		<button class="btn btn-primary w-100" type="submit">Registrar</button>
 				  </div>

@@ -14,7 +14,11 @@
             
                 <li> 
                     <a href="{{route('escola.dashboard')}}">
-                        <i class="fe fe-home"></i> <span>Dashboard</span>
+                        <i class="fe fe-home"></i> <span>Dashboard
+
+
+
+                        </span>
                     </a>
                 </li>
             
@@ -61,12 +65,7 @@
                     </a>
                 </li>
                 
-                <li> 
-                    <a href="{{route('empresa.configuracao',['userId' => Auth::user()->id])}}">
-                        <i class="fe fe-vector"></i>
-                        <span>Configuração</span>
-                    </a>
-                </li>  
+             
 
                 @if(Auth::user()->isAdmin)
                     <li class="submenu">
@@ -95,11 +94,13 @@
                                 <i class="fe fe-briefcase"></i><span> Empresa</span>
                             </a>
                         </li>  
+                        @isset(Auth::user()->empresa->user_id)
                         <li> 
                             <a href="{{route('empresa.endereco',['userId' => Auth::user()->id])}}">
                                <i class="fe fe-map-pin"></i><span> Endereço</span>
                             </a>
                         </li>
+                        @endisset
                     </div>
     </div>
 </div> 
