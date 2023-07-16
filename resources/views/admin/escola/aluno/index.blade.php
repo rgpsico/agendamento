@@ -63,6 +63,8 @@
                                                     <a href="{{route('alunos.show',['id' => $value->id ])}}">{{$value->nome}}</a>
                                                 </h2>
                                             </td>
+
+                                            
                                    
                                             <td>{{$value->usuario->email ?? ''}}</td>
                                             <td>{{$value->usuario->telefone ?? ''}}</td>
