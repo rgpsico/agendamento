@@ -124,8 +124,16 @@ class EmpresaController extends Controller
     public function disponibilidade()
     {
         $diaDaSemana = DiaDaSemana::all();
+
         $id_professor = Auth::user()->professor->id;
         $disponibilidades = Disponibilidade::where('id_professor', $id_professor)->get();
+
+        $horaInicio = $disponibilidades->first()->hora_inicio ?? null;
+        $horaFim = $disponibilidades->first()->hora_fim ?? null;
+
+        $mesmoHorario = $disponibilidades->every(function ($disponibilidade) use ($horaInicio, $horaFim) {
+            return $disponibilidade->hora_inicio == $horaInicio && $disponibilidade->hora_fim == $horaFim;
+        });
 
         // Busca as disponibilidades do professor
         return view(
@@ -133,7 +141,10 @@ class EmpresaController extends Controller
             [
                 'pageTitle' => 'Disponibilidade',
                 'diaDaSemana' => $diaDaSemana,
-                'disponibilidades' => $disponibilidades
+                'disponibilidades' => $disponibilidades,
+                'mesmoHorario' => $mesmoHorario,
+                'horaInicio' => $horaInicio,
+                'horaFim' => $horaFim
             ]
         );
     }

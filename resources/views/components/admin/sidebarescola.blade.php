@@ -30,20 +30,24 @@
                         <li><a href="{{route('admin.servico.create')}}">Cadastrar Serviços</a></li>
                     </ul>
                 </li>
-                @endisset
-                
+              
+                @isset(Auth::user()->professor->id)
                 <li> 
+                   
                     <a href="{{route('empresa.disponibilidade')}}">
                         <i class="fe fe-clock "></i>
                             <span>Disponbilidade</span>
                     </a>
                 </li>
-            
+                @endisset
+                @endisset
+                @isset(Auth::user()->professor->id)
                 <li> 
                     <a href="{{route('alunos.index')}}">
                         <i class="fe fe-users"></i><span>Alunos</span>
                     </a>
                 </li>
+                @endisset
                 <li> 
                     <a href="{{route('agenda.index')}}">
                         <i class="fe fe-calendar"></i><span>Agenda</span>

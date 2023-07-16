@@ -10,7 +10,7 @@ class DiaDaSemana extends Model
     use HasFactory;
     protected $table = "dias_da_semana";
 
-    protected $fillable = ['dia'];
+    protected $fillable = ['dia', 'nome_dia'];
 
     public $timestamps = false;
 
