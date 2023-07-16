@@ -18,6 +18,7 @@
                     </a>
                 </li>
             
+                @isset(Auth::user()->empresa->user_id)
                 <li class="submenu">
                     <a href="" class="">
                         <i class="fe fe-activity"></i>
@@ -29,6 +30,7 @@
                         <li><a href="{{route('admin.servico.create')}}">Cadastrar Serviços</a></li>
                     </ul>
                 </li>
+                @endisset
                 
                 <li> 
                     <a href="{{route('empresa.disponibilidade')}}">

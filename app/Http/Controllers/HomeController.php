@@ -6,6 +6,7 @@ use App\Models\Agendamento;
 use App\Models\Aulas;
 use App\Models\Disponibilidade;
 use App\Models\Empresa;
+use App\Models\Modalidade;
 use App\Models\Professor;
 use Illuminate\Http\Request;
 
@@ -36,14 +37,15 @@ class HomeController extends Controller
     {
         $model = $this->model::with('endereco', 'galeria')->get();
 
-
+        $modalidade = Modalidade::all();
         return view(
             $this->view . '.index',
             [
                 'pageTitle' => $this->pageTitle,
                 'view' => $this->view,
                 'route' => $this->route,
-                'model' =>  $model
+                'model' =>  $model,
+                'modalidade' => $modalidade
             ]
         );
     }

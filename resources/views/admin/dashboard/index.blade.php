@@ -19,7 +19,7 @@
                                 </div>
                             </div>
                             <div class="dash-widget-info">
-                                <h6 class="text-muted">Total de Escola</h6>
+                                <h6 class="text-muted">Total de Alunos</h6>
                                 <div class="progress progress-sm">
                                     <div class="progress-bar bg-primary w-50"></div>
                                 </div>
@@ -40,7 +40,7 @@
                             </div>
                             <div class="dash-widget-info">
                                 
-                                <h6 class="text-muted">Escolas Ativas</h6>
+                                <h6 class="text-muted">Total Arrecadação</h6>
                                 <div class="progress progress-sm">
                                     <div class="progress-bar bg-success w-50"></div>
                                 </div>
@@ -61,7 +61,7 @@
                             </div>
                             <div class="dash-widget-info">
                                 
-                                <h6 class="text-muted">Cancelamento</h6>
+                                <h6 class="text-muted">Aulas canceladas</h6>
                                 <div class="progress progress-sm">
                                     <div class="progress-bar bg-danger w-50"></div>
                                 </div>
@@ -82,7 +82,7 @@
                             </div>
                             <div class="dash-widget-info">
                                 
-                                <h6 class="text-muted">Arrecadação</h6>
+                                <h6 class="text-muted">Arrecadação Mensal</h6>
                                 <div class="progress progress-sm">
                                     <div class="progress-bar bg-warning w-50"></div>
                                 </div>

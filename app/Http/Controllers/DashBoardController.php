@@ -26,6 +26,7 @@ class DashBoardController extends Controller
         $cancelledSchools = $this->model::getCancelledSchools();
         $totalRevenue = $this->model::getTotalRevenue();
 
+
         return view('admin.dashboard.index', compact('activeSchools'));
     }
 
