@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Agendamento extends Model
 {
     use HasFactory;
-    protected $table = "Agendamentos";
+    protected $table = "agendamentos";
 
     protected $fillable = ['aluno_id', 'modalidade_id', 'professor_id', 'data_da_aula', 'valor_aula'];
 
