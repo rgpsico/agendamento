@@ -18,9 +18,16 @@
 											<div class="payment-widget">
 												<h4 class="card-title">Metodos de Pagamento</h4>
 									
-												<input type="hidden" name="user_id" value="{{Auth::user()->id}}">
+												<input type="text" name="aluno_id" value="{{Auth::user()->id}}">
+												<input type="text" name="professor_id" value="{{$model->user_id}}">
+												<input type="text" name="modalidade_id" value="{{$model->user_id}}">
 												<input type="hidden" id="data_aula" name="data_aula" value="">
 												<input type="hidden" id="hora_aula" name="hora_aula" value="">
+												<input type="hidden" id="valor_aula" name="valor_aula" value="">
+												<input type="hidden" id="titulo" name="titulo" value="">
+										
+												
+												
 												<!-- Credit Card Payment -->
 												<div class="payment-list">
 													<label class="payment-radio credit-card-option">
@@ -88,11 +95,23 @@
 										}
 
 										$(document).ready(function() {
-      var diaDaSemana = localStorage.getItem('diaDaSemana');
-      var data = localStorage.getItem('data');
-      var horaDaAula = localStorage.getItem('horaDaAula');
-      $('#data_aula').val(data);
-      $('#hora_aula').val(horaDaAula);
+											var diaDaSemana = localStorage.getItem('diaDaSemana');
+											var data = localStorage.getItem('data');
+											var horaDaAula = localStorage.getItem('horaDaAula');
+											
+											$('#data_aula').val(data);
+											$('#hora_aula').val(horaDaAula);
+
+											var servico = localStorage.getItem('servicos');
+											if(servico)
+											{
+												var res = JSON.parse(servico)	
+																					
+												$('#valor_aula').val(res[0].preco);
+												$('#titulo').val(res[0].titulo);
+											}
+										
+											
     });
 									</script>
 									

@@ -136,6 +136,8 @@ for (let servico of servicos) {
 
     // Adiciona o item de lista à lista de serviços
     bookingFee.appendChild(li);
+
+  
 }
 
   </script>

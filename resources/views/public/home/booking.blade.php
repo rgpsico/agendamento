@@ -86,23 +86,28 @@
 								</div>
 							</div>
 						</div>
-						<div class="row">
+            <div class="row">
               @isset($model->servicos)              
-              @foreach ($model->servicos as $serv )                        
-                  <div class="col-md-2">            
-                      <div class="card card_servicos" data-servico_preco="{{$serv->preco}}" data-servico_id="{{$serv->id}}" data-servico_titulo="{{$serv->titulo}}">
-                          <img class="img-fluid" src="{{ asset('servico/' . $serv->imagem ?? 'admin/img/doctors/Thumbs.db') }}" alt="Imagem do serviço">
-                          <div class="card-body">
-                              <h5 class="card-title">{{$serv->titulo}}</h5>
-                              <p class="card-text">{{$serv->descricao}}</p>
-                              <p class="card-text" style="color: #333; font-size: 16px;">{{$serv->preco}}</p>
-                              <a href="#" class="btn btn-primary">Escolher</a>
+                  @foreach ($model->servicos as $serv )                        
+                      <div class="col-md-4">            
+                          <div class="card card_servicos border-dark mb-3" data-servico_preco="{{$serv->preco}}" data-servico_id="{{$serv->id}}" data-servico_titulo="{{$serv->titulo}}">
+                              <div class="card-header bg-transparent border-dark">
+                                  <h5 class="card-title text-center">{{$serv->titulo}}</h5>
+                              </div>
+                              <img class="card-img-top img-fluid" src="{{ asset('servico/' . $serv->imagem ?? 'admin/img/doctors/Thumbs.db') }}" alt="Imagem do serviço">
+                              <div class="card-body text-dark">
+                                  <p class="card-text">{{$serv->descricao}}</p>
+                                  <p class="card-text text-primary" style="font-size: 16px;">{{$serv->preco}}</p>
+                              </div>
+                              <div class="card-footer bg-transparent border-dark">
+                                  <a href="#" class="btn btn-primary btn-block">Escolher</a>
+                              </div>
                           </div>
                       </div>
-                  </div>
-              @endforeach 
-          @endisset
-            </div>
+                  @endforeach 
+              @endisset
+          </div>
+          
 						<div class="row">
 							<div class="col-12 col-sm-4 col-md-6">
 								<h4 class="mb-1">{{ \Carbon\Carbon::now()->format('d F Y') }}</h4>

@@ -14,7 +14,7 @@
             
                 <li> 
                     <a href="{{route('escola.dashboard')}}">
-                        <i class="fe fe-home"></i> <span>Dashboardss</span>
+                        <i class="fe fe-home"></i> <span>Dashboard</span>
                     </a>
                 </li>
             
@@ -36,7 +36,7 @@
                    
                     <a href="{{route('empresa.disponibilidade')}}">
                         <i class="fe fe-clock "></i>
-                            <span>Disponbilidade</span>
+                            <span>Horários</span>
                     </a>
                 </li>
                 @endisset

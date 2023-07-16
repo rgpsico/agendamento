@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('professores', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('usuario_id');
-            $table->string('especialidade');
+            $table->integer('modalidade_id')->nullable();
             $table->text('sobre')->default(null);
             $table->string('avatar', 200)->default(null);
             $table->foreign('usuario_id')->references('id')->on('usuarios');
