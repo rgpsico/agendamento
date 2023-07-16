@@ -72,6 +72,25 @@
         </div>          
     </div>
     <script>
-    // Seu código JS aqui...
-    </script>
+        document.getElementById('marcarTodos').addEventListener('change', function() {
+            let check = this.checked;
+            document.querySelectorAll('.form-check-input').forEach(function(checkbox) {
+                checkbox.checked = check;
+            });
+        });
+        
+        document.getElementById('startTodos').addEventListener('change', function() {
+            let time = this.value;
+            document.querySelectorAll('input[name="start[]"]').forEach(function(timeInput) {
+                timeInput.value = time;
+            });
+        });
+        
+        document.getElementById('endTodos').addEventListener('change', function() {
+            let time = this.value;
+            document.querySelectorAll('input[name="end[]"]').forEach(function(timeInput) {
+                timeInput.value = time;
+            });
+        });
+        </script>
 </x-layoutsadmin>
