@@ -13,7 +13,8 @@
                     <x-avaliacao-home :model="$value" />
 
                     <x-gallery-home :model="$value"  /> 
-                    <span class="badge bg-primary" style="font-size: 1.2em; text-transform: capitalize;">{{$value->modalidade}}</span>
+                   
+                    <span class="badge bg-primary" style="font-size: 1.2em; text-transform: capitalize;">{{$value->modalidade ?? ''}}</span>
 
                    
                 </div>

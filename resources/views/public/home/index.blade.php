@@ -44,7 +44,7 @@
 							
 									<h4>Modalidade</h4>      
 									
-								
+                                        @isset($modalidade)
 										@foreach ($modalidade as $value )          
 											<div>
 												<label class="custom_check">
@@ -53,6 +53,7 @@
 												</label>
 											</div>
 										@endforeach
+                                        @endisset
 								
 								
 							
