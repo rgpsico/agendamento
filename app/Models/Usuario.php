@@ -113,6 +113,11 @@ class Usuario extends Authenticatable
         return $this->hasMany(Disponibilidade::class, 'id_professor');
     }
 
+    public function modalidade()
+    {
+        return $this->hasMany(Modalidade::class, 'modalidade_id', 'id');
+    }
+
 
 
     public function aluno()
