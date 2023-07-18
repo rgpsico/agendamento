@@ -48,7 +48,7 @@
 										@foreach ($modalidade as $value )          
 											<div>
 												<label class="custom_check">
-													<input type="checkbox" name="gender_type" data-type="{{$value->nome}} " class="filter_empresa">
+													<input type="checkbox" name="gender_type" data-type="{{$value->id}} " class="filter_empresa">
 													<span class="checkmark"></span> {{$value->nome}} 
 												</label>
 											</div>
@@ -163,7 +163,7 @@
                                                         ${galleryHTML}
                                                     </ul>
                                                 </div>
-                                                <span class="badge bg-primary" style="font-size: 1.2em; text-transform: capitalize;">${empresa.modalidade}</span>
+                                                <span class="badge bg-primary" style="font-size: 1.2em; text-transform: capitalize;">${empresa.modalidade.nome}</span>
                                             </div>
                                         </div>
                                         <div class="doc-info-right">

@@ -20,11 +20,11 @@ class EmpresaControllerApi extends Controller
 
         $nome = $request->input('nome_empresa');
 
-        $query = Empresa::with('endereco', 'galeria', 'avaliacao');
+        $query = Empresa::with('modalidade', 'endereco', 'galeria', 'avaliacao');
 
         if ($tipos) {
             $tipos = explode(',', $tipos); // divide a string em um array
-            $query = $query->whereIn('modalidade', $tipos); // filtra por todos os tipos
+            $query = $query->whereIn('modalidade_id', $tipos); // filtra por todos os tipos
         }
 
         if ($nome) {

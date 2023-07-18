@@ -62,7 +62,7 @@ Route::prefix('cliente')->middleware('auth')->group(function () {
         });
 
         Route::group(['prefix' => '/dashboard'], function () {
-            Route::get('/', [DashBoardController::class, 'dashboardAlunos'])->name('cliente.dashboard');
+            Route::get('/', [EmpresaController::class, 'dashboard'])->name('cliente.dashboard');
         });
 
         Route::group(['prefix' => '/agenda'], function () {

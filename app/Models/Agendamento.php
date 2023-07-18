@@ -19,6 +19,8 @@ class Agendamento extends Model
         return $this->hasMany(Disponibilidade::class, 'id_dia');
     }
 
+
+
     public function aluno()
     {
         return $this->belongsTo(Alunos::class);

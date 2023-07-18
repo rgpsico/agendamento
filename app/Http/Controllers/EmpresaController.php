@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Agendamento;
 use App\Models\DiaDaSemana;
 use App\Models\Disponibilidade;
 use App\Models\Empresa;
@@ -9,6 +10,8 @@ use App\Models\EmpresaEndereco;
 use App\Models\EmpresaGaleria;
 use App\Models\Modalidade;
 use App\Models\Professor;
+use App\Models\Usuario;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -17,11 +20,43 @@ class EmpresaController extends Controller
     protected $pageTitle = "Empresa TESTE";
     protected $view = "empresas";
     protected $route = "empresa";
-    protected $model;
-    public function __construct(Empresa $model)
+    protected $model, $usuario;
+    protected $agendamento;
+
+
+    public function __construct(Empresa $model, Usuario $usuario, Agendamento $agendamento)
     {
         $this->model = $model;
+        $this->usuario = $usuario;
+        $this->agendamento = $agendamento;
     }
+
+
+    public function dashboard()
+    {
+        $professor_id = Auth::user()->professor->id;
+        $numeroTotalDeAlunos = $this->agendamento::where('professor_id', $professor_id)->count();
+        $arrecadacao = $this->agendamento::where('professor_id', $professor_id)->sum('valor_aula');
+        $aulasCanceladas = $this->agendamento::where('professor_id', $professor_id)->where('status', 'cancelada')->count();
+        $aulasFeitas = $this->agendamento::where('professor_id', $professor_id)->where('status', 'realizadas')->count();
+        $arrecadacaoUltimos30Dias = $this->agendamento::where('professor_id', $professor_id)
+            ->whereDate('data_da_aula', '>=', Carbon::now()->subDays(30))
+            ->sum('valor_aula');
+
+        return view(
+            'admin.empresas.dashboard',
+            [
+                'pageTitle' => 'DashBoard',
+                'numeroTotalDeAlunos' => $numeroTotalDeAlunos,
+                'arrecadacao' => $arrecadacao,
+                'aulasCanceladas' => $aulasCanceladas,
+                'arrecadacaoUltimos30Dias' => $arrecadacaoUltimos30Dias,
+                'realizadas' =>  $aulasFeitas
+            ]
+        );
+    }
+
+
 
     private function loadView($viewSuffix = 'index', $data = [])
     {
@@ -120,6 +155,8 @@ class EmpresaController extends Controller
     {
         return $this->loadView('create');
     }
+
+
 
     public function disponibilidade()
     {

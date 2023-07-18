@@ -24,7 +24,7 @@
 											<img src="{{ asset('avatar/' . $model->avatar) }}" 
 											class="img-fluid" 
 											alt="Usuario Image">
-											<span class="badge bg-primary" style="font-size: 1.2em; text-transform: capitalize;">{{$model->modalidade}}</span>
+											<span class="badge bg-primary" style="font-size: 1.2em; text-transform: capitalize;">{{$model->modalidade->nome}}</span>
 										</p>
 
 
@@ -49,7 +49,7 @@
 											</ul>
 										</div>
 										<div class="clinic-services">
-											<span>{{$model->modalidade}}</span>
+											<span>{{$model->modalidade->nome}}</span>
 											
 										</div>
 									</div>
