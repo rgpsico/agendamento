@@ -35,7 +35,7 @@ class HomeController extends Controller
 
     public function index()
     {
-        $model = $this->model::with('endereco', 'galeria')->get();
+        $model = $this->model::with('modalidade', 'endereco', 'galeria')->get();
 
         $modalidade = Modalidade::all();
         return view(

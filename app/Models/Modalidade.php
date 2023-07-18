@@ -14,4 +14,9 @@ class Modalidade extends Model
     protected $fillable = [
         'nome'
     ];
+
+    public function empresas()
+    {
+        return $this->hasMany(Empresa::class, 'modalidade_id');
+    }
 }

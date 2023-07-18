@@ -26,7 +26,7 @@ class Empresa extends Model
 
     public function modalidade()
     {
-        return $this->hasOne(Modalidade::class, 'modalidade_id', 'id');
+        return $this->belongsTo(Modalidade::class, 'modalidade_id');
     }
 
     public function user()
@@ -47,10 +47,5 @@ class Empresa extends Model
     public function servicos()
     {
         return $this->hasMany(Servicos::class, 'empresa_id', 'id');
-    }
-
-    public function avaliacaoMedia()
-    {
-        return 10;
     }
 }
