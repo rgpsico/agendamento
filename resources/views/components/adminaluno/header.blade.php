@@ -167,8 +167,8 @@
 									<p class="text-muted mb-0">Administrator</p>
 								</div>
 							</div>
-							<a class="dropdown-item" href="profile.html">Perfil</a>
-							<a class="dropdown-item" href="settings.html">Configurações</a>
+							<a class="dropdown-item" href="{{route('home.show', ['id' => Auth::user()->empresa->id])}}">Perfil</a>
+							<a class="dropdown-item" href="{{route('empresa.configuracao')}}">Configurações</a>
 							<a class="dropdown-item" href="{{route('user.logout')}}">Logout</a>
 						</div>
 					</li>
