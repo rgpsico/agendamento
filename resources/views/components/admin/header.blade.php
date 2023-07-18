@@ -169,7 +169,7 @@
 								</div>
 							</div>
 							<a class="dropdown-item" href="{{route('home.show', ['id' => Auth::user()->empresa->id])}}">Perfil</a>
-							<a class="dropdown-item" href="{{route('empresa.configuracao')}}">Configurações</a>
+							<a class="dropdown-item" href="{{route('empresa.configuracao',['userId' => Auth::user()->id])}}">Configurações</a>
 							<a class="dropdown-item" href="{{route('user.logout')}}">Logout</a>		</div>
 					</li>
 					<!-- /User Menu -->
