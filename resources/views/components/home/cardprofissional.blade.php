@@ -13,10 +13,9 @@
                     <x-avaliacao-home :model="$value" />
 
                     <x-gallery-home :model="$value"  /> 
-                   
-                    @isset($value->$modalidade_id)                       
-                        <span class="badge bg-primary" style="font-size: 1.2em; text-transform: capitalize;">{{$value->modalidade_id ?? ''}}</span>
-                    @endisset
+                                 
+                        <span class="badge bg-primary" style="font-size: 1.2em; text-transform: capitalize;">{{$value->modalidade->nome}}</span>
+               
                    
                 </div>
             </div>
