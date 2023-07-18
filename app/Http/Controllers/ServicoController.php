@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ServicoRequest;
 use App\Models\Servicos;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ServicoController extends Controller
 {
@@ -21,7 +22,8 @@ class ServicoController extends Controller
 
     public function index()
     {
-        $model = $this->model->all();
+        $empresa_id = Auth::user()->empresa->id;
+        $model = $this->model->where('empresa_id', $empresa_id)->get();
 
         return view($this->view . '.index', [
             'pageTitle' => $this->pageTitle,
