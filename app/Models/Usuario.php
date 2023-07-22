@@ -78,20 +78,7 @@ class Usuario extends Authenticatable
         return $query->where('tipo_usuario', 'professor');
     }
 
-    public static function getActiveSchools()
-    {
-        return self::professores()->where('status', 'active')->count();
-    }
 
-    public static function getInactiveSchools()
-    {
-        return self::professores()->where('status', 'inactive')->count();
-    }
-
-    public static function getCancelledSchools()
-    {
-        return self::professores()->where('status', 'cancelled')->count();
-    }
 
     public static function getTotalRevenue()
     {

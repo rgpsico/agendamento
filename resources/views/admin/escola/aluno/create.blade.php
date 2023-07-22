@@ -1,33 +1,64 @@
-<x-admin.layout title="Criar Aluno">
+<x-admin.layout title="{{$pageTitle}}">
     <div class="page-wrapper">
         <div class="content container-fluid">
-                   <!-- Page Header -->
-           <x-header.titulo pageTitle="{{$pageTitle}}" />
+
+            <div class="page-header">
+						<div class="row">
+							<div class="col-sm-12">
+								<h3 class="page-title">{{$pageTitle}}</h3>
+								<ul class="breadcrumb">
+									<li class="breadcrumb-item">
+                                        <a href="">Admin</a></li>
+									<li class="breadcrumb-item active">{{$pageTitle}}</li>
+								</ul>
+							</div>
+						</div>
+					</div>
+
+                    <div class="row">
+						
+						<div class="col-12">
+							
+							<!-- General -->
+							
+								<div class="card">
+									<div class="card-header">
+										<h4 class="card-title">General</h4>
+									</div>
+									<div class="card-body">
+										<div class="card-body">
+                                            <x-alert/>
+											@if(isset($model))
+											<form action="{{route('admin.servico.update',['id' =>$model->id])}}" method="POST" enctype="multipart/form-data">
+                                         
+											@else 
+											<form action="{{route('admin.servico.store')}}" method="POST" enctype="multipart/form-data">
+                                            @endif
+                                            @csrf
+                                            
+											@include('admin.escola.servicos._partials.form')  
+											
+											@if(isset($model))
+                                                <div class="card-footer d-flex">
+                                            <button class="btn btn-success justify-content-right" >Atualizar</button>
+											@else 
+											<div class="card-footer d-flex">
+												<button class="btn btn-success justify-content-right" >Salvar</button>
+											@endif
+                                        </div>
+									</div>
+								</div>
+							
+							<!-- /General -->
+								
+						</div>
+					</div>
+        
+            <!-- Page Header -->
+        
             <!-- /Page Header -->
-           
-            @include('admin.empresas._partials.modal')
-            <div class="row">
-                <form action="{{route('empresa.update')}}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <input type="hidden"  name="user_id" value="{{Auth::user()->id}}" />
-
-                    <x-text-input name="nome" size="30" label="Nome Completo" :value="$model"/>
-
-                    <x-select-modalidade  label="Modalidade"  :model="$model" :modalidades="$modalidades"/>  
-                                                                  
-                    <x-text-input name="cnpj" size="30" label="Cnpj" :value="$model" />
-
-                    <x-text-area name="descricao" label="Descrição" :model="$model" />
-
-                    <x-text-input name="telefone" size="30" label="Telefone" :value="$model" />                
             
-                    
-                    <x-text-input name="valor_aula_de" size="30" label="Preço Minimo aula" :value="$model->valor_aula_de ?? ''" placeholder="Valor Aula" />
-                   
-                    <x-text-input name="valor_aula_ate" size="30" label="Preço Maximo aula" :value="$model->valor_aula_ate ?? ''" placeholder="Valor Aula" />
-                   
-                    <x-avatar-component label="Logo da Escola " :model="$model"/>
-                            
+           
             
         </div>			
     </div>
