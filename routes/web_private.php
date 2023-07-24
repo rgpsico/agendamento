@@ -54,7 +54,7 @@ Route::prefix('cliente')->middleware('auth')->group(function () {
             Route::get('/', [AlunosController::class, 'index'])->name('alunos.index');
             Route::get('/{id}/show', [AlunosController::class, 'show'])->name('alunos.show');
             Route::get('/create', [AlunosController::class, 'create'])->name('alunos.create');
-            Route::get('/{id}/edit', [AlunosController::class, 'edit'])->name('alunos.edit');
+            Route::get('/{id}/edit', [AlunosController::class, 'edit'])->name('aluno.edit');
             Route::post('/{id}/update', [AlunosController::class, 'update'])->name('alunos.update');
             Route::post('/post', [AlunosController::class, 'store'])->name('alunos.store');
             Route::delete('/{id}/destroy', [AlunosController::class, 'destroy'])->name('alunos.destroy');

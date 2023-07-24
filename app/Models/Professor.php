@@ -23,6 +23,10 @@ class Professor extends Model
     public $timestamps = false;
 
 
+    public function alunos()
+    {
+        return $this->belongsToMany(Alunos::class, 'aluno_professor', 'professor_id', 'aluno_id');
+    }
 
     public function aulas()
     {

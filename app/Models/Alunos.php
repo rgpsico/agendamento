@@ -15,6 +15,11 @@ class Alunos extends Model
         return $this->belongsTo(Usuario::class, 'usuario_id');
     }
 
+    public function professores()
+    {
+        return $this->belongsToMany(Professor::class, 'aluno_professor', 'aluno_id', 'professor_id');
+    }
+
 
     public function galeria()
     {

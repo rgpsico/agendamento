@@ -15,8 +15,8 @@
                         <div class="card-body">
                             <div class="table-responsive">   
                                                                  
-                                <x-datateste :model="$model" :headers="['id', 'user.name', 'modalidade_id', 'avatar', 'nome', 'descricao']" :actions="['edit' => 'modalidade.index', 'delete' => 'modalidade.index', 'ver' => 'modalidade.show']"  />
-                                </div>
+                                <x-datateste :model="$model" :headers="['id', 'user_id', 'modalidade_id', 'avatar', 'nome', 'descricao']" :actions="['edit' => 'modalidade.index', 'delete' => 'modalidade.index', 'ver' => 'modalidade.show']"  />
+                            </div>
                         </div>
                        </div>
                             </div>

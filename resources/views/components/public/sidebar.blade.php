@@ -13,7 +13,7 @@
                 </li>
 
                 <li> 
-                    <a href="{{route('empresa.index')}}">
+                    <a href="">
                         <i class="fe fe-layout"></i><span>Escolas</span>
                     </a>
                 </li>

@@ -20,21 +20,15 @@
                         </ul>
                     </div>
                 </div>
-                @if(isset($btAdd) && $btAdd ==  'true')
+        
                 <div class="row">
-                    <div class="col-2 my-4">
-                        @if(!isset($modal))
-                            <button class="btn btn-success Adicionar{{$pageTitle}}">
+                   <div class="col-2 my-4">
+                            <a href="{{route('alunos.create')}}" class="btn btn-success Adicionar{{$pageTitle}}">
                                 <i class="icon icon-plus">Adicionar {{$pageTitle}}</i>
-                            </button>
-                        @else 
-                            <button  class="btn btn-success" id="Adicionar{{$pageTitle}}">
-                                <i class="icon icon-plus">Adicionar {{$pageTitle}}</i>
-                            </button>
-                        @endif    
-                    </div>
+                            </a>
+                        </div>
                 </div>
-                @endif
+             
             </div>
             
             
@@ -55,35 +49,31 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($model as $value )
-                                            
-                                    
-                                        <tr class="linha_{{$value->id}}">
-                                          
-                                            <td>{{$value->id}}</td>                           
-                                            <td>{{$value->nome}}</td>
-                                            <td>{{$value->telefone}}</td>
-                                            <td>{{$value->telefone}}</td>
+                                
+                                        @foreach ($model as $aluno)
+                                      
+                                  
+                                        <tr class="linha_{{$aluno->id}}">
+                                            <td>{{$aluno->id}}</td>                           
+                                            <td>{{$aluno->usuario->nome}}</td>
+                                            <td>{{$aluno->usuario->telefone}}</td>
+                                            <td>{{$aluno->usuario->email}}</td>
                                             <td class="text-center">
                                                 <div class="actions">
                                                     <a class="btn btn-sm bg-info-light" 
-                                                        href="{{route('admin.aluno.edit',['id' => $value->id])}}"
-                                                        data-data="{{$model}}"
+                                                        href="{{route('aluno.edit',['id' => $aluno->usuario->id])}}"
+                                                        data-data="{{$aluno}}"
                                                         >
                                                         <i class="fe fe-pencil"></i> Editar
                                                     </a>
-
-                                                    {{-- <a class="btn btn-sm bg-info " href="{{route($route.'.show',['id' => $value->id])}}">
-                                                        <i class="fe fe-eye"></i> Ver
-
-                                                    </a> --}}
-                                                    <a data-bs-toggle="modal" href="#delete_modal" data-id="{{$value->id}}" class="btn btn-sm bg-danger-light bt_excluir">
+                                                    <a data-bs-toggle="modal" href="#delete_modal" data-id="{{$aluno->id}}" class="btn btn-sm bg-danger-light bt_excluir">
                                                         <i class="fe fe-trash"></i> Excluir
                                                     </a>
                                                 </div>
                                             </td>
                                         </tr>
-                                        @endforeach
+                                    @endforeach
+
                                     </tbody>
                                 </table>
                             </div>
@@ -107,26 +97,28 @@
     });
 
     $(document).on("click", ".confirmar_exclusao", function() {
+     
         var id = $(this).data('id');
         var token = $('meta[name="csrf-token"]').attr('content');
      
    
 
-    $.ajax({
-        url: '/api/servicos/' + id,
-        type: 'DELETE',
-        headers: {
-            'Authorization': 'Bearer ' + token,
-        },
-        success: function(result) {
-            alert('Excluido com sucesso')
-            $('.modal').modal('hide');
-            $(".linha_"+id).fadeOut();
-        },
-        error: function(request,msg,error) {
-            console.log(error);
-        }
-    });
+        $.ajax({
+    url: '/api/aluno/' + id+'/destroy',
+    type: 'DELETE',
+    headers: {
+        'Authorization': 'Bearer ' + token,
+    },
+    success: function(result) {
+        alert('Excluido com sucesso')
+        $('.modal').modal('hide');
+        $(".linha_"+id).fadeOut();
+    },
+    error: function(request,msg,error) {
+        console.log(error);
+    }
+});
+
  });
 
 

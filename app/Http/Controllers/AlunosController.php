@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Aluno;
 use App\Models\AlunoEndereco;
+use App\Models\AlunoProfessor;
 use App\Models\Alunos;
 use App\Models\Professor;
 use App\Models\Usuario;
+use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -26,14 +28,9 @@ class AlunosController extends Controller
     {
         $professor_id = Auth::user()->professor->id;
 
-        $professor = Professor::with('agendamentos.aluno')->find($professor_id);
+        $professor = Professor::with('alunos.usuario')->find($professor_id);
 
-        $alunos = collect([]);
-        foreach ($professor->agendamentos as $agendamento) {
-            if (!$alunos->contains($agendamento->aluno)) {
-                $alunos->push($agendamento->aluno);
-            }
-        }
+        $model = $professor->alunos;
 
         return view(
             $this->view . '.index',
@@ -41,22 +38,69 @@ class AlunosController extends Controller
                 'pageTitle' => $this->pageTitle,
                 'view' => $this->view,
                 'route' => $this->route,
-                'model' => $alunos
+                'model' => $model
             ]
         );
     }
 
 
 
+
+
     public function create()
     {
+
+        $fillable = [
+            'nome',
+            'email',
+            'tipo_usuario',
+            'data_nascimento',
+            'telefone',
+            'cep',
+            'rua',
+            'cidade',
+            'estado',
+            'numero'
+        ];
+
 
 
         return view(
             $this->view . '.create',
             [
                 'pageTitle' => $this->pageTitle,
-                'model' => []
+                'model' => [],
+                'fillable' => $fillable
+            ]
+        );
+    }
+
+    public function edit($id)
+    {
+
+        $model = $this->model::findOrFail($id);
+
+
+
+        $fillable = [
+            'nome',
+            'email',
+            'tipo_usuario',
+            'data_nascimento',
+            'telefone',
+            'cep',
+            'rua',
+            'cidade',
+            'estado',
+            'numero'
+        ];
+
+        return view(
+            $this->view . '.create',
+            [
+                'pageTitle' => $this->pageTitle,
+                'model' => $model,
+                'fillable' => $fillable
             ]
         );
     }
@@ -77,9 +121,13 @@ class AlunosController extends Controller
 
     public function update(Request $request, $id)
     {
-
-
+        $professor_id = Auth::user()->professor->id;
         // Updating User
+
+
+
+        $dataNascimentoFormatada = DateTime::createFromFormat('d/m/Y', $request['data_nascimento'])->format('Y-m-d');
+        $request['data_nascimento'] = $dataNascimentoFormatada;
         $user = Usuario::updateOrCreate(
             ['id' => $id],
             $request->only('nome', 'password', 'tipo_usuario', 'data_nascimento', 'telefone')
@@ -91,30 +139,46 @@ class AlunosController extends Controller
             $request->only('...')
         );
 
-        // Updating or Creating AlunoEndereco (StudentAddress)
-        $studentAddress = AlunoEndereco::updateOrCreate(
-            ['aluno_id' => $id],
-            $request->only('endereco', 'cidade', 'estado', 'cep')
-        );
+        $request['professor_id'] = $professor_id;
 
-        return response()->json(['message' => 'Dados atualizados com sucesso!']);
+        $professorAluno = AlunoProfessor::create([
+            'aluno_id' => $student->id,
+            'professor_id' => $request->professor_id
+        ]);
+
+
+
+
+        // Updating or Creating AlunoEndereco (StudentAddress)
+        // $studentAddress = AlunoEndereco::updateOrCreate(
+        //     ['aluno_id' => $id],
+        //     $request->only('endereco', 'cidade', 'estado', 'cep')
+        // );
+
+        return redirect()->back()->with(['success' => 'Atualizado com sucesso']);
     }
 
     public function store(Request $request)
     {
+        $professor_id = Auth::user()->professor->id;
+
+
         $request->validate([
             'nome' => 'required',
-            'sobreNome' => 'required',
-            'nascimento' => 'required|date',
+            // 'sobreNome' => 'required',
+            // 'nascimento' => 'required|date',
             'email' => 'required|email',
             'cep' => 'required',
             'rua' => 'required',
             'cidade' => 'required',
             'estado' => 'required',
             'numero' => 'required',
-            'password' => 'required'
+            // 'password' => 'required'
         ]);
 
+        if (!$request->password) {
+            $request['password'] = '124';
+        }
         $request['tipo_usuario'] = 'Aluno';
         // Atualizando ou Criando o Usuário
         $user = Usuario::updateOrCreate(
@@ -129,6 +193,7 @@ class AlunosController extends Controller
         );
 
 
+
         $request['endereco'] = $request->rua . ' ' . $request->numero . ' ' . $request->cidade;
 
         // Atualizando ou Criando o Endereço do Aluno
@@ -137,9 +202,25 @@ class AlunosController extends Controller
             $request->only('rua', 'cidade', 'estado', 'cep', 'numero', 'endereco')
         );
 
-        return response()->json([
-            'message' => 'Dados inseridos/atualizados com sucesso!',
-            'aluno' => $user // Aqui, estou supondo que $user contém os dados do novo aluno
-        ]);
+        $professorAluno = AlunoProfessor::create(
+            ['aluno_id' => $student->id, 'professor_id' => $professor_id],
+
+        );
+
+        return redirect()->route('alunos.index')->with(['success' => 'Atualizado com Sucesso']);
+    }
+
+    public function destroy($id)
+    {
+        $professor_id = Auth::user()->professor->id;
+
+        $alunoProfessor = AlunoProfessor::where('aluno_id', $id)->where('professor_id', $professor_id)->first();
+
+        if ($alunoProfessor) {
+            $alunoProfessor->delete();
+            return redirect()->route($this->route . '.index')->with('success', 'Aluno desassociado com sucesso!');
+        } else {
+            return redirect()->route($this->route . '.index')->with('error', 'Associação entre aluno e professor não encontrada.');
+        }
     }
 }

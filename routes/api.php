@@ -67,3 +67,5 @@ Route::delete('modalidade/{id}/destroy', [ModalidadeController::class, 'destroy'
 
 Route::post('/aluno/store', [AlunosController::class, 'store']);
 Route::post('/aluno/{id}/update', [AlunosController::class, 'update']);
+
+Route::delete('/aluno/{id}/destroy', [AlunosController::class, 'destroy']);

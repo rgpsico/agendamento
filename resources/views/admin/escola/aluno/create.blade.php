@@ -5,7 +5,7 @@
             <div class="page-header">
 						<div class="row">
 							<div class="col-sm-12">
-								<h3 class="page-title">{{$pageTitle}}</h3>
+								<h3 class="page-title">aaaa{{$pageTitle}}</h3>
 								<ul class="breadcrumb">
 									<li class="breadcrumb-item">
                                         <a href="">Admin</a></li>
@@ -28,15 +28,17 @@
 									<div class="card-body">
 										<div class="card-body">
                                             <x-alert/>
-											@if(isset($model))
-											<form action="{{route('admin.servico.update',['id' =>$model->id])}}" method="POST" enctype="multipart/form-data">
-                                         
+											@if(isset($model->id))
+											<form action="{{route('alunos.update', ['id' => $model->id])}}" method="POST" enctype="multipart/form-data">
+												@csrf
+												@method('post')
+											
 											@else 
-											<form action="{{route('admin.servico.store')}}" method="POST" enctype="multipart/form-data">
+											<form action="{{route('alunos.store')}}" method="POST" enctype="multipart/form-data">
                                             @endif
                                             @csrf
                                             
-											@include('admin.escola.servicos._partials.form')  
+											@include('admin.escola.aluno._partials.form')  
 											
 											@if(isset($model))
                                                 <div class="card-footer d-flex">
