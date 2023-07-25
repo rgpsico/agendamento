@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Empresa;
+use App\Models\Professor;
 use Illuminate\Http\Request;
 
 class EmpresaControllerApi extends Controller
@@ -32,6 +33,30 @@ class EmpresaControllerApi extends Controller
         }
 
         return $query->get();
+    }
+
+    public function getAlunoByIdProfessor($id)
+    {
+        $professor = Professor::find($id);
+
+        if (!$professor) {
+            return response()->json(['error' => 'Professor não encontrado'], 404);
+        }
+
+
+        $alunosDoProfessor = $professor->alunos;
+
+        // Monta um array com os dados de nome e email dos alunos
+        $alunosArray = [];
+        foreach ($alunosDoProfessor as $aluno) {
+            $alunosArray[] = [
+                'nome' => $aluno->usuario->nome,
+                'email' => $aluno->usuario->email,
+                // Outras informações do aluno (se houver)
+            ];
+        }
+
+        return response()->json($alunosArray);
     }
 
 

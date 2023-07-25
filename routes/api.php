@@ -69,3 +69,6 @@ Route::post('/aluno/store', [AlunosController::class, 'store']);
 Route::post('/aluno/{id}/update', [AlunosController::class, 'update']);
 
 Route::delete('/aluno/{id}/destroy', [AlunosController::class, 'destroy']);
+
+// routes/api.php
+Route::get('professores/{id}/alunos', [EmpresaControllerApi::class, 'getAlunoByIdProfessor']);
