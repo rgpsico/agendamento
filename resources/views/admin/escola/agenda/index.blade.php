@@ -34,6 +34,7 @@
                     <!-- Recent Orders -->
                     <div class="card">
                         <div class="card-body">
+                            <x-alert/>
                             <div class="table-responsive">
                                 <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
                                     <div class="row">
@@ -72,12 +73,17 @@
                                                 </td>
 
                                                 <td>
-                                                    <button class="btn btn-danger text-light">
-                                                        <a href="" class="text-light">Excluir</a>
-                                                    </button>
-                                                    <button class="btn btn-info  text-light">
-                                                        <a href="" class="text-light">Editar</a>
-                                                    </button>
+                                                    <div class="d-flex">
+                                                        <form action="{{ route('agenda.destroy', ['id' => $agendamento->id]) }}" method="POST">
+                                                            @method('delete')
+                                                            @csrf
+                                                            <button type="submit" class="btn btn-danger text-light mr-2">Excluir</button>
+                                                        </form>
+                                                
+                                                        <button class="btn btn-info text-light">
+                                                            <a href="{{ route('agenda.edit', ['id' => $agendamento->id]) }}" class="text-light">Editar</a>
+                                                        </button>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         @endforeach

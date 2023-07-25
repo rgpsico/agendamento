@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PaymentRequest;
+use App\Models\Agendamento;
 use App\Models\Alunos;
 use App\Models\Empresa;
 use App\Models\Professor;
@@ -17,8 +18,9 @@ class AgendaController extends Controller
     protected $route = "agenda";
     protected $model;
 
-    public function __construct()
+    public function __construct(Agendamento $model)
     {
+        $this->model =  $model;
     }
 
     public function index()
@@ -78,7 +80,7 @@ class AgendaController extends Controller
     public function store(PaymentRequest $request)
     {
 
-        dd("aaa");
+
         // Se a validação falhar, o usuário será redirecionado de volta ao formulário com erros de validação.
 
         // Crie o novo usuário
@@ -104,5 +106,31 @@ class AgendaController extends Controller
             $this->view . '.show',
             ['pageTitle' => $this->pageTitle]
         );
+    }
+
+    public function edit($id)
+    {
+        $model = $this->model->find($id);
+
+        return view(
+            $this->view . '.create',
+            [
+                'pageTitle' => $this->pageTitle,
+                'model' => $model,
+                'view' => $this->view,
+                'route' => $this->route
+            ]
+        );
+    }
+
+    public function destroy($id)
+    {
+        $model = $this->model->find($id);
+        if ($model) {
+            $model->delete();
+            return redirect()->route($this->route . '.index')->with('success', 'Aula Excluida com sucesso!');
+        } else {
+            return redirect()->route($this->route . '.index')->with('error', 'Aula não encontrada.');
+        }
     }
 }
