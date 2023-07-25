@@ -80,8 +80,6 @@ class AlunosController extends Controller
 
         $model = $this->model::findOrFail($id);
 
-
-
         $fillable = [
             'nome',
             'email',
@@ -130,7 +128,7 @@ class AlunosController extends Controller
         $request['data_nascimento'] = $dataNascimentoFormatada;
         $user = Usuario::updateOrCreate(
             ['id' => $id],
-            $request->only('nome', 'password', 'tipo_usuario', 'data_nascimento', 'telefone')
+            $request->only('nome', 'email', 'password', 'tipo_usuario', 'data_nascimento', 'telefone')
         );
 
         //Updating or Creating Aluno (Student)

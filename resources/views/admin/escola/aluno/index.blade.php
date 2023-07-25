@@ -54,7 +54,7 @@
                                       
                                   
                                         <tr class="linha_{{$aluno->id}}">
-                                            <td>{{$aluno->id}}</td>                           
+                                            <td>{{$aluno->usuario->id}}</td>                           
                                             <td>{{$aluno->usuario->nome}}</td>
                                             <td>{{$aluno->usuario->telefone}}</td>
                                             <td>{{$aluno->usuario->email}}</td>

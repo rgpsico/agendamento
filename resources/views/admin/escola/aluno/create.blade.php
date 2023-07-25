@@ -5,7 +5,7 @@
             <div class="page-header">
 						<div class="row">
 							<div class="col-sm-12">
-								<h3 class="page-title">aaaa{{$pageTitle}}</h3>
+								<h3 class="page-title">{{$pageTitle}}</h3>
 								<ul class="breadcrumb">
 									<li class="breadcrumb-item">
                                         <a href="">Admin</a></li>
@@ -40,12 +40,12 @@
                                             
 											@include('admin.escola.aluno._partials.form')  
 											
-											@if(isset($model))
+											@if(isset($model->id))
                                                 <div class="card-footer d-flex">
                                             <button class="btn btn-success justify-content-right" >Atualizar</button>
 											@else 
 											<div class="card-footer d-flex">
-												<button class="btn btn-success justify-content-right" >Salvar</button>
+												<button class="btn btn-success justify-content-right" >Cadastrar</button>
 											@endif
                                         </div>
 									</div>

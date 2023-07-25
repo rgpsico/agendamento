@@ -2,7 +2,7 @@
     <div class="page-wrapper">
         <div class="content container-fluid">
 					
-           <x-header.titulo pageTitle="TETE"/>
+           <x-header.titulo pageTitle="Alunos"/>
         
             
            
