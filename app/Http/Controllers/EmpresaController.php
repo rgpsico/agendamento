@@ -213,14 +213,27 @@ class EmpresaController extends Controller
 
     public function agendatore(Request $request)
     {
+
+
+
+
         // Validação dos dados recebidos do formulário
         $validatedData = $request->validate([
             'aluno_id' => 'required|numeric',
             'modalidade_id' => 'required|numeric',
             'professor_id' => 'required|numeric',
-            'data_da_aula' => 'required|date',
+            'data_da_aula' => 'required',
             'valor_aula' => 'required|numeric',
         ]);
+
+        // Pegar a data da aula do formulário
+        $dataAula = $validatedData['data_da_aula'];
+
+        // Converter a data da aula para o formato americano (ISO 8601)
+        $dataAulaFormatoAmericano = date('Y-m-d', strtotime($dataAula));
+
+        // Substituir a data da aula no array de dados validados
+        $validatedData['data_da_aula'] = $dataAulaFormatoAmericano;
 
         // Criação da nova aula com os dados validados
         $aula = Agendamento::create($validatedData);

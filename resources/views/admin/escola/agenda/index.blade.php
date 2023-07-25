@@ -50,6 +50,7 @@
                                             <th style="width: 155.047px;">Data da aula</th>
                                             <th style="width: 61.6406px;">Status</th>
                                             <th style="width: 74.9062px;">Pagamento</th>
+                                            <th style="width: 74.9062px;">Ações</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -57,20 +58,26 @@
                                             <tr role="row" class="odd">
                                                 <td class="sorting_1">
                                                     <h2 class="table-avatar">
-                                                        <a href="" class="avatar avatar-sm me-2">
-                                                            <img class="avatar-img rounded-circle" 
-                                                            src="{{asset('template/assets/img/doctors/doctor-thumb-02.jpg')}}"
-                                                             alt="User Image"></a>
-                                                        <a href="">{{$agendamento->aluno->nome}}</a>
+                                                         <a href="{{route('alunos.show',['id' => $agendamento->aluno->id])}}">{{$agendamento->aluno->usuario->nome}}</a>
                                                     </h2>
                                                 </td>
                                                 <td>{{$agendamento->modalidade->nome}}</td>
-                                                <td>{{$agendamento->data_da_aula}}</td>
+                                                <td>{{ date('d/m/Y', strtotime($agendamento->data_da_aula)) }}</td>
+
                                                 <td>
                                                      <span class="btn btn-success">{{$agendamento->status}}</span>    
                                                 </td>
                                                 <td class="text-start">
                                                     {{$agendamento->valor_aula}}
+                                                </td>
+
+                                                <td>
+                                                    <button class="btn btn-danger text-light">
+                                                        <a href="" class="text-light">Excluir</a>
+                                                    </button>
+                                                    <button class="btn btn-info  text-light">
+                                                        <a href="" class="text-light">Editar</a>
+                                                    </button>
                                                 </td>
                                             </tr>
                                         @endforeach
