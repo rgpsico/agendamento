@@ -3,7 +3,28 @@
         <div class="content container-fluid">
         
             <!-- Page Header -->
-            <x-header.titulo pageTitle="{{$pageTitle}}" modal="true" btAdd="true" route="{{$route}}" />
+            <div class="row">
+                <div class="col-10">
+                    <h3 class="page-title">Agenda</h3>
+                    <ul class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="">Admin</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="javascript:(0);">Alunos </a>
+                        </li>
+                  
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-2 my-4">
+             
+                <a href="{{route('agenda.create')}}"  class="btn btn-success" >
+                    <i class="icon icon-plus">Adicionar Agenda</i>
+                </a>
+                
+        </div>
             <!-- /Page Header -->
 
             

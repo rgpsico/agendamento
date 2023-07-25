@@ -2,9 +2,7 @@
     <div class="page-wrapper">
         <div class="content container-fluid">
         
-            <!-- Page Header -->
-            <x-header.titulo pageTitle="{{$pageTitle}}" modal="true" btAdd="true" route="{{$route}}" />
-            <!-- /Page Header -->
+        
 
             
             <div class="row">

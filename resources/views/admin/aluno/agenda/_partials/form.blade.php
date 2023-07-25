@@ -1,37 +1,8 @@
-<form action="" data-route="/admin/escola/agenda/store">
-<div class="row form-row">
-    <div class="col-12 col-sm-6">
-        <div class="form-group">
-            <label>Nome</label>
-            <input type="text" class="form-control" value="John">
-        </div>
-    </div>
-    <div class="col-12 col-sm-6">
-        <div class="form-group">
-            <label>Telefone</label>
-            <input type="text" class="form-control" value="Doe">
-        </div>
-    </div>
-    <div class="col-6">
-        <div class="form-group">
-            <label>Data da Aula</label>
-            <div class="cal-icon">
-                <input type="text" class="form-control datetimepicker">
-            </div>
-        </div>
-    </div>
-
-    <div class="col-6">
-        <div class="form-group">
-            <label>Horário</label>
-            <div class="cal-icon">
-                <input type="text" class="form-control datetimepicker">
-            </div>
-        </div>
-    </div>
-
-    <div class="col-12 d-flex">
-        <button type="submit" class="btn btn-success">Salvar</button>
-    </div>
-   </div>
-</form>
+<input type="text" class="" name="empresa_id" value="{{Auth::user()->id}}" />                                                              
+<x-text-input name="aluno_id" size="30" label="aluno_id" :value="$model ?? ''"/>
+<x-text-area name="modalidade_id" label="Modalidade" :model="$model ?? ''" />                                                                                       
+<x-text-input name="professor_id" size="30" label="Professor" :value="$model ?? '' ?? ''" />
+<x-text-input name="data_da_aula" size="30" label="Data da Aula" :value="$model ?? '' ?? ''" />
+<x-text-input name="data_da_aula" size="30" label="Data da Aula" :value="$model ?? '' ?? ''" />
+</div>
+                                                           

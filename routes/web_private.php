@@ -40,7 +40,11 @@ Route::prefix('cliente')->middleware('auth')->group(function () {
         Route::post('/{userId}/endereco_empresa', [EmpresaController::class, 'endereco_update'])->name('empresa.update_endereco');
         Route::get('/disponibilidade', [EmpresaController::class, 'disponibilidade'])->name('empresa.disponibilidade');
         Route::post('/disponibilidade', [EmpresaController::class, 'cadastrarDisponibilidade'])->name('empresa.disponibilidade.store');
+
         Route::get('/', [EmpresaController::class, 'index'])->name('agenda.index');
+        Route::get('/create', [EmpresaController::class, 'create'])->name('agenda.create');
+        Route::post('/agenda/store', [EmpresaController::class, 'agendatore'])->name('empresa.agenda.store');
+        Route::put('/{id}/agenda/store', [EmpresaController::class, 'agendaUpdate'])->name('empresa.agenda.update');
         Route::post('/{userId}/profile', [EmpresaController::class, 'profile'])->name('empresa.profile');
         Route::delete('/{id}/destroy', [EmpresaController::class, 'destroy'])->name('empresa.destroy');
         Route::get('/{userId}/config', [EmpresaController::class, 'configuracao'])->name('empresa.configuracao');

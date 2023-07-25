@@ -68,6 +68,7 @@ class AgendaController extends Controller
 
     public function create()
     {
+
         return view(
             $this->view . '.create',
             ['pageTitle' => $this->pageTitle]

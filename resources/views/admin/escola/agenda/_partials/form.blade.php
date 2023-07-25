@@ -1,4 +1,3 @@
-<form action="" data-route="/admin/escola/agenda/store">
 <div class="row form-row">
     <div class="col-12 col-sm-6">
         <div class="form-group">
@@ -30,8 +29,5 @@
         </div>
     </div>
 
-    <div class="col-12 d-flex">
-        <button type="submit" class="btn btn-success">Salvar</button>
-    </div>
-   </div>
+  
 </form>
