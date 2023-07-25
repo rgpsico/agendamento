@@ -211,6 +211,47 @@ class EmpresaController extends Controller
         return $this->loadView('show');
     }
 
+    public function agendatore(Request $request)
+    {
+        // Validação dos dados recebidos do formulário
+        $validatedData = $request->validate([
+            'aluno_id' => 'required|numeric',
+            'modalidade_id' => 'required|numeric',
+            'professor_id' => 'required|numeric',
+            'data_da_aula' => 'required|date',
+            'valor_aula' => 'required|numeric',
+        ]);
+
+        // Criação da nova aula com os dados validados
+        $aula = Agendamento::create($validatedData);
+
+        // Redireciona para alguma rota ou página após a criação
+        return redirect()->back()->with('success', 'Aula criada com sucesso!');
+    }
+
+    public function agendaUpdate(Request $request, $id)
+    {
+        // Validação dos dados recebidos do formulário
+        $validatedData = $request->validate([
+            'aluno_id' => 'required|numeric',
+            'modalidade_id' => 'required|numeric',
+            'professor_id' => 'required|numeric',
+            'data_da_aula' => 'required|date',
+            'valor_aula' => 'required|numeric',
+        ]);
+
+        // Busca a aula pelo ID fornecido
+        $agendamento = Agendamento::findOrFail($id);
+
+        // Atualiza os dados da aula com os dados validados
+        $agendamento->update($validatedData);
+
+        // Redireciona para alguma rota ou página após a atualização
+        return redirect()->back()->with('success', 'Aula atualizada com sucesso!');
+    }
+
+
+
     public function configuracao($userId)
     {
         $model = Empresa::where('user_id', $userId)->first();
