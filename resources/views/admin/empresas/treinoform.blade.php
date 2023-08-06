@@ -15,15 +15,15 @@
                         @csrf
                         <input type="hidden"  name="user_id" value="{{Auth::user()->id}}" />
 
-                        <x-text-input name="nome" size="30" label="Nome Completo" :value="$model"/>
+                        <x-text-input name="nome" size="30" label="Nome Completo" :value="$model->nome ?? '' "/>
 
                         <x-select-modalidade  label="Modalidade"  :model="$model" :modalidades="$modalidades"/>  
                                                                       
-                        <x-text-input name="cnpj" size="30" label="Cnpj" :value="$model->cnpj" />
+                        <x-text-input name="cnpj" size="30" label="Cnpj" :value="$model->cnpj ?? '' " />
 
                         <x-text-area name="descricao" label="Descrição" :model="$model" />
 
-                        <x-text-input name="telefone" size="30" label="Telefone" :value="$model" />                
+                        <x-text-input name="telefone" size="30" label="Telefone" :value="$model->telefone ?? '' " />                
                 
                         
                         <x-text-input name="valor_aula_de" size="30" label="Preço Minimo aula" :value="$model->valor_aula_de ?? ''" placeholder="Valor Aula" />
