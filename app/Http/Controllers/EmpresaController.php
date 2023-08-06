@@ -20,15 +20,14 @@ class EmpresaController extends Controller
     protected $pageTitle = "Empresa TESTE";
     protected $view = "empresas";
     protected $route = "empresa";
-    protected $model, $usuario;
-    protected $agendamento;
 
 
-    public function __construct(Empresa $model, Usuario $usuario, Agendamento $agendamento)
-    {
-        $this->model = $model;
-        $this->usuario = $usuario;
-        $this->agendamento = $agendamento;
+
+    public function __construct(
+        private Empresa $model,
+        private Usuario $usuario,
+        private Agendamento $agendamento
+    ) {
     }
 
 

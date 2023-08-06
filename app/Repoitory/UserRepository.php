@@ -11,7 +11,7 @@ use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class UserControllerApi extends Controller
+class UserRepository
 {
     // Mostrar todos os usuários
     public function index()

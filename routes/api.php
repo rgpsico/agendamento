@@ -51,6 +51,9 @@ Route::get('professor/{id}/aulas', [ProfessoresControllerApi::class, 'aulas']);
 
 
 Route::resource('users', UserControllerApi::class);
+Route::post('transacao', [UserControllerApi::class, 'transacao']);
+
+
 
 Route::resource('aulas', AulasControllerApi::class);
 
