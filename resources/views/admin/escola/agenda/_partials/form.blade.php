@@ -18,22 +18,22 @@
         <div class="form-group">
             <label>Data da Aula</label>
             <div class="cal-icon">
-                <input type="text" class="form-control datetimepicker" name="data_da_aula" value="{{ isset($model) ? $model->data_da_aula : old('data_da_aula') }}">
+                <input type="text" class="form-control datetimepicker" name="data_da_aula" value="{{ isset($model) && $model->data_da_aula ? \Carbon\Carbon::parse($model->data_da_aula)->format('d/m/Y') : old('data_da_aula') }}">
             </div>
         </div>
     </div>
+    
     
     <div class="col-6">
         <div class="form-group">
             <label>Horário</label>
             <div class="cal-icon">
-                <input type="text" class="form-control datetimepicker" name="horario_aula" value="{{ isset($model) ? $model->horario_aula : old('horario_aula') }}">
+                <input type="time" class="form-control timepicker" name="horario_aula" value="{{ isset($model) && $model->horario_aula ? \Carbon\Carbon::parse($model->horario_aula)->format('H:i') : old('horario_aula') }}">
             </div>
         </div>
     </div>
+    
 </div>
-
-
 
     <x-modalidadeselect/>
     
@@ -41,4 +41,4 @@
                   
 
   
-</form>
+

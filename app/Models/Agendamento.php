@@ -10,7 +10,7 @@ class Agendamento extends Model
     use HasFactory;
     protected $table = "agendamentos";
 
-    protected $fillable = ['aluno_id', 'modalidade_id', 'professor_id', 'data_da_aula', 'valor_aula'];
+    protected $fillable = ['aluno_id', 'modalidade_id', 'professor_id', 'data_da_aula', 'valor_aula', 'horario'];
 
     protected $dates = ['data_da_aula'];
 

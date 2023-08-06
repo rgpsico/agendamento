@@ -66,7 +66,7 @@
                                                         >
                                                         <i class="fe fe-pencil"></i> Editar
                                                     </a>
-                                                    <a data-bs-toggle="modal" href="#delete_modal" data-id="{{$aluno->id}}" class="btn btn-sm bg-danger-light bt_excluir">
+                                                    <a data-bs-toggle="modal" href="#delete_modal" data-id="{{$aluno->id}}" data-professor_id='{{Auth::user()->professor->id}}' class="btn btn-sm bg-danger-light bt_excluir">
                                                         <i class="fe fe-trash"></i> Excluir
                                                     </a>
                                                 </div>
@@ -92,32 +92,40 @@
     $(document).ready(function(){
         $(document).on("click", ".bt_excluir", function() {
         var id = $(this).data('id');
+        var professor_id = $(this).data('professor_id');
+
          $('.confirmar_exclusao').data('id', id);
+         $('.confirmar_exclusao').data('professor_id', professor_id);
          $(".delete_modal").modal('show');
+
     });
 
     $(document).on("click", ".confirmar_exclusao", function() {
      
         var id = $(this).data('id');
+        var professor_id = $(this).data('professor_id');
         var token = $('meta[name="csrf-token"]').attr('content');
      
    
-
         $.ajax({
-    url: '/api/aluno/' + id+'/destroy',
+    url: '/api/aluno/' + id + '/destroy/' + professor_id,
     type: 'DELETE',
+    docType:"json",
     headers: {
         'Authorization': 'Bearer ' + token,
     },
-    success: function(result) {
-        alert('Excluido com sucesso')
-        $('.modal').modal('hide');
-        $(".linha_"+id).fadeOut();
+    success: function(result, textStatus, xhr) {  // note que acrescentamos parâmetros adicionais aqui
+        if (xhr.status == 200) {  // Verifique o status da resposta
+            alert('Excluído com sucesso');
+            $('.modal').modal('hide');
+            $(".linha_" + id).fadeOut();
+        }
     },
-    error: function(request,msg,error) {
+    error: function(request, msg, error) {
         console.log(error);
     }
 });
+
 
  });
 

@@ -223,10 +223,16 @@ class EmpresaController extends Controller
             'professor_id' => 'required|numeric',
             'data_da_aula' => 'required',
             'valor_aula' => 'required|numeric',
+            'horario_aula' => 'required'
         ]);
 
         // Pegar a data da aula do formulário
         $dataAula = $validatedData['data_da_aula'];
+
+
+
+        $validatedData['horario'] = $validatedData['horario_aula'];
+
 
         // Converter a data da aula para o formato americano (ISO 8601)
         $dataAulaFormatoAmericano = date('Y-m-d', strtotime($dataAula));
@@ -250,6 +256,7 @@ class EmpresaController extends Controller
             'professor_id' => 'required|numeric',
             'data_da_aula' => 'required|date',
             'valor_aula' => 'required|numeric',
+            'horario' => 'required'
         ]);
 
         // Busca a aula pelo ID fornecido

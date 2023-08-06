@@ -71,7 +71,7 @@ Route::delete('modalidade/{id}/destroy', [ModalidadeController::class, 'destroy'
 Route::post('/aluno/store', [AlunosController::class, 'store']);
 Route::post('/aluno/{id}/update', [AlunosController::class, 'update']);
 
-Route::delete('/aluno/{id}/destroy', [AlunosController::class, 'destroy']);
+Route::delete('/aluno/{id}/destroy/{professor_id}', [AlunosController::class, 'destroy']);
 
 // routes/api.php
 Route::get('professores/{id}/alunos', [EmpresaControllerApi::class, 'getAlunoByIdProfessor']);

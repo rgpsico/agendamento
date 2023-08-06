@@ -112,6 +112,7 @@ class AgendaController extends Controller
     {
         $model = $this->model->find($id);
 
+
         return view(
             $this->view . '.create',
             [

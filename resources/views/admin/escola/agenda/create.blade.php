@@ -40,14 +40,15 @@
 											
 											@if(isset($model))
                                                 <div class="card-footer d-flex">
-                                            <button class="btn btn-success justify-content-right" >Atualizar</button>
+                                            <button class="btn btn-success justify-content-right" type="submit">Atualizar</button>
 											@else 
 											<div class="card-footer d-flex">
-												<button class="btn btn-success justify-content-right" >Salvar</button>
+												<button class="btn btn-success justify-content-right" type="submit" >Salvar</button>
 											@endif
                                         </div>
 									</div>
 								</div>
+							</form>
 							
 							<!-- /General -->
 								

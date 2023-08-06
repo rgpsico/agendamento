@@ -161,18 +161,23 @@ class AlunosController extends Controller
         $professor_id = Auth::user()->professor->id;
 
 
+        $dataNascimentoFormatada = DateTime::createFromFormat('d/m/Y', $request['data_nascimento'])->format('Y-m-d');
+        $request['data_nascimento'] = $dataNascimentoFormatada;
+
+
         $request->validate([
             'nome' => 'required',
-            // 'sobreNome' => 'required',
-            // 'nascimento' => 'required|date',
+            'telefone' => 'required',
+            // 'data_nascimento' => 'required|date',
             'email' => 'required|email',
-            'cep' => 'required',
-            'rua' => 'required',
-            'cidade' => 'required',
-            'estado' => 'required',
-            'numero' => 'required',
+            // 'cep' => 'required',
+            // 'rua' => 'required',
+            // 'cidade' => 'required',
+            // 'estado' => 'required',
+            // 'numero' => 'required',
             // 'password' => 'required'
         ]);
+
 
         if (!$request->password) {
             $request['password'] = '124';
@@ -181,7 +186,7 @@ class AlunosController extends Controller
         // Atualizando ou Criando o Usuário
         $user = Usuario::updateOrCreate(
             ['email' => $request->email],
-            $request->only('nome', 'sobreNome', 'nascimento', 'password', 'tipo_usuario')
+            $request->only('nome', 'sobreNome', 'nascimento', 'password', 'tipo_usuario', 'telefone')
         );
 
         // Atualizando ou Criando o Aluno
@@ -190,7 +195,11 @@ class AlunosController extends Controller
             $request->only('...')
         );
 
-
+        $request['rua'] = '200';
+        $request['numero'] = 'saint roman ';
+        $request['cidade'] = 'RJ';
+        $request['estado'] = 'RJ';
+        $request['cep'] = '22071060';
 
         $request['endereco'] = $request->rua . ' ' . $request->numero . ' ' . $request->cidade;
 
@@ -208,17 +217,19 @@ class AlunosController extends Controller
         return redirect()->route('alunos.index')->with(['success' => 'Atualizado com Sucesso']);
     }
 
-    public function destroy($id)
+    public function destroy($id, $professor_id)
     {
-        $professor_id = Auth::user()->professor->id;
+
 
         $alunoProfessor = AlunoProfessor::where('aluno_id', $id)->where('professor_id', $professor_id)->first();
 
         if ($alunoProfessor) {
             $alunoProfessor->delete();
-            return redirect()->route($this->route . '.index')->with('success', 'Aluno desassociado com sucesso!');
+
+            return response()->json(['message' => 'Excluído com sucesso'], 200);
         } else {
-            return redirect()->route($this->route . '.index')->with('error', 'Associação entre aluno e professor não encontrada.');
+
+            return response()->json(['message' => 'Excluído com sucesso'], 404);
         }
     }
 }
