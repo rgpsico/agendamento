@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AgendaController;
+use App\Http\Controllers\SocialLiteController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -26,3 +27,7 @@ Route::post('/deploy', function () {
 
 Route::get('/treino', [AgendaController::class, 'treino'])->name('treino');
 Route::get('/logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
+
+
+Route::get('/google', [SocialLiteController::class, 'redirectToGoogle'])->name('login.google');
+Route::get('/googleh', [SocialLiteController::class, 'handleGoogleCallback'])->name('handle.google');
