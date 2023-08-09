@@ -215,7 +215,6 @@ class EmpresaController extends Controller
 
 
 
-
         // Validação dos dados recebidos do formulário
         $validatedData = $request->validate([
             'aluno_id' => 'required|numeric',

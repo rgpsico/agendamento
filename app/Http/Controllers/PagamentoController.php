@@ -12,6 +12,7 @@ class PagamentoController extends Controller
     public function pagamentoStripe(Request $request)
     {
 
+
         Stripe::setApiKey(env('STRIPE_SECRET'));
 
         $token = $request->stripeToken;
@@ -46,7 +47,7 @@ class PagamentoController extends Controller
                 ]);
 
                 // Aqui você pode redirecionar o usuário para uma página de agradecimento, por exemplo
-                return redirect()->route('home.checkoutsucesso', ['id' =>  $aluno_id]);
+                return redirect()->route('home.checkoutsucesso', ['id' =>  $professor_id]);
             } else {
                 // Aqui você pode redirecionar o usuário para uma página de erro, por exemplo
                 return redirect()->route('erroPagamento');

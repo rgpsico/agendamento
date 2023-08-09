@@ -8,6 +8,7 @@ use App\Models\Disponibilidade;
 use App\Models\Empresa;
 use App\Models\Modalidade;
 use App\Models\Professor;
+use App\Models\Usuario;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -121,27 +122,33 @@ class HomeController extends Controller
     public function checkoutAuth($user_id)
     {
         $model = $this->model->where('user_id', $user_id)->first();
+        $professor_id = Professor::where('usuario_id', $user_id)->first();
+
         return view(
             $this->view . '.checkoutAuth',
             [
                 'pageTitle' => $this->pageTitle,
-                'view' => $this->view,
+
                 'route' => $this->route,
-                'model'  => $model
+                'model'  => $model,
+                'professor' => $professor_id,
+                'view' => $this->view,
             ]
         );
     }
 
     public function checkoutSucesso($user_id)
     {
-        $model = $this->model->where('user_id', $user_id)->first();
+        $model = Professor::with('usuario')->where('id', $user_id)->first();
+
         return view(
             $this->view . '.checkoutsucesso',
             [
                 'pageTitle' => $this->pageTitle,
                 'view' => $this->view,
                 'route' => $this->route,
-                'model'  => $model
+                'model'  => $model,
+                'nome_professor' => $model->usuario->nome
             ]
         );
     }

@@ -95,6 +95,8 @@ class Usuario extends Authenticatable
         return $this->hasOne(Professor::class, 'usuario_id', 'id');
     }
 
+
+
     public function disponibilidades()
     {
         return $this->hasMany(Disponibilidade::class, 'id_professor');
@@ -105,6 +107,6 @@ class Usuario extends Authenticatable
 
     public function aluno()
     {
-        return $this->hasOne(Alunos::class, 'usuario_id');
+        return $this->hasOne(Alunos::class, 'usuario_id', 'id');
     }
 }
