@@ -18,9 +18,9 @@
 											<div class="payment-widget">
 												<h4 class="card-title">Metodos de Pagamento</h4>
 									
-												<input type="text" name="aluno_id" value="{{Auth::user()->id}}">
-												<input type="text" name="professor_id" value="{{$model->user_id}}">
-												<input type="text" name="modalidade_id" value="{{$model->user_id}}">
+												<input type="hidden" name="aluno_id" value="{{Auth::user()->id}}">
+												<input type="hidden" name="professor_id" value="{{$model->user_id}}">
+												<input type="hidden" name="modalidade_id" value="{{$model->user_id}}">
 												<input type="hidden" id="data_aula" name="data_aula" value="">
 												<input type="hidden" id="hora_aula" name="hora_aula" value="">
 												<input type="hidden" id="valor_aula" name="valor_aula" value="">
@@ -52,7 +52,7 @@
 
 									<script src="https://js.stripe.com/v3/"></script>
 									<script>
-										var stripe = Stripe('pk_test_51JDFv2BOmvZWJe0xeu2cwxUHl3Fw92cGWXoDlUpLQfJlY8K2yhk6LKs0GNtDP7GBmRgSs8aOySLTFlkAJJ7hb1Yr00q73EhugI');
+										var stripe = Stripe(env('STRIPE_SECRET'));
 										var elements = stripe.elements();
 									
 										var card = elements.create('card');
