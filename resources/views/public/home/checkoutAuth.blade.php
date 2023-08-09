@@ -52,7 +52,7 @@
 
 									<script src="https://js.stripe.com/v3/"></script>
 									<script>
-										var stripe = Stripe(env('STRIPE_SECRET'));
+										var stripe = Stripe('pk_test_51JDFv2BOmvZWJe0xeu2cwxUHl3Fw92cGWXoDlUpLQfJlY8K2yhk6LKs0GNtDP7GBmRgSs8aOySLTFlkAJJ7hb1Yr00q73EhugI');
 										var elements = stripe.elements();
 									
 										var card = elements.create('card');
@@ -88,6 +88,7 @@
 											var hiddenInput = document.createElement('input');
 											hiddenInput.setAttribute('type', 'hidden');
 											hiddenInput.setAttribute('name', 'stripeToken');
+											hiddenInput.setAttribute('class', 'form-control');
 											hiddenInput.setAttribute('value', token.id);
 											form.appendChild(hiddenInput);
 									

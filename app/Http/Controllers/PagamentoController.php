@@ -11,7 +11,6 @@ class PagamentoController extends Controller
 {
     public function pagamentoStripe(Request $request)
     {
-        dd($request->all());
 
 
         Stripe::setApiKey(env('STRIPE_SECRET'));
