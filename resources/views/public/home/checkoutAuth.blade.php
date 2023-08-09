@@ -88,7 +88,7 @@
 											var hiddenInput = document.createElement('input');
 											hiddenInput.setAttribute('type', 'hidden');
 											hiddenInput.setAttribute('name', 'stripeToken');
-											hiddenInput.setAttribute('class', 'form-control');
+											// hiddenInput.setAttribute('class', 'form-control');
 											hiddenInput.setAttribute('value', token.id);
 											form.appendChild(hiddenInput);
 									
