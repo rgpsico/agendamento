@@ -27,7 +27,7 @@ class PagamentoController extends Controller
 
         try {
             $charge = \Stripe\Charge::create([
-                'amount' => 10, // Este é o valor da cobrança. Neste exemplo,    $10.00
+                'amount' => 200.00, // Este é o valor da cobrança. Neste exemplo,    $10.00
                 'currency' => 'usd', // Esta é a moeda.
                 'source' => $token, // Este é o token do cartão de crédito.
                 'description' => $request->titulo,
