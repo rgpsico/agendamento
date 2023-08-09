@@ -19,15 +19,15 @@ class PagamentoController extends Controller
         $aluno_id = $request->aluno_id;
         $professor_id = $request->professor_id;
         $valor_aula = $request->valor_aula;
-        $data_da_aula = $request->data_aula;
+
         $modalidade_id = $request->modalidade_id;
 
         $originalDate = $request->data_aula;
-        $formattedDate = date("Y-m-d", strtotime($originalDate));
+        $data_da_aula = date("Y-m-d", strtotime($originalDate));
 
         try {
             $charge = \Stripe\Charge::create([
-                'amount' => $valor_aula, // Este é o valor da cobrança. Neste exemplo,    $10.00
+                'amount' => 10, // Este é o valor da cobrança. Neste exemplo,    $10.00
                 'currency' => 'usd', // Esta é a moeda.
                 'source' => $token, // Este é o token do cartão de crédito.
                 'description' => $request->titulo,
@@ -41,7 +41,7 @@ class PagamentoController extends Controller
                     'aluno_id' => $aluno_id,
                     'modalidade_id' => $modalidade_id, // Você precisa definir essa variável
                     'professor_id' => $professor_id, // Você precisa definir essa variável
-                    'data_da_aula' => $formattedDate, // Você precisa definir essa variável
+                    'data_da_aula' => $data_da_aula, // Você precisa definir essa variável
                     'valor_aula' => $valor_aula,
                 ]);
 
@@ -55,7 +55,7 @@ class PagamentoController extends Controller
 
             // Aqui você pode capturar e lidar com possíveis erros
             // Você pode querer logar o erro e mostrar uma mensagem amigável ao usuário
-            return redirect()->back()->with('error', 'Ocorreu um erro ao processar o seu pagamento. Por favor, tente novamente.');
+            return redirect()->back()->with('error', 'Ocorreu um erro ao processar o seu pagamento. Por favor, tente novamente.' . $ex);
         }
     }
 }
