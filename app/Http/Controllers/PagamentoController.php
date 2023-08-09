@@ -11,8 +11,6 @@ class PagamentoController extends Controller
 {
     public function pagamentoStripe(Request $request)
     {
-        dd($request->all());
-
 
         Stripe::setApiKey(env('STRIPE_SECRET'));
 
@@ -24,9 +22,12 @@ class PagamentoController extends Controller
         $data_da_aula = $request->data_aula;
         $modalidade_id = $request->modalidade_id;
 
+        $originalDate = $request->data_aula;
+        $formattedDate = date("Y-m-d", strtotime($originalDate));
+
         try {
             $charge = \Stripe\Charge::create([
-                'amount' => $valor_aula, // Este é o valor da cobrança. Neste exemplo, $10.00
+                'amount' => $valor_aula, // Este é o valor da cobrança. Neste exemplo,    $10.00
                 'currency' => 'usd', // Esta é a moeda.
                 'source' => $token, // Este é o token do cartão de crédito.
                 'description' => $request->titulo,
@@ -40,7 +41,7 @@ class PagamentoController extends Controller
                     'aluno_id' => $aluno_id,
                     'modalidade_id' => $modalidade_id, // Você precisa definir essa variável
                     'professor_id' => $professor_id, // Você precisa definir essa variável
-                    'data_da_aula' => $data_da_aula, // Você precisa definir essa variável
+                    'data_da_aula' => $formattedDate, // Você precisa definir essa variável
                     'valor_aula' => $valor_aula,
                 ]);
 
