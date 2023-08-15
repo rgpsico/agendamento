@@ -30,4 +30,4 @@ Route::get('/logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
 
 
 Route::get('/google', [SocialLiteController::class, 'redirectToGoogle'])->name('login.google');
-Route::get('/googleh', [SocialLiteController::class, 'handleGoogleCallback'])->name('handle.google');
+Route::get('/google/callback', [SocialLiteController::class, 'handleGoogleCallback'])->name('handle.google');
