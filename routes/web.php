@@ -5,6 +5,12 @@ use App\Http\Controllers\SocialLiteController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+Route::get('/google/redirect', [SocialLiteController::class, 'redirectToGoogle'])->name('login.google');
+Route::get('/google/callback', [SocialLiteController::class, 'handleGoogleCallback'])->name('handle.google');
+
+
+
+
 Route::prefix('admin')->middleware(['check_user_authenticated'])->group(function () {
 });
 
@@ -27,7 +33,3 @@ Route::post('/deploy', function () {
 
 Route::get('/treino', [AgendaController::class, 'treino'])->name('treino');
 Route::get('/logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
-
-
-Route::get('/google', [SocialLiteController::class, 'redirectToGoogle'])->name('login.google');
-Route::get('/google/callback', [SocialLiteController::class, 'handleGoogleCallback'])->name('handle.google');
