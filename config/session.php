@@ -155,7 +155,7 @@ return [
     |
     */
 
-    'domain' => env('SESSION_DOMAIN', 'https://www.rjpasseios.com.br/'),
+    'domain' => env('SESSION_DOMAIN', 'www.rjpasseios.com.br'),
 
     /*
     |--------------------------------------------------------------------------
