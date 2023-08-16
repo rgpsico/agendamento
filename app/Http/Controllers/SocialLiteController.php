@@ -23,10 +23,6 @@ class SocialLiteController extends Controller
         try {
             $googleUser = Socialite::driver('google')->user();
 
-
-
-
-
             $user = Usuario::where('email', $googleUser->email)->first();
 
             if (!$user) {
@@ -45,7 +41,7 @@ class SocialLiteController extends Controller
             return redirect('/');  // ou onde você deseja redirecionar após o login
 
         } catch (\Exception $e) {
-            return redirect('/login')->with('error', 'Houve um problema ao tentar autenticar com o Google.' . $e);
+            dd($e);
         }
     }
 }
