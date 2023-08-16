@@ -18,10 +18,10 @@ class SocialLiteController extends Controller
 
     public function handleGoogleCallback()
     {
-
         try {
             $googleUser = Socialite::driver('google')->user();
 
+            dd($googleUser);
 
 
             $user = Usuario::where('email', $googleUser->email)->first();
