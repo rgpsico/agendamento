@@ -13,6 +13,7 @@ class SocialLiteController extends Controller
 
     public function redirectToGoogle()
     {
+        dd('aaa');
         return Socialite::driver('google')->redirect();
     }
 
