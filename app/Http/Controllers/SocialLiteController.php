@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Usuario;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
 
 class SocialLiteController extends Controller
@@ -41,7 +42,7 @@ class SocialLiteController extends Controller
             return redirect('/');  // ou onde você deseja redirecionar após o login
 
         } catch (\Exception $e) {
-            return redirect('/login')->with('error', 'Houve um problema ao tentar autenticar com o Google.');
+            return redirect('/login')->with('error', 'Houve um problema ao tentar autenticar com o Google.' . $e);
         }
     }
 }
