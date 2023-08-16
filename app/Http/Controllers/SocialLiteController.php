@@ -13,13 +13,13 @@ class SocialLiteController extends Controller
 
     public function redirectToGoogle()
     {
-        dd('aaa');
+
         return Socialite::driver('google')->redirect();
     }
 
     public function handleGoogleCallback()
     {
-        dd('aaaa');
+
         try {
             $googleUser = Socialite::driver('google')->user();
 

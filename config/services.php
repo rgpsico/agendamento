@@ -20,6 +20,7 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URL'),
     ],
 
+
     'mailgun' => [
         'domain' => env('MAILGUN_DOMAIN'),
         'secret' => env('MAILGUN_SECRET'),
