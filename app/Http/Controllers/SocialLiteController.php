@@ -21,6 +21,7 @@ class SocialLiteController extends Controller
         try {
             $googleUser = Socialite::driver('google')->user();
 
+
             dd($googleUser);
 
 
