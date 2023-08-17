@@ -44,18 +44,19 @@ class AgendaController extends Controller
 
     public function treino()
     {
-        $professor_id = Auth::user()->professor->id; // suponho que o professor esteja logado.
+        if (isset(Auth::user()->professor->id)) {
+            $professor_id = Auth::user()->professor->id; // suponho que o professor esteja logado.
 
-        // Obtenha o professor junto com seus agendamentos
-        $model = Empresa::get();
-
+            // Obtenha o professor junto com seus agendamentos
+            $model = Empresa::get();
+        }
         return view(
             $this->view . '.treino',
             [
                 'pageTitle' => $this->pageTitle,
                 'view' => $this->view,
                 'route' => $this->route,
-                'model' => $model
+                'model' => $model ?? ''
             ]
         );
     }
