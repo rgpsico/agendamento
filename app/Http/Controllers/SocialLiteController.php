@@ -44,7 +44,7 @@ class SocialLiteController extends Controller
 
             Auth::login($user, true);
 
-            dd('aa');
+
             return redirect()->route("admin.dashboard");  // ou onde você deseja redirecionar após o login
 
         } catch (\Exception $e) {
