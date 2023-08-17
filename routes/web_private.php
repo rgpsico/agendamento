@@ -1,9 +1,9 @@
 <?php
 
-use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\admin\AdminController;
 use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\AlunosController;
-use App\Http\Controllers\DashBoardController;
+
 use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\ModalidadeController;
 use App\Http\Controllers\PagamentoController;
