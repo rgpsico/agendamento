@@ -10,6 +10,9 @@
     </thead>
     <tbody>
       
+        @isset($model )
+            
+       
         @foreach ($model as $item)
         <tr>
             @foreach ($headers as $header)
@@ -40,6 +43,7 @@
             @endif
         </tr>
     @endforeach
+    @endisset
     
     </tbody>
 </table>
