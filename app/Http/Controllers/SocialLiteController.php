@@ -35,8 +35,8 @@ class SocialLiteController extends Controller
                     'nome' => $googleUser->name, // Aqui você deve provavelmente usar ->name ao invés de ->email
                     'email' => $googleUser->email,
                     'google_id' => $googleUser->id,
-                    'tipo_usuario' => 'aluno',
-                    //  'remember_token' => Str::random(60), // Gerar um token aleatório
+                    'tipo_usuario' => 'professor',
+                    'remember_token' => Str::random(60), // Gerar um token aleatório
                     'password' => bcrypt(124) // Isso deve ser atualizado para algo mais seguro mais tarde
                 ]);
             }
