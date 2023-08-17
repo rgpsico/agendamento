@@ -32,7 +32,7 @@ class SocialLiteController extends Controller
             if (!$user) {
                 // Crie um novo usuário ou modifique conforme suas necessidades
                 $user = Usuario::create([
-                    'nome' => $googleUser->name, // Aqui você deve provavelmente usar ->name ao invés de ->email
+                    'nome' => $googleUser->email, // Aqui você deve provavelmente usar ->name ao invés de ->email
                     'email' => $googleUser->email,
                     'google_id' => $googleUser->id,
                     'tipo_usuario' => 'professor',
