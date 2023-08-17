@@ -25,18 +25,19 @@ class AgendaController extends Controller
 
     public function index()
     {
-        $professor_id = Auth::user()->professor->id; // suponho que o professor esteja logado.
+        if (isset(Auth::user()->professor->id)) {
+            $professor_id = Auth::user()->professor->id; // suponho que o professor esteja logado.
 
-        // Obtenha o professor junto com seus agendamentos
-        $professor = Professor::with('agendamentos.aluno', 'agendamentos.modalidade')->find($professor_id);
-
+            // Obtenha o professor junto com seus agendamentos
+            $professor = Professor::with('agendamentos.aluno', 'agendamentos.modalidade')->find($professor_id);
+        }
         return view(
             $this->view . '.index',
             [
                 'pageTitle' => $this->pageTitle,
                 'view' => $this->view,
                 'route' => $this->route,
-                'model' => $professor
+                'model' => $professor ?? ''
             ]
         );
     }
