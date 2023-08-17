@@ -55,9 +55,8 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @forelse ($model->agendamentos as $agendamento)
-                                            
-                                     
+                                        @isset($model->agendamentos)
+                                        @foreach ($model->agendamentos as $agendamento)
                                             <tr role="row" class="odd">
                                                 <td class="sorting_1">
                                                     <h2 class="table-avatar">
@@ -88,10 +87,9 @@
                                                     </div>
                                                 </td>
                                             </tr>
-                                            @empty
-                                            
-                                            @endforelse 
-                                                                            </tbody>
+                                        @endforeach
+                                        @endisset
+                                    </tbody>
                                     
                                 </table>
                             </div>
