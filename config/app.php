@@ -170,6 +170,7 @@ return [
         App\Providers\RouteServiceProvider::class,
         Modules\Blog\Providers\BlogServiceProvider::class,
         Laravel\Socialite\SocialiteServiceProvider::class,
+
     ])->toArray(),
 
     /*
