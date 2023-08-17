@@ -33,24 +33,27 @@ class EmpresaController extends Controller
 
     public function dashboard()
     {
-        $professor_id = Auth::user()->professor->id;
-        $numeroTotalDeAlunos = $this->agendamento::where('professor_id', $professor_id)->count();
-        $arrecadacao = $this->agendamento::where('professor_id', $professor_id)->sum('valor_aula');
-        $aulasCanceladas = $this->agendamento::where('professor_id', $professor_id)->where('status', 'cancelada')->count();
-        $aulasFeitas = $this->agendamento::where('professor_id', $professor_id)->where('status', 'realizadas')->count();
-        $arrecadacaoUltimos30Dias = $this->agendamento::where('professor_id', $professor_id)
-            ->whereDate('data_da_aula', '>=', Carbon::now()->subDays(30))
-            ->sum('valor_aula');
+        if (isset(Auth::user()->professor->id)) {
+            $professor_id = Auth::user()->professor->id;
+            $numeroTotalDeAlunos = $this->agendamento::where('professor_id', $professor_id)->count();
+            $arrecadacao = $this->agendamento::where('professor_id', $professor_id)->sum('valor_aula');
+            $aulasCanceladas = $this->agendamento::where('professor_id', $professor_id)->where('status', 'cancelada')->count();
+            $aulasFeitas = $this->agendamento::where('professor_id', $professor_id)->where('status', 'realizadas')->count();
+            $arrecadacaoUltimos30Dias = $this->agendamento::where('professor_id', $professor_id)
+                ->whereDate('data_da_aula', '>=', Carbon::now()->subDays(30))
+                ->sum('valor_aula');
+        }
+
 
         return view(
             'admin.empresas.dashboard',
             [
                 'pageTitle' => 'DashBoard',
-                'numeroTotalDeAlunos' => $numeroTotalDeAlunos,
-                'arrecadacao' => $arrecadacao,
-                'aulasCanceladas' => $aulasCanceladas,
-                'arrecadacaoUltimos30Dias' => $arrecadacaoUltimos30Dias,
-                'realizadas' =>  $aulasFeitas
+                'numeroTotalDeAlunos' => $numeroTotalDeAlunos ?? '',
+                'arrecadacao' => $arrecadacao ?? '',
+                'aulasCanceladas' => $aulasCanceladas ?? '',
+                'arrecadacaoUltimos30Dias' => $arrecadacaoUltimos30Dias ?? '',
+                'realizadas' =>  $aulasFeitas ?? ''
             ]
         );
     }
