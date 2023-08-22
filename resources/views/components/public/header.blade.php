@@ -63,14 +63,7 @@
 								</a>
 							</div>
 							<ul class="main-nav">
-								<li class="has-submenu ">
-									<a href="">Home <i class="fas fa-chevron-down"></i></a>
-								</li>
-
-								<li class="has-submenu ">
-									<a href="">Home <i class="fas fa-chevron-down"></i></a>
-								</li>
-							
+												
 								@if(auth()->check())
 									<li class="my-3">
 										<a href="{{route('admin.servico.index')}}" class="btn reg-btn">Admin</a>										
