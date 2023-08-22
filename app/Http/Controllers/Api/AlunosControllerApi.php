@@ -9,12 +9,9 @@ use App\Models\Modalidade;
 use App\Models\Professor;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Laravel\Socialite\Facades\Socialite;
-use Google_Client;
 
-class UserControllerApi extends Controller
+class AlunosControllerApi extends Controller
 {
     // Mostrar todos os usuários
     public function index()
@@ -28,36 +25,6 @@ class UserControllerApi extends Controller
     {
         $user = Usuario::create($request->all());
         return response()->json($user, 201);
-    }
-
-
-
-    public function googleAuth(Request $request)
-    {
-
-        $client = new Google_Client(['client_id' => env('GOOGLE_CLIENT_ID')]);
-        $payload = $client->verifyIdToken($request->token);
-
-        if (!$payload) {
-            return response()->json(['error' => 'Invalid token'], 401);
-        }
-
-        $googleUserId = $payload['sub'];
-
-        // Você pode buscar ou criar um usuário com base no ID do Google
-        // Aqui você também pode verificar outros campos, como o e-mail do usuário.
-        $user = Usuario::firstOrCreate(['google_id' => $googleUserId], [
-            'name' => $payload['name'],
-            'email' => $payload['email'],
-            // outros campos que você desejar
-        ]);
-
-        // Aqui você pode autenticar o usuário e criar um token de autenticação,
-        // se você estiver usando, por exemplo, o `tymon/jwt-auth` para JWT.
-
-        Auth::login($user);
-
-        return response()->json(['message' => 'User authenticated']);
     }
 
     // Mostrar um usuário específico
@@ -74,6 +41,7 @@ class UserControllerApi extends Controller
     // Atualizar um usuário específico
     public function update(Request $request, $id)
     {
+        dd('aa');
         $user = Usuario::find($id);
         if ($user) {
             $user->update($request->all());

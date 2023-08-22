@@ -37,7 +37,7 @@
 
             <td> 
                 @if(array_key_exists('ver', $actions))
-                <a  class='btn btn-info' href="{{ route($actions['ver'], $item->id) }}">Ver</a>
+                    <a  class='btn btn-info' href="{{ route($actions['ver'], $item->id) }}">Ver</a>
                 @endif
             </td>
             @endif

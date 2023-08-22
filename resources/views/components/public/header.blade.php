@@ -66,6 +66,10 @@
 								<li class="has-submenu ">
 									<a href="">Home <i class="fas fa-chevron-down"></i></a>
 								</li>
+
+								<li class="has-submenu ">
+									<a href="">Home <i class="fas fa-chevron-down"></i></a>
+								</li>
 							
 								@if(auth()->check())
 									<li class="my-3">
@@ -74,11 +78,10 @@
 									<li class="my-3">
 										<a href="{{route('user.logout')}}" class="btn reg-btn">Sair</a>										
 									</li>
-
 									
 								@else
 									<li class="login-link">
-										<a href="{{route('home.login')}}">Login / Cadastrar</a>
+										<a href="{{route('home.login')}}">Login</a>
 									</li>
 									<li class="register-btn">
 										<a href="{{route('home.registerProf')}}" target="_blank" class="btn reg-btn">

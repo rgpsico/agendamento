@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AlunosController;
+use App\Http\Controllers\Api\AlunosControllerApi;
 use App\Http\Controllers\Api\AulasControllerApi;
 use App\Http\Controllers\Api\AuthControllerApi;
 use App\Http\Controllers\Api\DiaDaSemanaControllerApi;
@@ -53,7 +54,7 @@ Route::get('professor/{id}/aulas', [ProfessoresControllerApi::class, 'aulas']);
 Route::resource('users', UserControllerApi::class);
 Route::post('transacao', [UserControllerApi::class, 'transacao']);
 
-
+Route::post('googleAuth', [UserControllerApi::class, 'googleAuth']);
 
 Route::resource('aulas', AulasControllerApi::class);
 
@@ -69,7 +70,7 @@ Route::post('modalidade/{id}/update', [ModalidadeController::class, 'updateApi']
 Route::delete('modalidade/{id}/destroy', [ModalidadeController::class, 'destroy'])->name('modalidade.destroy');
 
 Route::post('/aluno/store', [AlunosController::class, 'store']);
-Route::post('/aluno/{id}/update', [AlunosController::class, 'update']);
+Route::post('/aluno/{id}/update', [AlunosControllerApi::class, 'update']);
 
 Route::delete('/aluno/{id}/destroy/{professor_id}', [AlunosController::class, 'destroy']);
 
