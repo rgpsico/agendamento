@@ -132,34 +132,40 @@
 
                     <div id="endereco_tab" class="tab-pane fade">
                         
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <h5 class="card-title d-flex justify-content-between">
-                                            <span>Endereço</span> 
-                                            <a class="edit-link" data-bs-toggle="modal" href="#editar_endereco">
-                                                <i class="fa fa-edit me-1"></i>Editar</a>
-                                        </h5>
-                                         <div class="row">
-                                            <p class="col-sm-2 text-muted text-sm-end mb-0 mb-sm-3">Celular</p>
-                                            <p class="col-sm-10">{{ $model->usuario->telefone ?? '' }}</p>
-                                        </div>
-                                        <div class="row">
-                                            <p class="col-sm-2 text-muted text-sm-end mb-0">Endereço</p>
-                                            <p class="col-sm-10 mb-0">{{ $model->endereco->endereco ?? ''}},<br>
-                                            {{ $model->endereco->cidade ?? '' }},<br>
-                                            {{ $model->endereco->estado ?? ''}} - {{ $model->cep  ?? ''}},<br>
-                                            {{ $model->endereco->pais ?? ''}}.</p>
-                                        </div>
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Alterar Senha</h5>
+                                <div class="row">
+                                    <div class="col-md-10 col-lg-6">
+                                        <form id="update-endereco-form">
+                                            <div class="form-group">
+                                                <label>CEP</label>
+                                                <input type="text" id="cep" class="form-control">
+                                                <span class="text-danger error-text cep_error"></span>
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label>Endereço</label>
+                                                <input type="text" id="endereco" class="form-control">
+                                                <span class="text-danger error-text endereco_error"></span>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Cidade</label>
+                                                <input type="text" id="cidade" class="form-control">
+                                                <span class="text-danger error-text cidade_error"></span>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Estado</label>
+                                                <input type="text" id="estado" class="form-control">
+                                                <span class="text-danger error-text estado_error"></span>
+                                            </div>
+                                          
+                                            <button class="btn btn-primary" type="submit">Salvar Alterações</button>
+                                        </form>
                                     </div>
                                     
                                 </div>
-                       
-                                
                             </div>
-
-                        
                         </div>
                         
                         
