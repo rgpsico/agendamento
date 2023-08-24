@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Professor;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -39,6 +40,10 @@ class SocialLiteController extends Controller
                     'remember_token' => Str::random(60), // Gerar um token aleatório
                     'password' => bcrypt(124) // Isso deve ser atualizado para algo mais seguro mais tarde
                 ]);
+
+                Professor::create([
+                    ''
+                ])
             }
 
 

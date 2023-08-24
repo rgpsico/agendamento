@@ -17,7 +17,7 @@
                                 </div>
                             </div>
    
-                            <div class="col-12">
+                            <div class="col-sm-6">
                                 <div class="form-group">
                                     <label>Data de Nascimento</label>
                                     <div class="cal-icon">
@@ -25,51 +25,19 @@
                                     </div>
                                 </div>
                             </div>
-                            {{-- <div class="col-12 col-sm-6">
+                            <div class="col-12 col-sm-6">
                                 <div class="form-group">
                                     <label>Email</label>
-                                    <input type="email" class="form-control" id="email" value="johndoe@example.com">
+                                    <input type="email" class="form-control" id="email" value="{{Auth::user()->email ?? ''}}">
                                 </div>
-                            </div> --}}
+                            </div>
                             <div class="col-12 col-sm-6">
                                 <div class="form-group">
                                     <label>Celular</label>
-                                    <input type="text" value="+21 990271287" id="telefone" class="form-control">
+                                    <input type="text" value="{{Auth::user()->telefone ?? ''}}" id="telefone" class="form-control">
                                 </div>
                             </div>
-                            <div class="col-12">
-                                <h5 class="form-title"><span>Endereço</span></h5>
-                            </div>
-                            <div class="col-12">
-                                <div class="form-group">
-                                    <label>Endereço</label>
-                                    <input type="text" class="form-control"  id="endereco" value="4663 Agriculture Lane">
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6">
-                                <div class="form-group">
-                                    <label>Cidade</label>
-                                    <input type="text" class="form-control" id="cidade" value="Miami">
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6">
-                                <div class="form-group">
-                                    <label>Estado</label>
-                                    <input type="text" class="form-control" id="estado" value="Florida">
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6">
-                                <div class="form-group">
-                                    <label>CEP</label>
-                                    <input type="text" class="form-control" id="cep" value="22434">
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6">
-                                <div class="form-group">
-                                    <label>País</label>
-                                    <input type="text" class="form-control" id="pais" value="United States">
-                                </div>
-                            </div>
+                            
                         </div>
                         <button type="submit" class="btn btn-primary w-100">Salvar Alterações</button>
                     </form>
@@ -81,6 +49,58 @@
 </div>
 
    
+
+<div class="modal fade" id="editar_endereco" aria-hidden="true" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Editar Endereço</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" class="form-control" id="aluno_id" value="{{Auth::user()->id}}">
+                <div class="modal-body">
+                    <form id="form-update-aluno">
+                        <div class="row form-row">
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label>Primeiro Nome</label>
+                                    <input type="text" class="form-control" id="primeiro_nome" value="{{Auth::user()->nome}}">
+                                </div>
+                            </div>
+   
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label>Data de Nascimento</label>
+                                    <div class="cal-icon">
+                                        <input type="text" class="form-control datetimepicker" id="data_nascimento" value="24-07-1983">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label>Email</label>
+                                    <input type="email" class="form-control" id="email" value="{{Auth::user()->email ?? ''}}">
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label>Celular</label>
+                                    <input type="text" value="{{Auth::user()->telefone ?? ''}}" id="telefone" class="form-control">
+                                </div>
+                            </div>
+                            
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Salvar Alterações</button>
+                    </form>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <script>
     $('#form-update-aluno').on('submit', function(e) {
     e.preventDefault();
@@ -118,6 +138,16 @@ let finalDate = dataSql.toISOString().split('T')[0];
       }
         
       
+    } , error: function(response) {
+        if (response.status == 422) { // verifica se é um erro de validação
+            const errors = response.responseJSON.errors;
+            // exibe os erros no formulário
+            for (let field in errors) {
+                $(`.${field}_error`).text(errors[field][0]);
+            }
+        } else {
+            alert('Ocorreu um erro desconhecido!');
+        }
     }
 });
 

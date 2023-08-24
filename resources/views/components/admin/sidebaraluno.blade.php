@@ -10,7 +10,7 @@
                 <li> 
                     <a href="{{route('cliente.dashboard')}}">
                         <i class="fe fe-home"></i> <span>Escola</span>
-                    </a>
+                    </a>\f
                 </li>
             
                 <li class="submenu">

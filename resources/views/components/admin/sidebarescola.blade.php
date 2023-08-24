@@ -65,12 +65,12 @@
                     </a>
                 </li>
 
-                <li> 
+                {{-- <li> 
                     <a href="{{route('treino')}}">
                         <i class="fe fe-camera"></i>
                         <span>Treino</span>
                     </a>
-                </li>
+                </li> --}}
                 
              
 

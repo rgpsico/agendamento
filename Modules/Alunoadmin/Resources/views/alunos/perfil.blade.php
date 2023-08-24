@@ -36,7 +36,10 @@
                             <a class="nav-link active" data-bs-toggle="tab" href="#per_details_tab">Sobre</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#password_tab">Aulas</a>
+                            <a class="nav-link"  data-bs-toggle="tab" href="#endereco_tab">Endereço</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link"  data-bs-toggle="tab" href="#password_tab">Mudar Senha</a>
                         </li>
                     </ul>
                 </div>	
@@ -67,7 +70,7 @@
                                             <p class="col-sm-2 text-muted text-sm-end mb-0 mb-sm-3">Email</p>
                                             <p class="col-sm-10">{{ $model->usuario->email ?? '' }}</p>
                                         </div>
-                                        <div class="row">
+                                        {{-- <div class="row">
                                             <p class="col-sm-2 text-muted text-sm-end mb-0 mb-sm-3">Celular</p>
                                             <p class="col-sm-10">{{ $model->usuario->telefone ?? '' }}</p>
                                         </div>
@@ -77,7 +80,7 @@
                                             {{ $model->endereco->cidade ?? '' }},<br>
                                             {{ $model->endereco->estado ?? ''}} - {{ $model->cep  ?? ''}},<br>
                                             {{ $model->endereco->pais ?? ''}}.</p>
-                                        </div>
+                                        </div> --}}
                                     </div>
                                     
                                 </div>
@@ -125,6 +128,42 @@
                         
                     </div>
                     <!-- /Change Password Tab -->
+
+
+                    <div id="endereco_tab" class="tab-pane fade">
+                        
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title d-flex justify-content-between">
+                                            <span>Endereço</span> 
+                                            <a class="edit-link" data-bs-toggle="modal" href="#editar_endereco">
+                                                <i class="fa fa-edit me-1"></i>Editar</a>
+                                        </h5>
+                                         <div class="row">
+                                            <p class="col-sm-2 text-muted text-sm-end mb-0 mb-sm-3">Celular</p>
+                                            <p class="col-sm-10">{{ $model->usuario->telefone ?? '' }}</p>
+                                        </div>
+                                        <div class="row">
+                                            <p class="col-sm-2 text-muted text-sm-end mb-0">Endereço</p>
+                                            <p class="col-sm-10 mb-0">{{ $model->endereco->endereco ?? ''}},<br>
+                                            {{ $model->endereco->cidade ?? '' }},<br>
+                                            {{ $model->endereco->estado ?? ''}} - {{ $model->cep  ?? ''}},<br>
+                                            {{ $model->endereco->pais ?? ''}}.</p>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                       
+                                
+                            </div>
+
+                        
+                        </div>
+                        
+                        
+                    </div>
                     
                 </div>
             </div>

@@ -58,8 +58,6 @@ class AlunoadminController extends Controller
         $title = 'Perfil';
         $user_id = auth()->user()->aluno->id;
         $model = Alunos::with('usuario', 'endereco')->where('id', $user_id)->first();
-
-
         return view('alunoadmin::alunos.perfil', compact('title', 'model'));
     }
 

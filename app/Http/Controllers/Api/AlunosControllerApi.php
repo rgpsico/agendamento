@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Agendamento;
+use App\Models\AlunoEndereco;
 use App\Models\Alunos;
 use App\Models\Modalidade;
 use App\Models\Professor;
@@ -39,17 +40,47 @@ class AlunosControllerApi extends Controller
     }
 
     // Atualizar um usuário específico
-    public function update(Request $request, $id)
+    public function update($id, Request $request)
     {
-        dd('aa');
-        $user = Usuario::find($id);
-        if ($user) {
-            $user->update($request->all());
-            return response()->json($user);
-        } else {
-            return response()->json(['error' => 'Usuário não encontrado'], 404);
+        // Validação dos dados recebidos
+        $request->validate([
+            'primeiro_nome' => 'required|string|max:255',
+            //  'ultimo_nome' => 'required|string|max:255',
+            'data_nascimento' => 'required|date',
+            'email' => 'required|email|max:255',
+            'telefone' => 'required|string|max:15',
+            // 'endereco' => 'required|string|max:255',
+            // 'cidade' => 'required|string|max:100',
+            // 'estado' => 'required|string|max:100',
+            // 'cep' => 'required|string|max:10',
+            // 'pais' => 'required|string|max:100'
+        ]);
+
+        // Atualiza os dados no modelo Usuario
+        $usuario = Usuario::find($id);
+        if (!$usuario) {
+            return response()->json(['message' => 'Aluno não encontrado!'], 404);
         }
+
+        $usuario->update([
+            'nome' => $request->primeiro_nome . ' ' . $request->ultimo_nome,
+            'email' => $request->email,
+            'data_nascimento' => $request->data_nascimento,
+            'telefone' => $request->telefone,
+        ]);
+
+        // Atualiza ou cria o endereço no modelo AlunoEndereco
+        // $endereco = AlunoEndereco::firstOrNew(['aluno_id' => $id]);
+        // $endereco->update([
+        //     'endereco' => $request->endereco,
+        //     'cidade' => $request->cidade,
+        //     'estado' => $request->estado,
+        //     'cep' => $request->cep,
+        // ]);
+
+        return response()->json(['message' => 'Dados atualizados com sucesso!']);
     }
+
 
     // Deletar um usuário específico
     public function destroy($id)
