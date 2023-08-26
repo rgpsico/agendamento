@@ -59,7 +59,257 @@
 }
 
         
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i,800,800i&display=swap');
 
+form {
+  width: 300px;
+  margin: 0 auto;
+  text-align: center;
+  padding-top: 0px;
+}
+form span{
+    text-align: center;
+    border: none;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    margin: 20px;
+    width: 40px;
+    height: 40px;
+       margin-block-start: 0px !important;
+    margin-block-end: 0px !important;
+    margin-inline-start: 20px !important;
+    margin-inline-end: 20px !important;
+}
+
+.value-button {
+  display: inline-block;
+  border: 1px solid #ddd;
+  margin: 0px;
+  width: 40px;
+  height: 20px;
+  text-align: center;
+  vertical-align: middle;
+  padding: 11px 0;
+  background: #eee;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.value-button:hover {
+  cursor: pointer;
+}
+
+form #decrease {
+  margin-right: -4px;
+  border-radius: 8px 0 0 8px;
+}
+
+form #increase {
+  margin-left: -4px;
+  border-radius: 0 8px 8px 0;
+}
+
+/* form #input-wrap {
+  margin: 0px;
+  padding: 0px;
+} */
+
+input#number {
+  text-align: center;
+  border: none;
+  border-top: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+  margin: 0px;
+  width: 40px;
+  height: 40px;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+///*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+} */
+body{
+  font-family: 'Open Sans', sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  font-weight: 400;
+  background: #f0f3f6;
+  color: #3a3a3a;
+}
+hr {
+  margin: 20px 0;
+  border: none;
+  border-bottom: 1px solid #d9d9d9;
+}
+label, input{
+	cursor: pointer;
+}
+h2,h3,h4,h5{
+	font-weight: 600;
+	line-height: 1.3;
+	color: #1f2949;
+}
+h2{
+	font-size: 24px;
+}
+h3 {
+	font-size: 18px;
+}
+h4 {
+	font-size: 14px;
+}
+h5 {
+	font-size: 12px;
+	font-weight: 400;
+}
+img{
+	max-width: 100%;
+	display: block;
+	vertical-align: middle;
+}
+.container {
+  max-width: 99vw;
+  margin: 15px auto;
+  padding: 0 15px;
+}
+
+.top-text-wrapper {
+	margin: 20px 0 30px 0;
+}
+.top-text-wrapper h4{
+	font-size: 24px;
+  margin-bottom: 10px;
+}
+.top-text-wrapper code{
+  font-size: .85em;
+  background: linear-gradient(90deg,#fce3ec,#ffe8cc);
+  color: #ff2200;
+  padding: .1rem .3rem .2rem;
+  border-radius: .2rem;
+}
+.tab-section-wrapper{
+  padding: 30px 0;
+}
+
+.grid-wrapper {
+	display: grid;
+	grid-gap: 30px;
+	place-items: center;
+	place-content: center;
+}
+.grid-col-auto{
+  grid-template-columns: repeat(auto-fill, minmax(280px, .1fr));
+  grid-template-rows: auto;
+}
+.grid-col-1{
+	grid-template-columns: repeat(1, auto);
+	grid-template-rows: repeat(1, auto);
+}
+.grid-col-2{
+	grid-template-columns: repeat(2, auto);
+	grid-template-rows: repeat(1, auto);
+}
+.grid-col-3{
+	grid-template-columns: repeat(3, auto);
+	grid-template-rows: repeat(1, auto);
+}
+.grid-col-4{
+	grid-template-columns: repeat(4, auto);
+	grid-template-rows: repeat(1, auto);
+}
+
+
+/* ******************* Selection Radio Item */
+
+.selected-content{
+	text-align: center;
+	border-radius: 3px;
+  box-shadow: 0 2px 4px 0 rgba(219, 215, 215, 0);
+  border: solid 2px transparent;
+	background: #fff;
+	max-width: 280px;
+	height: 330px;
+	padding: 15px;
+	display: grid;
+	grid-gap: 15px;
+	place-content: center;
+	transition: .3s ease-in-out all;
+}
+
+.selected-content img {
+    width: 230px;
+		margin: 0 auto;
+}
+.selected-content h4 {
+	font-size: 16px;
+  letter-spacing: -0.24px;
+  text-align: center;
+  color: #1f2949;
+}
+.selected-content h5 {
+	font-size: 14px;
+  line-height: 1.4;
+  text-align: center;
+  color: #686d73;
+}
+
+.selected-label{
+	position: relative;
+}
+.selected-label input{
+	display: none;
+}
+.selected-label .icon{
+	width: 20px;
+  height: 20px;
+  border: solid 2px #e3e3e3;
+	border-radius: 50%;
+	position: absolute;
+	top: 15px;
+	left: 15px;
+	transition: .3s ease-in-out all;
+	transform: scale(1);
+	z-index: 1;
+}
+.selected-label .icon:before{
+	content: "\f00c";
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	font-family: "Font Awesome 5 Free";
+	font-weight: 900;
+	font-size: 12px;
+	color: #000;
+	text-align: center;
+	opacity: 0;
+	transition: .2s ease-in-out all;
+	transform: scale(2);
+}
+.selected-label input:checked + .icon{
+	background: #3057d5;
+	border-color: #3057d5;
+	transform: scale(1.2);
+}
+.selected-label input:checked + .icon:before{
+	color: #fff;
+	opacity: 1;
+	transform: scale(.8);
+}
+.selected-label input:checked ~ .selected-content{
+  box-shadow: 0 2px 4px 0 rgba(219, 215, 215, 0.5);
+  border: solid 2px #3057d5;
+}
 			</style>
 
 			@include('admin.empresas._partials.modal')
@@ -86,24 +336,20 @@
 								</div>
 							</div>
 						</div>
-            <div class="row">
+            <div class="grid-wrapper grid-col-2">
               @isset($model->servicos)              
                   @foreach ($model->servicos as $serv )                        
-                      <div class="col-md-4">            
-                          <div class="card card_servicos border-dark mb-3" data-servico_preco="{{$serv->preco}}" data-servico_id="{{$serv->id}}" data-servico_titulo="{{$serv->titulo}}">
-                              <div class="card-header bg-transparent border-dark">
-                                  <h5 class="card-title text-center">{{$serv->titulo}}</h5>
-                              </div>
-                              <img class="card-img-top img-fluid" src="{{ asset('servico/' . $serv->imagem ?? 'admin/img/doctors/Thumbs.db') }}" alt="Imagem do serviço">
-                              <div class="card-body text-dark">
-                                  <p class="card-text">{{$serv->descricao}}</p>
-                                  <p class="card-text text-primary" style="font-size: 16px;">{{$serv->preco}}</p>
-                              </div>
-                              <div class="card-footer bg-transparent border-dark">
-                                  <a href="#" class="btn btn-primary btn-block">Escolher</a>
-                              </div>
-                          </div>
-                      </div>
+                  <div class="selection-wrapper card_servicos" data-servico_preco="{{$serv->preco}}" data-servico_id="{{$serv->id}}" data-servico_titulo="{{$serv->titulo}}">
+                      <label for="selected-item-2" class="selected-label">
+                        <input type="radio"  name="selected-item" id="selected-item-2">
+                        <span class="icon"></span>
+                        <div class="selected-content">
+                          <img class="card-img-top img-fluid"  src="{{ asset('servico/' . $serv->imagem ?? 'admin/img/doctors/Thumbs.db') }}" height="200" width="150" alt="">
+                          <h4>{{$serv->titulo}}</h4>
+                          <h5>{{$serv->descricao}}</h5>
+                        </div>
+                      </label>
+                  </div>
                   @endforeach 
               @endisset
           </div>
