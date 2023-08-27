@@ -33,6 +33,7 @@
 		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 		@vite(['resources/css/app.css'])
 
+		
     </head>
     <body>
 	

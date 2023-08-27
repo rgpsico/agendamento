@@ -29,12 +29,13 @@
 
 		
 
-		<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
-		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
-		@vite(['resources/css/app.css'])
+		
+		{{-- @vite(['resources/css/app.css']) --}}
 
     </head>
     <body>
+
+	
 	
 		<!-- Main Wrapper -->
         <div class="main-wrapper">
@@ -86,8 +87,8 @@
 						</a>
 						<div class="dropdown-menu notifications">
 							<div class="topnav-dropdown-header">
-								<span class="notification-title">Notifications</span>
-								<a href="javascript:void(0)" class="clear-noti"> Clear All </a>
+								<span class="notification-title">Notificação</span>
+								<a href="javascript:void(0)" class="clear-noti"> Limpar </a>
 							</div>
 							<div class="noti-content">
 								<ul class="notification-list">
@@ -96,49 +97,15 @@
 											<div class="media d-flex">
 												<span class="avatar avatar-sm flex-shrink-0">
 													<img class="avatar-img rounded-circle" alt="User Image" src="{{asset('admin/img/doctors/doctor-thumb-01.jpg')}}">
-												</span>404 (No
+												</span> 404 
 												<div class="media-body flex-grow-1">
-													<p class="noti-details"><span class="noti-title">Dr. Ruby Perrin</span> Schedule <span class="noti-title">her appointment</span></p>
-													<p class="noti-time"><span class="notification-time">4 mins ago</span></p>
-												</div>
-											</div>
-										</a>
-									</li>
-									<li class="notification-message">
-										<a href="#">
-											<div class="media d-flex">
-												<span class="avatar avatar-sm flex-shrink-0">
-													<img class="avatar-img rounded-circle" alt="User Image" src="{{asset('admin/img/patients/patient1.jpg')}}">
-												</span>
-												<div class="media-body flex-grow-1">
-													<p class="noti-details"><span class="noti-title">Charlene Reed</span> has booked her appointment to <span class="noti-title">Dr. Ruby Perrin</span></p>
-													<p class="noti-time"><span class="notification-time">6 mins ago</span></p>
-												</div>
-											</div>
-										</a>
-									</li>
-									<li class="notification-message">
-										<a href="#">
-											<div class="media d-flex">
-												<span class="avatar avatar-sm flex-shrink-0">
-													<img class="avatar-img rounded-circle" alt="User Image" src="{{asset('admin/img/patients/patient2.jpg')}}">
-												</span>
-												<div class="media-body flex-grow-1">
-												<p class="noti-details"><span class="noti-title">Travis Trimble</span> sent a amount of $210 for his <span class="noti-title">appointment</span></p>
-												<p class="noti-time"><span class="notification-time">8 mins ago</span></p>
-												</div>
-											</div>
-										</a>
-									</li>
-									<li class="notification-message">
-										<a href="#">
-											<div class="media d-flex">
-												<span class="avatar avatar-sm flex-shrink-0">
-													<img class="avatar-img rounded-circle" alt="User Image" src="{{asset('admin/img/patients/patient3.jpg')}}">
-												</span>
-												<div class="media-body flex-grow-1">
-													<p class="noti-details"><span class="noti-title">Carl Kelly</span> send a message <span class="noti-title"> to his doctor</span></p>
-													<p class="noti-time"><span class="notification-time">12 mins ago</span></p>
+													<p class="noti-details">
+														<span class="noti-title">Dr. Ruby Perrin</span> Schedule 
+														<span class="noti-title">her appointment</span>
+													</p>
+													<p class="noti-time">
+														<span class="notification-time">4 mins ago</span>
+													</p>
 												</div>
 											</div>
 										</a>
@@ -146,7 +113,7 @@
 								</ul>
 							</div>
 							<div class="topnav-dropdown-footer">
-								<a href="#">View all Notifications</a>
+								<a href="#">Notificação</a>
 							</div>
 						</div>
 					</li>
@@ -163,8 +130,9 @@
 									<img src="{{asset('admin/img/profiles/avatar-01.jpg')}}" alt="User Image" class="avatar-img rounded-circle">
 								</div>
 								<div class="user-text">
-									<h6>TESTE</h6>
 									<p class="text-muted mb-0">Administrator</p>
+									<a class="dropdown-item" href="{{route('user.logout')}}">Logout</a>		</div>
+			
 								</div>
 							</div>
 							{{-- <a class="dropdown-item" href="{{route('home.show', ['id' => Auth::user()->empresa->id])}}">Perfil</a>
@@ -177,4 +145,32 @@
 				</ul>
 			 <x-adminaluno.sidebarescola/>
 			<!-- /Sidebar -->
+
+	<!-- jQuery -->
+<script src="{{asset('template/assets/js/jquery-3.6.4.min.js')}}"></script>
+		
+<!-- Bootstrap Bundle JS -->
+<script src="{{asset('template/assets/js/bootstrap.bundle.min.js')}}"></script>
+		
+<!-- Slimscroll JS -->
+<script src="{{asset('template/assets/plugins/slimscroll/jquery.slimscroll.min.js')}}"></script>
+		
+<!-- Datetimepicker JS -->
+<script src="{{asset('template/assets/js/moment.min.js')}}"></script>
+<script src="{{asset('template/assets/js/bootstrap-datetimepicker.min.js')}}"></script>
+		
+<!-- Full Calendar JS -->
+<script src="{{asset('template/assets/js/jquery-ui.min.js')}}"></script>
+<script src="{{asset('template/assets/plugins/fullcalendar/fullcalendar.min.js')}}"></script>
+<script src="{{asset('template/assets/plugins/fullcalendar/jquery.fullcalendar.js')}}"></script>
+		
+<!-- Feather Icon JS -->
+<script src="{{asset('template/assets/js/feather.min.js')}}"></script>
+
+<!-- Mobile Input -->
+<script src="{{asset('template/assets/plugins/intltelinput/js/intlTelInput.js')}}"></script>
+
+<!-- Custom JS -->
+<script src="{{asset('template/assets/js/script.js')}}"></script>
+
 			

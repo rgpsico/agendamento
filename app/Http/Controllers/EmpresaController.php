@@ -300,9 +300,11 @@ class EmpresaController extends Controller
     }
 
 
-    public function fotos($userId)
+    public function fotos()
     {
-        $model = EmpresaGaleria::where('empresa_id', $userId)->get();
+
+        $empresa_id = Auth::user()->empresa->id;
+        $model = EmpresaGaleria::where('empresa_id', $empresa_id)->get();
         return view(
             'admin.empresas.fotos',
             [
@@ -318,6 +320,8 @@ class EmpresaController extends Controller
 
         $images = $request->file('image');
 
+        $empresa_id = Auth::user()->empresa->id;
+
         // Limita a quantidade de fotos a 5
         if (count($images) > 5) {
             return back()->with('error', 'Você pode enviar no máximo 5 imagens.');
@@ -329,7 +333,8 @@ class EmpresaController extends Controller
             return back()->with('error', 'O maximo de imagens que voce pode ter são cinco imagens');
         }
 
-        if ($request->hasfile('image')) {
+
+        if ($request->hasfile('image') && $request->empresa_id) {
 
             foreach ($request->file('image') as $key => $image) {
                 $name = time() . $key . '.' . $image->getClientOriginalExtension();
@@ -338,7 +343,7 @@ class EmpresaController extends Controller
 
                 $empresaGaleria = new EmpresaGaleria();  // supondo que EmpresaGaleria é seu modelo para a galeria
                 $empresaGaleria->image = $name;
-                $empresaGaleria->empresa_id = $request->empresa_id;
+                $empresaGaleria->empresa_id = $empresa_id;
                 $empresaGaleria->save();
             }
         }
