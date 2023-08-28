@@ -147,10 +147,10 @@ formData.push({ name: "hora_aula", value: horaAula });
         success: function (response) {
 			console.log(response)
           
-if(response) {
-    const baseRoute = "{{ route('home.checkoutsucesso', ['id' => "+response.content.id+"]) }}";
-    window.location.href = baseRoute.replace('USER_ID', response.content.id);
-}
+		if(response) {
+			const baseRoute = "{{ route('home.checkoutsucesso', ['id' => "+response.content.id+"]) }}";
+			window.location.href = baseRoute.replace('USER_ID', response.content.id);
+		}
 
 			
         },
