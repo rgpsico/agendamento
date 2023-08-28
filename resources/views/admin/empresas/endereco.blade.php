@@ -14,17 +14,17 @@
                     <form action="{{route('empresa.update_endereco',['userId' => Auth::user()->id ])}}" method="POST" enctype="multipart/form-data">
                         @csrf
                       
-                        <x-text-input name="cep" size="30" label="Cep" :value="$model->endereco ?? '' " />
+                        <x-text-input name="cep" size="30" label="Cep" :value="$model->endereco->cep ?? '' " />
                            
-                        <x-text-input name="estado" size="30" label="Estado" :value="$model->endereco ?? '' " />
+                        <x-text-input name="estado" size="30" label="Estado" :value="$model->endereco->estado ?? '' " />
                         
-                        <x-text-input name="uf" size="30" label="Uf" :value="$model->endereco ?? ''" />
+                        <x-text-input name="uf" size="30" label="Uf" :value="$model->endereco->uf ?? ''" />
                     
-                        <x-text-input name="pais" size="30" label="Pais" :value="$model->endereco ?? '' " />
+                        <x-text-input name="pais" size="30" label="Pais" :value="$model->endereco->pais ?? '' " />
 
-                        <x-text-input name="cidade" size="30" label="Cidade" :value="$model->endereco ?? ''" />
+                        <x-text-input name="cidade" size="30" label="Cidade" :value="$model->endereco->cidade ?? ''" />
         
-                        <x-text-input name="endereco" size="30" label="Endereco" :value="$model->endereco ?? ''" />
+                        <x-text-input name="endereco" size="30" label="Endereco" :value="$model->endereco->endereco ?? ''" />
                      
                     </div>
                     <input type="hidden"  name="empresa_id" value="{{$model->id}}" />   

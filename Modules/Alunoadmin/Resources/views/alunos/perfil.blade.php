@@ -33,7 +33,11 @@
                 <div class="profile-menu">
                     <ul class="nav nav-tabs nav-tabs-solid">
                         <li class="nav-item">
-                            <a class="nav-link active" data-bs-toggle="tab" href="#per_details_tab">Sobre</a>
+                            <a class="nav-link active" data-bs-toggle="tab" href="#foto">Foto</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link " data-bs-toggle="tab" href="#per_details_tab">Sobre</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link"  data-bs-toggle="tab" href="#endereco_tab">Endereço</a>
@@ -170,23 +174,39 @@
                         
                         
                     </div>
+
+
+                    <div id="foto" class="tab-pane fade">
+                        
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Alterar Senha</h5>
+                                <div class="row">
+                                    <div class="col-md-10 col-lg-6">
+                                     
+                                            <form action="{{route('aluno.upload')}}" method="POST" enctype="multipart/form-data">
+                                                @csrf
+                                                <input type="hidden" name="usuario_id" value="{{Auth::user()->aluno->id}}">
+                                                <div class="form-group row">
+                                                    <div class="col-sm-10">
+                                                        <input type="file" class="form-control" name="image[]" multiple required>        </div>
+                                                    <div class="col-sm-2">
+                                                        <button type="submit" class="btn btn-success">Enviar</button>
+                                                    </div>
+                                                </div>                        
+                                            </form>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                        
+                        
+                    </div>
                     
                 </div>
             </div>
         </div>  
 
-        <script src="{{asset('admin/js/jquery-3.6.4.min.js')}}"></script>
-		
-		<!-- Bootstrap Core JS -->
-        <script src="{{asset('admin/js/bootstrap.bundle.min.js')}}"></script>
-		
-		<!-- Slimscroll JS -->
-        <script src="{{asset('admin/plugins/slimscroll/jquery.slimscroll.min.js')}}"></script>
-
-        <!-- Bootstrap Datetimepicker JS -->
-        <script  src="{{asset('admin/js/moment.min.js')}}"></script>
-		<script  src="{{asset('admin/js/bootstrap-datetimepicker.min.js')}}"></script>
-		
-		<!-- Custom JS -->
-		<script  src="{{asset('admin/js/script.js')}}"></script>
+      
 @endsection

@@ -92,22 +92,29 @@
 </style>
 <div class="page-wrapper" style="min-height: 239px;">
     <div class="content container-fluid">
-    
         <!-- Page Header -->
         <x-breadcrumb-aluno title="{{$title}}"/>
-        
+       
         <div class="row">
             
-<div class="container gallery-container">
-
+            <form action="{{route('aluno.upload')}}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <input type="hidden" name="usuario_id" value="{{Auth::user()->aluno->id}}">
+                <div class="form-group row">
+                    <div class="col-sm-10">
+                        <input type="file" class="form-control" name="image[]" multiple required>        </div>
+                    <div class="col-sm-2">
+                        <button type="submit" class="btn btn-success">Enviar</button>
+                    </div>
+                </div>                        
+             
+            </form>
+    <div class="container gallery-container">
     <h1>Fotos</h1>
-
     <p class="page-description text-center"></p>
-    
     <div class="tz-gallery">
-
+        <x-alert/>
         <div class="row">
-
             @foreach ($model as $value )
             <div class="col-sm-12 col-md-4">
                 <a class="lightbox" href="{{asset('aluno_galeria/'.$value->image)}}">
@@ -115,12 +122,7 @@
                 </a>
             </div>
         @endforeach
-        
-           
-           
-
-        </div>
-
+       </div>
     </div>
 
 </div>

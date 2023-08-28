@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Aluno;
+use App\Models\Aluno_Galeria;
 use App\Models\AlunoEndereco;
 use App\Models\AlunoProfessor;
 use App\Models\Alunos;
@@ -231,5 +232,42 @@ class AlunosController extends Controller
 
             return response()->json(['message' => 'Excluído com sucesso'], 404);
         }
+    }
+    public function uploadImage(Request $request, Aluno_Galeria $empresaGaleria)
+    {
+
+        $images = $request->file('image');
+
+        $usuario_id = Auth::user()->aluno->id;
+
+        // Limita a quantidade de fotos a 5
+        if (count($images) > 5) {
+            return back()->with('error', 'Você pode enviar no máximo 5 imagens.');
+        }
+
+        $numeroDeImagens = Aluno_Galeria::where('usuario_id', $request->usuario_id)->count();
+
+        if ($numeroDeImagens >= 5) {
+            return back()->with('error', 'O maximo de imagens que voce pode ter são cinco imagens');
+        }
+
+
+
+        if ($request->hasfile('image') && $request->usuario_id) {
+
+
+            foreach ($request->file('image') as $key => $image) {
+                $name = time() . $key . '.' . $image->getClientOriginalExtension();
+                $destinationPath = public_path('/aluno_galeria');
+                $image->move($destinationPath, $name);
+
+                $Aluno_Galeria = new Aluno_Galeria();  // supondo que EmpresaGaleria é seu modelo para a galeria
+                $Aluno_Galeria->image = $name;
+                $Aluno_Galeria->usuario_id = $usuario_id;
+                $Aluno_Galeria->save();
+            }
+        }
+
+        return back()->with('success', 'Image Enviada com sucesso');
     }
 }

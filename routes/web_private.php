@@ -50,7 +50,7 @@ Route::prefix('cliente')->middleware('auth')->group(function () {
         Route::post('/{userId}/profile', [EmpresaController::class, 'profile'])->name('empresa.profile');
         Route::delete('/{id}/destroy', [EmpresaController::class, 'destroy'])->name('empresa.destroy');
         Route::get('/{userId}/config', [EmpresaController::class, 'configuracao'])->name('empresa.configuracao');
-        Route::get('/{userId}/fotos', [EmpresaController::class, 'fotos'])->name('empresa.fotos');
+        Route::get('/fotos', [EmpresaController::class, 'fotos'])->name('empresa.fotos');
         Route::get('/{userId}/endereco_empresa', [EmpresaController::class, 'endereco'])->name('empresa.endereco');
         Route::post('/uploadEmpresa', [EmpresaController::class, 'uploadImage'])->name('empresa.upload');
         Route::delete('/{id}/excluirImagens', [EmpresaController::class, 'destroy'])->name('gallery.destroy');
@@ -65,6 +65,7 @@ Route::prefix('cliente')->middleware('auth')->group(function () {
             Route::post('/post', [AlunosController::class, 'store'])->name('alunos.store');
             Route::delete('/{id}/destroy', [AlunosController::class, 'destroy'])->name('alunos.destroy');
             Route::get('/config', [AlunosController::class, 'configuracao'])->name('alunos.configuracao');
+            Route::post('/uploadAluno', [AlunosController::class, 'uploadImage'])->name('aluno.upload');
         });
 
         Route::group(['prefix' => '/dashboard'], function () {
