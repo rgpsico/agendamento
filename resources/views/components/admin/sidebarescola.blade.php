@@ -35,7 +35,7 @@
                     </ul>
                 </li>
               
-                @isset(Auth::user()->professor->id)
+                @isset(Auth::user()->empresa->user_id)
                 <li> 
                    
                     <a href="{{route('empresa.disponibilidade')}}">
