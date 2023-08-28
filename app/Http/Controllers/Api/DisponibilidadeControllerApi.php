@@ -21,7 +21,7 @@ class DisponibilidadeControllerApi extends Controller
     {
         $day = $request->input('day');
 
-        // procure os horários disponíveis para o dia
+
         $schedules = Disponibilidade::where('id_dia', $day)->get();
 
         $timeslots = [];

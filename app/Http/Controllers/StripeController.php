@@ -102,6 +102,8 @@ class StripeController extends Controller
 
         $data_agendamento_formato_eua = Carbon::createFromFormat('j M. Y', $data_agendamento)->format('Y-m-d');
 
+
+
         $agendamento = Agendamento::create([
             'aluno_id' => $aluno_id,
             'modalidade_id' => $modalidade_id,

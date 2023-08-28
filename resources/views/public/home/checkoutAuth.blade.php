@@ -30,7 +30,7 @@
 											
 												<input type="hidden" name="aluno_id" value="{{Auth::user()->aluno->id ?? Auth::user()->professor->id }}">
 												<input type="hidden" name="professor_id" value="{{$professor->id}}">
-												<input type="hidden" name="modalidade_id" value="{{$professor->modalidade_id}}">
+												<input type="hidden" name="modalidade_id" value="{{$professor->modalidade_id ?? 1}}">
 												<input type="hidden" id="data_aula" name="data_aula" value="">
 												<input type="hidden" id="hora_aula" name="hora_aula" value="">
 												<input type="hidden" id="valor_aula" name="valor_aula" value="">
