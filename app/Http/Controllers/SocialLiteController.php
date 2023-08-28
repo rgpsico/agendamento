@@ -42,8 +42,9 @@ class SocialLiteController extends Controller
                 ]);
 
                 Professor::create([
-                    ''
-                ])
+                    'usuario_id' => $user->id,
+                    'modalidade_id' => 1
+                ]);
             }
 
 
