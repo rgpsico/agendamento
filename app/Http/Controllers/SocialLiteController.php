@@ -43,7 +43,9 @@ class SocialLiteController extends Controller
 
                 Professor::create([
                     'usuario_id' => $user->id,
-                    'modalidade_id' => 1
+                    'modalidade_id' => 1,
+                    'sobre' => 'Professor'
+
                 ]);
             }
 
