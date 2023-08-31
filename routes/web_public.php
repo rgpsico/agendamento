@@ -4,7 +4,7 @@ use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/registrar_escola', function () {
+Route::get('/registerprof', function () {
     return view('auth.registerProf');
 });
 
