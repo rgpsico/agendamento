@@ -33,12 +33,16 @@
 				  <div class="form-group">
 					<label for="">Modalidade</label>
 						<select name="modalidade_id" class="form-control" id="modalidade_id">
+							@isset($modalidade)
+								
+						
 							@forelse ($modalidade as  $value)
 							<option value="{{$value->id}}">{{$value->nome}}</option>
 							@empty
 							<x-text-input type='hidden' name="modalidade_id" size="30"value="1"/>
 				
-							@endforelse					
+							@endforelse	
+							@endisset				
 						</select>
 				  </div>
 				 
