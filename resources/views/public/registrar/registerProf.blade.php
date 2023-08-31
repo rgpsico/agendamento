@@ -33,16 +33,12 @@
 				  <div class="form-group">
 					<label for="">Modalidade</label>
 						<select name="modalidade_id" class="form-control" id="modalidade_id">
-							@isset($modalidade)
-								
-						
-							@forelse ($modalidade as  $value)
-							<option value="{{$value->id}}">{{$value->nome}}</option>
-							@empty
-							<x-text-input type='hidden' name="modalidade_id" size="30"value="1"/>
-				
-							@endforelse	
-							@endisset				
+							
+					
+							@foreach ($modalidade as  $value)
+								<option value="{{$value->id}}">{{$value->nome}}</option>
+							@endforeach 
+										
 						</select>
 				  </div>
 				 
@@ -70,8 +66,11 @@
 				</div> --}}
 				<!-- /Social Login -->
   
-				<div class="text-center dont-have">Eu já tenho uma conta?
-				  <a href="{{route('home.login')}}">Login</a>
+				<div class="col-6">
+					<a href="{{route('login.google')}}" class="btn btn-google w-100">
+						<i class="fab fa-google me-1">
+							</i> Login
+						</a>
 				</div>
 			  </div>
 			</div>
