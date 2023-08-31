@@ -20,6 +20,7 @@ class PagamentoController extends Controller
 
         $aluno_id = $request->aluno_id;
         $professor_id = $request->professor_id;
+
         $valor_aula = $request->valor_aula;
 
         $modalidade_id = $request->modalidade_id;

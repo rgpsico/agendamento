@@ -20,7 +20,7 @@ Route::get('/test', function () {
 });
 
 Route::post('/deploy', function () {
-    $secret = "157121214"; // Use a mesma que foi usada no webhook do GitHub
+    $secret = "123"; // Use a mesma que foi usada no webhook do GitHub
     $signature = hash_hmac('sha256', file_get_contents("php://input"), $secret);
 
     if (hash_equals($signature, $_SERVER['HTTP_X_HUB_SIGNATURE'])) {

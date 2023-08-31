@@ -74,20 +74,9 @@
 									
 								@else
 									<li class="login-link">
-										<a href="{{route('home.login')}}">Login</a>
+										<a href="{{route('user.login')}}">Login</a>
 									</li>
-									<li class="register-btn">
-										<a href="{{route('home.registerProf')}}" target="_blank" class="btn reg-btn">
-											<i class="feather-user"></i>Registrar Professor
-										</a>
-									</li>
-
-									<li class="register-btn">
-										<a href="{{route('home.registerAluno')}}" class="btn reg-btn">
-											<i class="feather-user"></i>Registrar Aluno
-										</a>
-									</li>
-									<li class="register-btn">
+							    	<li class="register-btn">
 										<a href="{{route('home.login')}}" class="btn btn-primary log-btn">
 											<i class="feather-lock"></i>Login
 										</a>

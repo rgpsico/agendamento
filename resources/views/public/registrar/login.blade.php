@@ -16,12 +16,12 @@
 								<div class="row align-items-center justify-content-center">
 									<div class="col-md-7 col-lg-6 login-left">
 										<img src="{{asset('admin/img/register.png')}}"
-										 class="img-fluid" alt="Login Professor">	
+										 class="img-fluid" alt="Login">	
 									</div>
 									<div class="col-md-12 col-lg-6 login-right">
 										<div class="login-header">
 											<x-alert/>
-											<h3>Login <span>Professor</span></h3>
+											<h3>Login</h3>
 										</div>
 										<form action="{{route('user.login')}}" method="POST">
 											@csrf
@@ -64,7 +64,7 @@
 												</div>
 											</div>
 											<div class="text-center dont-have">Não tenho conta ainda 
-												<a href="{{route('home.registerProf')}}">Registrar</a></div>
+												<a href="{{route('home.registerAluno')}}">Registrar</a></div>
 										</form>
 									</div>
 								</div>

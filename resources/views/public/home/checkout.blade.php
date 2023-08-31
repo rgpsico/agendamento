@@ -148,8 +148,8 @@ formData.push({ name: "hora_aula", value: horaAula });
 			console.log(response)
           
 		if(response) {
-			const baseRoute = "{{ route('home.checkoutsucesso', ['id' => "+response.content.id+"]) }}";
-			window.location.href = baseRoute.replace('USER_ID', response.content.id);
+			const baseRoute = "{{ route('home.checkoutsucesso', ['id' => "+response.id+"]) }}";
+			window.location.href = baseRoute.replace('USER_ID', response.id);
 		}
 
 			
