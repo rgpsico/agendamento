@@ -109,29 +109,30 @@
 			</div>
 			<script>
 	$("#paymentForm").on('submit', function(e) {
-    e.preventDefault(); // para impedir o envio padrão do formulário
+    e.preventDefault(); 
 
-    // Pega os dados do formulário
+    
     var formData = $(this).serializeArray(); 
 
-    // Adiciona os dados do localStorage
+    
 	var servicos = localStorage.getItem('servicos');
-	var servicosArray = JSON.parse(servicos); // Converte a string JSON para um array JavaScript
-	 
+	var servicosArray = JSON.parse(servicos); 	 
 	var total = 0;
-for (var i = 0; i < servicosArray.length; i++) {
-    total += parseFloat(servicosArray[i].preco);
-}
 
-var data = localStorage.getItem('data');
-var horaAula = localStorage.getItem('horaDaAula');
+	for (var i = 0; i < servicosArray.length; i++) {
+		total += parseFloat(servicosArray[i].preco);
+	}
 
-formData.push({ name: "servicos", value: servicosArray });
-formData.push({ name: "total", value: total });
-formData.push({ name: "data_aula", value: data });
-formData.push({ name: "hora_aula", value: horaAula });
-    // Converta formData em um objeto para podermos manipulá-lo facilmente
+	var data = localStorage.getItem('data');
+	var horaAula = localStorage.getItem('horaDaAula');
+
+	formData.push({ name: "servicos", value: servicosArray });
+	formData.push({ name: "total", value: total });
+	formData.push({ name: "data_aula", value: data });
+	formData.push({ name: "hora_aula", value: horaAula });
+		
     var data = {};
+	
     $(formData).each(function(index, obj){
         data[obj.name] = obj.value;
     });

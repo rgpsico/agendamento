@@ -514,8 +514,7 @@ $(document).on('click', '.day-slot li', function(e) {
 	$('.dia_da_semana').val(dayOfWeek)
 	$('.data').val(date)
     
-	console.log('Dia da semana:', dayOfWeek);
-    console.log('Data:', date);
+	
   }
 });
 
