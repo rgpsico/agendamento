@@ -29,7 +29,7 @@ class PagamentoController extends Controller
         $originalDate = $request->data_aula;
         $hora_aula = $request->hora_aula;
 
-        dd($hora_aula);
+
         $data_agendamento_formato_eua = PagamentoController::convertToUSFormat($originalDate) . ' ' . $hora_aula;
 
 
