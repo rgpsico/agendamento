@@ -92,7 +92,7 @@
 
 			</div>		
 			<!-- /Page Content -->
-			<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+			<script src="{{asset('admin/js/jquery-3.6.3.min.js')}}"></script>
 <script>
     $(document).on('click', ".buscar_empresa", function() {
         $('.listar_empresas').empty();

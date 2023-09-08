@@ -6,7 +6,7 @@ use App\Http\Controllers\Api\AulasControllerApi;
 use App\Http\Controllers\Api\AuthControllerApi;
 use App\Http\Controllers\Api\DiaDaSemanaControllerApi;
 use App\Http\Controllers\Api\DisponibilidadeControllerApi;
-use App\Http\Controllers\Api\EmpresaController;
+
 use App\Http\Controllers\Api\EmpresaControllerApi;
 use App\Http\Controllers\Api\ProfessoresControllerApi;
 use App\Http\Controllers\Api\ServicoControllerApi;
@@ -16,16 +16,6 @@ use App\Http\Controllers\StripeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
-*/
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

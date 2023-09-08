@@ -124,7 +124,7 @@ for (var i = 0; i < servicosArray.length; i++) {
 }
 
 var data = localStorage.getItem('data');
-var horaAula = localStorage.getItem('horaAula');
+var horaAula = localStorage.getItem('horaDaAula');
 
 formData.push({ name: "servicos", value: servicosArray });
 formData.push({ name: "total", value: total });
@@ -147,10 +147,12 @@ formData.push({ name: "hora_aula", value: horaAula });
         success: function (response) {
 			console.log(response)
           
-		if(response) {
-			const baseRoute = "{{ route('home.checkoutsucesso', ['id' => "+response.id+"]) }}";
-			window.location.href = baseRoute.replace('USER_ID', response.id);
-		}
+	       
+		if(response && response.content && response.content.id) {
+            const baseUrl = "{{ route('home.checkoutsucesso', ['id' => 'USER_ID']) }}";
+            const redirectTo = baseUrl.replace('USER_ID', response.content.id);
+            window.location.href = redirectTo;
+        }
 
 			
         },

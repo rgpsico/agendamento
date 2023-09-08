@@ -28,13 +28,13 @@
 												@endphp
 												
 											
-												<input type="hidden" name="aluno_id" value="{{Auth::user()->aluno->id ?? Auth::user()->professor->id }}">
-												<input type="hidden" name="professor_id" value="{{$professor->id}}">
-												<input type="hidden" name="modalidade_id" value="{{$professor->modalidade_id ?? 1}}">
-												<input type="hidden" id="data_aula" name="data_aula" value="">
-												<input type="hidden" id="hora_aula" name="hora_aula" value="">
-												<input type="hidden" id="valor_aula" name="valor_aula" value="">
-												<input type="hidden" id="titulo" name="titulo" value="">
+												<input type="text" name="aluno_id" value="{{Auth::user()->aluno->id ?? Auth::user()->professor->id }}">
+												<input type="text" name="professor_id" value="{{$professor->id}}">
+												<input type="text" name="modalidade_id" value="{{$professor->modalidade_id ?? 1}}">
+												<input type="text" id="data_aula" name="data_aula" value="" placeholder="data_aula">
+												<input type="text" id="hora_aula" name="hora_aula" value="" placeholder="hora_aula">
+												<input type="text" id="valor_aula" name="valor_aula" value="" placeholder="valor_aula">
+												<input type="text" id="titulo" name="titulo" value="" placeholder="titulo">
 										
 												
 												
@@ -58,7 +58,7 @@
 											</div>
 										</div>
 									</form>
-									<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+									<script src="{{asset('admin/js/jquery-3.6.3.min.js')}}"></script>
 
 									<script src="https://js.stripe.com/v3/"></script>
 									<script>

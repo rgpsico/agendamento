@@ -28,7 +28,7 @@ class TreinoStripeRequest extends FormRequest
             'ano_vencimento' => 'required|digits:2',
             'cvv' => 'required|digits_between:2,4',
             'nome' => 'required|string',
-            'email' => 'required|string|email|max:255|unique:usuarios,email',
+            // 'email' => 'required|string|email|max:255|unique:usuarios,email',
             'telefone' => 'required|string',
             'servicos' => 'required|array',
             'servicos.*.id' => 'required|integer',

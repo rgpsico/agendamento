@@ -75,6 +75,7 @@ class StripeController extends Controller
 
 
 
+
         $user = new Usuario();
         $user->nome = $request->nome;
         $user->email = $request->email;
@@ -94,22 +95,20 @@ class StripeController extends Controller
         $modalidade_id = $request->aula_id ??  1;
 
         $professor = Professor::with('usuario')->where('usuario_id', $professor_id)->first();
+        $data_agendamento_formato_eua = PagamentoController::convertToUSFormat($data_agendamento) . ' ' . $hora_agendamento;
 
         if (!$professor) {
-            // Você pode retornar um erro ou redirecionar de volta com uma mensagem de erro
             return redirect()->back()->with('erro', 'Professor não encontrado');
         }
-
-        $data_agendamento_formato_eua = Carbon::createFromFormat('j M. Y', $data_agendamento)->format('Y-m-d');
-
 
 
         $agendamento = Agendamento::create([
             'aluno_id' => $aluno_id,
             'modalidade_id' => $modalidade_id,
             'professor_id' => $professor->id, // Aqui você deve usar o id do professor, não o usuario_id
-            'data_da_aula' => $data_agendamento_formato_eua . ' ' . $hora_agendamento,
-            'valor_aula' => $request->total
+            'data_da_aula' => $data_agendamento_formato_eua,
+            'valor_aula' => $request->total,
+            'horario' => $hora_agendamento
         ]);
 
         $res = $stripe->tokens->create([
@@ -134,11 +133,46 @@ class StripeController extends Controller
         $nome_do_professor = $professor->usuario->nome;
 
         if ($response->status === 'succeeded') {
-
             return response()->json(['content' => $professor]);
         } else {
             // Lógica para tratamento de erro, caso o pagamento não tenha sido bem-sucedido
         }
+    }
+
+    public static function convertToUSFormat($originalDate)
+    {
+        // Remova pontos após os meses
+        $originalDate = str_replace(
+            [' jan. ', ' fev. ', ' mar. ', ' abr. ', ' mai. ', ' jun. ', ' jul. ', ' ago. ', ' set. ', ' out. ', ' nov. ', ' dez. '],
+            [' jan ', ' fev ', ' mar ', ' abr ', ' mai ', ' jun ', ' jul ', ' ago ', ' set ', ' out ', ' nov ', ' dez '],
+            $originalDate
+        );
+
+        // Mapeie meses em português para seus números correspondentes
+        $months = [
+            'jan' => '01',
+            'fev' => '02',
+            'mar' => '03',
+            'abr' => '04',
+            'mai' => '05',
+            'jun' => '06',
+            'jul' => '07',
+            'ago' => '08',
+            'set' => '09',
+            'out' => '10',
+            'nov' => '11',
+            'dez' => '12',
+        ];
+
+
+        // Separe a string por espaços
+        $parts = explode(' ', $originalDate);
+
+        // Converta o mês textual para o número correspondente
+        $monthNumber = $months[strtolower($parts[1])];
+
+        // Retorne a data no formato "Y-m-d"
+        return "{$parts[2]}-{$monthNumber}-{$parts[0]}";
     }
 
 

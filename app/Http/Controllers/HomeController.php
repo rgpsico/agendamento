@@ -137,9 +137,13 @@ class HomeController extends Controller
         );
     }
 
-    public function checkoutSucesso($user_id)
+    public function checkoutSucesso($professor_id)
     {
-        $model = Professor::with('usuario')->where('id', $user_id)->first();
+        $professor = Professor::with('usuario')->where('id', $professor_id)->first();
+
+        // Buscando o último agendamento do professor e aluno.
+        $agendamento = Agendamento::where('professor_id', $professor_id)->latest()->first();
+        $aluno = $agendamento->aluno;  // Acessando a relação aluno no modelo Agendamento.
 
         return view(
             $this->view . '.checkoutsucesso',
@@ -147,11 +151,13 @@ class HomeController extends Controller
                 'pageTitle' => $this->pageTitle,
                 'view' => $this->view,
                 'route' => $this->route,
-                'model'  => $model,
-                'nome_professor' => $model->usuario->nome
+                'professor' => $professor,
+                'aluno' => $aluno,
+                'agendamento' => $agendamento
             ]
         );
     }
+
 
     public function registerProf()
     {

@@ -14,6 +14,7 @@ class PagamentoController extends Controller
     {
 
 
+
         Stripe::setApiKey(env('STRIPE_SECRET'));
 
         $token = $request->stripeToken;
@@ -28,6 +29,7 @@ class PagamentoController extends Controller
         $originalDate = $request->data_aula;
         $hora_aula = $request->hora_aula;
 
+        dd($hora_aula);
         $data_agendamento_formato_eua = PagamentoController::convertToUSFormat($originalDate) . ' ' . $hora_aula;
 
 
@@ -50,6 +52,7 @@ class PagamentoController extends Controller
                     'professor_id' => $professor_id, // Você precisa definir essa variável
                     'data_da_aula' => $data_agendamento_formato_eua, // Você precisa definir essa variável
                     'valor_aula' => $valor_aula,
+                    'horario' => $hora_aula
                 ]);
 
                 // Aqui você pode redirecionar o usuário para uma página de agradecimento, por exemplo
@@ -91,6 +94,7 @@ class PagamentoController extends Controller
             'nov' => '11',
             'dez' => '12',
         ];
+
 
         // Separe a string por espaços
         $parts = explode(' ', $originalDate);

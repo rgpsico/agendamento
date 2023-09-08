@@ -147,20 +147,26 @@
 			<!-- /Sidebar -->
 
 	<!-- jQuery -->
-<script src="{{asset('template/assets/js/jquery-3.6.4.min.js')}}"></script>
-		
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<!-- Estilos do jQuery UI -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
+
+<!-- Scripts do jQuery UI -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
 <!-- Bootstrap Bundle JS -->
-<script src="{{asset('template/assets/js/bootstrap.bundle.min.js')}}"></script>
+<script src="{{asset('admin/js/bootstrap.bundle.min.js')}}"></script>
 		
 <!-- Slimscroll JS -->
-<script src="{{asset('template/assets/plugins/slimscroll/jquery.slimscroll.min.js')}}"></script>
+<script src="{{asset('admin/plugins/slimscroll/jquery.slimscroll.min.js')}}"></script>
 		
 <!-- Datetimepicker JS -->
 <script src="{{asset('template/assets/js/moment.min.js')}}"></script>
 <script src="{{asset('template/assets/js/bootstrap-datetimepicker.min.js')}}"></script>
 		
 <!-- Full Calendar JS -->
-<script src="{{asset('template/assets/js/jquery-ui.min.js')}}"></script>
+<script src="{{asset('admin/js/jquery-ui.min.js')}}"></script>
 <script src="{{asset('template/assets/plugins/fullcalendar/fullcalendar.min.js')}}"></script>
 <script src="{{asset('template/assets/plugins/fullcalendar/jquery.fullcalendar.js')}}"></script>
 		
