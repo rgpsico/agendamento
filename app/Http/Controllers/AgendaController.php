@@ -44,6 +44,12 @@ class AgendaController extends Controller
 
     public function calendario()
     {
+        if (isset(Auth::user()->professor->id)) {
+            $professor_id = Auth::user()->professor->id; // suponho que o professor esteja logado.
+
+            // Obtenha o professor junto com seus alunos
+            $professor = Professor::with('alunos')->find($professor_id);
+        }
 
         return view(
             $this->view . '.calendario',
@@ -55,6 +61,7 @@ class AgendaController extends Controller
             ]
         );
     }
+
 
     public function treino()
     {

@@ -1,11 +1,12 @@
 <x-admin.layout title="Agendar de Alunos">
    
    <!-- Modal -->
+<!-- Modal -->
 <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="eventModalLabel">Adicionar Evento</h5>
+        <h5 class="modal-title" id="eventModalLabel">Agendar Aula</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -13,8 +14,12 @@
       <div class="modal-body">
         <form id="eventForm">
           <div class="form-group">
-            <label for="eventTitle">Título do Evento</label>
-            <input type="text" class="form-control" id="eventTitle">
+            <label for="selectAluno">Aluno</label>
+            <select class="form-control" id="selectAluno">
+              @foreach($model->alunos as $aluno)
+                  <option value="{{ $aluno->usuario->id }}">{{ $aluno->usuario->nome }}</option>
+              @endforeach
+          </select>
           </div>
           <div class="form-group">
             <label for="eventStart">Data Inicial</label>
@@ -28,11 +33,12 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-        <button type="button" class="btn btn-primary" id="saveEvent">Salvar</button>
+        <button type="button" class="btn btn-primary" id="saveEvent">Agendar</button>
       </div>
     </div>
   </div>
 </div>
+
 
    
     <div class="page-wrapper">
