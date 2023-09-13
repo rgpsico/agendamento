@@ -2,7 +2,7 @@
   <div class="page-header">
     <div class="row">
         <div class="col-6">
-            <h3 class="page-title">Bem vindo ROGER NEVES</h3>
+            <h3 class="page-title">Bem vindo <b class="" style="text-transform: capitalize;">{{Auth::user()->nome ?? 'Usuário'}}</b></h3>
             <ul class="breadcrumb">
                 <li class="breadcrumb-item">
                     <a href="">Admin</a>

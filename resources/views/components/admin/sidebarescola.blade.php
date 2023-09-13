@@ -52,18 +52,28 @@
                     </a>
                 </li>
                 @endisset
-                <li> 
-                    <a href="{{route('agenda.index')}}">
-                        <i class="fe fe-calendar"></i><span>Agenda</span>
+               
+
+                <li class="submenu">
+                    <a href="" class="">
+                        <i class="fe fe-calendar"></i>
+                        <span>Agenda</span> 
+                        <span class="menu-arrow"></span>
                     </a>
-                </li>    
+                    <ul style="display: none;">
+                        <li><a href="{{route('agenda.index')}}">Listar Aulas</a></li>
+                        <li><a href="{{route('agenda.calendario')}}">Calendario</a></li>
+                    </ul>
+                </li>
             
+                @isset(Auth::user()->empresa->id)
                 <li> 
                     <a href="{{route('empresa.fotos',['userId' => Auth::user()->id])}}">
                         <i class="fe fe-camera"></i>
                         <span>Fotos</span>
                     </a>
                 </li>
+                @endisset
 
                 {{-- <li> 
                     <a href="{{route('treino')}}">

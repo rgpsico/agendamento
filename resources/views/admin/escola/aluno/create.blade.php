@@ -23,7 +23,7 @@
 							
 								<div class="card">
 									<div class="card-header">
-										<h4 class="card-title">General</h4>
+										<h4 class="card-title">Cadastrar Aluno</h4>
 									</div>
 									<div class="card-body">
 										<div class="card-body">

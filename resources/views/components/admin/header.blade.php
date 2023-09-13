@@ -25,6 +25,7 @@
 		
 		<!-- Main CSS -->
         <link rel="stylesheet" href="{{asset('admin/css/custom.css')}}">
+		<link href='https://fullcalendar.io/releases/fullcalendar/3.9.0/fullcalendar.min.css' rel='stylesheet' />
 
 		<meta name="csrf-token" content="{{ csrf_token() }}">
 

@@ -74,6 +74,7 @@ Route::prefix('cliente')->middleware('auth')->group(function () {
 
         Route::group(['prefix' => '/agenda'], function () {
             Route::get('/', [AgendaController::class, 'index'])->name('agenda.index');
+            Route::get('/calendario', [AgendaController::class, 'calendario'])->name('agenda.calendario');
             Route::get('/{id}/show', [AgendaController::class, 'show'])->name('agenda.show');
             Route::get('/create', [AgendaController::class, 'create'])->name('agenda.create');
             Route::get('/{id}/edit', [AgendaController::class, 'edit'])->name('agenda.edit');

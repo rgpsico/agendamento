@@ -42,6 +42,20 @@ class AgendaController extends Controller
         );
     }
 
+    public function calendario()
+    {
+
+        return view(
+            $this->view . '.calendario',
+            [
+                'pageTitle' => $this->pageTitle,
+                'view' => $this->view,
+                'route' => $this->route,
+                'model' => $professor ?? []
+            ]
+        );
+    }
+
     public function treino()
     {
         if (isset(Auth::user()->professor->id)) {

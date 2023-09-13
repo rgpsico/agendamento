@@ -26,7 +26,9 @@ class EmpresaController extends Controller
     public function __construct(
         private Empresa $model,
         private Usuario $usuario,
-        private Agendamento $agendamento
+        private Agendamento $agendamento,
+        private Professor $professor
+
     ) {
     }
 
@@ -35,7 +37,11 @@ class EmpresaController extends Controller
     {
         if (isset(Auth::user()->professor->id)) {
             $professor_id = Auth::user()->professor->id;
-            $numeroTotalDeAlunos = $this->agendamento::where('professor_id', $professor_id)->count();
+
+            $professor = Professor::find($professor_id);
+            $numeroTotalDeAlunos = $professor->alunos->count();
+            $numeroTotalDeAulas = $professor->aulas->count();
+
             $arrecadacao = $this->agendamento::where('professor_id', $professor_id)->sum('valor_aula');
             $aulasCanceladas = $this->agendamento::where('professor_id', $professor_id)->where('status', 'cancelada')->count();
             $aulasFeitas = $this->agendamento::where('professor_id', $professor_id)->where('status', 'realizadas')->count();
@@ -49,11 +55,12 @@ class EmpresaController extends Controller
             'admin.empresas.dashboard',
             [
                 'pageTitle' => 'DashBoard',
-                'numeroTotalDeAlunos' => $numeroTotalDeAlunos ?? '',
+                'numeroTotalDeAlunos' => $numeroTotalDeAlunos ?? '10',
                 'arrecadacao' => $arrecadacao ?? '',
                 'aulasCanceladas' => $aulasCanceladas ?? '',
                 'arrecadacaoUltimos30Dias' => $arrecadacaoUltimos30Dias ?? '',
-                'realizadas' =>  $aulasFeitas ?? ''
+                'realizadas' =>  $aulasFeitas ?? '',
+                'numero_total_de_aulas' => $numeroTotalDeAulas
             ]
         );
     }
