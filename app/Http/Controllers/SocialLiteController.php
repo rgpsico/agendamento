@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Alunos;
 use App\Models\Professor;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
@@ -25,9 +26,6 @@ class SocialLiteController extends Controller
 
         try {
             $googleUser = Socialite::driver('google')->user();
-
-
-
             $user = Usuario::where('email', $googleUser->email)->first();
 
             if (!$user) {
@@ -36,16 +34,13 @@ class SocialLiteController extends Controller
                     'nome' => $googleUser->email, // Aqui você deve provavelmente usar ->name ao invés de ->email
                     'email' => $googleUser->email,
                     'google_id' => $googleUser->id,
-                    'tipo_usuario' => 'professor',
+                    'tipo_usuario' => 'Aluno',
                     'remember_token' => Str::random(60), // Gerar um token aleatório
                     'password' => bcrypt(124) // Isso deve ser atualizado para algo mais seguro mais tarde
                 ]);
 
-                Professor::create([
-                    'usuario_id' => $user->id,
-                    'modalidade_id' => 1,
-                    'sobre' => 'Professor'
-
+                Alunos::create([
+                    'usuario_id' => $user->id
                 ]);
             }
 
@@ -57,7 +52,7 @@ class SocialLiteController extends Controller
 
         } catch (\Exception $e) {
             dd($e);
-            \Log::error('Erro com autenticação do Google: ' . $e->getMessage());
+            // \Log::error('Erro com autenticação do Google: ' . $e->getMessage());
 
             dd($e);
             return redirect('/')->with('error', 'Erro ao tentar autenticar com o Google.');
