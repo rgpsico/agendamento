@@ -30,7 +30,6 @@ Route::middleware('auth:sanctum')->get('/teste', function (Request $request) {
 Route::post('/login', [AuthControllerApi::class, 'login']);
 
 Route::resource('agendamento', AgendamentoControllerApi::class);
-Route::get('/professor/agendamentos', [AgendamentoControllerApi::class, 'getAgendamentos']);
 
 
 
