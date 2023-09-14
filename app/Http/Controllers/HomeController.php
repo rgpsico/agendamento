@@ -236,7 +236,12 @@ class HomeController extends Controller
             Auth::login($user, true);
 
 
-            return redirect()->route("admin.dashboard");  // ou onde você deseja redirecionar após o login
+            $id = auth()->user()->aluno->id;
+
+            // Obter os agendamentos para o aluno
+            $agendamentos = Agendamento::with('professor')->where('aluno_id', $id)->get();
+
+            return view('alunoadmin::alunos.index', compact('title', 'agendamentos')); // ou onde você deseja redirecionar após o login
 
         } catch (\Exception $e) {
             dd($e);
