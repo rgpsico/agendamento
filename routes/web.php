@@ -9,6 +9,9 @@ Route::get('/google/redirect', [SocialLiteController::class, 'redirectToGoogle']
 Route::get('/google/callback', [SocialLiteController::class, 'handleGoogleCallback'])->name('handle.google');
 
 
+Route::get('/google/rof/redirect', [HomeController::class, 'redirectToGoogle'])->name('public.googleAuth');
+Route::get('/loginGoogle', [HomeController::class, 'handleGoogleCallback'])->name('public.googleAuth');
+
 
 
 Route::prefix('admin')->middleware(['check_user_authenticated'])->group(function () {

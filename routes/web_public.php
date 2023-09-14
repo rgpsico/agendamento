@@ -9,6 +9,11 @@ use Illuminate\Support\Facades\Route;
 Route::get('/registrar_escola', [HomeController::class, 'registerProf'])->name('public.registerProf');
 Route::get('/loginGoogle', [HomeController::class, 'handleGoogleCallback'])->name('public.googleAuth');
 
+
+Route::get('/registrar_escola', [HomeController::class, 'registerProf'])->name('public.registerProf');
+Route::get('/loginGoogle', [HomeController::class, 'handleGoogleCallback'])->name('public.googleAuth');
+
+
 Route::get('/registeraluno', function () {
     return view('auth.registerAluno');
 });
