@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AgendaController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SocialLiteController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
