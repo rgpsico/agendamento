@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AlunosController;
+use App\Http\Controllers\Api\AgendamentoControllerApi;
 use App\Http\Controllers\Api\AlunosControllerApi;
 use App\Http\Controllers\Api\AulasControllerApi;
 use App\Http\Controllers\Api\AuthControllerApi;
@@ -29,6 +30,9 @@ Route::middleware('auth:sanctum')->get('/teste', function (Request $request) {
 Route::post('/login', [AuthControllerApi::class, 'login']);
 
 Route::resource('agendamento', AgendamentoControllerApi::class);
+Route::get('/professor/agendamentos', [AgendamentoControllerApi::class, 'getAgendamentos']);
+
+
 
 Route::resource('professor', ProfessoresControllerApi::class);
 

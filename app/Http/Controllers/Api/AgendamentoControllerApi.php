@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Agendamento;
 use App\Models\Aulas;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AgendamentoControllerApi extends Controller
 {
@@ -58,5 +60,24 @@ class AgendamentoControllerApi extends Controller
         } else {
             return response()->json(['error' => 'Usuário não encontrado'], 404);
         }
+    }
+
+    public function getAgendamentos()
+    {
+        $professor_id = Auth::user()->professor->id;
+
+        $agendamentos = Agendamento::with('aluno')
+            ->where('professor_id', $professor_id)
+            ->get();
+
+        $eventos = $agendamentos->map(function ($agendamento) {
+            return [
+                'title' => $agendamento->aluno->usuario->nome,  // Assumindo que 'nome' é um campo do aluno
+                'start' => Carbon::parse($agendamento->data_da_aula)->format('Y-m-d') . 'T' . $agendamento->horario,
+                'color' => '#ff0000'  // Uma cor de exemplo. Você pode personalizar com base no status, etc.
+            ];
+        });
+
+        return response()->json($eventos);
     }
 }

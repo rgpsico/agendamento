@@ -5,7 +5,7 @@
 use App\Http\Controllers\admin\AdminController;
 use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\AlunosController;
-
+use App\Http\Controllers\Api\AgendamentoControllerApi;
 use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\ModalidadeController;
 use App\Http\Controllers\PagamentoController;
@@ -74,6 +74,7 @@ Route::prefix('cliente')->middleware('auth')->group(function () {
 
         Route::group(['prefix' => '/agenda'], function () {
             Route::get('/', [AgendaController::class, 'index'])->name('agenda.index');
+
             Route::get('/calendario', [AgendaController::class, 'calendario'])->name('agenda.calendario');
             Route::get('/{id}/show', [AgendaController::class, 'show'])->name('agenda.show');
             Route::get('/create', [AgendaController::class, 'create'])->name('agenda.create');
@@ -96,6 +97,8 @@ Route::prefix('cliente')->middleware('auth')->group(function () {
 
         Route::get('{id}/profile', [UserController::class, 'profile'])->name('usuario.profile');
     });
+
+    Route::get('/professor/agendamentos', [AgendamentoControllerApi::class, 'getAgendamentos']);
 });
 
 

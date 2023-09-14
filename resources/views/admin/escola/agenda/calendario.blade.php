@@ -108,17 +108,7 @@
                         $('#eventForm')[0].reset();
                     });
                 },
-                events: [
-                    {
-                        title  : 'Evento 1',
-                        start  : '2023-09-13'
-                    },
-                    {
-                        title  : 'Evento 2',
-                        start  : '2023-09-14',
-                        end    : '2023-09-16'
-                    }
-                ]
+                events: '/cliente/professor/agendamentos'
             });
         });
     </script>
