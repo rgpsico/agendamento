@@ -212,7 +212,7 @@ class HomeController extends Controller
     public function handleGoogleCallback()
     {
 
-        dd('aaa');
+
         try {
             $googleUser = Socialite::driver('google')->user();
             $user = Usuario::where('email', $googleUser->email)->first();
@@ -223,7 +223,7 @@ class HomeController extends Controller
                     'nome' => $googleUser->email, // Aqui você deve provavelmente usar ->name ao invés de ->email
                     'email' => $googleUser->email,
                     'google_id' => $googleUser->id,
-                    'tipo_usuario' => 'Professor',
+                    'tipo_usuario' => 'Aluno',
                     'remember_token' => Str::random(60), // Gerar um token aleatório
                     'password' => bcrypt(124) // Isso deve ser atualizado para algo mais seguro mais tarde
                 ]);
