@@ -212,7 +212,6 @@ class HomeController extends Controller
     public function handleGoogleCallback()
     {
 
-        dd('aaa');
 
         try {
             $googleUser = Socialite::driver('google')->user();
