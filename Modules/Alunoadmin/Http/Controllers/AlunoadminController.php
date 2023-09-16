@@ -32,7 +32,6 @@ class AlunoadminController extends Controller
         // Obter os agendamentos para o aluno
         $agendamentos = Agendamento::with('professor')->where('aluno_id', $id)->get();
 
-        dd('aaa');
         return view('alunoadmin::alunos.index', compact('title', 'agendamentos'));
     }
 
