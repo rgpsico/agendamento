@@ -6,12 +6,12 @@ use App\Http\Controllers\SocialLiteController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/google/redirect', [SocialLiteController::class, 'redirectToGoogle'])->name('login.google');
-Route::get('/google/callback', [SocialLiteController::class, 'handleGoogleCallback'])->name('handle.google');
+Route::get('/google/prof/redirect', [SocialLiteController::class, 'professorRedirectToGoogle'])->name('prof.login.google');
+Route::get('/google/prof/callback', [SocialLiteController::class, 'professorGoogleCallback'])->name('prof.handle.google');
 
 
-Route::get('/google/aluno/redirect', [HomeController::class, 'redirectToGoogle'])->name('aluno.googleAuth.redirect');
-Route::get('/loginGoogle', [HomeController::class, 'handleGoogleCallback'])->name('aluno.googleAuth.handle');
+Route::get('/google/aluno/redirect', [HomeController::class, 'alunoRedirectToGoogle'])->name('aluno.googleAuth.redirect');
+Route::get('/loginGoogle', [HomeController::class, 'alunoGoogleCallback'])->name('aluno.googleAuth.handle');
 
 
 
