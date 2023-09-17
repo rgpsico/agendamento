@@ -14,16 +14,15 @@ class SocialLiteController extends Controller
 {
 
 
-    public function alunoRedirectToGoogle(Request $request)
+    public function alunoRedirectToGoogle()
     {
-        dd($request->all());
+
         return Socialite::driver('google')->redirect();
     }
 
     public function alunoGoogleCallback(Request $request)
     {
 
-        dd($request->all());
 
         try {
             $googleUser = Socialite::driver('google')->user();
