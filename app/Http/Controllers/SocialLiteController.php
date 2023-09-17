@@ -20,9 +20,10 @@ class SocialLiteController extends Controller
         return Socialite::driver('google')->redirect();
     }
 
-    public function alunoGoogleCallback()
+    public function alunoGoogleCallback(Request $request)
     {
 
+        dd($request);
 
         try {
             $googleUser = Socialite::driver('google')->user();
@@ -75,7 +76,7 @@ class SocialLiteController extends Controller
                     'nome' => $googleUser->email, // Aqui você deve provavelmente usar ->name ao invés de ->email
                     'email' => $googleUser->email,
                     'google_id' => $googleUser->id,
-                    'tipo_usuario' => 'Prfessor',
+                    'tipo_usuario' => 'Professor',
                     'remember_token' => Str::random(60), // Gerar um token aleatório
                     'password' => bcrypt(124) // Isso deve ser atualizado para algo mais seguro mais tarde
                 ]);
