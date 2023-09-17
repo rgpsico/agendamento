@@ -57,7 +57,7 @@
 														</a>
 												</div>
 												<div class="col-6">
-													<a href="{{route('login.google')}}" class="btn btn-google w-100">
+													<a href="{{route('aluno.googleAuth.redirect')}}" class="btn btn-google w-100">
 														<i class="fab fa-google me-1">
 															</i> Login
 														</a>
