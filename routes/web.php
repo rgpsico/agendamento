@@ -11,7 +11,7 @@ Route::get('/google/prof/callback', [SocialLiteController::class, 'professorGoog
 
 
 Route::get('/google/aluno/redirect', [SocialLiteController::class, 'alunoRedirectToGoogle'])->name('aluno.googleAuth.redirect');
-Route::get('/loginGoogle', [SocialLiteController::class, 'alunoGoogleCallback'])->name('aluno.googleAuth.handle');
+Route::get('/google/callback', [SocialLiteController::class, 'alunoGoogleCallback'])->name('aluno.googleAuth.handle');
 
 
 
