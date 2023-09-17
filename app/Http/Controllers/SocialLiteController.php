@@ -23,7 +23,7 @@ class SocialLiteController extends Controller
     public function alunoGoogleCallback(Request $request)
     {
 
-        dd($request);
+        dd($request->all());
 
         try {
             $googleUser = Socialite::driver('google')->user();
