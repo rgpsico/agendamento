@@ -10,8 +10,8 @@ Route::get('/google/redirect', [SocialLiteController::class, 'redirectToGoogle']
 Route::get('/google/callback', [SocialLiteController::class, 'handleGoogleCallback'])->name('handle.google');
 
 
-Route::get('/google/rof/redirect', [HomeController::class, 'redirectToGoogle'])->name('prof.googleAuth.redirect');
-Route::get('/loginGoogle', [HomeController::class, 'handleGoogleCallback'])->name('prof.googleAuth.handle');
+Route::get('/google/aluno/redirect', [HomeController::class, 'redirectToGoogle'])->name('aluno.googleAuth.redirect');
+Route::get('/loginGoogle', [HomeController::class, 'handleGoogleCallback'])->name('aluno.googleAuth.handle');
 
 
 
