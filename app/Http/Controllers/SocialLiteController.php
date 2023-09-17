@@ -48,7 +48,7 @@ class SocialLiteController extends Controller
             Auth::login($user, true);
 
 
-            return redirect()->route('admin.da');  // ou onde você deseja redirecionar após o login
+            return redirect()->route('alunos.fotos');  // ou onde você deseja redirecionar após o login
 
         } catch (\Exception $e) {
             dd($e);
