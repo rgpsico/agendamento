@@ -67,13 +67,13 @@
 				<!-- /Social Login -->
   
 				<div class="col-12">
-					<div class="col-12">
+					{{-- <div class="col-12">
 						<a href="{{route('prof.login.google')}}" class="btn btn-google w-100">
 							<i class="fab fa-google me-1">
 								</i> Login com Google
 							</a>
 							
-					</div>
+					</div> --}}
 				</div>
 			  </div>
 			</div>
