@@ -643,7 +643,7 @@ function toggleServico(servico) {
 
     // Se não tem nada no sessionStorage, inicializa uma lista vazia
     if (!servicos) {
-        servicos = [];
+        //servicos = [];
     } else {
         // Converte a string de volta em uma lista
         servicos = JSON.parse(servicos);
