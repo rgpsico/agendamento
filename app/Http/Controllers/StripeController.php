@@ -95,6 +95,7 @@ class StripeController extends Controller
             $aluno = Alunos::where('usuario_id', $user->id)->first();
         }
 
+        Auth::login($user);
 
         $aluno_id = $aluno->id;
         $data_agendamento = $request->data_aula;
@@ -139,7 +140,7 @@ class StripeController extends Controller
         ]);
 
         $nome_do_professor = $professor->usuario->nome;
-        Auth::login($user);
+
         if ($response->status === 'succeeded') {
             return response()->json(['content' => $professor]);
         } else {
