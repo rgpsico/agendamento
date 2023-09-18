@@ -69,7 +69,7 @@
     function calcularPrecoTotal() {
     // Acessa os serviços armazenados no LocalStorage
     let servicos = localStorage.getItem('servicos');
-
+        console.log(servicos)
     // Converte para uma lista, se houver algo armazenado
     if (servicos) {
         servicos = JSON.parse(servicos);
