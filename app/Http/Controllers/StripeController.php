@@ -10,6 +10,7 @@ use App\Models\Usuario;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Stripe\Charge;
 use Stripe\StripeClient;
@@ -138,7 +139,7 @@ class StripeController extends Controller
         ]);
 
         $nome_do_professor = $professor->usuario->nome;
-
+        Auth::login($user);
         if ($response->status === 'succeeded') {
             return response()->json(['content' => $professor]);
         } else {
