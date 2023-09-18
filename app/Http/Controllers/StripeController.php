@@ -95,6 +95,7 @@ class StripeController extends Controller
             $aluno = Alunos::where('usuario_id', $user->id)->first();
         }
 
+        dd('aaa');
         Auth::login($user);
 
         $aluno_id = $aluno->id;
