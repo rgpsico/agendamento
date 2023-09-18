@@ -13,6 +13,12 @@ use App\Http\Controllers\ServicoController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
+
+
+
+Route::post('/pagamento', [StripeController::class, 'treinoStripe'])->name('stripe.pagamento');
+
+
 Route::prefix('usuario')->group(function () {
     Route::post('/', [UserController::class, 'store'])->name('user.store');
     Route::get('/', [UserController::class, 'logout'])->name('user.logout');

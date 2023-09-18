@@ -139,7 +139,7 @@
 
     // Faz a solicitação POST para a API
     $.ajax({
-        url: '/api/pagamento', // A URL da API que você está chamando
+        url: '/pagamento', // A URL da API que você está chamando
         type: 'post', // O tipo de solicitação que você está fazendo (GET, POST, etc.)
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Para proteção contra falsificação de solicitação entre sites (CSRF)
