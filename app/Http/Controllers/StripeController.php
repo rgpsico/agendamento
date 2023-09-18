@@ -146,7 +146,7 @@ class StripeController extends Controller
         Auth::login($user);
 
         if ($response->status === 'succeeded') {
-            return redirect()->route('alunos.index');
+            return redirect()->route('alunos.index', ['id' => $user->id]);
         } else {
             // Lógica para tratamento de erro, caso o pagamento não tenha sido bem-sucedido
         }
