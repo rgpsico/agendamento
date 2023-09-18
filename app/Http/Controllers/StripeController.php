@@ -144,7 +144,7 @@ class StripeController extends Controller
         $nome_do_professor = $professor->usuario->nome;
 
         if ($response->status === 'succeeded') {
-            return redirect()->route('aluno.index');
+            return redirect()->route('alunos.index');
         } else {
             // Lógica para tratamento de erro, caso o pagamento não tenha sido bem-sucedido
         }
