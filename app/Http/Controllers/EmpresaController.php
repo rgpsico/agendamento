@@ -50,6 +50,7 @@ class EmpresaController extends Controller
                 ->sum('valor_aula');
         }
 
+        dd($numeroTotalDeAlunos);
 
         return view(
             'admin.empresas.dashboard',
