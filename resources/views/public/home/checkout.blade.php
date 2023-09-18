@@ -111,77 +111,86 @@
 	$("#paymentForm").on('submit', function(e) {
     e.preventDefault(); 
 
+    
     var formData = $(this).serializeArray(); 
 
-    var servicos = sessionStorage.getItem('servicos');
-    var servicosArray = JSON.parse(servicos); 	 
-    var total = 0;
-
-    for (var i = 0; i < servicosArray.length; i++) {
-        total += parseFloat(servicosArray[i].preco);
-    }
-
-    var data = sessionStorage.getItem('data');
-    var horaAula = sessionStorage.getItem('horaDaAula');
-
-    formData.push({ name: "servicos", value: servicosArray });
-    formData.push({ name: "total", value: total });
-    formData.push({ name: "data_aula", value: data });
-    formData.push({ name: "hora_aula", value: horaAula });
-        
-    var data = {};
     
+	var servicos = localStorage.getItem('servicos');
+	var servicosArray = JSON.parse(servicos); 	 
+	var total = 0;
+
+	for (var i = 0; i < servicosArray.length; i++) {
+		total += parseFloat(servicosArray[i].preco);
+	}
+
+	var data = localStorage.getItem('data');
+	var horaAula = localStorage.getItem('horaDaAula');
+
+	formData.push({ name: "servicos", value: servicosArray });
+	formData.push({ name: "total", value: total });
+	formData.push({ name: "data_aula", value: data });
+	formData.push({ name: "hora_aula", value: horaAula });
+		
+    var data = {};
+	
     $(formData).each(function(index, obj){
         data[obj.name] = obj.value;
     });
 
     // Faz a solicitação POST para a API
     $.ajax({
-        url: '/api/pagamento', 
-        type: 'post', 
+        url: '/api/pagamento', // A URL da API que você está chamando
+        type: 'post', // O tipo de solicitação que você está fazendo (GET, POST, etc.)
         headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') 
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Para proteção contra falsificação de solicitação entre sites (CSRF)
         },
-        data: data,
+        data: data, // Os dados que você está enviando para a API
         success: function (response) {
-            console.log(response)
+			console.log(response)
           
-            if(response && response.content && response.content.id) {
-                const baseUrl = "{{ route('home.checkoutsucesso', ['id' => 'USER_ID']) }}";
-                const redirectTo = baseUrl.replace('USER_ID', response.content.id);
-                window.location.href = redirectTo;
-            }
+	       
+		if(response && response.content && response.content.id) {
+            const baseUrl = "{{ route('home.checkoutsucesso', ['id' => 'USER_ID']) }}";
+            const redirectTo = baseUrl.replace('USER_ID', response.content.id);
+            window.location.href = redirectTo;
+        }
+
+			
         },
         error: function(response) {
-            try {
-                let errors = response.responseJSON.errors;
-                
-                $('.error').empty(); 
-                $.each(errors, function(key, values) {
-                    $('#' + key ).removeClass();   
-                });
+			try {
 
-                $.each(errors, function(key, values) {
-                    let errorMessages = '';
+				let errors = response.responseJSON.errors;
+				
+			$('.error').empty()	
+			$.each(errors, function(key, values) {
+				$('#' + key ).removeClass(); 	
+			});
 
-                    $('#' + key + '_erro').empty(); 
+			$.each(errors, function(key, values) {
+			let errorMessages = '';
 
-                    $.each(values, function(index, value) {
-                        errorMessages += '<span class="error">' + value + '</span><br>';
-                    });
-                
-                    $('#' + key).addClass('is-invalid');
-                    $('#' + key+'_erro').show()
-                    $('#' + key+'_erro').append(errorMessages);
-                });
+    		$('#' + key + '_erro').empty(); 			
+			
 
-            } catch (error) {
-                
-            }
-        }
+
+            $.each(values, function(index, value) {
+                errorMessages += '<span class="error">' + value + '</span><br>';
+            });
+			
+			$('#' + key).addClass('is-invalid');
+			$('#' + key+'_erro').show()
+            $('#' + key+'_erro').append(errorMessages);
+        });
+				
+			} catch (error) {
+				
+			}
+      
+
+    }
     });
 });
-
 
 // Limpa a mensagem de erro ao corrigir o campo
 
