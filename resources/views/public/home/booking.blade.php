@@ -657,7 +657,7 @@ function toggleServico(servico) {
         servicos.push(servico);
     } else {
         // Se o serviço está na lista, remove
-       // servicos.splice(index, 1);
+        //servicos.splice(index, 1);
     }
 
     // Salva a lista atualizada no sessionStorage
