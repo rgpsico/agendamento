@@ -66,7 +66,7 @@
 												
 								@if(auth()->check())
 									<li class="my-3">
-										<a href="{{route('alunos.index')}}" class="btn reg-btn">Admin</a>										
+										<a href="{{route('alunos.fotos',['id' => Auth::user()->id])}}" class="btn reg-btn">Admin</a>										
 									</li>
 									<li class="my-3">
 										<a href="{{route('user.logout')}}" class="btn reg-btn">Sair</a>										
