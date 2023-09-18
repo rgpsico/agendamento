@@ -40,12 +40,12 @@ class EmpresaController extends Controller
 
             $professor = Professor::find($professor_id);
             $numeroTotalDeAlunos = $professor->alunos->count();
-            $numeroTotalDeAulas = $professor->aulas->count();
+            $numeroTotalDeAulas = $professor->agendamentos->count();
 
-            $arrecadacao = $this->agendamento::where('professor_id', $professor_id)->sum('valor_aula');
-            $aulasCanceladas = $this->agendamento::where('professor_id', $professor_id)->where('status', 'cancelada')->count();
-            $aulasFeitas = $this->agendamento::where('professor_id', $professor_id)->where('status', 'realizadas')->count();
-            $arrecadacaoUltimos30Dias = $this->agendamento::where('professor_id', $professor_id)
+            $arrecadacao = Agendamento::where('professor_id', $professor_id)->sum('valor_aula');
+            $aulasCanceladas = Agendamento::where('professor_id', $professor_id)->where('status', 'cancelada')->count();
+            $aulasFeitas = Agendamento::where('professor_id', $professor_id)->where('status', 'realizadas')->count();
+            $arrecadacaoUltimos30Dias = Agendamento::where('professor_id', $professor_id)
                 ->whereDate('data_da_aula', '>=', Carbon::now()->subDays(30))
                 ->sum('valor_aula');
         }
