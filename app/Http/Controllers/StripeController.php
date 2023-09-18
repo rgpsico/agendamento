@@ -95,7 +95,6 @@ class StripeController extends Controller
             $aluno = Alunos::where('usuario_id', $user->id)->first();
         }
 
-        dd('aaa');
         Auth::login($user);
 
         $aluno_id = $aluno->id;
@@ -140,10 +139,12 @@ class StripeController extends Controller
             'description' => $request->description
         ]);
 
+
+
         $nome_do_professor = $professor->usuario->nome;
 
         if ($response->status === 'succeeded') {
-            return response()->json(['content' => $professor]);
+            return redirect()->route('aluno.index');
         } else {
             // Lógica para tratamento de erro, caso o pagamento não tenha sido bem-sucedido
         }
