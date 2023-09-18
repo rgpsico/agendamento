@@ -74,19 +74,26 @@ class StripeController extends Controller
         $stripe = new StripeClient(env('STRIPE_SECRET'));
 
 
+        $existingUser = Usuario::where('email', $request->email)->first();
 
+        if (!$existingUser) {
+            // Se o usuário não existir, crie um novo
+            $user = new Usuario();
+            $user->nome = $request->nome;
+            $user->email = $request->email;
+            $user->tipo_usuario = 'Aluno';
+            $user->password = Hash::make('senha');
+            $user->save();
 
-        $user = new Usuario();
-        $user->nome = $request->nome;
-        $user->email = $request->email;
-        $user->tipo_usuario = 'Aluno';
-        $user->password = Hash::make('senha');
-        $user->save();
+            $aluno = new Alunos();
+            $aluno->usuario_id = $user->id;
+            $aluno->save();
+        } else {
+            // Se o usuário já existir, use as informações existentes
+            $user = $existingUser;
+            $aluno = Alunos::where('usuario_id', $user->id)->first();
+        }
 
-        $aluno = new Alunos();
-        $aluno->usuario_id = $user->id;
-
-        $aluno->save();
 
         $aluno_id = $aluno->id;
         $data_agendamento = $request->data_aula;
