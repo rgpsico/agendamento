@@ -56,7 +56,7 @@ Route::resource('disponibilidade', DisponibilidadeControllerApi::class);
 Route::get('disponibilidade', [DisponibilidadeControllerApi::class, 'disponibilidade']);
 Route::resource('dias', DiaDaSemanaControllerApi::class);
 
-Route::post('/pagamento', [StripeController::class, 'treinoStripe'])->name('stripe.pagamento');
+
 
 
 Route::post('modalidade/{id}/update', [ModalidadeController::class, 'updateApi'])->name('modalidade.update');
