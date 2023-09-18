@@ -51,10 +51,10 @@
 											</div>
 											<div class="row form-row social-login">
 												<div class="col-6">
-													<a href="#" class="btn btn-facebook w-100">
+													{{-- <a href="#" class="btn btn-facebook w-100">
 														<i class="fab fa-facebook-f me-1">
 															</i> Login Facebook
-														</a>
+														</a> --}}
 												</div>
 												<div class="col-6">
 													<a href="{{route('aluno.googleAuth.redirect')}}" class="btn btn-google w-100">
