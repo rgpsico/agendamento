@@ -45,6 +45,7 @@ class EmpresaController extends Controller
             $arrecadacao = Agendamento::where('professor_id', $professor_id)->sum('valor_aula');
             $aulasCanceladas = Agendamento::where('professor_id', $professor_id)->where('status', 'cancelada')->count();
             $aulasFeitas = Agendamento::where('professor_id', $professor_id)->where('status', 'realizadas')->count();
+
             $arrecadacaoUltimos30Dias = Agendamento::where('professor_id', $professor_id)
                 ->whereDate('data_da_aula', '>=', Carbon::now()->subDays(30))
                 ->sum('valor_aula');

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\TreinoStripeRequest;
 use App\Models\Agendamento;
+use App\Models\AlunoProfessor;
 use App\Models\Alunos;
 use App\Models\Professor;
 use App\Models\Usuario;
@@ -97,11 +98,25 @@ class StripeController extends Controller
 
 
 
+
+
+
         $aluno_id = $aluno->id;
         $data_agendamento = $request->data_aula;
         $hora_agendamento = $request->hora_aula;
         $professor_id = $request->professor_id;
         $modalidade_id = $request->aula_id ??  1;
+
+        $existingRelation = AlunoProfessor::where('aluno_id', $aluno->id)
+            ->where('professor_id', $professor_id)
+            ->first();
+
+        if (!$existingRelation) {
+            $alunoProfessor = new AlunoProfessor();
+            $alunoProfessor->aluno_id = $aluno->id;
+            $alunoProfessor->professor_id = $professor_id;
+            $alunoProfessor->save();
+        }
 
         $professor = Professor::with('usuario')->where('usuario_id', $professor_id)->first();
         $data_agendamento_formato_eua = PagamentoController::convertToUSFormat($data_agendamento) . ' ' . $hora_agendamento;
