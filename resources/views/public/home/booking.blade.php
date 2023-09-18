@@ -438,8 +438,8 @@ img{
 			<script src="{{asset('admin/js/jquery-3.6.3.min.js')}}"></script>
 
 				<script>
-					var currentStartIndex = 0;
-const dates = getNext29Days();
+        var currentStartIndex = 0;
+        const dates = getNext29Days();
 
 function getNext29Days() {
   const dates = [];
@@ -604,7 +604,6 @@ $('.submit-btn').on('click', function(e) {
   }
 });
 
-
 $(document).ready(function() {
     $('.card_servicos').on('click', function() {
         $(this).toggleClass('card-selected');
@@ -615,13 +614,13 @@ $(document).ready(function() {
             preco: $(this).data('servico_preco')
         };
 
-        $(".schedule-header").show()
+        $(".schedule-header").show();
         toggleServico(servico);
     });
 });
 
 function calcularPrecoTotal() {
-    let servicos = localStorage.getItem('servicos');
+    let servicos = sessionStorage.getItem('servicos');
     
     if (servicos) {
         servicos = JSON.parse(servicos);
@@ -638,12 +637,11 @@ function calcularPrecoTotal() {
     return total;
 }
 
-
 function toggleServico(servico) {
-    // Pega a lista de serviços do localStorage
-    let servicos = localStorage.getItem('servicos');
+    // Pega a lista de serviços do sessionStorage
+    let servicos = sessionStorage.getItem('servicos');
 
-    // Se não tem nada no localStorage, inicializa uma lista vazia
+    // Se não tem nada no sessionStorage, inicializa uma lista vazia
     if (!servicos) {
         servicos = [];
     } else {
@@ -662,9 +660,10 @@ function toggleServico(servico) {
         servicos.splice(index, 1);
     }
 
-    // Salva a lista atualizada no localStorage
-    localStorage.setItem('servicos', JSON.stringify(servicos));
+    // Salva a lista atualizada no sessionStorage
+    sessionStorage.setItem('servicos', JSON.stringify(servicos));
 }
+
 
 
 
