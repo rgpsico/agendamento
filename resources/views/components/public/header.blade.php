@@ -74,7 +74,7 @@
 									
 								@else
 									<li class="login-link">
-										<a href="{{route('user.login')}}">Login</a>
+										<a href="/login">Login</a>
 									</li>
 							    	<li class="register-btn">
 										<a href="{{route('home.login')}}" class="btn btn-primary log-btn">
