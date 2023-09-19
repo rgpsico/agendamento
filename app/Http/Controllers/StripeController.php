@@ -101,7 +101,7 @@ class StripeController extends Controller
 
 
 
-        Mail::to($user->email)->send(new PaymentConfirmation($user));
+
 
 
         $aluno_id = $aluno->id;
@@ -162,7 +162,7 @@ class StripeController extends Controller
         $nome_do_professor = $professor->usuario->nome;
 
         Auth::login($user);
-
+        Mail::to($user->email)->send(new PaymentConfirmation($user));
         if ($response->status === 'succeeded') {
             return response()->json(['content' => $professor]);
         } else {
