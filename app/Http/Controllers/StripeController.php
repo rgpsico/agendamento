@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\TreinoStripeRequest;
+use App\Mail\PaymentConfirmation;
 use App\Models\Agendamento;
 use App\Models\AlunoProfessor;
 use App\Models\Alunos;
@@ -13,6 +14,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Stripe\Charge;
 use Stripe\StripeClient;
 
@@ -99,6 +101,7 @@ class StripeController extends Controller
 
 
 
+        Mail::to($user->email)->send(new PaymentConfirmation($user));
 
 
         $aluno_id = $aluno->id;
