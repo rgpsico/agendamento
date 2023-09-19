@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\PaymentConfirmation;
 use App\Models\Agendamento;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Stripe\Stripe;
 use Stripe\Charge;
 
@@ -55,6 +58,7 @@ class PagamentoController extends Controller
                     'horario' => $hora_aula
                 ]);
 
+                Mail::to(['nome' => 'roger', 'email' => 'rgyr2010@hotmail.com'])->send(new PaymentConfirmation(Auth::user()));
                 // Aqui você pode redirecionar o usuário para uma página de agradecimento, por exemplo
                 return redirect()->route('home.checkoutsucesso', ['id' =>  $professor_id]);
             } else {
