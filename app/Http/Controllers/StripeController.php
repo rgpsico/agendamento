@@ -77,7 +77,6 @@ class StripeController extends Controller
     {
         $stripe = new StripeClient(env('STRIPE_SECRET'));
 
-
         $existingUser = Usuario::where('email', $request->email)->first();
 
         if (!$existingUser) {
@@ -97,10 +96,6 @@ class StripeController extends Controller
             $user = $existingUser;
             $aluno = Alunos::where('usuario_id', $user->id)->first();
         }
-
-
-
-
 
 
 

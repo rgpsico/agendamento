@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\SendMassEmail;
 use App\Models\Agendamento;
 use App\Models\AlunoEndereco;
 use App\Models\Alunos;
@@ -11,6 +12,7 @@ use App\Models\Professor;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class AlunosControllerApi extends Controller
 {
@@ -19,6 +21,14 @@ class AlunosControllerApi extends Controller
     {
         $users = Usuario::all();
         return response()->json($users);
+    }
+
+    public function treinoEmail()
+    {
+        // Mail::raw('Texto do e-mail', function ($message) {
+        //     $message->to('rgyr2010@hotmail.com')->subject('Teste de e-mail');
+        // });
+        SendMassEmail::dispatch()->onQueue('emails');
     }
 
     // Criar um novo usuário

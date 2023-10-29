@@ -23,18 +23,20 @@ class HomeController extends Controller
     protected $aulas;
     protected $disponibilidade;
     protected $agendamento;
-
+    protected $professor;
     public function __construct(
         Empresa $model,
         Aulas $aulas,
         Disponibilidade $disponibilidade,
-        Agendamento $agendamento
+        Agendamento $agendamento,
+        Professor $professor
 
     ) {
         $this->model = $model;
         $this->aulas = $aulas;
         $this->disponibilidade = $disponibilidade;
         $this->agendamento = $agendamento;
+        $this->professor = $professor;
     }
 
     public function index()
@@ -77,6 +79,10 @@ class HomeController extends Controller
 
         $aulas = $this->aulas->where('professor_id', $id)->get();
 
+
+        $professor_id = $this->professor->where('usuario_id', $id)->value('id');
+
+
         // Array de dias da semana
         $diasDaSemana = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
 
@@ -101,6 +107,7 @@ class HomeController extends Controller
                 'aulasDias' => $aulasDias,
                 'model' => $model,
                 'horarios' => $horarios, // Passar os horários para a view
+                'professor_id' => $professor_id
             ]
         );
     }

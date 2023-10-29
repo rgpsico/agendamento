@@ -23,6 +23,6 @@ class PaymentConfirmation extends Mailable
     public function build()
     {
         return $this->subject('Confirmação de Pagamento')
-            ->view('emails.payment_confirmation', ['user' => $this->user]);
+            ->view('admin.emails.payment_confirmation', ['user' => $this->user]);
     }
 }

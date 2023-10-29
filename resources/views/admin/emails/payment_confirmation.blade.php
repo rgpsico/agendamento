@@ -10,8 +10,8 @@
 </head>
 <body>
     <div style="padding: 20px; font-family: Arial, sans-serif;">
-        <h2>Olá, {{ $user->nome }}!</h2>
-        
+        <h2>Olá,aqui!</h2>
+                
         <p>
             Gostaríamos de confirmar que seu pagamento foi realizado com sucesso. Obrigado por escolher nosso serviço!
         </p>

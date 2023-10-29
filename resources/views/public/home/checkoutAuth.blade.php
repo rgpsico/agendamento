@@ -1,8 +1,19 @@
 <x-public.layout title="HOME">
-   
+   <style>
+	#spinner {
+    position: fixed; 
+    top: 50%; 
+    left: 50%; 
+    
+    z-index: 9999; 
+}
+   </style>
     <!-- Breadcrumb -->
 		<x-home.breadcrumb title="TESTE"/>
 			<!-- /Breadcrumb -->
+			<div id="spinner" class="spinner-border text-primary" role="status" style="display:none;">
+				<span class="sr-only">Loading...</span>
+				</div>
 			<div class="content" style="transform: none; min-height: 172.906px;">
 				<div class="container" style="transform: none;">
 

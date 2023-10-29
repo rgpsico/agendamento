@@ -441,6 +441,10 @@ img{
 					var currentStartIndex = 0;
 const dates = getNext29Days();
 
+
+
+
+
 function getNext29Days() {
   const dates = [];
   for (let i = 0; i < 29; i++) {
@@ -476,6 +480,8 @@ function renderDates() {
 }
 
 $(document).ready(function() {
+  
+
   // Render inicial das datas
   renderDates();
 
@@ -527,6 +533,18 @@ $(document).on('click', '.day-slot li', function(e) {
     $(this).addClass('selected-date');
 
     const dayOfWeek = $(this).find('span:first').text();
+    
+    // Extract the day, month, and year
+    const day = $(this).find('span.slot-date').text().trim();
+    const month = $(this).find('span:not(.slot-date)').text().trim();
+    const year = $(this).find('small.slot-year').text().trim();
+
+    // Combine to get the full date
+    const fullDate = day + ' ' + month + ' ' + year;
+
+    let data_selecionada = converterData(fullDate)
+    console.log( converterData(fullDate)); // You can see the full date in the console for now
+
     const dayMapping = {
       'seg.': 1,
       'ter.': 2,
@@ -538,30 +556,58 @@ $(document).on('click', '.day-slot li', function(e) {
     };
 
     const dayNumber = dayMapping[dayOfWeek];
-	console.log(dayNumber)
+
     $.ajax({
       url: '/api/disponibilidade', 
       method: 'GET',
       data: {
-        day: dayNumber // enviar o número do dia
+        day: dayNumber,
+        data_select:data_selecionada,
+        professor_id:{{ $professor_id }}
       },
       success: function(response) {
         $('.time-slot ul').html(''); 
-
-		
         response.forEach(function(time) {
-    const timeElement = `<li>
-      <a class="timing" href="#">
-        <span>${time}</span>
-      </a>
-    </li>`;
-    $('.time-slot ul').append(timeElement);
-  });
-
+          const timeElement = `<li>
+            <a class="timing" href="#">
+              <span>${time}</span>
+            </a>
+          </li>`;
+          $('.time-slot ul').append(timeElement);
+        });
       }
     });
   }
 });
+
+function converterData(dateString) {
+    // Define month mapping
+    const monthMapping = {
+        'jan.': '01',
+        'fev.': '02',
+        'mar.': '03',
+        'abr.': '04',
+        'mai.': '05',
+        'jun.': '06',
+        'jul.': '07',
+        'ago.': '08',
+        'set.': '09',
+        'out.': '10',
+        'nov.': '11',
+        'dez.': '12'
+    };
+
+    // Split the date string by spaces
+    const parts = dateString.split(' ');
+
+    // Extract day, month, and year
+    const day = parts[0].padStart(2, '0'); // Ensure day is two digits
+    const month = monthMapping[parts[1]];
+    const year = parts[2];
+
+    // Return in the format "YYYY-MM-DD"
+    return year + '-' + month + '-' + day;
+}
 
 
 $(document).on('click', '.timing', function(e) {

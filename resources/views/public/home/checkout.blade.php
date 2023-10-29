@@ -1,18 +1,28 @@
 <x-public.layout title="HOME">
 	<style>
-		.error {
+.error {
     color: red;
+}
+#spinner {
+    position: fixed; 
+    top: 50%; 
+    left: 50%; 
+    
+    z-index: 9999; 
 }
 	</style>
    
+  
     <!-- Breadcrumb -->
 		<x-home.breadcrumb title="TESTE"/>
 			<!-- /Breadcrumb -->
 			<div class="content" style="transform: none; min-height: 172.906px;">
+				
 				<div class="container" style="transform: none;">
 
 					<div class="row" style="transform: none;">
 						<div class="col-md-7 col-lg-8">
+						
 							<div class="card">
 								<div class="card-body">
 								<x-alert/>
@@ -86,6 +96,9 @@
 											<!-- /Terms Accept -->
 											<!-- Submit Section -->
 											<div class="submit-section mt-4">
+												<div id="spinner" class="spinner-border text-primary" role="status" style="display: none;">
+													<span class="sr-only">Loading...</span>
+													</div>
 												<button type="submit"  class="btn btn-primary submit-btn">Confirmar Pagamento</button>
 											</div>
 										</div>
@@ -108,10 +121,10 @@
 
 			</div>
 			<script>
-	$("#paymentForm").on('submit', function(e) {
+$("#paymentForm").on('submit', function(e) {
     e.preventDefault(); 
 
-    
+    $('#spinner').show();
     var formData = $(this).serializeArray(); 
 
     
@@ -148,7 +161,7 @@
         success: function (response) {
 			console.log(response)
           
-	       
+			$('#spinner').hide();
 		if(response && response.content && response.content.id) {
             const baseUrl = "{{ route('home.checkoutsucesso', ['id' => 'USER_ID']) }}";
             const redirectTo = baseUrl.replace('USER_ID', response.content.id);

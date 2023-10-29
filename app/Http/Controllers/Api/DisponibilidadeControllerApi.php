@@ -7,6 +7,7 @@ use App\Models\DiaDaSemana;
 use App\Models\Disponibilidade;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class DisponibilidadeControllerApi extends Controller
 {
@@ -19,8 +20,10 @@ class DisponibilidadeControllerApi extends Controller
 
     public function disponibilidade(Request $request)
     {
-        $day = $request->input('day');
 
+        $day = $request->input('day');
+        $data_selecionada = $request->input("data_select");
+        $professor_id = $request->input("professor_id");; // Você precisa enviar o ID do professor na sua requisição
 
         $schedules = Disponibilidade::where('id_dia', $day)->get();
 
@@ -31,13 +34,21 @@ class DisponibilidadeControllerApi extends Controller
             $end = Carbon::parse($schedule->hora_fim);
 
             for ($time = $start; $time->lessThan($end); $time->addHour()) {
-                $timeslots[] = $time->format('H:i');
+
+                $alreadyBooked = DB::table('agendamentos')
+                    ->where('data_da_aula', $data_selecionada)
+                    ->where('horario', $time->format('H:i'))
+                    ->where('professor_id', $professor_id)
+                    ->exists();
+
+
+                if (!$alreadyBooked) {
+                    $timeslots[] = $time->format('H:i');
+                }
             }
         }
-
         return response()->json($timeslots);
     }
-
 
     // Criar um novo usuário
     public function store(Request $request)

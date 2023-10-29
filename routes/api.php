@@ -69,3 +69,6 @@ Route::delete('/aluno/{id}/destroy/{professor_id}', [AlunosController::class, 'd
 
 // routes/api.php
 Route::get('professores/{id}/alunos', [EmpresaControllerApi::class, 'getAlunoByIdProfessor']);
+
+
+Route::post('/treino/email', [AlunosControllerApi::class, 'treinoEmail']);
