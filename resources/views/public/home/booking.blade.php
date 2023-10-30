@@ -310,6 +310,14 @@ img{
   box-shadow: 0 2px 4px 0 rgba(219, 215, 215, 0.5);
   border: solid 2px #3057d5;
 }
+
+#spinner {
+    position: fixed; 
+    top: 50%; 
+    left: 50%; 
+    
+    z-index: 9999; 
+}
 			</style>
 
 			@include('admin.empresas._partials.modal')
