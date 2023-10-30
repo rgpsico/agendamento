@@ -322,9 +322,7 @@ img{
 
 			@include('admin.empresas._partials.modal')
 
-      <div id="spinner" class="spinner-border text-primary" role="status" style="display:none;">
-				<span class="sr-only">Loading...</span>
-				</div>
+      
 			<div class="container">
 				<div class="row">
 					<div class="col-12">
@@ -376,7 +374,10 @@ img{
 						<input type="hidden" class="data">
 						<input type="hidden" class="hora_da_aula">
 						<!-- Schedule Widget -->
-						<div class="card booking-schedule schedule-widget">
+						<div id="spinner" class="spinner-border text-primary" role="status" style="display:none;">
+              <span class="sr-only">Loading...</span>
+              </div>
+            <div class="card booking-schedule schedule-widget">
 					  	<!-- Schedule Header -->
 							<div class="schedule-header" style="display:none;">
 								<div class="row">
