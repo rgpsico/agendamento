@@ -313,6 +313,10 @@ img{
 			</style>
 
 			@include('admin.empresas._partials.modal')
+
+      <div id="spinner" class="spinner-border text-primary" role="status" style="display:none;">
+				<span class="sr-only">Loading...</span>
+				</div>
 			<div class="container">
 				<div class="row">
 					<div class="col-12">
@@ -556,7 +560,7 @@ $(document).on('click', '.day-slot li', function(e) {
     };
 
     const dayNumber = dayMapping[dayOfWeek];
-
+$('#spinner').show()
     $.ajax({
       url: '/api/disponibilidade', 
       method: 'GET',
@@ -567,6 +571,7 @@ $(document).on('click', '.day-slot li', function(e) {
       },
       success: function(response) {
         $('.time-slot ul').html(''); 
+        $('#spinner').hide()
         response.forEach(function(time) {
           const timeElement = `<li>
             <a class="timing" href="#">
