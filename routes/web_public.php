@@ -24,10 +24,6 @@ Route::get('/login', function () {
 });
 
 
-Route::get('/', function () {
-    return view('index');
-});
-
 
 Route::get('/registerProf', [HomeController::class, 'registerProf'])->name('home.registerProf');
 Route::get('/registerAluno', [HomeController::class, 'registerAluno'])->name('home.registerAluno');

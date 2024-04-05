@@ -15,11 +15,6 @@ class Usuario extends Authenticatable
 
     protected $table = "usuarios";
 
-
-
-
-
-
     /**
      * The attributes that are mass assignable.
      *
@@ -101,8 +96,6 @@ class Usuario extends Authenticatable
     {
         return $this->hasMany(Disponibilidade::class, 'id_professor');
     }
-
-
 
 
     public function aluno()

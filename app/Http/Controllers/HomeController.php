@@ -16,6 +16,7 @@ use Illuminate\Support\Str;
 
 class HomeController extends Controller
 {
+
     protected $pageTitle = "Aluno";
     protected $view = "public.home";
     protected $route = "alunos";
@@ -41,6 +42,7 @@ class HomeController extends Controller
 
     public function index()
     {
+
         $model = $this->model::with('modalidade', 'endereco', 'galeria')->get();
 
         $modalidade = Modalidade::all();

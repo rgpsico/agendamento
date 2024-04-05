@@ -10,7 +10,7 @@
 						</a>
 						</div>
 						<div class="footer-about-content">
-							<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore.</p>
+							<p> Estamos comprometidos em promover a paixão pelos esportes ao ar livre, facilitando o acesso, o engajamento e o sucesso dos atletas e comunidades costeiras em todo o mundo</p>
 						</div>
 					</div>
 				</div>
@@ -95,8 +95,8 @@
 						<!-- Copyright Menu -->
 						<div class="copyright-menu">
 							<ul class="policy-menu">
-								<li><a href="">Privacy Policy</a></li>
-								<li><a href="">Terms and Conditions</a></li>
+								<li><a href="">Politica de Privacidade</a></li>
+								<li><a href="">Termos e Condições</a></li>
 							</ul>
 						</div>
 						<!-- /Copyright Menu -->

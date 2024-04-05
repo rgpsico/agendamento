@@ -24,10 +24,10 @@ class EmpresaController extends Controller
 
 
     public function __construct(
-        private Empresa $model,
-        private Usuario $usuario,
-        private Agendamento $agendamento,
-        private Professor $professor
+        Empresa $model,
+        Usuario $usuario,
+        Agendamento $agendamento,
+        Professor $professor
 
     ) {
     }

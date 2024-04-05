@@ -66,15 +66,18 @@ class AgendamentoControllerApi extends Controller
     {
         $professor_id = Auth::user()->professor->id;
 
-        $agendamentos = Agendamento::with('aluno')
+        // Aqui é importante notar a mudança: 'aluno.usuario'
+        // Isso indica ao Eloquent para carregar a relação 'usuario' para cada 'aluno' carregado.
+        $agendamentos = Agendamento::with('aluno.usuario')
             ->where('professor_id', $professor_id)
             ->get();
 
         $eventos = $agendamentos->map(function ($agendamento) {
+            // Removi o dd() para que o código execute completamente.
             return [
-                'title' => $agendamento->aluno->usuario->nome,  // Assumindo que 'nome' é um campo do aluno
+                'title' => $agendamento->aluno->usuario->nome ?? '', // Corretamente acessando o nome do usuário através do aluno
                 'start' => Carbon::parse($agendamento->data_da_aula)->format('Y-m-d') . 'T' . $agendamento->horario,
-                'color' => '#ff0000'  // Uma cor de exemplo. Você pode personalizar com base no status, etc.
+                'color' => '#ff0000' // Uma cor de exemplo.
             ];
         });
 

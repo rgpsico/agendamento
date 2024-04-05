@@ -60,7 +60,7 @@
                                             <tr role="row" class="odd">
                                                 <td class="sorting_1">
                                                     <h2 class="table-avatar">
-                                                         <a href="{{route('alunos.show',['id' => $agendamento->aluno->id])}}">{{$agendamento->aluno->usuario->nome}}</a>
+                                                         <a href="{{route('alunos.show',['id' => $agendamento->aluno->id])}}">{{$agendamento->aluno->usuario->nome ?? ''}}</a>
                                                     </h2>
                                                 </td>
                                                 <td>{{$agendamento->modalidade->nome}}</td>

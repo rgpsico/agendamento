@@ -26,6 +26,12 @@ class Agendamento extends Model
         return $this->belongsTo(Alunos::class);
     }
 
+    public function usuario()
+    {
+        return $this->belongsTo(Usuario::class, 'usuario_id', 'id');
+    }
+
+
     public function aula()
     {
         return $this->belongsTo(Aulas::class);

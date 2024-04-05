@@ -63,26 +63,35 @@
 								</a>
 							</div>
 							<ul class="main-nav">
-												
-								@if(auth()->check())
+								@if(auth()->check()) {{-- Verifica se o usuário está autenticado --}}
+									@if(auth()->user()->tipo_usuario == 'Professor')
 									<li class="my-3">
-										<a href="{{route('alunos.aulas')}}" class="btn reg-btn">Admin</a>										
+										<a href="{{route('cliente.dashboard')}}" class="btn reg-btn">Admin</a>                                        
 									</li>
 									<li class="my-3">
-										<a href="{{route('user.logout')}}" class="btn reg-btn">Sair</a>										
+										<a href="{{route('user.logout')}}" class="btn reg-btn">Sair</a>                                        
 									</li>
-									
+									@elseif (auth()->user()->tipo_usuario == 'Aluno')    
+									<li class="my-3">
+										<a href="{{route('alunos.aulas')}}" class="btn reg-btn">Admin</a>                                        
+									</li>
+									<li class="my-3">
+										<a href="{{route('user.logout')}}" class="btn reg-btn">Sair</a>                                        
+									</li>
+									@endif
 								@else
-									<li class="login-link">
-										<a href="/login">Login</a>
-									</li>
-							    	<li class="register-btn">
-										<a href="{{route('home.login')}}" class="btn btn-primary log-btn">
-											<i class="feather-lock"></i>Login
-										</a>
-									</li>
+								{{-- Caso não haja usuário autenticado, mostre as opções de login --}}
+								<li class="login-link">
+									<a href="/login">Login</a>
+								</li>
+								<li class="register-btn">
+									<a href="{{route('home.login')}}" class="btn btn-primary log-btn">
+										<i class="feather-lock"></i>Login
+									</a>
+								</li>
 								@endif
 							</ul>
+							
 							
 						</div>
 					</nav>
