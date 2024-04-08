@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\ProfessoresControllerApi;
 use App\Http\Controllers\Api\ServicoControllerApi;
 use App\Http\Controllers\Api\UserControllerApi;
 use App\Http\Controllers\ModalidadeController;
+use App\Http\Controllers\PagamentoController;
 use App\Http\Controllers\StripeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -42,6 +43,8 @@ Route::get('search/empresa', [EmpresaControllerApi::class, 'search'])->name('emp
 Route::resource('servicos', ServicoControllerApi::class);
 
 Route::get('professor/{id}/aulas', [ProfessoresControllerApi::class, 'aulas']);
+
+Route::post('pagamentoApi', [PagamentoController::class, 'pagamentoStripe']);
 
 
 Route::resource('users', UserControllerApi::class);

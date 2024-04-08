@@ -25,6 +25,14 @@
                     
                         <!-- Fechamento incorreto da div removido -->
                     
+                        <div class="form-group">
+                            <label for="status">Status</label>
+                            <select name="status" id="status" class="form-control">
+                                <option value="1" {{ (isset($model) && $model->status == '1') ? 'selected' : '' }}>Ativo</option>
+                                <option value="0" {{ (isset($model) && $model->status == '0') ? 'selected' : '' }}>Inativo</option>
+                            </select>
+                        </div>
+                        
                         <div class="card-footer d-flex">
                             <button class="btn btn-success justify-content-right">Salvar</button>
                         </div>

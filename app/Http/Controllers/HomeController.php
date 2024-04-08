@@ -8,6 +8,7 @@ use App\Models\Aulas;
 use App\Models\Disponibilidade;
 use App\Models\Empresa;
 use App\Models\Modalidade;
+use App\Models\PagamentoGateway;
 use App\Models\Professor;
 use App\Models\Usuario;
 use Illuminate\Support\Facades\Auth;
@@ -133,14 +134,19 @@ class HomeController extends Controller
 
     public function checkoutAuth($user_id)
     {
-        $model = $this->model->where('user_id', $user_id)->first();
-        $professor_id = Professor::where('usuario_id', $user_id)->first();
+        $model = $this->model::with('paymentGateways')->where('user_id', $user_id)->first();
+        $professor_id = Professor::with('usuario')->where('usuario_id', $user_id)->first();
+
+
+        $token_gateway = PagamentoGateway::where('empresa_id', $model->id)
+            ->where('status', 1)
+            ->value('api_key');
 
         return view(
             $this->view . '.checkoutAuth',
             [
                 'pageTitle' => $this->pageTitle,
-
+                'token_gateway' => $token_gateway,
                 'route' => $this->route,
                 'model'  => $model,
                 'professor' => $professor_id,

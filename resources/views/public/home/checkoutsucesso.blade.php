@@ -15,7 +15,7 @@
 									<i class="fas fa-check"></i>
 									<h3>Sua aula foi agendada com sucesso!</h3>
 									<p>
-										O professor <strong>{{ Str::ucfirst($professor->usuario->nome) }}</strong>
+										O professor <strong>{{ Str::ucfirst($professor->usuario->nome ?? 'Professor') }}</strong>
 										vai ensinar  a surfar no dia 
 										<strong class='data_aula'>{{ date('d/m/Y', strtotime($agendamento->data_da_aula)) }}</strong>
 										às <strong class='hora_aula'>{{ date('H:i', strtotime($agendamento->data_da_aula)) }}</strong>

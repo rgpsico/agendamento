@@ -46,7 +46,7 @@
 												<input type="hidden" id="hora_aula" name="hora_aula" value="" placeholder="hora_aula">
 												<input type="hidden" id="valor_aula" name="valor_aula" value="" placeholder="valor_aula">
 												<input type="hidden" id="titulo" name="titulo" value="" placeholder="titulo">
-										
+												<input type="hidden" id="token_gateway" name="token_gateway" value="{{$token_gateway}}" >
 												
 												
 												<!-- Credit Card Payment -->

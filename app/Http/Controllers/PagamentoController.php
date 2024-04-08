@@ -27,7 +27,8 @@ class PagamentoController extends Controller
 
     public function index()
     {
-        $pagamento = PagamentoGateway::all();
+        $empresa_id = Auth::user()->empresa->id;
+        $pagamento = PagamentoGateway::where('empresa_id', $empresa_id)->get();
 
         return view(
             'admin.pagamento.index',
@@ -76,9 +77,17 @@ class PagamentoController extends Controller
         ]);
 
 
+        if ($request->status == 1) {
+            PagamentoGateway::where('empresa_id', $request->empresa_id)
+                ->update(['status' => 0]);
+        }
+
+        // Criando o novo pagamento com o status fornecido (pode ser 1 ou 0)
+
         $pagamento = PagamentoGateway::create([
             'name' => $validated['name'],
             'api_key' => $validated['api_key'],
+            'status' => $request->status,
             //'additional_config' => $validated['additional_config'] ?? null, // Usando o operador null coalesce
             'empresa_id' => $request->empresa_id // Certifique-se de que este campo é esperado pelo modelo
         ]);
@@ -99,11 +108,16 @@ class PagamentoController extends Controller
         // Buscando o registro existente
         $pagamento = PagamentoGateway::findOrFail($id);
 
+        if ($request->status == 1) {
+            PagamentoGateway::where('empresa_id', $request->empresa_id)
+                ->update(['status' => 0]);
+        }
+
         // Atualizando o registro
         $pagamento->update([
             'name' => $validated['name'],
             'api_key' => $validated['api_key'],
-            // 'additional_config' => $validated['additional_config'] ?? null, // Se este campo for utilizado
+            'status' => $request->status, // Se este campo for utilizado
             'empresa_id' => $request->empresa_id, // Assumindo que empresa_id vem do request e é válido
         ]);
 
@@ -113,10 +127,11 @@ class PagamentoController extends Controller
 
 
 
-
+    //acct_1P23pLPi8YEsgyY7
     public function pagamentoStripe(Request $request)
     {
         Stripe::setApiKey(env('STRIPE_SECRET'));
+
 
         $token = $request->stripeToken;
 
@@ -129,14 +144,28 @@ class PagamentoController extends Controller
 
         $originalDate = $request->data_aula;
         $hora_aula = $request->hora_aula;
+        $conta_professor =  $request->token_gateway;
 
-
-
+        $professor = Professor::with('usuario.empresa')->find($professor_id);
+        // Para acessar a empresa diretamente
+        $empresa = null;
 
         $data_agendamento_formato_eua = PagamentoController::convertToUSFormat($originalDate) . ' ' . $hora_aula;
 
         $aluno = Alunos::find($aluno_id);
         $professor = Professor::find($professor_id);
+
+
+        $professor = Professor::with('usuario.empresa')->find($professor_id);
+
+        // Para acessar a empresa diretamente
+        $empresa = null;
+        if ($professor && $professor->usuario && $professor->usuario->empresa) {
+            $empresa = $professor->usuario->empresa;
+        }
+
+
+
 
         $aluno->professores()->attach($professor);
 
@@ -150,7 +179,7 @@ class PagamentoController extends Controller
 
 
             if ($charge->paid == true) {
-                $conta_professor = "acct_1P23pLPi8YEsgyY7";
+                //$conta_professor = "acct_1P23pLPi8YEsgyY7";
 
                 $amount_brl = PagamentoController::convertToBRL($valor_aula, 'USD');
 

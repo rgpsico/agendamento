@@ -52,7 +52,10 @@ class Usuario extends Authenticatable
     protected $dates = [
         'data_nascimento',
     ];
-
+    public function empresa()
+    {
+        return $this->hasOne(Empresa::class, 'user_id', 'id');
+    }
 
 
 
@@ -80,10 +83,7 @@ class Usuario extends Authenticatable
         return self::professores()->sum('revenue');
     }
 
-    public function empresa()
-    {
-        return $this->hasOne(Empresa::class, 'user_id', 'id');
-    }
+
 
     public function professor()
     {

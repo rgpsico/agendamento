@@ -24,6 +24,11 @@ class Empresa extends Model
         return $this->hasOne(EmpresaEndereco::class, 'empresa_id', 'id');
     }
 
+    public function paymentGateways()
+    {
+        return $this->hasMany(PagamentoGateway::class, 'empresa_id');
+    }
+
     public function modalidade()
     {
         return $this->belongsTo(Modalidade::class, 'modalidade_id');

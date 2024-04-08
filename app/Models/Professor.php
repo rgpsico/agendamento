@@ -22,6 +22,11 @@ class Professor extends Model
 
     public $timestamps = false;
 
+    public function usuario()
+    {
+        return $this->hasOne(Usuario::class, 'id', 'usuario_id');
+    }
+
 
     public function alunos()
     {
@@ -33,10 +38,6 @@ class Professor extends Model
         return $this->hasMany(Aulas::class, 'professor_id');
     }
 
-    public function usuario()
-    {
-        return $this->hasOne(Usuario::class, 'id', 'usuario_id');
-    }
 
     public function endereco()
     {
