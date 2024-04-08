@@ -298,6 +298,7 @@ class EmpresaController extends Controller
     public function endereco($userId)
     {
         $model = Empresa::where('user_id', $userId)->first();
+
         return view(
             'admin.empresas.endereco',
             [
@@ -306,6 +307,8 @@ class EmpresaController extends Controller
             ]
         );
     }
+
+
 
 
     public function fotos()

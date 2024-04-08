@@ -47,6 +47,15 @@ Route::prefix('cliente')->middleware('auth')->group(function () {
         Route::post('update', [EmpresaController::class, 'update'])->name('empresa.update');
         Route::post('/post', [EmpresaController::class, 'store'])->name('empresa.store');
         Route::post('/{userId}/endereco_empresa', [EmpresaController::class, 'endereco_update'])->name('empresa.update_endereco');
+
+        Route::get('/pagamento/create', [PagamentoController::class, 'create'])->name('empresa.pagamento.create');
+        Route::get('/pagamento', [PagamentoController::class, 'index'])->name('pagamento.index');
+        Route::post('/pagamento/store', [PagamentoController::class, 'store'])->name('empresa.pagamento.store');
+        Route::put('/pagamento/{id}/update', [PagamentoController::class, 'update'])->name('empresa.pagamento.update');
+
+        Route::get('/pagamento/{id}/edit', [PagamentoController::class, 'edit'])->name('empresa.pagamento.edit');
+
+
         Route::get('/disponibilidade', [EmpresaController::class, 'disponibilidade'])->name('empresa.disponibilidade');
         Route::post('/disponibilidade', [EmpresaController::class, 'cadastrarDisponibilidade'])->name('empresa.disponibilidade.store');
 
@@ -114,13 +123,12 @@ Route::prefix('pagamento')->middleware('auth')->group(function () {
     Route::post('/stripe', [PagamentoController::class, 'pagamentoStripe'])->name('pagamento.stripe');
 });
 
-
+Route::group(['prefix' => '/manager'], function () {
+    Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    // Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    // Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    // Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+});
 
 Route::prefix('admin')->middleware('auth')->group(function () {
-    Route::group(['prefix' => '/manager'], function () {
-        Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-        // Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-        // Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-        // Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-    });
 });

@@ -6,6 +6,8 @@ use App\Mail\PaymentConfirmation;
 use App\Models\Agendamento;
 use App\Models\AlunoProfessor;
 use App\Models\Alunos;
+use App\Models\Empresa;
+use App\Models\PagamentoGateway;
 use App\Models\Professor;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -22,6 +24,94 @@ class PagamentoController extends Controller
     {
         $this->aluno_professor  =   $aluno_professor;
     }
+
+    public function index()
+    {
+        $pagamento = PagamentoGateway::all();
+
+        return view(
+            'admin.pagamento.index',
+            [
+                'pageTitle' =>  'Cadastrar Pagamento',
+                'model' => $pagamento,
+                'route' => null
+            ]
+        );
+    }
+
+    public function create()
+    {
+        return view(
+            'admin.pagamento.create',
+            [
+                'pageTitle' =>  'Cadastrar Pagamento',
+                'model' => null
+            ]
+        );
+    }
+
+    public function edit($pagamentoID)
+    {
+
+        $model = PagamentoGateway::where('id', $pagamentoID)->first();
+
+
+        return view(
+            'admin.pagamento.create',
+            [
+                'pageTitle' =>  'Cadastrar Pagamento',
+                'model' => $model
+            ]
+        );
+    }
+
+    public function store(Request $request)
+    {
+        // Validando os dados de entrada
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'api_key' => 'required|string'
+            // 'additional_config' => 'nullable|string', // assumindo que é um campo opcional
+            // 'empresa_id' => 'required|integer|exists:empresas,id', // Validação de existência na tabela de empresas
+        ]);
+
+
+        $pagamento = PagamentoGateway::create([
+            'name' => $validated['name'],
+            'api_key' => $validated['api_key'],
+            //'additional_config' => $validated['additional_config'] ?? null, // Usando o operador null coalesce
+            'empresa_id' => $request->empresa_id // Certifique-se de que este campo é esperado pelo modelo
+        ]);
+
+
+        return redirect()->route('empresa.pagamento.create')->with('success', 'Pagamento cadastrado com sucesso!');
+    }
+
+    public function update(Request $request, $id)
+    {
+        // Validando os dados de entrada
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'api_key' => 'required|string',
+            // 'additional_config' => 'nullable|string', // Se você decidir usar este campo
+        ]);
+
+        // Buscando o registro existente
+        $pagamento = PagamentoGateway::findOrFail($id);
+
+        // Atualizando o registro
+        $pagamento->update([
+            'name' => $validated['name'],
+            'api_key' => $validated['api_key'],
+            // 'additional_config' => $validated['additional_config'] ?? null, // Se este campo for utilizado
+            'empresa_id' => $request->empresa_id, // Assumindo que empresa_id vem do request e é válido
+        ]);
+
+        // Redirecionando para a página desejada com uma mensagem de sucesso
+        return redirect()->route('empresa.pagamento.edit', $pagamento->id)->with('success', 'Pagamento atualizado com sucesso!');
+    }
+
+
 
 
     public function pagamentoStripe(Request $request)

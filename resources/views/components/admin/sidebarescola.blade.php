@@ -117,7 +117,27 @@
                                <i class="fe fe-map-pin"></i><span> Endereço</span>
                             </a>
                         </li>
+                        <li> 
+                            <a href="{{route('empresa.pagamento.store')}}">
+                               <i class="fe fe-map-pin"></i><span>Tipos de Pagamento</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
                         @endisset
+
+                        <li class="submenu">
+                            <a href="" class="">
+                                <i class="fas fa-credit-card mr-2" style=""></i> 
+                                <span>Pagamento</span> 
+                                <span class="menu-arrow"></span>
+                            </a>
+                            <ul style="display: none;">
+                                <li><a href="{{route('pagamento.index')}}">Listar</a></li>
+                                <li><a href="{{route('empresa.pagamento.create')}}">Cadastrar</a></li>
+                            </ul>
+                        </li>
+                        
                     </div>
     </div>
 </div> 
