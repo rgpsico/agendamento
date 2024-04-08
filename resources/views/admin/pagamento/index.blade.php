@@ -37,7 +37,11 @@
                                    
                                             <td>{{$value->api_key ?? '21 990271287'}}</td>
                                             <td class="text-center">
-                                                <span class="badge rounded-pill bg-success inv-badge">Ativo</span>
+                                                @if($value->status == 1 )
+                                                    <span class="badge rounded-pill bg-success inv-badge">Ativo</span>
+                                                @else    
+                                                    <span class="badge rounded-pill bg-danger inv-badge">Inativo</span>
+                                                @endif
                                             </td>
                                             <td class="text-end">
                                                 <div class="actions">
