@@ -122,6 +122,7 @@
 			</div>
 			<script>
 $("#paymentForm").on('submit', function(e) {
+	
     e.preventDefault(); 
 
     $('#spinner').show();
@@ -159,22 +160,23 @@ $("#paymentForm").on('submit', function(e) {
         },
         data: data, // Os dados que você está enviando para a API
         success: function (response) {
-			console.log(response)
-          
-			$('#spinner').hide();
-		if(response && response.content && response.content.id) {
-            const baseUrl = "{{ route('home.checkoutsucesso', ['id' => 'USER_ID']) }}";
-            const redirectTo = baseUrl.replace('USER_ID', response.content.id);
-            window.location.href = redirectTo;
-        }
+		if (response.error) {
+        alert('Erro: ' + response.error); // Mostra o erro em um alerta
+       
+    } else if (response && response.content && response.content.id) {
+        const baseUrl = "{{ route('home.checkoutsucesso', ['id' => 'USER_ID']) }}";
+        const redirectTo = baseUrl.replace('USER_ID', response.content.id);
+        window.location.href = redirectTo;
+    }
 
 			
         },
         error: function(response) {
 			try {
-
+				console.log(response.responseJSON)
 				let errors = response.responseJSON.errors;
-				
+				alert(response.responseJSON.error);
+				$('#spinner').hide();
 			$('.error').empty()	
 			$.each(errors, function(key, values) {
 				$('#' + key ).removeClass(); 	
@@ -228,13 +230,10 @@ form.addEventListener('submit', function(event) {
       // Se houver um erro ao criar o token, exiba a mensagem de erro
       console.log(result.error.message);
     } else {
-      // Se o token for criado com sucesso, você pode acessar o token através de result.token.id
+  
       var token = result.token.id;
 
-      // Faça o que você precisa com o token (por exemplo, enviar para o backend para criar uma cobrança)
-      // ...
-
-      // Envie o formulário para o backend (ou faça qualquer outra ação desejada)
+  
       form.submit();
     }
   });

@@ -97,7 +97,9 @@ class StripeController extends Controller
             $aluno = Alunos::where('usuario_id', $user->id)->first();
         }
 
-
+        if ($aluno == null) {
+            return response()->json(['error' => 'Erro aluno não econtrado'], 500);
+        }
 
         $aluno_id = $aluno->id;
         $data_agendamento = $request->data_aula;

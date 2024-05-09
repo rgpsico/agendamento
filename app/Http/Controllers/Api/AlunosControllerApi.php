@@ -10,6 +10,7 @@ use App\Models\Alunos;
 use App\Models\Modalidade;
 use App\Models\Professor;
 use App\Models\Usuario;
+use App\Service\AsaasService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -17,6 +18,15 @@ use Illuminate\Support\Facades\Mail;
 class AlunosControllerApi extends Controller
 {
     // Mostrar todos os usuários
+
+    protected $service;
+
+    public function  __construct(AsaasService $service)
+    {
+        $this->service = $service;
+    }
+
+
     public function index()
     {
         $users = Usuario::all();
@@ -151,5 +161,15 @@ class AlunosControllerApi extends Controller
         } catch (\Throwable $th) {
             //throw $th;
         }
+    }
+
+    public function service(Request $request)
+    {
+        return  $this->service->cobranca($request);
+    }
+
+    public function getCobrancas()
+    {
+        return  $this->service->getCobrancas();
     }
 }

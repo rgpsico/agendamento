@@ -75,3 +75,7 @@ Route::get('professores/{id}/alunos', [EmpresaControllerApi::class, 'getAlunoByI
 
 
 Route::post('/treino/email', [AlunosControllerApi::class, 'treinoEmail']);
+
+
+Route::post('/treino/service', [AlunosControllerApi::class, 'service']);
+Route::get('/treino/cobrancas', [AlunosControllerApi::class, 'getCobrancas']);
