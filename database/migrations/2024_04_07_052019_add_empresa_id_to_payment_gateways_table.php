@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('payment_gateways', function (Blueprint $table) {
-            $table->unsignedBigInteger('empresa_id')->after('id'); // Adiciona após a coluna 'id'
-            $table->foreign('empresa_id')->references('id')->on('empresas'); // Define a chave estrangeira
-        });
+        // Schema::table('payment_gateways', function (Blueprint $table) {
+        //     $table->unsignedBigInteger('empresa_id')->after('id'); // Adiciona após a coluna 'id'
+        //     $table->foreign('empresa_id')->references('id')->on('empresas'); // Define a chave estrangeira
+        // });
     }
 
     /**
