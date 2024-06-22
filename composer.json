@@ -6,6 +6,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.1",
+        "google/apiclient": "^2.16",
         "guzzlehttp/guzzle": "^7.2",
         "inertiajs/inertia-laravel": "^0.6.9",
         "laravel/framework": "^10.8",
@@ -15,6 +16,7 @@
         "nwidart/laravel-modules": "^10.0",
         "proengsoft/laravel-jsvalidation": "^4.8",
         "rap2hpoutre/laravel-log-viewer": "^2.3",
+        "spatie/laravel-google-calendar": "*",
         "stripe/stripe-php": "^10.15"
     },
     "require-dev": {
