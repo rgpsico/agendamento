@@ -12,8 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('payment_gateways', function (Blueprint $table) {
-            $table->unsignedBigInteger('empresa_id')->after('id'); // Adiciona após a coluna 'id'
-            $table->foreign('empresa_id')->references('id')->on('empresas'); // Define a chave estrangeira
+            $table->unsignedBigInteger('status'); // Adiciona após a coluna 'id'
+            // Define a chave estrangeira
+
         });
     }
 
@@ -23,8 +24,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('payment_gateways', function (Blueprint $table) {
-            $table->dropForeign(['empresa_id']); // Remove a chave estrangeira
-            $table->dropColumn('empresa_id'); // Remove a coluna
+            $table->dropColumn('status');
         });
     }
 };
