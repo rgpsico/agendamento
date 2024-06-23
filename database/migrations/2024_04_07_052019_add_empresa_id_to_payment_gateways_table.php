@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('payment_gateways', function (Blueprint $table) {
             $table->unsignedBigInteger('empresa_id')->after('id'); // Adiciona após a coluna 'id'
-            $table->foreign('empresa_id')->references('id')->on('empresas'); // Define a chave estrangeira
+            $table->foreign('empresa_id')->references('id')->on('empresa'); // Define a chave estrangeira
         });
     }
 
