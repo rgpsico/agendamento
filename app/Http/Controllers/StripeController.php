@@ -77,6 +77,7 @@ class StripeController extends Controller
     {
         $stripe = new StripeClient(env('STRIPE_SECRET'));
 
+
         $existingUser = Usuario::where('email', $request->email)->first();
 
         if (!$existingUser) {
@@ -107,19 +108,25 @@ class StripeController extends Controller
         $professor_id = $request->professor_id;
         $modalidade_id = $request->aula_id ??  1;
 
+        $professor = Professor::select('id')->where('usuario_id', $professor_id)->first();
+
+
         $existingRelation = AlunoProfessor::where('aluno_id', $aluno->id)
             ->where('professor_id', $professor_id)
             ->first();
 
+
+
         if (!$existingRelation) {
             $alunoProfessor = new AlunoProfessor();
             $alunoProfessor->aluno_id = $aluno->id;
-            $alunoProfessor->professor_id = $professor_id;
+            $alunoProfessor->professor_id = $professor->id;
             $alunoProfessor->save();
         }
 
         $professor = Professor::with('usuario')->where('usuario_id', $professor_id)->first();
         $data_agendamento_formato_eua = PagamentoController::convertToUSFormat($data_agendamento) . ' ' . $hora_agendamento;
+
 
         if (!$professor) {
             return redirect()->back()->with('erro', 'Professor não encontrado');
