@@ -112,8 +112,9 @@ class StripeController extends Controller
 
 
         $existingRelation = AlunoProfessor::where('aluno_id', $aluno->id)
-            ->where('professor_id', $professor_id)
+            ->where('professor_id', $professor->id)
             ->first();
+
 
 
 
