@@ -12,12 +12,14 @@ use App\Http\Controllers\Api\EmpresaControllerApi;
 use App\Http\Controllers\Api\ProfessoresControllerApi;
 use App\Http\Controllers\Api\ServicoControllerApi;
 use App\Http\Controllers\Api\UserControllerApi;
+use App\Http\Controllers\GoogleCalendarController;
 use App\Http\Controllers\ModalidadeController;
 use App\Http\Controllers\PagamentoController;
 use App\Http\Controllers\StripeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+Route::post('/events', [GoogleCalendarController::class, 'createEvent']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

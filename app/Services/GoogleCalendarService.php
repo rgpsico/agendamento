@@ -56,11 +56,37 @@ class GoogleCalendarService
         return $events->getItems();
     }
 
-    public function createEvent($calendarId = 'primary', $eventData)
+    public function createEvent(Request $request)
     {
-        $service = new Google_Service_Calendar($this->client);
-        $event = new Google_Service_Calendar_Event($eventData);
-        $event = $service->events->insert($calendarId, $event);
-        return $event;
+        $client = new Google_Client();
+        $client->setAuthConfig(storage_path('app/google/credentials.json'));
+        $client->setRedirectUri(env('GOOGLE_CALENDAR_REDIRECT_URI'));
+    
+        // Verificar se o token de acesso está na sessão
+        if (!$request->session()->has('google_calendar_access_token')) {
+            return redirect()->route('google.calendar.auth');
+        }
+    
+        $accessToken = $request->session()->get('google_calendar_access_token');
+        $client->setAccessToken($accessToken);
+    
+        // Verificar se o token de acesso está expirado
+        if ($client->isAccessTokenExpired()) {
+            $client->fetchAccessTokenWithRefreshToken($client->getRefreshToken());
+            $request->session()->put('google_calendar_access_token', $client->getAccessToken());
+        }
+    
+        $service = new Google_Service_Calendar($client);
+    
+        $event = new \Google_Service_Calendar_Event([
+            'summary' => 'A new event',
+            'start' => ['dateTime' => Carbon::now()->toRfc3339String()],
+            'end' => ['dateTime' => Carbon::now()->addHour()->toRfc3339String()],
+        ]);
+    
+        $createdEvent = $service->events->insert(env('GOOGLE_CALENDAR_ID'), $event);
+    
+        return response()->json(['message' => 'Event created!', 'event' => $createdEvent]);
     }
+    
 }

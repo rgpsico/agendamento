@@ -5,7 +5,11 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SocialLiteController;
 use App\Http\Controllers\GoogleCalendarController;
 use Illuminate\Support\Facades\Route;
+use Spatie\GoogleCalendar\Event;
 use Inertia\Inertia;
+
+use App\Http\Controllers\GoogleController;
+
 
 
 Route::get('/google/prof/redirect', [SocialLiteController::class, 'professorRedirectToGoogle'])->name('prof.login.google');
@@ -18,9 +22,21 @@ Route::get('/google/callback', [SocialLiteController::class, 'alunoGoogleCallbac
 
 
 
+// Route::get('/google-calendar/auth', [GoogleCalendarController::class, 'authenticate'])->name('google.calendar.auth');
+// Route::get('/google-calendar/events', [GoogleCalendarController::class, 'listEvents'])->name('google.calendar.events');
+
+
+
+
+
 Route::get('/google-calendar/auth', [GoogleCalendarController::class, 'authenticate'])->name('google.calendar.auth');
+Route::get('/google-calendar/callback', [GoogleCalendarController::class, 'authenticate']);
 Route::get('/google-calendar/events', [GoogleCalendarController::class, 'listEvents'])->name('google.calendar.events');
-Route::post('/google-calendar/events', [GoogleCalendarController::class, 'createEvent'])->name('google.calendar.createEvent');
+Route::get('/google-calendar/create-event', [GoogleCalendarController::class, 'createEvent']);
+
+Route::get('/events', [GoogleCalendarController::class, 'getAllEvents'])->name('google.calendar.events');
+Route::get('/google-calendar/create-event', [GoogleCalendarController::class, 'createEvent']);
+
 
 
 Route::prefix('admin')->middleware(['check_user_authenticated'])->group(function () {

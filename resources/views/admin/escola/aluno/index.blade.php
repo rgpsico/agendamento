@@ -1,6 +1,6 @@
 <x-admin.layout title="{{$pageTitle}}">
 
-    {{dd('aaaa')}}
+    
     <x-modal-delete/>
     <x-modal-editar-usuario/>
     <div class="page-wrapper">
