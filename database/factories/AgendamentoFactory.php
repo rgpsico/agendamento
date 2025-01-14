@@ -2,11 +2,11 @@
 
 namespace Database\Factories;
 
+
 use App\Models\Alunos;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\Empresa;
 use App\Models\Modalidade;
-use App\Models\Professor;
 use App\Models\Usuario;
 use Illuminate\Support\Str;
 use Faker\Generator as Faker;

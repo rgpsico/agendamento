@@ -12,7 +12,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        \App\Models\Usuario::factory(10)->create();
+        // \App\Models\Usuario::factory(10)->create();
 
         // \App\Models\User::factory()->create([
         //     'name' => 'Test User',
@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
 
         // \App\Models\Usuario::factory(10)->create();
         // \App\Models\DiaDaSemana::factory(7)->create();
-        \App\Models\Modalidade::factory(5)->create();
+        // \App\Models\Modalidade::factory(5)->create();
         // \App\Models\Empresa::factory(10)->create();
         // \App\Models\EmpresaEndereco::factory(10)->create();
 
@@ -33,6 +33,6 @@ class DatabaseSeeder extends Seeder
 
         // \App\Models\Servicos::factory(10)->create();
 
-        \App\Models\Disponibilidade::factory(7)->create();
+        // \App\Models\Disponibilidade::factory(7)->create();
     }
 }
