@@ -13,22 +13,22 @@
 				}
 
 				.card-selected {
-   				 background-color: #007bff;
+   			
     			color: #fff;
 				}
 
-        .card_servicos {
+.card_servicos {
     border: 1px solid #ddd;
     border-radius: 10px;
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
     transition: 0.3s;
-    overflow: hidden; /* para garantir que as imagens fiquem contidas no card */
+    overflow: hidden;
 }
 
 .card_servicos img {
     width: 100%;
-    height: 80px; /* Ajuste esse valor para o tamanho desejado */
-    object-fit: cover; /* Faz com que as imagens se ajustem ao tamanho especificado sem distorção */
+    height: 100px;
+    object-fit: cover;
 }
 
 .card_servicos .card-body {
@@ -75,7 +75,7 @@ form span{
     margin: 20px;
     width: 40px;
     height: 40px;
-       margin-block-start: 0px !important;
+    margin-block-start: 0px !important;
     margin-block-end: 0px !important;
     margin-inline-start: 20px !important;
     margin-inline-end: 20px !important;
@@ -238,7 +238,6 @@ img{
   box-shadow: 0 2px 4px 0 rgba(219, 215, 215, 0);
   border: solid 2px transparent;
 	background: #fff;
-	max-width: 280px;
 	height: 330px;
 	padding: 15px;
 	display: grid;
@@ -346,10 +345,10 @@ img{
 								</div>
 							</div>
 						</div>
-            <div class="grid-wrapper grid-col-2">
+            <div class="row mb-4">
               @isset($model->servicos)              
                   @foreach ($model->servicos as $serv )                        
-                  <div class="selection-wrapper card_servicos card-selected" data-servico_preco="{{$serv->preco}}" data-servico_id="{{$serv->id}}" data-servico_titulo="{{$serv->titulo}}">
+                  <div class="selection-wrapper card_servicos  mb-3" data-servico_preco="{{$serv->preco}}" data-servico_id="{{$serv->id}}" data-servico_titulo="{{$serv->titulo}}">
                     <label for="selected-item-{{ $serv->id }}" class="selected-label">
                         <input type="radio" name="selected-item" id="selected-item-{{ $serv->id }}">
                         <span class="icon"></span>
@@ -452,7 +451,7 @@ img{
 			<script src="{{asset('admin/js/jquery-3.6.3.min.js')}}"></script>
 
 				<script>
-					var currentStartIndex = 0;
+		var currentStartIndex = 0;
 const dates = getNext29Days();
 
 
@@ -726,7 +725,6 @@ function toggleServico(servico) {
     // Salva a lista atualizada no localStorage
     localStorage.setItem('servicos', JSON.stringify(servicos));
 }
-
 
 
 				</script>
