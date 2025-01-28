@@ -21,9 +21,13 @@ class DisponibilidadeControllerApi extends Controller
     public function disponibilidade(Request $request)
     {
 
+
         $day = $request->input('day');
         $data_selecionada = $request->input("data_select");
+
+
         $professor_id = $request->input("professor_id");; // Você precisa enviar o ID do professor na sua requisição
+
 
         $schedules = Disponibilidade::where('id_dia', $day)->get();
 
@@ -32,6 +36,7 @@ class DisponibilidadeControllerApi extends Controller
         foreach ($schedules as $schedule) {
             $start = Carbon::parse($schedule->hora_inicio);
             $end = Carbon::parse($schedule->hora_fim);
+
 
             for ($time = $start; $time->lessThan($end); $time->addHour()) {
 
@@ -47,6 +52,9 @@ class DisponibilidadeControllerApi extends Controller
                 }
             }
         }
+
+
+
         return response()->json($timeslots);
     }
 
