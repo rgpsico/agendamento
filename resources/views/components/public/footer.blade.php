@@ -6,7 +6,7 @@
 					<div class="footer-widget footer-about">
 						<div class="footer-logo">
 							<a href="">
-							<img src="{{asset('template/assets/img/logo.png')}}" alt="logo">
+							<img src="{{asset('https://rjpasseios.com.br/wp-content/uploads/2024/12/cropped-logo-1.png')}}" alt="logo">
 						</a>
 						</div>
 						<div class="footer-about-content">
