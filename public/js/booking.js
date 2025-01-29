@@ -1,10 +1,6 @@
 var currentStartIndex = 0;
 const dates = getNext29Days();
 
-
-
-
-
 function getNext29Days() {
   const dates = [];
   for (let i = 0; i < 29; i++) {
@@ -40,8 +36,6 @@ function renderDates() {
 }
 
 $(document).ready(function() {
-  
-
   // Render inicial das datas
   renderDates();
 
@@ -55,6 +49,7 @@ $(document).ready(function() {
   });
 
   $(document).on('click', '.day-slot .right-arrow', function(e) {
+      
     e.preventDefault();
     if (currentStartIndex < dates.length - 7) {
       currentStartIndex++;
@@ -65,7 +60,7 @@ $(document).ready(function() {
 
 $(document).on('click', '.day-slot li', function(e) {
   e.preventDefault();
-  
+  $('.submit-btn').prop('disabled', true);
   // Verifique se o item clicado não é uma seta
   if (!$(this).hasClass('left-arrow') && !$(this).hasClass('right-arrow')) {
     // Remove a classe 'selected-date' de qualquer li que a possua
@@ -77,13 +72,10 @@ $(document).on('click', '.day-slot li', function(e) {
     const dayOfWeek = $(this).find('span:first').text();
     const date = $(this).find('.slot-date').text();
 
-	$('.dia_da_semana').val(dayOfWeek)
-	$('.data').val(date)
-    
-	
+    $('.dia_da_semana').val(dayOfWeek);
+    $('.data').val(date);
   }
 });
-
 
 $(document).on('click', '.day-slot li', function(e) {
   e.preventDefault();
@@ -102,8 +94,8 @@ $(document).on('click', '.day-slot li', function(e) {
     // Combine to get the full date
     const fullDate = day + ' ' + month + ' ' + year;
 
-    let data_selecionada = converterData(fullDate)
-    console.log( converterData(fullDate)); // You can see the full date in the console for now
+    let data_selecionada = converterData(fullDate);
+    console.log(converterData(fullDate)); // You can see the full date in the console for now
 
     const dayMapping = {
       'seg.': 1,
@@ -116,18 +108,18 @@ $(document).on('click', '.day-slot li', function(e) {
     };
 
     const dayNumber = dayMapping[dayOfWeek];
-$('#spinner').show()
+    $('#spinner').show();
     $.ajax({
       url: '/api/disponibilidade', 
       method: 'GET',
       data: {
         day: dayNumber,
-        data_select:data_selecionada,
-        professor_id:$('#professor_id').val()
+        data_select: data_selecionada,
+        professor_id: $('#professor_id').val()
       },
       success: function(response) {
         $('.time-slot ul').html(''); 
-        $('#spinner').hide()
+        $('#spinner').hide();
         response.forEach(function(time) {
           const timeElement = `<li>
             <a class="timing" href="#">
@@ -170,7 +162,6 @@ function converterData(dateString) {
     return year + '-' + month + '-' + day;
 }
 
-
 $(document).on('click', '.timing', function(e) {
   e.preventDefault();
   
@@ -185,8 +176,10 @@ $(document).on('click', '.timing', function(e) {
   
   // Coloca a hora no input
   $('.hora_da_aula').val(time);
-});
 
+  // Habilita o botão de agendamento
+  $('.submit-btn').prop('disabled', false);
+});
 
 $('.submit-btn').on('click', function(e) {
   // Previne o evento padrão (navegação) até que os dados sejam salvos
@@ -211,7 +204,6 @@ $('.submit-btn').on('click', function(e) {
   }
 });
 
-
 $(document).ready(function() {
     $('.card_servicos').on('click', function() {
         $(this).toggleClass('card-selected');
@@ -222,7 +214,7 @@ $(document).ready(function() {
             preco: $(this).data('servico_preco')
         };
 
-        $(".schedule-header").show()
+        $(".schedule-header").show();
         toggleServico(servico);
     });
 });
@@ -245,7 +237,6 @@ function calcularPrecoTotal() {
     return total;
 }
 
-
 function toggleServico(servico) {
     // Pega a lista de serviços do localStorage
     let servicos = localStorage.getItem('servicos');
@@ -266,7 +257,7 @@ function toggleServico(servico) {
         servicos.push(servico);
     } else {
         // Se o serviço está na lista, remove
-       // servicos.splice(index, 1);
+        servicos.splice(index, 1);
     }
 
     // Salva a lista atualizada no localStorage
