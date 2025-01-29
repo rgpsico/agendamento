@@ -85,7 +85,61 @@ $(document).on('click', '.day-slot li', function(e) {
 });
 
 
+$(document).on('click', '.day-slot li', function(e) {
+  e.preventDefault();
+  
+  if (!$(this).hasClass('left-arrow') && !$(this).hasClass('right-arrow')) {
+    $('.day-slot li').removeClass('selected-date');
+    $(this).addClass('selected-date');
 
+    const dayOfWeek = $(this).find('span:first').text();
+    
+    // Extract the day, month, and year
+    const day = $(this).find('span.slot-date').text().trim();
+    const month = $(this).find('span:not(.slot-date)').text().trim();
+    const year = $(this).find('small.slot-year').text().trim();
+
+    // Combine to get the full date
+    const fullDate = day + ' ' + month + ' ' + year;
+
+    let data_selecionada = converterData(fullDate)
+    console.log( converterData(fullDate)); // You can see the full date in the console for now
+
+    const dayMapping = {
+      'seg.': 1,
+      'ter.': 2,
+      'qua.': 3,
+      'qui.': 4,
+      'sex.': 5,
+      'sáb.': 6,
+      'dom.': 7
+    };
+
+    const dayNumber = dayMapping[dayOfWeek];
+$('#spinner').show()
+    $.ajax({
+      url: '/api/disponibilidade', 
+      method: 'GET',
+      data: {
+        day: dayNumber,
+        data_select:data_selecionada,
+        professor_id:$('#professor_id').val()
+      },
+      success: function(response) {
+        $('.time-slot ul').html(''); 
+        $('#spinner').hide()
+        response.forEach(function(time) {
+          const timeElement = `<li>
+            <a class="timing" href="#">
+              <span>${time}</span>
+            </a>
+          </li>`;
+          $('.time-slot ul').append(timeElement);
+        });
+      }
+    });
+  }
+});
 
 function converterData(dateString) {
     // Define month mapping
@@ -218,4 +272,3 @@ function toggleServico(servico) {
     // Salva a lista atualizada no localStorage
     localStorage.setItem('servicos', JSON.stringify(servicos));
 }
-
