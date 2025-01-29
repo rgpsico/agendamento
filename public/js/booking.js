@@ -60,7 +60,7 @@ $(document).ready(function() {
 
 $(document).on('click', '.day-slot li', function(e) {
   e.preventDefault();
-  $('.submit-btn').prop('disabled', true);
+  $('.btn-primary').addClass('disabled');
   // Verifique se o item clicado não é uma seta
   if (!$(this).hasClass('left-arrow') && !$(this).hasClass('right-arrow')) {
     // Remove a classe 'selected-date' de qualquer li que a possua
@@ -168,6 +168,7 @@ $(document).on('click', '.timing', function(e) {
   // Remove a classe "selected" de qualquer outra marcação de tempo
   $('.timing').removeClass('selected');
   
+  $('.btn-primary').removeClass('disabled');
   // Adiciona a classe "selected" ao elemento clicado
   $(this).addClass('selected');
   
