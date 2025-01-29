@@ -4,7 +4,7 @@
   <!-- /Breadcrumb -->
 
   <link rel="stylesheet" type="text/css" href="{{ asset('css/booking.css') }}">
-
+  <img src="" alt="">
   @include('admin.empresas._partials.modal')
 
   <input type="hidden" id="professor_id" value="{{ $professor_id }}">
@@ -105,12 +105,12 @@
 
               <!-- Submit Section -->
               <div class="submit-section proceed-btn text-end mt-4">
-                  @if(Auth::check())
-                      <a href="{{ route('home.checkoutAuth', ['user_id' => $model->user_id]) }}" class="btn btn-primary submit-btn">Agendar e Pagar</a>
-                  @else
-                      <a href="{{ route('home.checkout', ['id' => $model->user_id]) }}" class="btn btn-primary submit-btn">Agendar e Pagar</a>
-                  @endif
-              </div>
+                @if(Auth::check())
+                    <button class="btn btn-primary submit-btn" disabled>Agendar e Pagar</button>
+                @else
+                    <button class="btn btn-primary submit-btn" disabled>Agendar e Pagar</button>
+                @endif
+            </div>
               <!-- /Submit Section -->
           </div>
       </div>
