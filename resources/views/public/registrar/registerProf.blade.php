@@ -1,85 +1,128 @@
-<link rel="stylesheet" href="{{asset('admin/css/custom.css')}}">
+<head>
+    <link rel="stylesheet" href="{{ asset('admin/css/custom.css') }}">
+    <link rel="stylesheet" href="{{ asset('admin/css/bootstrap.css') }}">
+    <link rel="stylesheet" href="{{ asset('admin/css/font-awesome.min.css') }}">
 
-<link rel="stylesheet" href="{{asset('admin/css/bootstrap.css')}}">
-		
-<!-- Fontawesome CSS -->
-<link rel="stylesheet" href="{{asset('admin/css/font-awesome.min.css')}}">
+    <style>
+        /* Ajustes para telas menores */
+        @media (max-width: 768px) {
+            .loginbox {
+                padding: 20px;
+                width: 100%;
+                max-width: 400px;
+                margin: 0 auto;
+            }
 
-<!-- Main CSS -->
-<link rel="stylesheet" href="{{asset('admin/css/custom.css')}}">
-<div class="main-wrapper login-body">
-	<div class="login-wrapper">
-	  <div class="container">
-		<div class="loginbox">
-		  <div class="row">
-			<div class="col-md-6 login-left">
-			  <img class="img-fluid" src="{{asset('admin/img/logo-white.png')}}" alt="Logo">
-			</div>
-			<div class="col-md-6 login-right">
-			  <div class="login-right-wrap">
-				<h1>Registrar Escola de surf</h1>
-				<p class="account-subtitle">Acessar seu painel administrativo</p>
-  
-				<!-- Form -->
-				<form action="{{route('user.store')}}" method="POST">
-				  @csrf
-  
-				  <input type="hidden" name="tipo_usuario" value="Professor">
-				  <x-text-input name="nome"  size="100%" label="Nome" placeholder="Nome: Roger Ne" />
-				  <x-text-input name="email" size="30" label="Email" placeholder="email@124.com" />
-				  <x-text-input type='password' name="senha" size="30" label="Senha" />
-				  <x-text-input type='password' name="senha" size="30" label="Repetir Senha" />
-				   
-				  <div class="form-group">
-					<label for="">Modalidade</label>
-						<select name="modalidade_id" class="form-control" id="modalidade_id">
-							
-					
-							@foreach ($modalidade as  $value)
-								<option value="{{$value->id}}">{{$value->nome}}</option>
-							@endforeach 
-										
-						</select>
-				  </div>
-				 
+            .login-left {
+                text-align: center;
+                padding: 10px;
+            }
 
-				  <div class="form-group mb-0">
-				  		<button class="btn btn-primary w-100" type="submit">Registrar</button>
-				  </div>
-				</form>
-				<!-- /Form -->
-  
-				<div class="login-or">
-				  <span class="or-line"></span>
-				  <span class="span-or">Ou</span>
-				</div>
-  
-				<!-- Social Login -->
-				{{-- <div class="social-login">
-				  <span>Registrar Com</span>
-				  <a href="#" class="facebook">
-					<i class="fa fa-facebook"></i>
-				  </a>
-				  <a href="#" class="google">
-					<i class="fa fa-google"></i>
-				  </a>
-				</div> --}}
-				<!-- /Social Login -->
-  
-				<div class="col-12">
-					{{-- <div class="col-12">
-						<a href="{{route('prof.login.google')}}" class="btn btn-google w-100">
-							<i class="fab fa-google me-1">
-								</i> Login com Google
-							</a>
-							
-					</div> --}}
-				</div>
-			  </div>
-			</div>
-		  </div>
-		</div>
-	  </div>
-	</div>
-  </div>
-  
+            .login-left img {
+                width: 100px; /* Redimensiona a imagem em telas menores */
+                height: auto;
+            }
+
+            .login-right-wrap {
+                padding: 20px;
+            }
+        }
+
+        .main-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #f8f9fa;
+        }
+
+        .loginbox {
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .btn-google {
+            background: #dd4b39;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            border-radius: 5px;
+            display: block;
+            margin-top: 15px;
+        }
+
+        .btn-google i {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+
+<div class="main-wrapper">
+    <div class="loginbox">
+        <div class="row">
+            <!-- Logo (visível em todas as telas agora) -->
+            <div class="col-md-6 login-left d-flex align-items-center justify-content-center">
+                <img class="img-fluid" src="{{ asset('admin/img/logo-white.png') }}" alt="Logo">
+            </div>
+
+            <div class="col-md-6 login-right">
+                <div class="login-right-wrap">
+                    <h1 class="text-center">Registrar Escola de Surf</h1>
+                    <p class="account-subtitle text-center">Acesse seu painel administrativo</p>
+
+                    <!-- Formulário -->
+                    <form action="{{ route('user.store') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="tipo_usuario" value="Professor">
+
+                        <div class="form-group">
+                            <x-text-input name="nome" label="Nome" placeholder="Nome: Roger Ne" />
+                        </div>
+
+                        <div class="form-group">
+                            <x-text-input name="email" label="Email" placeholder="email@124.com" />
+                        </div>
+
+                        <div class="form-group">
+                            <x-text-input type="password" name="senha" label="Senha" />
+                        </div>
+
+                        <div class="form-group">
+                            <x-text-input type="password" name="senha" label="Repetir Senha" />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="modalidade_id">Modalidade</label>
+                            <select name="modalidade_id" class="form-control" id="modalidade_id">
+                                @foreach ($modalidade as $value)
+                                    <option value="{{ $value->id }}">{{ $value->nome }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <button class="btn btn-primary w-100" type="submit">Registrar</button>
+                        </div>
+                    </form>
+
+                    <!-- Linha divisória -->
+                    <div class="login-or text-center">
+                        <span class="or-line"></span>
+                        <span class="span-or">Ou</span>
+                    </div>
+
+                    <!-- Login com Google -->
+                    <div class="col-12 text-center">
+                        <a href="{{ route('prof.login.google') }}" class="btn-google">
+                            <i class="fab fa-google"></i> Login com Google
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

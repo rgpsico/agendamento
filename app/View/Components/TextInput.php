@@ -18,7 +18,7 @@ class TextInput extends Component
      *
      * @return void
      */
-    public function __construct($label, $name, $size, $value = null, $placeholder = null, $type = 'text') // Valor padrão como null
+    public function __construct($label, $name, $size = '100%', $value = null, $placeholder = null, $type = 'text') // Valor padrão como null
     {
         $this->name = $name;
         $this->size = $size;
