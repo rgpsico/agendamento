@@ -35,21 +35,23 @@
 
               <div class="row mb-4">
                   @isset($model->servicos)
-                      @foreach ($model->servicos as $serv)
-                          <div class="col-12 col-md-6 col-lg-4 mb-3">
-                              <div class="selection-wrapper card_servicos" data-servico_preco="{{ $serv->preco }}" data-servico_id="{{ $serv->id }}" data-servico_titulo="{{ $serv->titulo }}">
-                                  <label for="selected-item-{{ $serv->id }}" class="selected-label">
-                                      <input type="radio" name="selected-item" id="selected-item-{{ $serv->id }}">
-                                      <span class="icon"></span>
-                                      <div class="selected-content">
-                                          <img class="card-img-top img-fluid" src="{{ asset('servico/' . $serv->imagem ?? 'admin/img/doctors/Thumbs.db') }}" alt="{{ $serv->titulo }}">
-                                          <h4>{{ $serv->titulo }}</h4>
-                                          <h5>{{ $serv->descricao }}</h5>
-                                      </div>
-                                  </label>
+                  @foreach ($model->servicos as $serv)
+                  <div class="col-12 col-md-6 col-lg-4 mb-3">
+                      <div class="selection-wrapper card_servicos" data-servico_preco="{{ $serv->preco }}" 
+                          data-servico_id="{{ $serv->id }}" data-servico_titulo="{{ $serv->titulo }}">
+                          <label for="selected-item-{{ $serv->id }}" class="selected-label">
+                              <input type="radio" name="selected-item" id="selected-item-{{ $serv->id }}" class="servico-selecionado" data-servico_id="{{ $serv->id }}">
+                              <span class="icon"></span>
+                              <div class="selected-content">
+                                  <img class="card-img-top img-fluid" src="{{ asset('servico/' . $serv->imagem ?? 'admin/img/doctors/Thumbs.db') }}" alt="{{ $serv->titulo }}">
+                                  <h4>{{ $serv->titulo }}</h4>
+                                  <h5>{{ $serv->descricao }}</h5>
                               </div>
-                          </div>
-                      @endforeach
+                          </label>
+                      </div>
+                  </div>
+              @endforeach
+              
                   @endisset
               </div>
 

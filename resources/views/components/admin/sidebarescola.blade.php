@@ -36,13 +36,20 @@
                 </li>
               
                 @isset(Auth::user()->professor->id)
-                <li> 
-                   
-                    <a href="{{route('empresa.disponibilidade')}}">
-                        <i class="fe fe-clock "></i>
-                            <span>Horários</span>
-                    </a>
-                </li>
+        
+    <li class="submenu">
+        <a href="" class="">
+            <i class="fas fa-clock"></i>
+            <span>Horários</span>
+            <span class="menu-arrow"></span>
+             {{-- Ícone do FontAwesome --}}
+        </a>
+        <ul style="display: none;">
+            <li><a href="{{ route('empresa.disponibilidade') }}">Únicos</a></li>
+            <li><a href="{{ route('empresa.disponibilidadePersonalizada') }}">Personalizado</a></li>
+        </ul>
+    </li>
+
                 @endisset
                 @endisset
                 @isset(Auth::user()->professor->id)
@@ -52,6 +59,8 @@
                     </a>
                 </li>
                 @endisset
+
+                
                
 
                 <li class="submenu">

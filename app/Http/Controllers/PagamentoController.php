@@ -254,14 +254,27 @@ class PagamentoController extends Controller
 
     public static function convertToUSFormat($originalDate)
     {
-        // Remova pontos após os meses
+        // Se a data já estiver no formato correto YYYY-MM-DD, apenas a retorna
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $originalDate)) {
+            return $originalDate;
+        }
+
+        // Remove pontos após os meses (caso existam)
         $originalDate = str_replace(
             [' jan. ', ' fev. ', ' mar. ', ' abr. ', ' mai. ', ' jun. ', ' jul. ', ' ago. ', ' set. ', ' out. ', ' nov. ', ' dez. '],
             [' jan ', ' fev ', ' mar ', ' abr ', ' mai ', ' jun ', ' jul ', ' ago ', ' set ', ' out ', ' nov ', ' dez '],
             $originalDate
         );
 
-        // Mapeie meses em português para seus números correspondentes
+        // Divide a string para extrair dia, mês e ano
+        $parts = explode(' ', trim($originalDate));
+
+        // Verifica se a data está completa (deve ter 3 partes: dia, mês, ano)
+        if (count($parts) !== 3) {
+            throw new \Exception("Formato de data inválido: '{$originalDate}'. Esperado: '3 fev 2025'");
+        }
+
+        // Mapeamento de meses
         $months = [
             'jan' => '01',
             'fev' => '02',
@@ -277,14 +290,18 @@ class PagamentoController extends Controller
             'dez' => '12',
         ];
 
+        $day = $parts[0]; // Dia
+        $monthAbbrev = strtolower($parts[1]); // Mês abreviado (ex: 'fev')
+        $year = $parts[2]; // Ano
 
-        // Separe a string por espaços
-        $parts = explode(' ', $originalDate);
+        // Verifica se o mês é válido
+        if (!isset($months[$monthAbbrev])) {
+            throw new \Exception("Mês inválido: '{$monthAbbrev}' na data '{$originalDate}'.");
+        }
 
-        // Converta o mês textual para o número correspondente
-        $monthNumber = $months[strtolower($parts[1])];
+        $monthNumber = $months[$monthAbbrev]; // Converte o mês para número
 
-        // Retorne a data no formato "Y-m-d"
-        return "{$parts[2]}-{$monthNumber}-{$parts[0]}";
+        // Retorna a data no formato "Y-m-d"
+        return "{$year}-{$monthNumber}-{$day}";
     }
 }

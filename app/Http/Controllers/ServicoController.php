@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ServicoRequest;
+use App\Models\DiaDaSemana;
+use App\Models\Disponibilidade;
 use App\Models\Servicos;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -44,6 +46,66 @@ class ServicoController extends Controller
             ]
         );
     }
+
+    public function listarServicos()
+    {
+        $servicos = Servicos::all(); // Busca todos os serviços cadastrados
+
+        return view('admin.empresas.listar_servicos', [
+            'pageTitle' => 'Lista de Serviços',
+            'servicos' => $servicos
+        ]);
+    }
+
+    public function configurarHorarios($idServico)
+    {
+        $servico = Servicos::findOrFail($idServico);
+        $diaDaSemana = DiaDaSemana::all();
+        $id_professor = Auth::user()->professor->id;
+
+        // Buscar as disponibilidades já cadastradas para esse serviço
+        $disponibilidades = Disponibilidade::where('id_professor', $id_professor)
+            ->where('id_servico', $idServico)
+            ->get();
+
+        return view('admin.empresas.configurar_horarios', [
+            'servico' => $servico,
+            'diaDaSemana' => $diaDaSemana,
+            'disponibilidades' => $disponibilidades
+        ]);
+    }
+
+    public function salvarHorarios(Request $request, $idServico)
+    {
+        $id_professor = $request->professor_id;
+
+        // Deletar todas as disponibilidades para evitar duplicações
+        Disponibilidade::where('id_professor', $id_professor)
+            ->where('id_servico', $idServico)
+            ->delete();
+
+        // Percorrer os horários e salvar
+        foreach ($request->start as $dia => $horariosInicio) {
+            foreach ($horariosInicio as $index => $horaInicio) {
+                $horaFim = $request->end[$dia][$index] ?? null;
+
+                if ($horaInicio && $horaFim) {
+                    Disponibilidade::create([
+                        'id_professor' => $id_professor,
+                        'id_servico' => $idServico,
+                        'id_dia' => $dia,
+                        'hora_inicio' => $horaInicio,
+                        'hora_fim' => $horaFim,
+                    ]);
+                }
+            }
+        }
+
+        return redirect()->route('configurar.horarios', $idServico)->with('success', 'Horários salvos com sucesso!');
+    }
+
+
+
 
     public function edit($id)
     {
