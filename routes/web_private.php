@@ -6,6 +6,7 @@ use App\Http\Controllers\admin\AdminController;
 use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\AlunosController;
 use App\Http\Controllers\Api\AgendamentoControllerApi;
+use App\Http\Controllers\ConfiguracoesController;
 use App\Http\Controllers\DisponibilidadeController;
 use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\ModalidadeController;
@@ -28,6 +29,13 @@ Route::prefix('usuario')->group(function () {
 });
 
 
+Route::prefix('configuracoes')->group(function () {
+    Route::get('/permissoes', [ConfiguracoesController::class, 'permissoes'])->name('configuracoes.permissoes');
+    Route::get('/pagamentos', [ConfiguracoesController::class, 'pagamentos'])->name('configuracoes.pagamentos');
+    Route::get('/empresa', [ConfiguracoesController::class, 'empresa'])->name('configuracoes.empresa');
+    Route::get('/usuarios', [ConfiguracoesController::class, 'usuarios'])->name('configuracoes.usuarios');
+    Route::get('/sistema', [ConfiguracoesController::class, 'sistema'])->name('configuracoes.sistema');
+});
 
 Route::prefix('cliente')->middleware('auth')->group(function () {
     Route::group(['prefix' => '/servicos'], function () {
