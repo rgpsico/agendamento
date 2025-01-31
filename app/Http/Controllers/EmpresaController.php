@@ -204,6 +204,7 @@ class EmpresaController extends Controller
         $diaDaSemana = DiaDaSemana::all();
 
         $id_professor = Auth::user()->professor->id;
+
         $disponibilidades = Disponibilidade::where('id_professor', $id_professor)->get();
 
         $servicos = Servicos::all();

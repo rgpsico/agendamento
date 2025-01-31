@@ -146,6 +146,22 @@
                                 <li><a href="{{route('empresa.pagamento.create')}}">Cadastrar</a></li>
                             </ul>
                         </li>
+
+                        <li class="submenu">
+                            <a href="#">
+                                <i class="fas fa-cogs mr-2"></i> 
+                                <span> Configurações</span> 
+                                <span class="menu-arrow"></span>
+                            </a>
+                            <ul style="display: none;">
+                                <li><a href="{{ route('configuracoes.permissoes') }}">Permissões</a></li>
+                                <li><a href="{{ route('configuracoes.pagamentos') }}">Pagamentos</a></li>
+                                <li><a href="{{ route('configuracoes.empresa') }}">Empresa</a></li>
+                                <li><a href="{{ route('configuracoes.usuarios') }}">Usuários</a></li>
+                                <li><a href="{{ route('configuracoes.sistema') }}">Sistema</a></li>
+                            </ul>
+                        </li>
+                        
                         
                     </div>
     </div>
