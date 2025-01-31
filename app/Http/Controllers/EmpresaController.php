@@ -10,6 +10,7 @@ use App\Models\EmpresaEndereco;
 use App\Models\EmpresaGaleria;
 use App\Models\Modalidade;
 use App\Models\Professor;
+use App\Models\Servicos;
 use App\Models\Usuario;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -29,8 +30,7 @@ class EmpresaController extends Controller
         Agendamento $agendamento,
         Professor $professor
 
-    ) {
-    }
+    ) {}
 
 
     public function dashboard()
@@ -192,6 +192,41 @@ class EmpresaController extends Controller
                 'mesmoHorario' => $mesmoHorario,
                 'horaInicio' => $horaInicio,
                 'horaFim' => $horaFim
+            ]
+        );
+    }
+
+
+
+    public function disponibilidadePersonalizada()
+    {
+
+        $diaDaSemana = DiaDaSemana::all();
+
+        $id_professor = Auth::user()->professor->id;
+        $disponibilidades = Disponibilidade::where('id_professor', $id_professor)->get();
+
+        $servicos = Servicos::all();
+
+        $horaInicio = $disponibilidades->first()->hora_inicio ?? null;
+        $horaFim = $disponibilidades->first()->hora_fim ?? null;
+
+        $mesmoHorario = $disponibilidades->every(function ($disponibilidade) use ($horaInicio, $horaFim) {
+            return $disponibilidade->hora_inicio == $horaInicio && $disponibilidade->hora_fim == $horaFim;
+        });
+
+
+        // Busca as disponibilidades do professor
+        return view(
+            'admin.empresas.disponibilidadepersonalizada',
+            [
+                'pageTitle' => 'Disponibilidade personalizada',
+                'diaDaSemana' => $diaDaSemana,
+                'disponibilidades' => $disponibilidades,
+                'mesmoHorario' => $mesmoHorario,
+                'horaInicio' => $horaInicio,
+                'horaFim' => $horaFim,
+                'servicos' => $servicos
             ]
         );
     }

@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ServicoRequest;
+use App\Models\DiaDaSemana;
 use App\Models\Disponibilidade;
 use App\Models\Servicos;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class DisponibilidadeController extends Controller
 {
@@ -19,6 +21,38 @@ class DisponibilidadeController extends Controller
     {
         $this->model = $model;
     }
+
+
+    public function storeper(Request $request)
+    {
+        $id_professor = $request->professor_id;
+
+        // Deleta as disponibilidades atuais para evitar duplicações
+        Disponibilidade::where('id_professor', $id_professor)->delete();
+
+        // Percorre os dias e salva múltiplos horários por dia
+        foreach ($request->start as $dia => $horariosInicio) {
+            foreach ($horariosInicio as $index => $horaInicio) {
+                $horaFim = $request->end[$dia][$index] ?? null;
+
+                if ($horaInicio && $horaFim) {
+                    Disponibilidade::create([
+                        'id_professor' => $id_professor,
+                        'id_dia' => $dia,
+                        'hora_inicio' => $horaInicio,
+                        'hora_fim' => $horaFim,
+                    ]);
+                }
+            }
+        }
+
+        return redirect()->back()->with('success', 'Disponibilidade atualizada com sucesso!');
+    }
+
+
+
+
+
 
     public function index()
     {

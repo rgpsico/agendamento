@@ -6,6 +6,7 @@ use App\Http\Controllers\admin\AdminController;
 use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\AlunosController;
 use App\Http\Controllers\Api\AgendamentoControllerApi;
+use App\Http\Controllers\DisponibilidadeController;
 use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\ModalidadeController;
 use App\Http\Controllers\PagamentoController;
@@ -55,9 +56,17 @@ Route::prefix('cliente')->middleware('auth')->group(function () {
 
         Route::get('/pagamento/{id}/edit', [PagamentoController::class, 'edit'])->name('empresa.pagamento.edit');
 
+        Route::post('/disponibilidadeperstore', [DisponibilidadeController::class, 'storeper'])->name('storeper');
+        Route::get('/disponibilidadeper', [EmpresaController::class, 'disponibilidadePersonalizada'])->name('empresa.disponibilidadePersonalizada');
 
         Route::get('/disponibilidade', [EmpresaController::class, 'disponibilidade'])->name('empresa.disponibilidade');
         Route::post('/disponibilidade', [EmpresaController::class, 'cadastrarDisponibilidade'])->name('empresa.disponibilidade.store');
+
+
+        Route::get('/servicos', [ServicoController::class, 'listarServicos'])->name('listar.servicos');
+        Route::get('/configurar-horarios/{idServico}', [ServicoController::class, 'configurarHorarios'])->name('configurar.horarios');
+        Route::post('/salvar-horarios/{idServico}', [ServicoController::class, 'salvarHorarios'])->name('salvar.horarios');
+
 
         Route::get('/', [EmpresaController::class, 'index'])->name('agenda.index');
         Route::get('/create', [EmpresaController::class, 'create'])->name('agenda.create');
@@ -130,5 +139,4 @@ Route::group(['prefix' => '/manager'], function () {
     // Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
 });
 
-Route::prefix('admin')->middleware('auth')->group(function () {
-});
+Route::prefix('admin')->middleware('auth')->group(function () {});

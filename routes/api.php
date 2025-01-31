@@ -59,6 +59,7 @@ Route::resource('aulas', AulasControllerApi::class);
 Route::resource('disponibilidade', DisponibilidadeControllerApi::class);
 
 Route::get('disponibilidade', [DisponibilidadeControllerApi::class, 'disponibilidade']);
+
 Route::resource('dias', DiaDaSemanaControllerApi::class);
 
 

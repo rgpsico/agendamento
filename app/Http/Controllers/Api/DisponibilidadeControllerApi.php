@@ -20,43 +20,36 @@ class DisponibilidadeControllerApi extends Controller
 
     public function disponibilidade(Request $request)
     {
-
-
         $day = $request->input('day');
         $data_selecionada = $request->input("data_select");
+        $professor_id = $request->input("professor_id");
+        $servico_id = $request->input("servico_id"); // Novo parâmetro
 
-
-        $professor_id = $request->input("professor_id");; // Você precisa enviar o ID do professor na sua requisição
-
-
-        $schedules = Disponibilidade::where('id_dia', $day)->get();
+        // Obtém todas as disponibilidades do serviço selecionado naquele dia
+        $schedules = Disponibilidade::where('id_dia', $day)
+            ->where('id_servico', $servico_id)
+            ->get();
 
         $timeslots = [];
 
         foreach ($schedules as $schedule) {
-            $start = Carbon::parse($schedule->hora_inicio);
-            $end = Carbon::parse($schedule->hora_fim);
+            $start = Carbon::parse($schedule->hora_inicio)->format('H:i');
 
+            // Verifica se o horário já foi agendado
+            $alreadyBooked = DB::table('agendamentos')
+                ->where('data_da_aula', $data_selecionada)
+                ->where('horario', $start)
+                ->where('professor_id', $professor_id)
+                ->exists();
 
-            for ($time = $start; $time->lessThan($end); $time->addHour()) {
-
-                $alreadyBooked = DB::table('agendamentos')
-                    ->where('data_da_aula', $data_selecionada)
-                    ->where('horario', $time->format('H:i'))
-                    ->where('professor_id', $professor_id)
-                    ->exists();
-
-
-                if (!$alreadyBooked) {
-                    $timeslots[] = $time->format('H:i');
-                }
+            if (!$alreadyBooked) {
+                $timeslots[] = $start;
             }
         }
 
-
-
         return response()->json($timeslots);
     }
+
 
     // Criar um novo usuário
     public function store(Request $request)
@@ -64,6 +57,33 @@ class DisponibilidadeControllerApi extends Controller
         $user = Disponibilidade::create($request->all());
         return response()->json($user, 201);
     }
+
+    public function storepersonalizado(Request $request)
+    {
+        $id_professor = $request->professor_id;
+
+        // Deleta as disponibilidades atuais para evitar duplicações
+        Disponibilidade::where('id_professor', $id_professor)->delete();
+
+        // Percorre os dias e salva múltiplos horários por dia
+        foreach ($request->start as $dia => $horariosInicio) {
+            foreach ($horariosInicio as $index => $horaInicio) {
+                $horaFim = $request->end[$dia][$index] ?? null;
+
+                if ($horaInicio && $horaFim) {
+                    Disponibilidade::create([
+                        'id_professor' => $id_professor,
+                        'id_dia' => $dia,
+                        'hora_inicio' => $horaInicio,
+                        'hora_fim' => $horaFim,
+                    ]);
+                }
+            }
+        }
+
+        return redirect()->back()->with('success', 'Disponibilidade atualizada com sucesso!');
+    }
+
 
     // Mostrar um usuário específico
     public function show($id)
