@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Agendamento;
 use App\Models\Alunos;
 use App\Models\Aulas;
+use App\Models\Configuracao;
 use App\Models\Disponibilidade;
 use App\Models\Empresa;
 use App\Models\Modalidade;
@@ -43,10 +44,15 @@ class HomeController extends Controller
 
     public function index()
     {
-
         $model = $this->model::with('modalidade', 'endereco', 'galeria')->get();
-
         $modalidade = Modalidade::all();
+
+        // Adiciona configuração de agendamento para cada empresa
+        foreach ($model as $empresa) {
+            $empresa->tipoAgendamento = Configuracao::get($empresa->id, 'agendamento_tipo', 'horarios');
+            $empresa->whatsappNumero = Configuracao::get($empresa->id, 'whatsapp_numero', '');
+        }
+
         return view(
             $this->view . '.index',
             [
@@ -58,6 +64,7 @@ class HomeController extends Controller
             ]
         );
     }
+
 
     public function show($id)
     {
