@@ -35,6 +35,8 @@ Route::prefix('configuracoes')->group(function () {
     Route::get('/empresa', [ConfiguracoesController::class, 'empresa'])->name('configuracoes.empresa');
     Route::get('/usuarios', [ConfiguracoesController::class, 'usuarios'])->name('configuracoes.usuarios');
     Route::get('/sistema', [ConfiguracoesController::class, 'sistema'])->name('configuracoes.sistema');
+    Route::get('/configuracoes', [ConfiguracoesController::class, 'index'])->name('configuracoes.index');
+    Route::post('/configuracoes/salvar', [ConfiguracoesController::class, 'salvar'])->name('configuracoes.salvar');
 });
 
 Route::prefix('cliente')->middleware('auth')->group(function () {

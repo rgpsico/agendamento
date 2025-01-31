@@ -53,4 +53,16 @@ class Empresa extends Model
     {
         return $this->hasMany(Servicos::class, 'empresa_id', 'id');
     }
+
+
+    public function getTipoAgendamentoAttribute()
+    {
+        return Configuracao::get($this->id, 'agendamento_tipo', 'horarios');
+    }
+
+    // Acessor para WhatsApp
+    public function getWhatsappNumeroAttribute()
+    {
+        return Configuracao::get($this->id, 'whatsapp_numero', '');
+    }
 }
