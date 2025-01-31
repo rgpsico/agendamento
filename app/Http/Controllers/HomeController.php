@@ -70,20 +70,29 @@ class HomeController extends Controller
     {
         $model = $this->model->where('user_id', $id)->first();
 
+        // Obtendo a configuração de agendamento da empresa
+        $tipoAgendamento = Configuracao::get($model->id, 'agendamento_tipo', 'horarios');
+        $whatsappNumero = Configuracao::get($model->id, 'whatsapp_numero', '');
+
         return view(
             $this->view . '.show',
             [
                 'pageTitle' => $this->pageTitle,
                 'view' => $this->view,
                 'route' => $this->route,
-                'model' => $model
+                'model' => $model,
+                'tipoAgendamento' => $tipoAgendamento,
+                'whatsappNumero' => $whatsappNumero
             ]
         );
     }
 
 
+
     public function booking($id)
     {
+
+
         $model = $this->model::with('servicos')->where('user_id', $id)->first();
 
 
