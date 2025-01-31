@@ -88,6 +88,7 @@
 								<li class="nav-item ms-2" style="color:#000;">
 									<a href="{{ route('user.logout') }}"  class="btn btn-outline-danger" style="color:#000;">
 										<i class="fas fa-sign-out-alt"></i> Sair
+										
 									</a>                                        
 								</li>
 							@else
