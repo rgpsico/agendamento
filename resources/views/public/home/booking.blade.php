@@ -107,12 +107,12 @@
 
               <!-- Submit Section -->
               <div class="submit-section proceed-btn text-end mt-4">
-                @if(Auth::check())
-                    <a href="{{ route('home.checkoutAuth', ['user_id' => $model->user_id]) }}" class="btn btn-primary submit-btn disabled">Agendar e Pagar</a>
-                @else
-                    <a href="{{ route('home.checkout', ['id' => $model->user_id]) }}" class="btn btn-primary submit-btn disabled">Agendar e Pagar</a>
-                @endif
-            </div>
+                    @if(Auth::check())
+                        <a href="{{ route('home.checkoutAuth', ['user_id' => $model->user_id]) }}" class="btn btn-primary submit-btn disabled">Agendar e Pagar</a>
+                    @else
+                        <a href="{{ route('home.checkout', ['id' => $model->user_id]) }}" class="btn btn-primary submit-btn disabled">Agendar e Pagar</a>
+                    @endif
+                </div>
               <!-- /Submit Section -->
           </div>
       </div>

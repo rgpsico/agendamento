@@ -75,9 +75,21 @@
 										
 										
 								   </div>
-									<div class="clinic-booking">
-										<a class="apt-btn" href="{{route('home.booking',['id' => $model->user_id])}}">Agendar</a>
-									</div>
+								   <div class="clinic-booking">
+									@if ($tipoAgendamento == 'whatsapp' && !empty($whatsappNumero))
+										<a class="apt-btn btn btn-success" 
+										   href="https://wa.me/{{ $whatsappNumero }}?text=Olá, gostaria de agendar uma aula com você!" 
+										   target="_blank">
+											Agendar pelo WhatsApp
+										</a>
+									@else
+										<a class="apt-btn btn btn-primary" 
+										   href="{{ route('home.booking', ['id' => $model->user_id]) }}">
+											Agendar
+										</a>
+									@endif
+								</div>
+								
 								</div>
 							</div>
 						</div>
