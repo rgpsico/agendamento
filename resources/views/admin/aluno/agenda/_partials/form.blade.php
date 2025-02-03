@@ -5,4 +5,4 @@
 <x-text-input name="data_da_aula" size="30" label="Data da Aula" :value="$model ?? '' ?? ''" />
 <x-text-input name="valor_aula" size="30" label="Valor da Aula" :value="$model ?? '' ?? ''" />
 </div>
-                                                           
+                                                           {{dd("aaa")}}

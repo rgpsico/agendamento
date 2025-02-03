@@ -81,7 +81,7 @@ Route::prefix('cliente')->middleware('auth')->group(function () {
         Route::get('/', [EmpresaController::class, 'index'])->name('agenda.index');
         Route::get('/create', [EmpresaController::class, 'create'])->name('agenda.create');
         Route::post('/agenda/store', [EmpresaController::class, 'agendatore'])->name('empresa.agenda.store');
-        Route::put('/{id}/agenda/store', [EmpresaController::class, 'agendaUpdate'])->name('empresa.agenda.update');
+        Route::put('/{id}/agenda/update', [EmpresaController::class, 'agendaUpdate'])->name('empresa.agenda.update');
         Route::post('/{userId}/profile', [EmpresaController::class, 'profile'])->name('empresa.profile');
         Route::delete('/{id}/destroy', [EmpresaController::class, 'destroy'])->name('empresa.destroy');
         Route::get('/{userId}/config', [EmpresaController::class, 'configuracao'])->name('empresa.configuracao');

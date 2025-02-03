@@ -28,14 +28,16 @@
         <div class="form-group">
             <label>Horário</label>
             <div class="cal-icon">
-                <input type="time" class="form-control timepicker" name="horario_aula" value="{{ isset($model) && $model->horario_aula ? \Carbon\Carbon::parse($model->horario_aula)->format('H:i') : old('horario_aula') }}">
+            
+                <input type="time" class="form-control timepicker" name="horario" value="{{ isset($model) && $model->horario ? \Carbon\Carbon::parse($model->horario)->format('H:i') : old('horario') }}">
             </div>
         </div>
     </div>
     
 </div>
+    
+<x-modalidadeselect :modalidadeId="isset($model) ? $model->modalidade_id : null" />
 
-    <x-modalidadeselect/>
     
     
                   

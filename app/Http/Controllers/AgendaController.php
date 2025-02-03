@@ -133,6 +133,7 @@ class AgendaController extends Controller
 
     public function edit($id)
     {
+        
         $model = $this->model->find($id);
 
 

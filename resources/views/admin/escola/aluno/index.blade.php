@@ -43,7 +43,7 @@
                                     <thead>
                                         <tr>
                                             <th>Id</th>
-                                            <th>Nomess</th>
+                                            <th>Nomes</th>
                                             <th>Telefone</th>
                                             <th>Endereço</th>
                                             <th class="text-center">Ação</th>

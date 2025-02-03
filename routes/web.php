@@ -4,6 +4,7 @@ use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SocialLiteController;
 use App\Http\Controllers\GoogleCalendarController;
+use App\Http\Controllers\AvaliacaoController;
 use Illuminate\Support\Facades\Route;
 use Spatie\GoogleCalendar\Event;
 use Inertia\Inertia;
@@ -41,6 +42,8 @@ Route::get('/google-calendar/create-event', [GoogleCalendarController::class, 'c
 
 Route::prefix('admin')->middleware(['check_user_authenticated'])->group(function () {
 });
+
+Route::post('/avaliacao/store', [AvaliacaoController::class, 'store'])->name('empresa.avaliacao.store');
 
 
 Route::get('/test', function () {

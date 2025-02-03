@@ -24,7 +24,7 @@
                                             <th style="width: 100.859px;">Nome</th>
                                             <th style="width: 91.2188px;">Email</th>
                                            
-                                            <th style="width: 155.047px;">Data da aula</th>
+                                            <th style="width: 155.047px;">Data da aulaaa</th>
                                             <th style="width: 61.6406px;">Status</th>
                                             <th style="width: 74.9062px;">Pagamento</th>
                                         </tr>

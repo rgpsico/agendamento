@@ -16,6 +16,7 @@ use App\Http\Controllers\GoogleCalendarController;
 use App\Http\Controllers\ModalidadeController;
 use App\Http\Controllers\PagamentoController;
 use App\Http\Controllers\StripeController;
+use App\Http\Controllers\TwilioController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -63,7 +64,21 @@ Route::get('disponibilidade', [DisponibilidadeControllerApi::class, 'disponibili
 Route::resource('dias', DiaDaSemanaControllerApi::class);
 
 
+use Twilio\Rest\Client;
 
+Route::post('/test-twilio', function () {
+    try {
+        $sid = env('TWILIO_SID');
+        $token = env('TWILIO_AUTH_TOKEN');
+        $client = new Client($sid, $token);
+        return "Twilio SDK está funcionando!";
+    } catch (\Exception $e) {
+        return "Erro: " . $e->getMessage();
+    }
+});
+
+
+Route::post('/send-whatsapp', [TwilioController::class, 'sendWhatsApp']);
 
 Route::post('modalidade/{id}/update', [ModalidadeController::class, 'updateApi'])->name('modalidade.update');
 Route::delete('modalidade/{id}/destroy', [ModalidadeController::class, 'destroy'])->name('modalidade.destroy');
