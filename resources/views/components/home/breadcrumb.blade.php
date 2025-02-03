@@ -24,10 +24,8 @@ $img  = 'admin/img/surfbread2.png';
                 <h2 class="breadcrumb-title">{{$title ?? 'Home'}}</h2>
                 <nav aria-label="breadcrumb" class="page-breadcrumb">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item">
-                            <a href="">{{$title ?? ''}} </a>
-                        </li>
-                        <li class="breadcrumb-item" aria-current="page">{{$title ?? ''}}</li>
+                    
+                       
                     </ol>
                 </nav>
             </div>

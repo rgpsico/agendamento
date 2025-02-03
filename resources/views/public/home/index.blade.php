@@ -15,7 +15,7 @@
 	
 	</style>
     <!-- Breadcrumb -->
-		<x-home.breadcrumb title="Escola "/>
+		<x-home.breadcrumb title="Busque Seu Passeio "/>
 			<!-- /Breadcrumb -->
 			
 			<!-- Page Content -->
@@ -94,5 +94,6 @@
 			<!-- /Page Content -->
 			<script src="{{asset('admin/js/jquery-3.6.3.min.js')}}"></script>
             <script src="{{asset('js/home.js')}}"></script>
+			
 </x-layoutsadmin>
 

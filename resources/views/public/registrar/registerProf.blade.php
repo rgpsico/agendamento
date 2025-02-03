@@ -126,6 +126,10 @@
 
         /* Responsividade */
         @media (max-width: 768px) {
+            .main-wrapper {
+                padding: 10px;
+            }
+
             .register-box {
                 padding: 20px;
             }
@@ -154,6 +158,14 @@
             .login-left img {
                 width: 80px;
                 height: auto;
+            }
+
+            .row {
+                flex-direction: column;
+            }
+
+            .col-md-6 {
+                width: 100%;
             }
         }
     </style>
