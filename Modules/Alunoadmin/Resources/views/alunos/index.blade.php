@@ -33,7 +33,7 @@
                     <table class="datatable table table-hover table-center mb-0 dataTable">
                         <thead>
                             <tr>
-                                <th>Professora</th>
+                                <th>Professora </th>
                                 <th>Modalidade</th>
                                 <th>Data da Aula</th>
                                 <th>Status</th>
