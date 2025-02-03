@@ -300,21 +300,24 @@ class EmpresaController extends Controller
             'aluno_id' => 'required|numeric',
             'modalidade_id' => 'required|numeric',
             'professor_id' => 'required|numeric',
-            'data_da_aula' => 'required|date',
+            'data_da_aula' => 'required|date_format:d/m/Y', // Ajusta a validação para o formato recebido
             'valor_aula' => 'required|numeric',
             'horario' => 'required'
         ]);
-
+    
+        // Converte a data para o formato do MySQL (Y-m-d)
+        $validatedData['data_da_aula'] = \Carbon\Carbon::createFromFormat('d/m/Y', $validatedData['data_da_aula'])->format('Y-m-d');
+    
         // Busca a aula pelo ID fornecido
         $agendamento = Agendamento::findOrFail($id);
-
+    
         // Atualiza os dados da aula com os dados validados
         $agendamento->update($validatedData);
-
+    
         // Redireciona para alguma rota ou página após a atualização
         return redirect()->back()->with('success', 'Aula atualizada com sucesso!');
     }
-
+    
 
 
     public function configuracao($userId)
