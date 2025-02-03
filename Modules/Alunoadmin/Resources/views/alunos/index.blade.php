@@ -8,7 +8,7 @@
     <div class="content container-fluid">
 
         <!-- Page Header -->
-        <x-breadcrumb-aluno title="{{$title}}"/>
+        <x-breadcrumb-aluno title="{{$title}}"  />
         <!-- /Page Header -->
 
         <div class="card">
