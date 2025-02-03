@@ -182,7 +182,7 @@
             <!-- Formulário de Cadastro -->
             <div class="col-md-6 login-right">
                 <div class="login-right-wrap">
-                    <h1>Cadastro de Professoraa</h1>
+                    <h1>Cadastro de Professor</h1>
                     <p class="account-subtitle">Preencha os dados para se registrar</p>
 
                     <!-- Formulário -->
