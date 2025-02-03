@@ -98,8 +98,8 @@
 											<div class="submit-section mt-4">
 												<div id="spinner" class="spinner-border text-primary" role="status" style="display: none;">
 													<span class="sr-only">Loading...</span>
-													</div>
-												<button type="submit"  class="btn btn-primary submit-btn">Confirmar Pagamento</button>
+												</div>
+												<button type="submit" id="confirmarPagamento" class="btn btn-primary submit-btn" disabled>Confirmar Pagamento</button>
 											</div>
 										</div>
 									</form>
@@ -121,6 +121,19 @@
 
 			</div>
 			<script>
+
+$(document).ready(function () {
+        // Monitorando mudanças no checkbox
+        $('#terms_accept').change(function () {
+            if ($(this).is(':checked')) {
+                $('#confirmarPagamento').prop('disabled', false); // Habilita o botão
+            } else {
+                $('#confirmarPagamento').prop('disabled', true); // Desabilita o botão
+            }
+        });
+    });
+
+
 $("#paymentForm").on('submit', function(e) {
 	
     e.preventDefault(); 
