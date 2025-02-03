@@ -40,11 +40,11 @@ Route::get('/google-calendar/create-event', [GoogleCalendarController::class, 'c
 
 
 
-Route::prefix('admin')->middleware(['check_user_authenticated'])->group(function () {
-});
+Route::prefix('admin')->middleware(['check_user_authenticated'])->group(function () {});
 
 Route::post('/avaliacao/store', [AvaliacaoController::class, 'store'])->name('empresa.avaliacao.store');
-
+Route::post('/avaliar-aula', [AvaliacaoController::class, 'storeAvaliacao'])->name('avaliacao.store');
+Route::get('/avaliacao/{agendamento_id}', [AvaliacaoController::class, 'getAvaliacoes'])->name('avaliacao.getAvaliacoes');
 
 Route::get('/test', function () {
     return Inertia::render('Test');

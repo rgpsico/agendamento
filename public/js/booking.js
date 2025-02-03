@@ -103,7 +103,7 @@ $(document).ready(function() {
 
   // Corrigindo a seleção do serviço
   $('.card_servicos').on('click', function() {
-    
+    localStorage.removeItem('servicos');
     $('.time-slot ul').empty();
     $('.submit-btn').addClass('disabled');
     // Remove a seleção do dia previamente selecionado

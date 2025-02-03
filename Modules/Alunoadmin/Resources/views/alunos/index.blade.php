@@ -3,6 +3,22 @@
 @section('content')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 
+<style>
+    .star-rating {
+    font-size: 2rem;
+    cursor: pointer;
+    color: #ccc;
+}
+
+.star-rating i {
+    transition: color 0.3s;
+}
+
+.star-rating i.text-warning {
+    color: #ffc107;
+}
+
+</style>
 
 <div class="page-wrapper" style="min-height: 239px;">
     <div class="content container-fluid">
@@ -17,7 +33,7 @@
                     <table class="datatable table table-hover table-center mb-0 dataTable">
                         <thead>
                             <tr>
-                                <th>Professoraaa</th>
+                                <th>Professora</th>
                                 <th>Modalidade</th>
                                 <th>Data da Aula</th>
                                 <th>Status</th>
@@ -64,13 +80,20 @@
 
                                 <td class='text-success font-weight-bold'>R$ {{ number_format($agendamento->preco, 2, ',', '.') }}</td>
                                 <td>
-                                    <button class="btn btn-primary avaliar-btn" 
-                                            data-id="{{ $agendamento->id }}" 
-                                            data-status="{{ $agendamento->status }}">
-                                        Avaliar
+                                    <button class="btn btn-primary atualizar-btn" data-id="{{ $agendamento->id }}" data-status="{{ $agendamento->status }}">
+                                        Atualizar Status
                                     </button>
+                                
+                                    <button class="btn btn-warning avaliar-btn" data-id="{{ $agendamento->id }}" data-professor="{{ $agendamento->professor->usuario->nome ?? 'AQUI' }}">
+                                        Avaliar Aula ⭐
+                                    </button>
+                                
                                     <a href="" class="btn btn-secondary">Mensagem</a>
                                 </td>
+                                
+
+                                
+                                
                             </tr>
                         @endforeach
                         </tbody>
@@ -82,11 +105,54 @@
 </div>  
 
 <!-- Modal de Avaliação -->
-<div class="modal fade" id="avaliacaoModal" tabindex="-1" aria-labelledby="avaliacaoModalLabel" aria-hidden="true">
+<div class="modal fade" id="avaliacaoAulaModal" tabindex="-1" aria-labelledby="avaliacaoAulaModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="avaliacaoModalLabel">Avaliar Aula</h5>
+                <h5 class="modal-title" id="avaliacaoAulaModalLabel">Avaliar Aula de <span id="professorNome"></span></h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="avaliacaoAulaForm" action="{{ route('empresa.avaliacao.store') }}" method="POST">
+                @csrf
+                <input type="hidden" name="agendamento_id" id="avaliacao_agendamento_id">
+                
+                <div class="modal-body">
+                    <div class="form-group text-center">
+                        <label class="mb-2">Dê sua nota:</label>
+                        <div class="star-rating">
+                            <i class="fas fa-star" data-rating="1"></i>
+                            <i class="fas fa-star" data-rating="2"></i>
+                            <i class="fas fa-star" data-rating="3"></i>
+                            <i class="fas fa-star" data-rating="4"></i>
+                            <i class="fas fa-star" data-rating="5"></i>
+                        </div>
+                        <input type="hidden" name="nota" id="avaliacao_nota" value="0">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Comentários (Opcional)</label>
+                        <textarea name="comentario" id="avaliacao_comentario" class="form-control" rows="3" placeholder="Escreva um comentário sobre a aula..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Salvar Avaliação</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal de Avaliação -->
+<div class="modal fade" id="atualizarStatusModal" tabindex="-1" aria-labelledby="atualizarStatusModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="atualizarStatusModalLabel">Avaliar Aula</h5>
                 <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -124,7 +190,7 @@
 <script>
     $(document).ready(function () {
     
-        $(document).on("click", ".avaliar-btn", function(){
+        $(document).on("click", ".atualizar-btn", function(){
        
             var agendamentoId = $(this).data("id");
             var statusAtual = $(this).data("status");
@@ -137,8 +203,76 @@
             $("#status").val(statusAtual);
 
             // Abre o modal
-            $("#avaliacaoModal").modal("show");
+            $("#atualizarStatusModal").modal("show");
         });
     });
 </script>
+
+
+
+<script>
+   $(document).ready(function () {
+    $(".avaliar-btn").on("click", function () {
+        let agendamentoId = $(this).data("id");
+        let professorNome = $(this).data("professor");
+
+        $("#avaliacao_agendamento_id").val(agendamentoId);
+        $("#professorNome").text(professorNome);
+        $(".star-rating i").removeClass("text-warning");
+
+        // Buscar avaliação já existente
+        $.ajax({
+            type: "GET",
+            url: `/avaliacao/${agendamentoId}`,
+            success: function (response) {
+                if (response.avaliacao) {
+                    $("#avaliacao_nota").val(response.avaliacao.nota);
+                    $("#avaliacao_comentario").val(response.avaliacao.comentario);
+
+                    // Preenche as estrelas conforme a nota já salva
+                    $(".star-rating i").removeClass("text-warning");
+                    for (let i = 1; i <= response.avaliacao.nota; i++) {
+                        $(".star-rating i[data-rating='" + i + "']").addClass("text-warning");
+                    }
+                }
+                $("#avaliacaoAulaModal").modal("show");
+            }
+        });
+    });
+
+    // Marcar estrelas ao clicar
+    $(".star-rating i").on("click", function () {
+        let rating = $(this).data("rating");
+        $("#avaliacao_nota").val(rating);
+        $(".star-rating i").removeClass("text-warning");
+
+        for (let i = 1; i <= rating; i++) {
+            $(".star-rating i[data-rating='" + i + "']").addClass("text-warning");
+        }
+    });
+
+    // Enviar avaliação
+    $("#avaliacaoAulaForm").on("submit", function (e) {
+        e.preventDefault();
+
+        let formData = $(this).serialize();
+
+        $.ajax({
+            type: "POST",
+            url: "{{ route('avaliacao.store') }}",
+            data: formData,
+            success: function (response) {
+                alert(response.message);
+                $("#avaliacaoAulaModal").modal("hide");
+            },
+            error: function (xhr) {
+                alert("Erro ao enviar avaliação. Tente novamente.");
+            }
+        });
+    });
+});
+
+
+</script>
+
 @endsection
