@@ -8,6 +8,8 @@
         body {
             background-color: #f8f9fa;
             font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
         }
 
         .main-wrapper {
@@ -58,6 +60,7 @@
             padding: 10px;
             font-size: 14px;
             transition: border-color 0.3s ease;
+            width: 100%;
         }
 
         .form-control:focus {
@@ -73,6 +76,7 @@
             font-weight: bold;
             border-radius: 5px;
             transition: background-color 0.3s ease;
+            width: 100%;
         }
 
         .btn-primary:hover {
@@ -88,6 +92,7 @@
             display: block;
             margin-top: 15px;
             transition: background-color 0.3s ease;
+            width: 100%;
         }
 
         .btn-google:hover {
@@ -166,6 +171,34 @@
 
             .col-md-6 {
                 width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .register-box {
+                padding: 15px;
+            }
+
+            .register-box h1 {
+                font-size: 18px;
+            }
+
+            .register-box .account-subtitle {
+                font-size: 11px;
+            }
+
+            .form-control {
+                font-size: 12px;
+                padding: 8px;
+            }
+
+            .btn-primary, .btn-google {
+                font-size: 12px;
+                padding: 8px;
+            }
+
+            .login-left img {
+                width: 60px;
             }
         }
     </style>
