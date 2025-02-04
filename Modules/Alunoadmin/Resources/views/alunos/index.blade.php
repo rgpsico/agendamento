@@ -40,10 +40,11 @@
                 </div>
         
                 <!-- Botões -->
-                <div class="col-md-4 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary">Filtrar</button>
-                    <a href="{{ route('alunos.index') }}" class="btn btn-secondary ms-2">Limpar</a>
+                <div class="col-md-4 d-flex flex-column flex-md-row align-items-stretch align-items-md-end">
+                    <button type="submit" class="btn btn-primary w-100 w-md-auto mb-2 mb-md-0">Filtrar</button>
+                    <a href="{{ route('alunos.index') }}" class="btn btn-secondary w-100 w-md-auto ms-md-2">Limpar</a>
                 </div>
+                
             </div>
         </form>
         
