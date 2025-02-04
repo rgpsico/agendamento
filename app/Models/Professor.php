@@ -39,10 +39,10 @@ class Professor extends Model
     }
 
 
-    public function endereco()
-    {
-        return $this->hasOne(ProfessorEndereco::class, 'id', 'professor_id');
-    }
+    // public function endereco()
+    // {
+    //     return $this->hasOne(ProfessorEndereco::class, 'id', 'professor_id');
+    // }
 
     public function disponibilidades()
     {
