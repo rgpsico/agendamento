@@ -26,7 +26,6 @@ class AlunoadminController extends Controller
     {
         $title = 'Alunos';
 
-
         // Obter o aluno ligado ao usuário autenticado
         $id = auth()->user()->aluno->id;
 

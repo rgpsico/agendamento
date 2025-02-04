@@ -11,7 +11,7 @@ class EmpresaAvaliacao extends Model
 
     protected $table = 'empresa_avaliacao';
 
-    protected $fillable = ['empresa_id', 'avaliacao'];
+    protected $fillable = ['empresa_id', 'avaliacao', 'agendamento_id', 'user_id'];
 
     public function empresa()
     {

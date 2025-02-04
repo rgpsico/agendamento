@@ -54,6 +54,23 @@ class Professor extends Model
         return $this->hasMany(Agendamento::class);
     }
 
+    public function avaliacoes()
+    {
+        return $this->hasMany(ProfessorAvaliacao::class, 'professor_id');
+    }
+
+    // Método para obter a média das avaliações
+    public function getMediaAvaliacaoAttribute()
+    {
+        return $this->avaliacoes()->avg('nota') ?? 0;
+    }
+
+    // Método para contar quantas avaliações existem
+    public function getTotalAvaliacoesAttribute()
+    {
+        return $this->avaliacoes()->count();
+    }
+
 
     // protected static function boot()
     // {

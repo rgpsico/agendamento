@@ -204,10 +204,11 @@ class EmpresaController extends Controller
         $diaDaSemana = DiaDaSemana::all();
 
         $id_professor = Auth::user()->professor->id;
-
+        $empresa_id = Auth::user()->empresa->id;
         $disponibilidades = Disponibilidade::where('id_professor', $id_professor)->get();
 
-        $servicos = Servicos::all();
+
+        $servicos = Servicos::where('empresa_id', $empresa_id)->get();
 
         $horaInicio = $disponibilidades->first()->hora_inicio ?? null;
         $horaFim = $disponibilidades->first()->hora_fim ?? null;
@@ -304,20 +305,20 @@ class EmpresaController extends Controller
             'valor_aula' => 'required|numeric',
             'horario' => 'required'
         ]);
-    
+
         // Converte a data para o formato do MySQL (Y-m-d)
         $validatedData['data_da_aula'] = \Carbon\Carbon::createFromFormat('d/m/Y', $validatedData['data_da_aula'])->format('Y-m-d');
-    
+
         // Busca a aula pelo ID fornecido
         $agendamento = Agendamento::findOrFail($id);
-    
+
         // Atualiza os dados da aula com os dados validados
         $agendamento->update($validatedData);
-    
+
         // Redireciona para alguma rota ou página após a atualização
         return redirect()->back()->with('success', 'Aula atualizada com sucesso!');
     }
-    
+
 
 
     public function configuracao($userId)

@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -16,6 +17,14 @@ return new class extends Migration
             $table->string('nome')->default('Surf');
             $table->timestamps();
         });
+
+        DB::table('modalidade')->insert([
+            ['id' => 1, 'nome' => 'Surf'],
+            ['id' => 2, 'nome' => 'BodyBoard'],
+            ['id' => 3, 'nome' => 'Passeios'],
+            ['id' => 4, 'nome' => 'Corrida'],
+            ['id' => 5, 'nome' => 'Futevôlei'],
+        ]);
     }
 
     /**

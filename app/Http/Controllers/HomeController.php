@@ -44,7 +44,7 @@ class HomeController extends Controller
 
     public function index()
     {
-        $model = $this->model::with('modalidade', 'endereco', 'galeria')->get();
+        $model = $this->model::with('modalidade', 'endereco', 'galeria', 'avaliacao')->get();
         $modalidade = Modalidade::all();
 
         // Adiciona configuração de agendamento para cada empresa
