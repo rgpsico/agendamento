@@ -6,6 +6,7 @@ use App\Http\Controllers\admin\AdminController;
 use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\AlunosController;
 use App\Http\Controllers\Api\AgendamentoControllerApi;
+use App\Http\Controllers\Api\EmpresaControllerApi;
 use App\Http\Controllers\ConfiguracoesController;
 use App\Http\Controllers\DisponibilidadeController;
 use App\Http\Controllers\EmpresaController;
@@ -143,7 +144,7 @@ Route::prefix('pagamento')->middleware('auth')->group(function () {
 });
 
 Route::group(['prefix' => '/manager'], function () {
-    Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    Route::get('/', [EmpresaController::class, 'dashboard'])->name('admin.dashboard');
     // Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     // Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     // Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');

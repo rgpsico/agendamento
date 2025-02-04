@@ -15,118 +15,42 @@
 } 
 
     </style>
+   
     <div class="page-wrapper">
         <div class="content container-fluid">
         
           @include('admin.empresas._partials.header')
             @include('admin.empresas._partials.modal')
             <div class="row">
-                <div class="col-xl-3 col-sm-6 col-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="dash-widget-header">
-                                <span class="dash-widget-icon text-primary border-primary">
-                                    <i class="fe fe-users"></i>
-                                </span>
-                                <div class="dash-count">
-                                    <h3>{{$numeroTotalDeAlunos}}</h3>
+                @foreach([
+                    ['Total de Alunos', $numeroTotalDeAlunos, 'fe-users', 'primary'],
+                    ['Total Arrecadação', 'R$ ' . number_format($arrecadacao, 2, ',', '.'), 'fe-credit-card', 'success'],
+                    ['Número de Aulas', $numero_total_de_aulas, 'fe-money', 'danger'],
+                    ['Aulas Canceladas', $aulasCanceladas, 'fe-alert-circle', 'danger']
+                ] as $item)
+                    <div class="col-xl-3 col-sm-6 col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="dash-widget-header">
+                                    <span class="dash-widget-icon text-{{ $item[3] }}">
+                                        <i class="fe {{ $item[2] }}"></i>
+                                    </span>
+                                    <div class="dash-count">
+                                        <h3>{{ $item[1] }}</h3>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="dash-widget-info">
-                                <h6 class="text-muted">Total de Alunos</h6>
-                                <div class="progress progress-sm">
-                                    <div class="progress-bar bg-primary w-50"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xl-3 col-sm-6 col-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="dash-widget-header">
-                                <span class="dash-widget-icon text-success">
-                                    <i class="fe fe-credit-card"></i>
-                                </span>
-                                <div class="dash-count">
-                                    <h3>{{$arrecadacao}}</h3>
-                                </div>
-                            </div>
-                            <div class="dash-widget-info">
-                                
-                                <h6 class="text-muted">Total Arrecadação</h6>
-                                <div class="progress progress-sm">
-                                    <div class="progress-bar bg-success w-50"></div>
+                                <div class="dash-widget-info">
+                                    <h6 class="text-muted">{{ $item[0] }}</h6>
+                                    <div class="progress progress-sm">
+                                        <div class="progress-bar bg-{{ $item[3] }} w-50"></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-xl-3 col-sm-6 col-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="dash-widget-header">
-                                <span class="dash-widget-icon text-danger border-danger">
-                                    <i class="fe fe-money"></i>
-                                </span>
-                                <div class="dash-count">
-                                    <h3>{{$numero_total_de_aulas}}</h3>
-                                </div>
-                            </div>
-                            <div class="dash-widget-info">
-                                
-                                <h6 class="text-muted">N Aulas</h6>
-                                <div class="progress progress-sm">
-                                    <div class="progress-bar bg-danger w-50"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-xl-3 col-sm-6 col-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="dash-widget-header">
-                                <span class="dash-widget-icon text-danger border-danger">
-                                    <i class="fe fe-money"></i>
-                                </span>
-                                <div class="dash-count">
-                                    <h3>{{$aulasCanceladas}}</h3>
-                                </div>
-                            </div>
-                            <div class="dash-widget-info">
-                                
-                                <h6 class="text-muted">Aulas canceladas</h6>
-                                <div class="progress progress-sm">
-                                    <div class="progress-bar bg-danger w-50"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xl-3 col-sm-6 col-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="dash-widget-header">
-                                <span class="dash-widget-icon text-warning border-warning">
-                                    <i class="fe fe-money"></i>
-                                </span>
-                                <div class="dash-count">
-                                    <h3>R$ {{$arrecadacaoUltimos30Dias}}</h3>
-                                </div>
-                            </div>
-                            <div class="dash-widget-info">
-                                
-                                <h6 class="text-muted">Arrecadação Mensal</h6>
-                                <div class="progress progress-sm">
-                                    <div class="progress-bar bg-warning w-50"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                @endforeach
             </div>
+            
 
             <div class="row">
                 <div class="col-md-12 col-lg-6">
@@ -164,23 +88,27 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    var arrecadacaoDatas = {!! json_encode(array_keys($arrecadacaoPorDia->toArray())) !!};
+    var arrecadacaoValores = {!! json_encode(array_values($arrecadacaoPorDia->toArray())) !!};
 
-
-        var ctx = document.getElementById('revenueChart').getContext('2d');
+    var ctx = document.getElementById('revenueChart').getContext('2d');
     var revenueChart = new Chart(ctx, {
-        type: 'line',
+        type: 'bar',
         data: {
-            labels: [01,02,04],  // Este é o array de datas
+            labels: arrecadacaoDatas,
             datasets: [{
                 label: 'Arrecadação',
-                data: [10,20,20],  // Este é o array de valores de arrecadação
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                borderColor: 'rgba(75, 192, 192, 1)',
+                data: arrecadacaoValores,
+                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                borderColor: 'rgba(54, 162, 235, 1)',
                 borderWidth: 1
             }]
         },
         options: {
+            responsive: true,
+            maintainAspectRatio: false,
             scales: {
                 y: {
                     beginAtZero: true
@@ -189,36 +117,27 @@
         }
     });
 
-
-    var cancelados  = <?php echo json_encode($aulasCanceladas); ?>;
-    var realizadas = <?php echo json_encode($realizadas); ?>;
+    var aulasCanceladas = {{ $aulasCanceladas }};
+    var aulasRealizadas = {{ $realizadas }};
   
     var ctx2 = document.getElementById('statusChart').getContext('2d');
-
-   
     var statusChart = new Chart(ctx2, {
-    type: 'pie',
-    data: {
-        labels: ['Aulas Feitas', 'Aulas Canceladas'],  // Este é o array de labels
-        datasets: [{
-            data: [realizadas, cancelados],  // Este é o array de valores correspondentes
-            backgroundColor: [
-                'rgba(75, 192, 192, 0.2)',
-                'rgba(255, 99, 132, 0.2)'
-            ],
-            borderColor: [
-                'rgba(75, 192, 192, 1)',
-                'rgba(255, 99, 132, 1)'
-            ],
-            borderWidth: 1
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false
-    }
-});
+        type: 'pie',
+        data: {
+            labels: ['Aulas Feitas', 'Aulas Canceladas'],
+            datasets: [{
+                data: [aulasRealizadas, aulasCanceladas],
+                backgroundColor: ['rgba(75, 192, 192, 0.7)', 'rgba(255, 99, 132, 0.7)'],
+                borderColor: ['rgba(75, 192, 192, 1)', 'rgba(255, 99, 132, 1)'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+</script>
 
-    </script>
     <!-- /Page Wrapper -->
 </x-layoutsadmin>

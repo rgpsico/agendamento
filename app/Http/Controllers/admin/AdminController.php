@@ -16,12 +16,11 @@ class AdminController extends Controller
     protected $route = "admin";
     protected $model;
 
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     public function dashboard()
     {
+
 
         return view(
             $this->view . '.dashboard',
