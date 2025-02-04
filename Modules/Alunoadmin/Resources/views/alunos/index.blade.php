@@ -63,52 +63,61 @@
                         </thead>
 
                         <tbody>
-                        @foreach($agendamentos as $agendamento)
-                            <tr>
-                                <td>
-                                    <h2 class="table-avatar">
-                                        <a href="" class="avatar avatar-sm me-2">
-                                            <img class="avatar-img rounded-circle" src="{{ asset('admin/img/doctors/doctor-02.jpg') }}" alt="User Image">
-                                        </a>
-                                        <a href="">{{ $agendamento->professor->usuario->nome ?? 'AQUI' }}</a>
-                                    </h2>
-                                </td>
-                                <td>{{ $agendamento->modalidade->nome }}</td>
-                                <td>
-                                    <span class="text-primary d-block">{{ date('d/m/Y', strtotime($agendamento->data_da_aula)) }}</span>
-                                </td>
-
-                                <td>
-                                    @php
-                                        // Define as cores com base no status
-                                        $statusColors = [
-                                            'Aula Realizada' => 'bg-success text-white',
-                                            'Aula Cancelada' => 'bg-danger text-white',
-                                            'Aula Adiada pelo Professor' => 'bg-warning text-dark',
-                                            'Aula Adiada pelo Aluno' => 'bg-info text-dark',
-                                        ];
-                                
-                                        // Obtém a classe correspondente ao status
-                                        $badgeClass = $statusColors[$agendamento->status] ?? 'bg-secondary text-white';
-                                    @endphp
-                                
-                                    <span class="badge rounded-pill {{ $badgeClass }} p-2">
-                                        {{ $agendamento->status }}
-                                    </span>
-                                </td>
-
-                                <td class='text-success font-weight-bold'>R$ {{ number_format($agendamento->preco, 2, ',', '.') }}</td>
-                                <td>
-                                    <button class="btn btn-warning avaliar-btn"
-                                        data-empresa_id="{{ $agendamento->professor->usuario->empresa->id ?? '' }}"
-                                        data-id="{{ $agendamento->id }}"
-                                        data-professor="{{ $agendamento->professor->usuario->nome ?? 'AQUI' }}">
-                                        Avaliar Aula ⭐
-                                    </button>
-                                </td>
-                            </tr>
-                        @endforeach
-                        </tbody>
+                            @foreach($agendamentos as $agendamento)
+                            
+                                <tr>
+                                    <td>
+                                        <h2 class="table-avatar">
+                                            <a href="" class="avatar avatar-sm me-2">
+                                                <img class="avatar-img rounded-circle" src="{{ asset('admin/img/doctors/doctor-02.jpg') }}" alt="User Image">
+                                            </a>
+                                            <a href="">{{ $agendamento->professor->usuario->nome ?? 'AQUI' }}</a>
+                                        </h2>
+                                    </td>
+                                    <td>{{ $agendamento->modalidade->nome }}</td>
+                                    <td>
+                                        <span class="text-primary d-block">{{ date('d/m/Y', strtotime($agendamento->data_da_aula)) }}</span>
+                                    </td>
+    
+                                   
+                                    <td>
+                                        @php
+                                            // Define as cores com base no status
+                                            $statusColors = [
+                                                'Aula Realizada' => 'bg-success text-white',
+                                                'Aula Cancelada' => 'bg-danger text-white',
+                                                'Aula Adiada pelo Professor' => 'bg-warning text-dark',
+                                                'Aula Adiada pelo Aluno' => 'bg-info text-dark',
+                                            ];
+                                    
+                                            // Obtém a classe correspondente ao status
+                                            $badgeClass = $statusColors[$agendamento->status] ?? 'bg-secondary text-white';
+                                        @endphp
+                                    
+                                        <span class="badge rounded-pill {{ $badgeClass }} p-2">
+                                            {{ $agendamento->status }}
+                                        </span>
+                                    </td>
+    
+                                    <td class='text-success font-weight-bold'>R$ {{ number_format($agendamento->preco, 2, ',', '.') }}</td>
+                                    <td>
+                                        <button class="btn btn-primary atualizar-btn" data-id="{{ $agendamento->id }}" data-status="{{ $agendamento->status }}">
+                                            Atualizar Status
+                                        </button>
+                                    
+                                        <button class="btn btn-warning avaliar-btn" data-empresa_id='{{$agendamento->professor->usuario->empresa->id}}' data-id="{{ $agendamento->id }}" data-professor="{{ $agendamento->professor->usuario->nome ?? 'AQUI' }}">
+                                            Avaliar Aula ⭐
+                                        </button>
+                                    
+                                        <a href="" class="btn btn-secondary">Mensagem</a>
+                                    </td>
+                                    
+    
+                                    
+                                    
+                                </tr>
+                            @endforeach
+                            </tbody>
                     </table>
                 </div>
             </div>
