@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\EmpresaControllerApi;
 use App\Http\Controllers\Api\ProfessoresControllerApi;
 use App\Http\Controllers\Api\ServicoControllerApi;
 use App\Http\Controllers\Api\UserControllerApi;
+use App\Http\Controllers\AvaliacaoController;
 use App\Http\Controllers\GoogleCalendarController;
 use App\Http\Controllers\ModalidadeController;
 use App\Http\Controllers\PagamentoController;
@@ -77,6 +78,7 @@ Route::post('/test-twilio', function () {
     }
 });
 
+Route::get('/professores/media-avaliacoes', [AvaliacaoController::class, 'mediaAvaliacoes']);
 
 Route::post('/send-whatsapp', [TwilioController::class, 'sendWhatsApp']);
 

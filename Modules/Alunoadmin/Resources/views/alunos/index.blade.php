@@ -44,6 +44,7 @@
 
                         <tbody>
                         @foreach($agendamentos as $agendamento)
+                        
                             <tr>
                                 <td>
                                     <h2 class="table-avatar">
@@ -84,7 +85,7 @@
                                         Atualizar Status
                                     </button>
                                 
-                                    <button class="btn btn-warning avaliar-btn" data-id="{{ $agendamento->id }}" data-professor="{{ $agendamento->professor->usuario->nome ?? 'AQUI' }}">
+                                    <button class="btn btn-warning avaliar-btn" data-empresa_id='{{$agendamento->professor->usuario->empresa->id}}' data-id="{{ $agendamento->id }}" data-professor="{{ $agendamento->professor->usuario->nome ?? 'AQUI' }}">
                                         Avaliar Aula ⭐
                                     </button>
                                 
@@ -129,6 +130,7 @@
                             <i class="fas fa-star" data-rating="5"></i>
                         </div>
                         <input type="hidden" name="nota" id="avaliacao_nota" value="0">
+                        <input type="hidden" name="empresa_id" id="empresa_id" value="{{$agendamento->professor->usuario->empresa->id ?? ''}}">
                     </div>
                     
                     <div class="form-group">
@@ -215,8 +217,10 @@
     $(".avaliar-btn").on("click", function () {
         let agendamentoId = $(this).data("id");
         let professorNome = $(this).data("professor");
+        let empresaId = $(this).data("empresa_id");
 
         $("#avaliacao_agendamento_id").val(agendamentoId);
+        $("#empresa_id").val(empresaId);
         $("#professorNome").text(professorNome);
         $(".star-rating i").removeClass("text-warning");
 
@@ -228,7 +232,6 @@
                 if (response.avaliacao) {
                     $("#avaliacao_nota").val(response.avaliacao.nota);
                     $("#avaliacao_comentario").val(response.avaliacao.comentario);
-
                     // Preenche as estrelas conforme a nota já salva
                     $(".star-rating i").removeClass("text-warning");
                     for (let i = 1; i <= response.avaliacao.nota; i++) {
@@ -271,6 +274,7 @@
         });
     });
 });
+
 
 
 </script>
