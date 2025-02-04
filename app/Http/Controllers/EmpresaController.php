@@ -33,38 +33,50 @@ class EmpresaController extends Controller
     ) {}
 
 
-    public function dashboard()
+    public function dashboard(Request $request)
     {
-        if (isset(Auth::user()->professor->id)) {
-            $professor_id = Auth::user()->professor->id;
+        $professor_id = Auth::user()->professor->id ?? null;
 
-            $professor = Professor::find($professor_id);
-            $numeroTotalDeAlunos = $professor->alunos->count();
-            $numeroTotalDeAulas = $professor->agendamentos->count();
-
-            $arrecadacao = Agendamento::where('professor_id', $professor_id)->sum('valor_aula');
-            $aulasCanceladas = Agendamento::where('professor_id', $professor_id)->where('status', 'cancelada')->count();
-            $aulasFeitas = Agendamento::where('professor_id', $professor_id)->where('status', 'realizadas')->count();
-
-            $arrecadacaoUltimos30Dias = Agendamento::where('professor_id', $professor_id)
-                ->whereDate('data_da_aula', '>=', Carbon::now()->subDays(30))
-                ->sum('valor_aula');
+        if (!$professor_id) {
+            return redirect()->route('home')->with('error', 'Acesso negado.');
         }
 
+        // Definir datas padrão (últimos 30 dias)
+        $data_inicial = $request->input('data_inicial', Carbon::now()->subDays(30)->format('Y-m-d'));
+        $data_final = $request->input('data_final', Carbon::now()->format('Y-m-d'));
 
-        return view(
-            'admin.empresas.dashboard',
-            [
-                'pageTitle' => 'DashBoard',
-                'numeroTotalDeAlunos' => $numeroTotalDeAlunos ?? '10',
-                'arrecadacao' => $arrecadacao ?? '',
-                'aulasCanceladas' => $aulasCanceladas ?? '',
-                'arrecadacaoUltimos30Dias' => $arrecadacaoUltimos30Dias ?? '',
-                'realizadas' =>  $aulasFeitas ?? '',
-                'numero_total_de_aulas' => $numeroTotalDeAulas
-            ]
-        );
+        // Filtragem dos agendamentos
+        $agendamentos = Agendamento::where('professor_id', $professor_id)
+            ->whereBetween('data_da_aula', [$data_inicial, $data_final])
+            ->get();
+
+        // Cálculos do Dashboard
+        $professor = Professor::find($professor_id);
+        $numeroTotalDeAlunos = $professor->alunos->count();
+        $numeroTotalDeAulas = $agendamentos->count();
+        $arrecadacao = $agendamentos->sum('valor_aula');
+        $aulasCanceladas = $agendamentos->where('status', 'cancelada')->count();
+        $aulasFeitas = $agendamentos->where('status', 'realizada')->count();
+
+        // Arrecadação por dia (para gráfico)
+        $arrecadacaoPorDia = $agendamentos->groupBy('data_da_aula')->map(function ($day) {
+            return $day->sum('valor_aula');
+        });
+
+        return view('admin.empresas.dashboard', [
+            'pageTitle' => 'DashBoard',
+            'numeroTotalDeAlunos' => $numeroTotalDeAlunos,
+            'arrecadacao' => $arrecadacao,
+            'aulasCanceladas' => $aulasCanceladas,
+            'realizadas' => $aulasFeitas,
+            'numero_total_de_aulas' => $numeroTotalDeAulas,
+            'data_inicial' => $data_inicial,
+            'data_final' => $data_final,
+            'arrecadacaoPorDia' => $arrecadacaoPorDia
+        ]);
     }
+
+
 
 
 
