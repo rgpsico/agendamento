@@ -52,11 +52,11 @@ Route::prefix('cliente')->middleware('auth')->group(function () {
     });
 
     Route::group(['prefix' => '/empresa'], function () {
-        Route::get('/', [EmpresaController::class, 'index'])->name('empresa.index');
+        Route::get('/empresa/all', [EmpresaController::class, 'index'])->name('empresa.index');
         Route::get('/{id}/show', [EmpresaController::class, 'show'])->name('empresa.show');
         Route::get('/create', [EmpresaController::class, 'create'])->name('empresa.create');
         Route::get('/{id}/edit', [EmpresaController::class, 'edit'])->name('empresa.edit');
-        Route::post('update', [EmpresaController::class, 'update'])->name('empresa.update');
+        Route::post('update/{id}', [EmpresaController::class, 'update'])->name('empresa.update');
         Route::post('/post', [EmpresaController::class, 'store'])->name('empresa.store');
         Route::post('/{userId}/endereco_empresa', [EmpresaController::class, 'endereco_update'])->name('empresa.update_endereco');
 

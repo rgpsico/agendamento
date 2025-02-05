@@ -3,7 +3,7 @@
         <div class="content container-fluid">
 					
            <x-header.titulo pageTitle="TETE"/>
-           @include('admin.alunos._partials.modal') 
+           @include('admin.empresas._partials.modal') 
             
             <div class="row">
                 <div class="col-md-12">

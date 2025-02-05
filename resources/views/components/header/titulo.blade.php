@@ -7,7 +7,7 @@
                     <a href="">Admin</a>
                 </li>
                 <li class="breadcrumb-item">
-                    <a href="javascript:(0);">Alunos </a>
+                    <a href="javascript:(0);">{{$pageTitle ?? ''}} </a>
                 </li>
           
             </ul>

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AgendaController;
+use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
@@ -43,13 +44,13 @@ Route::post('/agendar', [AgendaController::class, 'store'])->name('agendamento.p
 
 
 Route::prefix('public')->group(function () {
-    Route::group(['prefix' => '/categoria'], function () {
-        Route::get('/', [CategoryController::class, 'index'])->name('category.index');
-        Route::get('/{id}/show', [CategoryController::class, 'show'])->name('category.show');
-        Route::get('/create', [CategoryController::class, 'create'])->name('category.create');
-        Route::get('/{id}/edit', [CategoryController::class, 'edit'])->name('category.edit');
-        Route::post('/{id}/update', [CategoryController::class, 'update'])->name('category.update');
-        Route::post('/post', [CategoryController::class, 'store'])->name('category.store');
-        Route::delete('/{id}/destroy', [CategoryController::class, 'destroy'])->name('category.destroy');
-    });
+    // Route::group(['prefix' => '/categoria'], function () {
+    //     Route::get('/', [CategoryController::class, 'index'])->name('category.index');
+    //     Route::get('/{id}/show', [CategoryController::class, 'show'])->name('category.show');
+    //     Route::get('/create', [CategoryController::class, 'create'])->name('category.create');
+    //     Route::get('/{id}/edit', [CategoryController::class, 'edit'])->name('category.edit');
+    //     Route::post('/{id}/update', [CategoryController::class, 'update'])->name('category.update');
+    //     Route::post('/post', [CategoryController::class, 'store'])->name('category.store');
+    //     Route::delete('/{id}/destroy', [CategoryController::class, 'destroy'])->name('category.destroy');
+    // });
 });

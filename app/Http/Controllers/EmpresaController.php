@@ -93,7 +93,7 @@ class EmpresaController extends Controller
     }
 
 
-    public function update(Request $request)
+    public function update(Request $request, $id)
     {
         $data = $request->validate([
             'avatar' => 'nullable|image|max:2048',
@@ -101,45 +101,30 @@ class EmpresaController extends Controller
             'descricao' => 'required',
             'telefone' => 'required',
             'cnpj' => 'required',
-
             'valor_aula_de' => 'required',
             'valor_aula_ate' => 'required',
             'modalidade_id' => 'required',
         ]);
 
+        $empresa = Empresa::findOrFail($id);
 
-        $data = $request->all();
+        // Atualizar dados
+        $empresa->update($data);
 
-        $data['user_id'] = $request->user_id;
-
-        // Processar o arquivo de avatar, se houver 
-
+        // Processar arquivos
         if ($request->hasFile('avatar')) {
-            $file = $request->file('avatar');
-            $filename = time() . '.' . $file->getClientOriginalExtension();
-            $path = public_path('/avatar');
-            $file->move($path, $filename);
-            $data['avatar'] = $filename;
+            $avatar = $request->file('avatar')->store('avatars', 'public');
+            $empresa->update(['avatar' => $avatar]);
         }
 
         if ($request->hasFile('banner')) {
-
-            $file = $request->file('banner');
-            $filenameBanners = time() . '.' . $file->getClientOriginalExtension();
-            $path = public_path('/banner');
-            $file->move($path, $filenameBanners);
-            $data['banners'] = $filenameBanners;
+            $banner = $request->file('banner')->store('banners', 'public');
+            $empresa->update(['banners' => $banner]);
         }
 
-
-        // Atualizar a empresa existente ou criar uma nova
-        $empresa = Empresa::updateOrCreate(
-            ['user_id' => $data['user_id']],
-            $data
-        );
-
-        return redirect()->route('empresa.configuracao', ['userId' => $request->user_id])->with('success', 'Empresa atualizada ou criada com sucesso');
+        return response()->json(['message' => 'Empresa atualizada com sucesso!']);
     }
+
 
     public function endereco_update(Request $request)
     {
@@ -166,11 +151,21 @@ class EmpresaController extends Controller
         return redirect()->back()->with('success', 'Endereço atualizado com sucesso');
     }
 
-
-    public function index()
+    public function all()
     {
 
         return $this->loadView();
+    }
+
+    public function index()
+    {
+        // Buscar todas as empresas no banco de dados
+        $empresas = Empresa::all();
+        $modalidades = Modalidade::all();
+        $pageTitle = 'Empresa';
+        $route = $this->route;
+        // Retornar para a view, caso seja Blade
+        return view('admin.empresas.index', compact('empresas', 'modalidades', 'pageTitle', 'route'));
     }
 
     public function create()
@@ -247,7 +242,7 @@ class EmpresaController extends Controller
 
     public function cadastrarDisponibilidade(Request $request)
     {
-      
+
         $dias = $request->input('dias');
         $hora_inicio = $request->input('start');
         $hora_fim = $request->input('end');

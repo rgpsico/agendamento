@@ -124,15 +124,16 @@
 
                 <li class="submenu">
                     <a href="#">
-                        <i class="fas fa-swimmer"></i> 
+                        <i class="fas fa-building"></i> 
                         <span>Empresas</span> 
                         <span class="menu-arrow"></span>
                     </a>
                     <ul>
-                        <li><a href="{{ route('modalidade.index') }}">Listar</a></li>
-                        <li><a href="{{ route('modalidade.create') }}">Cadastrar</a></li>
+                        <li><a href="{{ route('empresa.index') }}">Listar</a></li>
+                        <li><a href="">Cadastrar</a></li>
                     </ul>
                 </li>
+                
 
                     <!-- Esportes -->
                     <li class="submenu">
