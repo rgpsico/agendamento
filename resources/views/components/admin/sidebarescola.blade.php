@@ -77,20 +77,7 @@
                 </li>
                 @endisset
 
-                @if(Auth::user()->isAdmin)
-                <!-- Esportes -->
-                <li class="submenu">
-                    <a href="#">
-                        <i class="fas fa-swimmer"></i> 
-                        <span>Esportes</span> 
-                        <span class="menu-arrow"></span>
-                    </a>
-                    <ul>
-                        <li><a href="{{ route('modalidade.index') }}">Listar</a></li>
-                        <li><a href="{{ route('modalidade.create') }}">Cadastrar</a></li>
-                    </ul>
-                </li>
-                @endif
+               
 
                 <!-- Dados Cadastrais -->
                 <li class="submenu">
@@ -133,21 +120,49 @@
                     </ul>
                 </li>
 
-                <!-- Configurações -->
+                @if(Auth::user()->isAdmin)
+
                 <li class="submenu">
                     <a href="#">
-                        <i class="fas fa-cogs" style="font-size: 18px;"></i> 
-                        <span>Configurações</span> 
+                        <i class="fas fa-swimmer"></i> 
+                        <span>Empresas</span> 
                         <span class="menu-arrow"></span>
                     </a>
                     <ul>
-                        <li><a href="{{ route('configuracoes.permissoes') }}">Permissões</a></li>
-                        <li><a href="{{ route('configuracoes.pagamentos') }}">Pagamentos</a></li>
-                        <li><a href="{{ route('configuracoes.empresa') }}">Empresa</a></li>
-                        <li><a href="{{ route('configuracoes.usuarios') }}">Usuários</a></li>
-                        <li><a href="{{ route('configuracoes.index') }}">Sistema</a></li>
+                        <li><a href="{{ route('modalidade.index') }}">Listar</a></li>
+                        <li><a href="{{ route('modalidade.create') }}">Cadastrar</a></li>
                     </ul>
                 </li>
+
+                    <!-- Esportes -->
+                    <li class="submenu">
+                        <a href="#">
+                            <i class="fas fa-swimmer"></i> 
+                            <span>Modalidades</span> 
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <ul>
+                            <li><a href="{{ route('modalidade.index') }}">Listar</a></li>
+                            <li><a href="{{ route('modalidade.create') }}">Cadastrar</a></li>
+                        </ul>
+                    </li>
+                
+                    <!-- Configurações -->
+                    <li class="submenu">
+                        <a href="#">
+                            <i class="fas fa-cogs" style="font-size: 18px;"></i> 
+                            <span>Configurações</span> 
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <ul>
+                            <li><a href="{{ route('configuracoes.permissoes') }}">Permissões</a></li>
+                            <li><a href="{{ route('configuracoes.pagamentos') }}">Pagamentos</a></li>
+                            <li><a href="{{ route('configuracoes.empresa') }}">Empresa</a></li>
+                            <li><a href="{{ route('configuracoes.usuarios') }}">Usuários</a></li>
+                            <li><a href="{{ route('configuracoes.index') }}">Sistema</a></li>
+                        </ul>
+                    </li>
+                @endif
 
             </ul>
         </div>

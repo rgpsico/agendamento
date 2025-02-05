@@ -247,6 +247,7 @@ class EmpresaController extends Controller
 
     public function cadastrarDisponibilidade(Request $request)
     {
+      
         $dias = $request->input('dias');
         $hora_inicio = $request->input('start');
         $hora_fim = $request->input('end');
@@ -255,7 +256,11 @@ class EmpresaController extends Controller
             // verifica se o horário de início e fim estão definidos para o dia atual
             if (!empty($hora_inicio[$i]) && !empty($hora_fim[$i])) {
                 Disponibilidade::updateOrCreate(
-                    ['id_professor' => $request->input('professor_id'), 'id_dia' => $dias[$i]],
+                    [
+                        'id_professor' => $request->input('professor_id'),
+                        'id_servico' => 1,
+                        'id_dia' => $dias[$i]
+                    ],
                     ['hora_inicio' => $hora_inicio[$i], 'hora_fim' => $hora_fim[$i]]
                 );
             }
