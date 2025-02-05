@@ -31,6 +31,10 @@ Route::prefix('usuario')->group(function () {
 
 
 Route::prefix('configuracoes')->group(function () {
+    Route::get('/admin', [ConfiguracoesController::class, 'indexAdmin'])->name('configuracoes.indexAdmin');
+    Route::get('/configuracoes', [ConfiguracoesController::class, 'index'])->name('configuracoes.index');
+    Route::post('/configuracoes/salvar', [ConfiguracoesController::class, 'salvar'])->name('configuracoes.salvar');
+
     Route::get('/permissoes', [ConfiguracoesController::class, 'permissoes'])->name('configuracoes.permissoes');
     Route::get('/pagamentos', [ConfiguracoesController::class, 'pagamentos'])->name('configuracoes.pagamentos');
     Route::get('/empresa', [ConfiguracoesController::class, 'empresa'])->name('configuracoes.empresa');

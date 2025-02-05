@@ -32,6 +32,22 @@ class ConfiguracoesController extends Controller
         return view('configuracoes.sistema');
     }
 
+    public function indexadmin()
+    {
+        // Pegar todas as configurações salvas no banco
+        $config = Configuracao::first();
+
+        return view('configuracoesadmin.index', [
+            'tipoAgendamento' => $config->agendamento_tipo ?? 'horarios',
+            'whatsappNumero' => $config->whatsapp_numero ?? '',
+            'loginImage' => $config->login_image ?? '',
+            'registerImage' => $config->register_image ?? '',
+            'homeMode' => $config->home_mode ?? 'carousel',
+            'carouselImages' => json_decode($config->carousel_images ?? '[]', true),
+            'sistemaTipo' => $config->sistema_tipo ?? 'passeio',
+        ]);
+    }
+
     public function index()
     {
         $empresaId = auth()->user()->empresa->id ?? null;
