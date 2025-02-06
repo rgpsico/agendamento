@@ -103,7 +103,7 @@ class AgendaController extends Controller
     public function store(PaymentRequest $request)
     {
 
-
+        dd($request->all());
         // Se a validação falhar, o usuário será redirecionado de volta ao formulário com erros de validação.
 
         // Crie o novo usuário
@@ -133,7 +133,7 @@ class AgendaController extends Controller
 
     public function edit($id)
     {
-        
+
         $model = $this->model->find($id);
 
 
