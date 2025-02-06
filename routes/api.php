@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\ProfessoresControllerApi;
 use App\Http\Controllers\Api\ServicoControllerApi;
 use App\Http\Controllers\Api\UserControllerApi;
 use App\Http\Controllers\AvaliacaoController;
+use App\Http\Controllers\DisponibilidadeServicoController;
 use App\Http\Controllers\GoogleCalendarController;
 use App\Http\Controllers\ModalidadeController;
 use App\Http\Controllers\PagamentoController;
@@ -77,6 +78,11 @@ Route::post('/test-twilio', function () {
         return "Erro: " . $e->getMessage();
     }
 });
+
+
+Route::get('/disponibilidadedia', [DisponibilidadeServicoController::class, 'getDisponibilidade']);
+Route::post('/disponibilidade/update', [DisponibilidadeServicoController::class, 'updateDisponibilidade']);
+Route::post('/disponibilidade/reservar', [DisponibilidadeServicoController::class, 'reservarVaga']);
 
 Route::get('/professores/media-avaliacoes', [AvaliacaoController::class, 'mediaAvaliacoes']);
 

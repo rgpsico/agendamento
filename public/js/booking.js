@@ -57,20 +57,30 @@ $(document).ready(function() {
   $(document).on('click', '.day-slot li', function(e) {
     e.preventDefault();
     $('.submit-btn').addClass('disabled');
+
     if (!$(this).hasClass('left-arrow') && !$(this).hasClass('right-arrow')) {
-      $('.day-slot li').removeClass('selected-date');
-      $(this).addClass('selected-date');
+        $('.day-slot li').removeClass('selected-date');
+        $(this).addClass('selected-date');
 
-      const dayOfWeek = $(this).find('span:first').text();
-      const fullDate = $(this).find('.slot-date').text() + ' ' + $(this).find('.slot-year').text();
+        const dayOfWeek = $(this).find('span:first').text();
+        const fullDate = $(this).find('.slot-date').text() + ' ' + $(this).find('.slot-year').text();
+        let data_selecionada = converterData(fullDate);
 
-      let data_selecionada = converterData(fullDate);
-      $('.dia_da_semana').val(dayOfWeek);
-      $('.data').val(data_selecionada);
+        $('.dia_da_semana').val(dayOfWeek);
+        $('.data').val(data_selecionada);
 
-      buscarHorarios(dayOfWeek, data_selecionada);
+        const servicoSelecionado = $('.card-selected').data('tipo_agendamento');
+        const servicoId = $('.card-selected').data('servico_id');
+
+        if (servicoSelecionado === 'DIA') {
+            buscarDisponibilidade(servicoId, data_selecionada);
+        } else {
+            buscarHorarios(dayOfWeek, data_selecionada);
+        }
     }
-  });
+});
+
+
 
   $(document).on('click', '.timing', function(e) {
     e.preventDefault();
@@ -89,39 +99,111 @@ $(document).ready(function() {
     var diaDaSemana = $('.dia_da_semana').val();
     var data = $('.data').val();
     var horaDaAula = $('.hora_da_aula').val();
+    var tipoAgendamento = $('.card-selected').data('tipo_agendamento');
 
-    if (data && horaDaAula) {
-      localStorage.setItem('diaDaSemana', diaDaSemana);
-      localStorage.setItem('data', data);
-      localStorage.setItem('horaDaAula', horaDaAula);
+    if (tipoAgendamento === 'DIA' && data) {
+        // Apenas armazena a data e segue para pagamento
+        localStorage.setItem('diaDaSemana', diaDaSemana);
+        localStorage.setItem('data', data);
 
-      window.location.href = $(this).attr('href');
-    } else {
-      alert('Por favor, preencha a data e a hora da aula.');
+        window.location.href = $(this).attr('href');
+    } 
+    else if (tipoAgendamento === 'HORARIO' && data && horaDaAula) {
+        // Serviço com horário precisa da hora também
+        localStorage.setItem('diaDaSemana', diaDaSemana);
+        localStorage.setItem('data', data);
+        localStorage.setItem('horaDaAula', horaDaAula);
+
+        window.location.href = $(this).attr('href');
+    } 
+    else {
+        alert('Por favor, preencha a data e o horário corretamente.');
     }
-  });
+});
+
 
   // Corrigindo a seleção do serviço
   $('.card_servicos').on('click', function() {
     localStorage.removeItem('servicos');
     $('.time-slot ul').empty();
     $('.submit-btn').addClass('disabled');
-    // Remove a seleção do dia previamente selecionado
     $('.day-slot li').removeClass('selected-date');
 
-    $('.card_servicos').removeClass('card-selected'); // Garante que apenas um serviço será selecionado
+    $('.card_servicos').removeClass('card-selected');
     $(this).addClass('card-selected');
 
     const servico = {
-      id: $(this).data('servico_id'),
-      titulo: $(this).data('servico_titulo'),
-      preco: $(this).data('servico_preco')
+        id: $(this).data('servico_id'),
+        titulo: $(this).data('servico_titulo'),
+        preco: $(this).data('servico_preco'),
+        tipo_agendamento: $(this).data('tipo_agendamento')
     };
 
-    $(".schedule-header").show();
+    console.log(servico);
+    $(".schedule-header").show(); // Mantém a seleção de datas visível
+
     toggleServico(servico);
-  });
+
+    // Ajusta a interface conforme o tipo de serviço
+    if (servico.tipo_agendamento === 'DIA') {
+        $('.time-slot ul').html(`
+            <li class="text-info">
+                <strong>Este serviço não possui horários específicos.</strong>
+            </li>
+        `);
+        $('.submit-btn').addClass('disabled'); // Botão desativado até que o usuário escolha um dia
+    } else {
+        $('.time-slot ul').empty(); // Limpa horários anteriores
+    }
 });
+
+
+
+
+
+function buscarDisponibilidade(servicoId, dataSelecionada) {
+  $.ajax({
+      url: '/api/disponibilidadedia',
+      method: 'GET',
+      data: {
+          servico_id: servicoId,
+          data: dataSelecionada
+      },
+      success: function(response) {
+          $('.time-slot ul').html('');
+
+          if (response.vagas_disponiveis > 0) {
+              $('.time-slot ul').html(`
+                  <li class="text-success">
+                      <strong>Vagas Disponíveis: ${response.vagas_disponiveis}</strong>
+                  </li>
+                  <li class="text-info">
+                      <strong>Este serviço não possui horários específicos.</strong>
+                  </li>
+              `);
+              $('.submit-btn').removeClass('disabled');
+          } else {
+              $('.time-slot ul').html(`
+                  <li class="text-danger">
+                      <strong>Nenhuma vaga disponível para esta data.</strong>
+                  </li>
+              `);
+              $('.submit-btn').addClass('disabled');
+          }
+      },
+      error: function() {
+          $('.time-slot ul').html(`
+              <li class="text-danger">
+                  <strong>Erro ao carregar disponibilidade.</strong>
+              </li>
+          `);
+          $('.submit-btn').addClass('disabled');
+      }
+  });
+}
+
+
+
 
 function buscarHorarios(dayOfWeek, data_selecionada) {
   const dayMapping = {
@@ -209,3 +291,4 @@ function toggleServico(servico) {
 
   localStorage.setItem('servicos', JSON.stringify(servicos));
 }
+});

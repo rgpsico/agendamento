@@ -37,8 +37,11 @@
                   @isset($model->servicos)
                   @foreach ($model->servicos as $serv)
                   <div class="col-12 col-md-6 col-lg-4 mb-3">
-                      <div class="selection-wrapper card_servicos" data-servico_preco="{{ $serv->preco }}" 
-                          data-servico_id="{{ $serv->id }}" data-servico_titulo="{{ $serv->titulo }}">
+                    <div class="selection-wrapper card_servicos" 
+                    data-servico_preco="{{ $serv->preco }}" 
+                    data-servico_id="{{ $serv->id }}" 
+                    data-servico_titulo="{{ $serv->titulo }}" 
+                    data-tipo_agendamento="{{ $serv->tipo_agendamento }}">
                           <label for="selected-item-{{ $serv->id }}" class="selected-label">
                               <input type="radio" name="selected-item" id="selected-item-{{ $serv->id }}" class="servico-selecionado" data-servico_id="{{ $serv->id }}">
                               <span class="icon"></span>

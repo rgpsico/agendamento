@@ -130,6 +130,7 @@ class PagamentoController extends Controller
     //acct_1P23pLPi8YEsgyY7
     public function pagamentoStripe(Request $request)
     {
+
         Stripe::setApiKey(env('STRIPE_SECRET'));
 
 
@@ -199,6 +200,8 @@ class PagamentoController extends Controller
                     'valor_aula' => $valor_aula,
                     'horario' => $hora_aula
                 ]);
+
+
 
                 Mail::to(['email' => Auth::user()->email])->send(new PaymentConfirmation(Auth::user()));
                 // Aqui você pode redirecionar o usuário para uma página de agradecimento, por exemplo

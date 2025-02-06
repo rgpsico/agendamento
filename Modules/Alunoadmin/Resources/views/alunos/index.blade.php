@@ -126,6 +126,42 @@
     </div>  
 </div>  
 
+<div class="modal fade" id="atualizarStatusModal" tabindex="-1" aria-labelledby="atualizarStatusModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="atualizarStatusModalLabel">Avaliar Aula</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="avaliacaoForm" action="{{ route('empresa.avaliacao.store') }}" method="POST">
+                @csrf
+                <input type="hidden" name="agendamento_id" id="agendamento_id">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Status da Aula</label>
+                        <select name="status" id="status" class="form-control">
+                            <option value="Aula Realizada">Aula Realizada</option>
+                            <option value="Aula Cancelada">Aula Cancelada</option>
+                            <option value="Aula Adiada pelo Professor">Aula Adiada pelo Professor</option>
+                            <option value="Aula Adiada pelo Aluno">Aula Adiada pelo Aluno</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Comentários (Opcional)</label>
+                        <textarea name="comentario" id="comentario" class="form-control" rows="3" placeholder="Escreva um comentário sobre a aula..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Salvar Avaliação</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <!-- Modal de Avaliação -->
 <div class="modal fade" id="avaliacaoAulaModal" tabindex="-1" aria-labelledby="avaliacaoAulaModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -194,6 +230,23 @@ $(document).ready(function () {
             $(".star-rating i[data-rating='" + i + "']").addClass("text-warning");
         }
     });
+
+    $(document).on("click", ".atualizar-btn", function(){
+       
+       var agendamentoId = $(this).data("id");
+       var statusAtual = $(this).data("status");
+
+       console.log("Agendamento ID:", agendamentoId);
+       console.log("Status Atual:", statusAtual);
+
+       // Preenche os campos do modal
+       $("#agendamento_id").val(agendamentoId);
+       $("#status").val(statusAtual);
+
+       // Abre o modal
+       $("#atualizarStatusModal").modal("show");
+   });
+
 
     $("#avaliacaoAulaForm").on("submit", function (e) {
         e.preventDefault();

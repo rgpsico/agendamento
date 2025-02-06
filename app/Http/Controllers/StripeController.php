@@ -7,6 +7,7 @@ use App\Mail\PaymentConfirmation;
 use App\Models\Agendamento;
 use App\Models\AlunoProfessor;
 use App\Models\Alunos;
+use App\Models\DisponibilidadeServico;
 use App\Models\Professor;
 use App\Models\Usuario;
 use Carbon\Carbon;
@@ -77,11 +78,10 @@ class StripeController extends Controller
     {
         $stripe = new StripeClient(env('STRIPE_SECRET'));
 
-
+        // Buscar ou criar usuário
         $existingUser = Usuario::where('email', $request->email)->first();
 
         if (!$existingUser) {
-            // Se o usuário não existir, crie um novo
             $user = new Usuario();
             $user->nome = $request->nome;
             $user->email = $request->email;
@@ -93,30 +93,24 @@ class StripeController extends Controller
             $aluno->usuario_id = $user->id;
             $aluno->save();
         } else {
-            // Se o usuário já existir, use as informações existentes
             $user = $existingUser;
             $aluno = Alunos::where('usuario_id', $user->id)->first();
         }
 
         if ($aluno == null) {
-            return response()->json(['error' => 'Erro aluno não econtrado'], 500);
+            return response()->json(['error' => 'Erro aluno não encontrado'], 500);
         }
 
         $aluno_id = $aluno->id;
         $data_agendamento = $request->data_aula;
         $hora_agendamento = $request->hora_aula;
         $professor_id = $request->professor_id;
-        $modalidade_id = $request->aula_id ??  1;
 
         $professor = Professor::select('id')->where('usuario_id', $professor_id)->first();
-
 
         $existingRelation = AlunoProfessor::where('aluno_id', $aluno->id)
             ->where('professor_id', $professor->id)
             ->first();
-
-
-
 
         if (!$existingRelation) {
             $alunoProfessor = new AlunoProfessor();
@@ -128,21 +122,45 @@ class StripeController extends Controller
         $professor = Professor::with('usuario')->where('usuario_id', $professor_id)->first();
         $data_agendamento_formato_eua = PagamentoController::convertToUSFormat($data_agendamento) . ' ' . $hora_agendamento;
 
-
         if (!$professor) {
             return redirect()->back()->with('erro', 'Professor não encontrado');
         }
 
+        // 🚀 **Lógica para Serviços**
+        $servicos = $request->servicos;
 
-        $agendamento = Agendamento::create([
-            'aluno_id' => $aluno_id,
-            'modalidade_id' => $modalidade_id,
-            'professor_id' => $professor->id, // Aqui você deve usar o id do professor, não o usuario_id
-            'data_da_aula' => $data_agendamento_formato_eua,
-            'valor_aula' => $request->total,
-            'horario' => $hora_agendamento
-        ]);
+        if (!is_array($servicos) || count($servicos) === 0) {
+            return response()->json(['error' => 'Nenhum serviço selecionado'], 400);
+        }
 
+        foreach ($servicos as $servico) {
+            $servico_id = $servico['id'];
+            $tipo_agendamento = $servico['tipo_agendamento'];
+            $modalidade_id = $request->aula_id ??  1;
+            $agendamento = Agendamento::create([
+                'aluno_id' => $aluno_id,
+                'modalidade_id' => $modalidade_id,
+                'professor_id' => $professor->id, // Aqui você deve usar o id do professor, não o usuario_id
+                'data_da_aula' => $data_agendamento_formato_eua,
+                'valor_aula' => $request->total,
+                'horario' => $hora_agendamento
+            ]);
+
+            // 🚀 **Se for um serviço do tipo DIA, reduz uma vaga**
+            if ($tipo_agendamento === 'DIA') {
+                $disponibilidade = DisponibilidadeServico::where('servico_id', $servico_id)
+                    ->where('data', $data_agendamento)
+                    ->first();
+
+                if ($disponibilidade && $disponibilidade->vagas_totais > $disponibilidade->vagas_reservadas) {
+                    $disponibilidade->increment('vagas_reservadas');
+                } else {
+                    return response()->json(['error' => 'Nenhuma vaga disponível para essa data'], 400);
+                }
+            }
+        }
+
+        // Criando token para o pagamento
         $res = $stripe->tokens->create([
             'card' => [
                 'number' => $request->numero_cartao,
@@ -156,24 +174,23 @@ class StripeController extends Controller
         \Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
 
         $response = $stripe->charges->create([
-            'amount' => $request->total * 100, // Convertendo o valor para centavos
-            'currency' => 'brl', // Usando a moeda correta
+            'amount' => $request->total * 100,
+            'currency' => 'brl',
             'source' => $res->id,
-            'description' => $request->description
+            'description' => "Pagamento de serviços"
         ]);
 
-
-
-        $nome_do_professor = $professor->usuario->nome;
-
-        Auth::login($user);
-        Mail::to($user->email)->send(new PaymentConfirmation($user));
         if ($response->status === 'succeeded') {
+            Auth::login($user);
+            Mail::to($user->email)->send(new PaymentConfirmation($user));
+
             return response()->json(['content' => $professor]);
+            //   return response()->json(['success' => true, 'message' => 'Pagamento realizado com sucesso']);
         } else {
-            // Lógica para tratamento de erro, caso o pagamento não tenha sido bem-sucedido
+            return response()->json(['error' => 'Falha no pagamento'], 500);
         }
     }
+
 
     public static function convertToUSFormat($originalDate)
     {

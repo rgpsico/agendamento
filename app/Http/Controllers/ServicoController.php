@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ServicoRequest;
 use App\Models\DiaDaSemana;
 use App\Models\Disponibilidade;
+use App\Models\DisponibilidadeServico;
 use App\Models\Servicos;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -123,31 +124,33 @@ class ServicoController extends Controller
 
     public function update(ServicoRequest $request, $id)
     {
-        $model = $this->model->find($id);
+        $servicos = Servicos::findOrFail($id);
 
+        $servicos->empresa_id = $request->empresa_id;
+        $servicos->titulo = $request->titulo;
+        $servicos->descricao = $request->descricao;
+        $servicos->preco = $request->preco;
+        $servicos->tempo_de_aula = $request->tempo_de_aula;
+        $servicos->tipo_agendamento = $request->tipo_agendamento;
 
-        if ($model) {
-            $model->empresa_id = $request->empresa_id;
-            $model->titulo = $request->titulo;
-            $model->descricao = $request->descricao;
-            $model->preco = $request->preco;
-            $model->tempo_de_aula = $request->tempo_de_aula;
-
-            // Se a imagem foi carregada, atualize o atributo da imagem
-            if ($request->hasFile('imagem')) {
-                $file = $request->file('imagem');
-                $filename = time() . '.' . $file->getClientOriginalExtension();
-                $path = public_path('/servico');
-                $file->move($path, $filename);
-                $model->imagem  = $filename;
+        if ($request->hasFile('imagem')) {
+            // Excluir a imagem antiga se existir
+            if ($servicos->imagem && file_exists(public_path('servico/' . $servicos->imagem))) {
+                unlink(public_path('servico/' . $servicos->imagem));
             }
 
-            $model->save();
-            return redirect()->route($this->route . '.edit', ['id' => $id])->with('success', 'Serviço atualizado com sucesso!');
-        } else {
-            return redirect()->route($this->route . '.index')->with('error', 'Serviço não encontrado.');
+            $file = $request->file('imagem');
+            $filename = time() . '.' . $file->getClientOriginalExtension();
+            $path = public_path('/servico');
+            $file->move($path, $filename);
+            $servicos->imagem = $filename;
         }
+
+        $servicos->save();
+
+        return redirect()->route('admin.servico.edit', ['id' => $servicos->id])->with('success', 'Serviço atualizado com sucesso!');
     }
+
 
     public function destroy($id)
     {
@@ -162,32 +165,49 @@ class ServicoController extends Controller
 
     public function store(ServicoRequest $request)
     {
-        $empresa_id = $request->empresa_id;
-        $titulo = $request->titulo;
-        $descricao = $request->descricao;
-        $preco = $request->preco;
-        $tempo_de_aula = $request->tempo_de_aula;
+        $request->validate([
+            'titulo' => 'required|string|max:255',
+            'descricao' => 'nullable|string',
+            'preco' => 'required|numeric',
+            'tempo_de_aula' => 'nullable|integer',
+            'tipo_agendamento' => 'required|in:DIA,HORARIO',
+            'vagas' => 'required_if:tipo_agendamento,DIA|integer|min:1',
+        ]);
 
-        $servicos = new Servicos();
-        $servicos->empresa_id = $empresa_id;
-        $servicos->titulo = $titulo;
-        $servicos->descricao = $descricao;
-        $servicos->preco = $preco;
-        $servicos->tempo_de_aula = $tempo_de_aula;
-
-
+        $servico = new Servicos();
+        $servico->empresa_id = $request->empresa_id;
+        $servico->titulo = $request->titulo;
+        $servico->descricao = $request->descricao;
+        $servico->preco = $request->preco;
+        $servico->tempo_de_aula = $request->tempo_de_aula;
+        $servico->tipo_agendamento = $request->tipo_agendamento;
 
         if ($request->hasFile('imagem')) {
             $file = $request->file('imagem');
             $filename = time() . '.' . $file->getClientOriginalExtension();
             $path = public_path('/servico');
             $file->move($path, $filename);
-            $servicos->imagem  = $filename;
+            $servico->imagem  = $filename;
         }
 
+        $servico->save();
 
-        $servicos->save();
+        // Criar disponibilidade para serviços do tipo DIA
+        if ($request->tipo_agendamento === 'DIA') {
+            $vagasTotais = $request->vagas ?? 1; // Garante que não seja null
 
-        return redirect()->route('admin.servico.edit', ['id' => $servicos->id]);
+            for ($i = 0; $i < 30; $i++) {
+                $data = now()->addDays($i)->format('Y-m-d');
+
+                DisponibilidadeServico::create([
+                    'servico_id' => $servico->id,
+                    'data' => $data,
+                    'vagas_totais' => $vagasTotais,
+                    'vagas_reservadas' => 0
+                ]);
+            }
+        }
+
+        return redirect()->route('admin.servico.edit', ['id' => $servico->id]);
     }
 }
