@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ServicoRequest;
 use App\Models\DiaDaSemana;
 use App\Models\Disponibilidade;
+use App\Models\DisponibilidadeServico;
 use App\Models\Servicos;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -164,36 +165,49 @@ class ServicoController extends Controller
 
     public function store(ServicoRequest $request)
     {
+        $request->validate([
+            'titulo' => 'required|string|max:255',
+            'descricao' => 'nullable|string',
+            'preco' => 'required|numeric',
+            'tempo_de_aula' => 'nullable|integer',
+            'tipo_agendamento' => 'required|in:DIA,HORARIO',
+            'vagas' => 'required_if:tipo_agendamento,DIA|integer|min:1',
+        ]);
 
-
-        $empresa_id = $request->empresa_id;
-        $titulo = $request->titulo;
-        $descricao = $request->descricao;
-        $preco = $request->preco;
-        $tempo_de_aula = $request->tempo_de_aula;
-        $tempo_de_aula = $request->tempo_de_aula;
-
-        $servicos = new Servicos();
-        $servicos->empresa_id = $empresa_id;
-        $servicos->titulo = $titulo;
-        $servicos->descricao = $descricao;
-        $servicos->preco = $preco;
-        $servicos->tempo_de_aula = $tempo_de_aula;
-        $servicos->tipo_agendamento = $request->tipo_agendamento;
-
-
+        $servico = new Servicos();
+        $servico->empresa_id = $request->empresa_id;
+        $servico->titulo = $request->titulo;
+        $servico->descricao = $request->descricao;
+        $servico->preco = $request->preco;
+        $servico->tempo_de_aula = $request->tempo_de_aula;
+        $servico->tipo_agendamento = $request->tipo_agendamento;
 
         if ($request->hasFile('imagem')) {
             $file = $request->file('imagem');
             $filename = time() . '.' . $file->getClientOriginalExtension();
             $path = public_path('/servico');
             $file->move($path, $filename);
-            $servicos->imagem  = $filename;
+            $servico->imagem  = $filename;
         }
 
+        $servico->save();
 
-        $servicos->save();
+        // Criar disponibilidade para serviços do tipo DIA
+        if ($request->tipo_agendamento === 'DIA') {
+            $vagasTotais = $request->vagas ?? 1; // Garante que não seja null
 
-        return redirect()->route('admin.servico.edit', ['id' => $servicos->id]);
+            for ($i = 0; $i < 30; $i++) {
+                $data = now()->addDays($i)->format('Y-m-d');
+
+                DisponibilidadeServico::create([
+                    'servico_id' => $servico->id,
+                    'data' => $data,
+                    'vagas_totais' => $vagasTotais,
+                    'vagas_reservadas' => 0
+                ]);
+            }
+        }
+
+        return redirect()->route('admin.servico.edit', ['id' => $servico->id]);
     }
 }
