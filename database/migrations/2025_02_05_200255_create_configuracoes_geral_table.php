@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('configuracoes_geral', function (Blueprint $table) {
             $table->id();
-            $table->string('agendamento_tipo')->default('horarios');
+            $table->string('agendamento_tipo')->default('horarios')->nullable();;
             $table->string('whatsapp_numero')->nullable();
             $table->string('login_image')->nullable();
             $table->string('register_image')->nullable();

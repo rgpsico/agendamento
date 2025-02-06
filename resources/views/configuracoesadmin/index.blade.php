@@ -33,9 +33,10 @@
                         <div class="form-group">
                             <label>Tipo de Agendamento:</label>
                             <select name="agendamento_tipo" class="form-control" id="tipoAgendamento">
-                                <option value="horarios" {{ $tipoAgendamento === 'horarios' ? 'selected' : '' }}>Com Horário</option>
-                                <option value="whatsapp" {{ $tipoAgendamento === 'whatsapp' ? 'selected' : '' }}>Via WhatsApp</option>
+                                <option value="horarios" {{ old('agendamento_tipo', $tipoAgendamento) == 'horarios' ? 'selected' : '' }}>Com Horário</option>
+                                <option value="whatsapp" {{ old('agendamento_tipo', $tipoAgendamento) == 'whatsapp' ? 'selected' : '' }}>Via WhatsApp</option>
                             </select>
+                            
                         </div>
 
                         <div class="form-group" id="whatsappField" style="{{ $tipoAgendamento === 'whatsapp' ? '' : 'display:none;' }}">
@@ -49,17 +50,28 @@
 
                 <!-- Aba: Login & Registro -->
                 <div class="tab-pane fade" id="login">
-                    <form action="{{ route('configuracoes.salvar') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('configuracoesGeral.salvar') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="form-group">
                             <label>Imagem da Tela de Login:</label>
                             <input type="file" name="login_image" class="form-control">
+                            @if($loginImage)
+                                <div class="mt-2">
+                                    <img src="{{ $loginImage }}" alt="Imagem Login" width="150">
+                                </div>
+                            @endif
                         </div>
-
+                        
                         <div class="form-group">
                             <label>Imagem da Tela de Registro:</label>
                             <input type="file" name="register_image" class="form-control">
+                            @if($registerImage)
+                                <div class="mt-2">
+                                    <img src="{{ $registerImage }}" alt="Imagem Registro" width="150">
+                                </div>
+                            @endif
                         </div>
+                        
 
                         <button type="submit" class="btn btn-primary mt-3">Salvar</button>
                     </form>
@@ -67,7 +79,7 @@
 
                 <!-- Aba: Página Inicial -->
                 <div class="tab-pane fade" id="home">
-                    <form action="{{ route('configuracoes.salvar') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('configuracoesGeral.salvar') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="form-group">
                             <label>Modo de Exibição:</label>
@@ -80,23 +92,32 @@
                         <div class="form-group">
                             <label>Imagens do Carrossel:</label>
                             <input type="file" name="carousel_images[]" class="form-control" multiple>
+                            
+                            @if(!empty($carouselImages))
+                                <div class="mt-3">
+                                    @foreach($carouselImages as $image)
+                                        <img src="{{ asset('storage/' . $image) }}" alt="Imagem Carrossel" width="100" class="m-1">
+                                    @endforeach
+                                </div>
+                            @endif
                         </div>
-
+                        
                         <button type="submit" class="btn btn-primary mt-3">Salvar</button>
                     </form>
                 </div>
 
                 <!-- Aba: Tipo de Sistema -->
                 <div class="tab-pane fade" id="tipoSistema">
-                    <form action="{{ route('configuracoes.salvar') }}" method="POST">
+                    <form action="{{ route('configuracoesGeral.salvar') }}" method="POST">
                         @csrf
                         <div class="form-group">
                             <label>Selecione o Tipo de Sistema:</label>
                             <select name="sistema_tipo" class="form-control">
-                                <option value="passeio" {{ $sistemaTipo === 'passeio' ? 'selected' : '' }}>Passeio Turístico</option>
-                                <option value="estetica" {{ $sistemaTipo === 'estetica' ? 'selected' : '' }}>Área de Estética</option>
-                                <option value="manicure" {{ $sistemaTipo === 'manicure' ? 'selected' : '' }}>Manicure</option>
+                                <option value="passeio" {{ old('sistema_tipo', $sistemaTipo) == 'passeio' ? 'selected' : '' }}>Passeio Turístico</option>
+                                <option value="estetica" {{ old('sistema_tipo', $sistemaTipo) == 'estetica' ? 'selected' : '' }}>Área de Estética</option>
+                                <option value="manicure" {{ old('sistema_tipo', $sistemaTipo) == 'manicure' ? 'selected' : '' }}>Manicure</option>
                             </select>
+                            
                         </div>
 
                         <button type="submit" class="btn btn-primary mt-3">Salvar</button>

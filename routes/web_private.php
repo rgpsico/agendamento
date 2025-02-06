@@ -35,6 +35,9 @@ Route::prefix('configuracoes')->group(function () {
     Route::get('/configuracoes', [ConfiguracoesController::class, 'index'])->name('configuracoes.index');
     Route::post('/configuracoes/salvar', [ConfiguracoesController::class, 'salvar'])->name('configuracoes.salvar');
 
+    Route::get('/configuracoes', [ConfiguracoesController::class, 'index'])->name('configuracoes.index');
+    Route::post('/configuracoesgeral/salvar', [ConfiguracoesController::class, 'salvarConfigGeral'])->name('configuracoesGeral.salvar');
+
     Route::get('/permissoes', [ConfiguracoesController::class, 'permissoes'])->name('configuracoes.permissoes');
     Route::get('/pagamentos', [ConfiguracoesController::class, 'pagamentos'])->name('configuracoes.pagamentos');
     Route::get('/empresa', [ConfiguracoesController::class, 'empresa'])->name('configuracoes.empresa');

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Configuracao;
+use App\Models\ConfiguracaoGeral;
 use Illuminate\Http\Request;
 
 class ConfiguracoesController extends Controller
@@ -34,19 +35,20 @@ class ConfiguracoesController extends Controller
 
     public function indexadmin()
     {
-        // Pegar todas as configurações salvas no banco
-        $config = Configuracao::first();
+        // Buscar as configurações salvas
+        $config = ConfiguracaoGeral::first();
 
         return view('configuracoesadmin.index', [
             'tipoAgendamento' => $config->agendamento_tipo ?? 'horarios',
             'whatsappNumero' => $config->whatsapp_numero ?? '',
-            'loginImage' => $config->login_image ?? '',
-            'registerImage' => $config->register_image ?? '',
+            'loginImage' => $config->login_image ? asset('storage/' . $config->login_image) : null,
+            'registerImage' => $config->register_image ? asset('storage/' . $config->register_image) : null,
             'homeMode' => $config->home_mode ?? 'carousel',
             'carouselImages' => json_decode($config->carousel_images ?? '[]', true),
             'sistemaTipo' => $config->sistema_tipo ?? 'passeio',
         ]);
     }
+
 
     public function index()
     {
@@ -61,6 +63,7 @@ class ConfiguracoesController extends Controller
 
     public function salvar(Request $request)
     {
+
         $empresaId = auth()->user()->empresa->id ?? null;
 
         // Atualiza o tipo de agendamento
@@ -72,5 +75,57 @@ class ConfiguracoesController extends Controller
         }
 
         return redirect()->back()->with('success', 'Configurações atualizadas com sucesso!');
+    }
+
+
+    public function salvarConfigGeral(Request $request)
+    {
+        // Validação dos campos obrigatórios
+        // $request->validate([
+        //     'agendamento_tipo' => 'required|string',
+        //     'whatsapp_numero' => 'nullable|string',
+        //     'home_mode' => 'required|string',
+        //     'sistema_tipo' => 'required|string',
+        //     'login_image' => 'nullable|image|max:2048',
+        //     'register_image' => 'nullable|image|max:2048',
+        //     'carousel_images.*' => 'nullable|image|max:2048',
+        // ]);
+
+        // Obter a primeira configuração ou criar nova
+        $config = ConfiguracaoGeral::firstOrNew([]);
+
+        // Atualizar configurações gerais
+        $config->agendamento_tipo = $request->input('agendamento_tipo', 'horarios'); // Definir padrão caso esteja vazio
+        $config->whatsapp_numero = $request->input('whatsapp_numero', '');
+
+        // Upload da imagem da tela de login
+        if ($request->hasFile('login_image')) {
+            $config->login_image = $request->file('login_image')->store('configuracoes', 'public');
+        }
+
+        // Upload da imagem da tela de registro
+        if ($request->hasFile('register_image')) {
+            $config->register_image = $request->file('register_image')->store('configuracoes', 'public');
+        }
+
+        // Configuração da Página Inicial (Carrossel ou Breadcrumb)
+        $config->home_mode = $request->input('home_mode', 'carousel');
+
+        // Upload de imagens do carrossel
+        if ($request->hasFile('carousel_images')) {
+            $carouselPaths = [];
+            foreach ($request->file('carousel_images') as $image) {
+                $carouselPaths[] = $image->store('carrossel', 'public');
+            }
+            $config->carousel_images = json_encode($carouselPaths);
+        }
+
+        // Definição do Tipo de Sistema
+        $config->sistema_tipo = $request->input('sistema_tipo', 'passeio');
+
+        // Salvar tudo no banco
+        $config->save();
+
+        return redirect()->route('configuracoes.indexAdmin')->with('success', 'Configurações salvas com sucesso!');
     }
 }
