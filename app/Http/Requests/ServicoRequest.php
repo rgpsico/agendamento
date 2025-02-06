@@ -25,7 +25,6 @@ class ServicoRequest extends FormRequest
         return [
             'empresa_id' => 'required|integer',
             'titulo' => 'required|string|max:255',
-            'imagem'   => 'required|file',
             'descricao' => 'nullable|string',
             'preco' => 'required|numeric',
             'tempo_de_aula' => 'required|integer',

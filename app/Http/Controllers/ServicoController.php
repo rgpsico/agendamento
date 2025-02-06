@@ -123,31 +123,33 @@ class ServicoController extends Controller
 
     public function update(ServicoRequest $request, $id)
     {
-        $model = $this->model->find($id);
+        $servicos = Servicos::findOrFail($id);
 
+        $servicos->empresa_id = $request->empresa_id;
+        $servicos->titulo = $request->titulo;
+        $servicos->descricao = $request->descricao;
+        $servicos->preco = $request->preco;
+        $servicos->tempo_de_aula = $request->tempo_de_aula;
+        $servicos->tipo_agendamento = $request->tipo_agendamento;
 
-        if ($model) {
-            $model->empresa_id = $request->empresa_id;
-            $model->titulo = $request->titulo;
-            $model->descricao = $request->descricao;
-            $model->preco = $request->preco;
-            $model->tempo_de_aula = $request->tempo_de_aula;
-
-            // Se a imagem foi carregada, atualize o atributo da imagem
-            if ($request->hasFile('imagem')) {
-                $file = $request->file('imagem');
-                $filename = time() . '.' . $file->getClientOriginalExtension();
-                $path = public_path('/servico');
-                $file->move($path, $filename);
-                $model->imagem  = $filename;
+        if ($request->hasFile('imagem')) {
+            // Excluir a imagem antiga se existir
+            if ($servicos->imagem && file_exists(public_path('servico/' . $servicos->imagem))) {
+                unlink(public_path('servico/' . $servicos->imagem));
             }
 
-            $model->save();
-            return redirect()->route($this->route . '.edit', ['id' => $id])->with('success', 'Serviço atualizado com sucesso!');
-        } else {
-            return redirect()->route($this->route . '.index')->with('error', 'Serviço não encontrado.');
+            $file = $request->file('imagem');
+            $filename = time() . '.' . $file->getClientOriginalExtension();
+            $path = public_path('/servico');
+            $file->move($path, $filename);
+            $servicos->imagem = $filename;
         }
+
+        $servicos->save();
+
+        return redirect()->route('admin.servico.edit', ['id' => $servicos->id])->with('success', 'Serviço atualizado com sucesso!');
     }
+
 
     public function destroy($id)
     {
@@ -162,10 +164,13 @@ class ServicoController extends Controller
 
     public function store(ServicoRequest $request)
     {
+
+
         $empresa_id = $request->empresa_id;
         $titulo = $request->titulo;
         $descricao = $request->descricao;
         $preco = $request->preco;
+        $tempo_de_aula = $request->tempo_de_aula;
         $tempo_de_aula = $request->tempo_de_aula;
 
         $servicos = new Servicos();
@@ -174,6 +179,7 @@ class ServicoController extends Controller
         $servicos->descricao = $descricao;
         $servicos->preco = $preco;
         $servicos->tempo_de_aula = $tempo_de_aula;
+        $servicos->tipo_agendamento = $request->tipo_agendamento;
 
 
 
