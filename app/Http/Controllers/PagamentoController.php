@@ -180,7 +180,7 @@ class PagamentoController extends Controller
 
 
             if ($charge->paid == true) {
-                //$conta_professor = "acct_1P23pLPi8YEsgyY7";
+                $conta_professor = "acct_1P23pLPi8YEsgyY7";
 
                 $amount_brl = PagamentoController::convertToBRL($valor_aula, 'USD');
 

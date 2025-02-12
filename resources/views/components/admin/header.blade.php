@@ -85,12 +85,12 @@
 					<!-- Notifications -->
 					<li class="nav-item dropdown noti-dropdown">
 						<a href="#" class="dropdown-toggle nav-link" data-bs-toggle="dropdown">
-							<i class="fe fe-bell"></i> <span class="badge rounded-pill">3</span>
+							<i class="fe fe-bell"></i> <span class="badge rounded-pill notification-count">3</span>
 						</a>
 						<div class="dropdown-menu notifications">
 							<div class="topnav-dropdown-header">
-								<span class="notification-title">Notifications</span>
-								<a href="javascript:void(0)" class="clear-noti"> Clear All </a>
+								<span class="notification-title">Notificação</span>
+								<a href="javascript:void(0)" class="clear-noti"> Limpar </a>
 							</div>
 							<div class="noti-content">
 								<ul class="notification-list">
@@ -107,45 +107,8 @@
 											</div>
 										</a>
 									</li>
-									<li class="notification-message">
-										<a href="#">
-											<div class="media d-flex">
-												<span class="avatar avatar-sm flex-shrink-0">
-													<img class="avatar-img rounded-circle" alt="User Image" src="{{asset('admin/img/patients/patient1.jpg')}}">
-												</span>
-												<div class="media-body flex-grow-1">
-													<p class="noti-details"><span class="noti-title">Charlene Reed</span> has booked her appointment to <span class="noti-title">Dr. Ruby Perrin</span></p>
-													<p class="noti-time"><span class="notification-time">6 mins ago</span></p>
-												</div>
-											</div>
-										</a>
-									</li>
-									<li class="notification-message">
-										<a href="#">
-											<div class="media d-flex">
-												<span class="avatar avatar-sm flex-shrink-0">
-													<img class="avatar-img rounded-circle" alt="User Image" src="{{asset('admin/img/patients/patient2.jpg')}}">
-												</span>
-												<div class="media-body flex-grow-1">
-												<p class="noti-details"><span class="noti-title">Travis Trimble</span> sent a amount of $210 for his <span class="noti-title">appointment</span></p>
-												<p class="noti-time"><span class="notification-time">8 mins ago</span></p>
-												</div>
-											</div>
-										</a>
-									</li>
-									<li class="notification-message">
-										<a href="#">
-											<div class="media d-flex">
-												<span class="avatar avatar-sm flex-shrink-0">
-													<img class="avatar-img rounded-circle" alt="User Image" src="{{asset('admin/img/patients/patient3.jpg')}}">
-												</span>
-												<div class="media-body flex-grow-1">
-													<p class="noti-details"><span class="noti-title">Carl Kelly</span> send a message <span class="noti-title"> to his doctor</span></p>
-													<p class="noti-time"><span class="notification-time">12 mins ago</span></p>
-												</div>
-											</div>
-										</a>
-									</li>
+									
+									
 								</ul>
 							</div>
 							<div class="topnav-dropdown-footer">
@@ -181,6 +144,65 @@
 				
             </div>
 			<!-- /Header -->
+
+			<script>
+				$(document).ready(function () {
+    function loadNotifications() {
+        $.get('/notificacoes/usuario', function (data) {
+			console.log(data)
+			let list = $(".notification-list");
+            let count = data.length;
+            list.empty();
+
+            if (count === 0) {
+                list.append('<li class="notification-message"><a href="#">Nenhuma nova notificação</a></li>');
+            } else {
+                $.each(data, function (index, notification) {
+                    list.append(`
+                        <li class="notification-message" data-id="${notification.id}">
+                            <a href="#" class="notification-link" data-id="${notification.id}" data-url="${notification.url ?? '#'}">
+                                <div class="media">
+                                    <div class="media-body">
+                                        <p class="noti-details"><strong>${notification.title}</strong><br>${notification.message}</p>
+                                        <p class="noti-time">${notification.created_at}</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                    `);
+                });
+            }
+
+            $(".notification-count").text(count);
+        });
+    }
+
+    // Carrega as notificações ao carregar a página
+    loadNotifications();
+
+    // Atualiza a cada 30 segundos
+    setInterval(loadNotifications, 30000);
+
+    // Marcar como lida quando clicar
+    $(document).on("click", ".notification-link", function (e) {
+        e.preventDefault();
+        let id = $(this).data("id");
+        let url = $(this).data("url");
+
+        console.log("Notificação clicada ID:", id);
+
+        if (id) {
+            $.post(`/notificacao/lida/${id}`, function () {
+                loadNotifications();
+                if (url !== "#") {
+                    window.location.href = url;
+                }
+            });
+        }
+    });
+});
+
+			</script>
 			
 			<!-- Sidebar -->
          {{-- <x-admin.sidebar/> --}}

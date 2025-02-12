@@ -27,7 +27,7 @@
                     </a>
                     <ul>
                         <li><a href="{{ route('admin.servico.index') }}">Listar Serviços</a></li>
-                        <li><a href="{{ route('admin.servico.create') }}">Cadastrar Serviços</a></li>
+                        <li><a href="{{ route('admin.servico.create') }}">Cadastrar Serviço</a></li>
                     </ul>
                 </li>
                 @endisset
@@ -36,7 +36,7 @@
                 <!-- Horários -->
                 <li class="submenu">
                     <a href="#">
-                        <i class="fas fa-clock" style="font-size: 18px;"> </i>
+                        <i class="fas fa-clock" style="font-size: 18px;"></i>
                         <span>Horários</span>
                         <span class="menu-arrow"></span>
                     </a>
@@ -77,8 +77,6 @@
                 </li>
                 @endisset
 
-               
-
                 <!-- Dados Cadastrais -->
                 <li class="submenu">
                     <a href="#">
@@ -89,25 +87,25 @@
                     <ul>
                         <li> 
                             <a href="{{ route('empresa.configuracao', ['userId' => Auth::user()->id]) }}">
-                                <i class="fe fe-briefcase"></i><span> Empresa</span>
+                                <i class="fe fe-briefcase"></i> <span> Empresa</span>
                             </a>
                         </li>  
                         @isset(Auth::user()->empresa->user_id)
                         <li> 
                             <a href="{{ route('empresa.endereco', ['userId' => Auth::user()->id]) }}">
-                               <i class="fe fe-map-pin"></i><span> Endereço</span>
+                               <i class="fe fe-map-pin"></i> <span> Endereço</span>
                             </a>
                         </li>
                         <li> 
                             <a href="{{ route('empresa.pagamento.store') }}">
-                               <i class="fe fe-credit-card"></i><span> Tipos de Pagamento</span>
+                               <i class="fe fe-credit-card"></i> <span> Tipos de Pagamento</span>
                             </a>
                         </li>
                         @endisset
                     </ul>
                 </li>
 
-                <!-- Pagamento -->
+                <!-- Pagamentos -->
                 <li class="submenu">
                     <a href="#">
                         <i class="fas fa-credit-card" style="font-size: 18px;"></i> 
@@ -121,7 +119,7 @@
                 </li>
 
                 @if(Auth::user()->isAdmin)
-
+                <!-- Gestão de Empresas -->
                 <li class="submenu">
                     <a href="#">
                         <i class="fas fa-building"></i> 
@@ -130,45 +128,43 @@
                     </a>
                     <ul>
                         <li><a href="{{ route('empresa.index') }}">Listar</a></li>
-                        <li><a href="">Cadastrar</a></li>
+                        <li><a href="#">Cadastrar</a></li>
                     </ul>
                 </li>
                 
+                <!-- Modalidades -->
+                <li class="submenu">
+                    <a href="#">
+                        <i class="fas fa-swimmer"></i> 
+                        <span>Modalidades</span> 
+                        <span class="menu-arrow"></span>
+                    </a>
+                    <ul>
+                        <li><a href="{{ route('modalidade.index') }}">Listar</a></li>
+                        <li><a href="{{ route('modalidade.create') }}">Cadastrar</a></li>
+                    </ul>
+                </li>
 
-                    <!-- Esportes -->
-                    <li class="submenu">
-                        <a href="#">
-                            <i class="fas fa-swimmer"></i> 
-                            <span>Modalidades</span> 
-                            <span class="menu-arrow"></span>
-                        </a>
-                        <ul>
-                            <li><a href="{{ route('modalidade.index') }}">Listar</a></li>
-                            <li><a href="{{ route('modalidade.create') }}">Cadastrar</a></li>
-                        </ul>
-                    </li>
-                
-                    <!-- Configurações -->
-                    <li class="submenu">
-                        <a href="#">
-                            <i class="fas fa-cogs" style="font-size: 18px;"></i> 
-                            <span>Configurações</span> 
-                            <span class="menu-arrow"></span>
-                        </a>
-                        <ul>
-                            <li><a href="{{ route('configuracoes.permissoes') }}">Permissões</a></li>
-                            <li><a href="{{ route('configuracoes.pagamentos') }}">Pagamentos</a></li>
-                            <li><a href="{{ route('configuracoes.empresa') }}">Empresa</a></li>
-                            <li><a href="{{ route('configuracoes.usuarios') }}">Usuários</a></li>
-                            <li><a href="{{ route('configuracoes.index') }}">Sistema</a></li>
-                            @if(Auth::user()->isAdmin)
-                            <li><a href="{{ route('configuracoes.indexAdmin') }}">Sistema Geral</a></li>
-                            @endif
-                        </ul>
-                    </li>
+                <!-- Configurações -->
+                <li class="submenu">
+                    <a href="#">
+                        <i class="fas fa-cogs" style="font-size: 18px;"></i> 
+                        <span>Configurações</span> 
+                        <span class="menu-arrow"></span>
+                    </a>
+                    <ul>
+                        <li><a href="{{ route('configuracoes.permissoes') }}">Permissões</a></li>
+                        <li><a href="{{ route('configuracoes.pagamentos') }}">Pagamentos</a></li>
+                        <li><a href="{{ route('configuracoes.empresa') }}">Empresa</a></li>
+                        <li><a href="{{ route('configuracoes.usuarios') }}">Usuários</a></li>
+                        <li><a href="{{ route('configuracoes.index') }}">Sistema</a></li>
+                        @if(Auth::user()->isAdmin)
+                        <li><a href="{{ route('configuracoes.indexAdmin') }}">Sistema Geral</a></li>
+                        @endif
+                    </ul>
+                </li>
                 @endif
-
             </ul>
         </div>
     </div>
-</div> 
+</div>

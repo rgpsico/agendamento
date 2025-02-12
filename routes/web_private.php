@@ -1,7 +1,5 @@
 <?php
 
-
-
 use App\Http\Controllers\admin\AdminController;
 use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\AlunosController;
@@ -17,12 +15,15 @@ use App\Http\Controllers\StripeController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-
-
-
+// --------------------------------------------------
+// Rota de Pagamento via Stripe (StripeController)
+// --------------------------------------------------
 Route::post('/pagamento', [StripeController::class, 'treinoStripe'])->name('stripe.pagamento');
 
 
+// --------------------------------------------------
+// Rotas de Usuário (UserController)
+// --------------------------------------------------
 Route::prefix('usuario')->group(function () {
     Route::post('/', [UserController::class, 'store'])->name('user.store');
     Route::get('/', [UserController::class, 'logout'])->name('user.logout');
@@ -30,6 +31,9 @@ Route::prefix('usuario')->group(function () {
 });
 
 
+// --------------------------------------------------
+// Rotas de Configurações (ConfiguracoesController)
+// --------------------------------------------------
 Route::prefix('configuracoes')->group(function () {
     Route::get('/admin', [ConfiguracoesController::class, 'indexAdmin'])->name('configuracoes.indexAdmin');
     Route::get('/configuracoes', [ConfiguracoesController::class, 'index'])->name('configuracoes.index');
@@ -47,7 +51,13 @@ Route::prefix('configuracoes')->group(function () {
     Route::post('/configuracoes/salvar', [ConfiguracoesController::class, 'salvar'])->name('configuracoes.salvar');
 });
 
+
+// --------------------------------------------------
+// Rotas do Cliente (middleware 'auth')
+// --------------------------------------------------
 Route::prefix('cliente')->middleware('auth')->group(function () {
+
+    // --- Rotas de Serviços (ServicoController) ---
     Route::group(['prefix' => '/servicos'], function () {
         Route::get('/', [ServicoController::class, 'index'])->name('admin.servico.index');
         Route::get('/{id}/servico', [ServicoController::class, 'show'])->name('admin.servico.show');
@@ -58,7 +68,9 @@ Route::prefix('cliente')->middleware('auth')->group(function () {
         Route::post('/{id}/update', [ServicoController::class, 'update'])->name('admin.servico.update');
     });
 
+    // --- Rotas de Empresa (EmpresaController, PagamentoController, DisponibilidadeController, etc.) ---
     Route::group(['prefix' => '/empresa'], function () {
+        // Empresa
         Route::get('/empresa/all', [EmpresaController::class, 'index'])->name('empresa.index');
         Route::get('/{id}/show', [EmpresaController::class, 'show'])->name('empresa.show');
         Route::get('/create', [EmpresaController::class, 'create'])->name('empresa.create');
@@ -67,38 +79,42 @@ Route::prefix('cliente')->middleware('auth')->group(function () {
         Route::post('/post', [EmpresaController::class, 'store'])->name('empresa.store');
         Route::post('/{userId}/endereco_empresa', [EmpresaController::class, 'endereco_update'])->name('empresa.update_endereco');
 
+        // Pagamento da Empresa
         Route::get('/pagamento/create', [PagamentoController::class, 'create'])->name('empresa.pagamento.create');
         Route::get('/pagamento', [PagamentoController::class, 'index'])->name('pagamento.index');
         Route::post('/pagamento/store', [PagamentoController::class, 'store'])->name('empresa.pagamento.store');
         Route::put('/pagamento/{id}/update', [PagamentoController::class, 'update'])->name('empresa.pagamento.update');
-
         Route::get('/pagamento/{id}/edit', [PagamentoController::class, 'edit'])->name('empresa.pagamento.edit');
 
+        // Disponibilidade
         Route::post('/disponibilidadeperstore', [DisponibilidadeController::class, 'storeper'])->name('storeper');
         Route::get('/disponibilidadeper', [EmpresaController::class, 'disponibilidadePersonalizada'])->name('empresa.disponibilidadePersonalizada');
-
         Route::get('/disponibilidade', [EmpresaController::class, 'disponibilidade'])->name('empresa.disponibilidade');
         Route::post('/disponibilidade', [EmpresaController::class, 'cadastrarDisponibilidade'])->name('empresa.disponibilidade.store');
 
-
+        // Serviços e Horários
         Route::get('/servicos', [ServicoController::class, 'listarServicos'])->name('listar.servicos');
         Route::get('/configurar-horarios/{idServico}', [ServicoController::class, 'configurarHorarios'])->name('configurar.horarios');
         Route::post('/salvar-horarios/{idServico}', [ServicoController::class, 'salvarHorarios'])->name('salvar.horarios');
 
-
+        // Agenda (Empresa)
         Route::get('/', [EmpresaController::class, 'index'])->name('agenda.index');
         Route::get('/create', [EmpresaController::class, 'create'])->name('agenda.create');
         Route::post('/agenda/store', [EmpresaController::class, 'agendatore'])->name('empresa.agenda.store');
         Route::put('/{id}/agenda/update', [EmpresaController::class, 'agendaUpdate'])->name('empresa.agenda.update');
+
+        // Perfil e Configuração da Empresa
         Route::post('/{userId}/profile', [EmpresaController::class, 'profile'])->name('empresa.profile');
         Route::delete('/{id}/destroy', [EmpresaController::class, 'destroy'])->name('empresa.destroy');
         Route::get('/{userId}/config', [EmpresaController::class, 'configuracao'])->name('empresa.configuracao');
+
+        // Fotos e Endereço da Empresa
         Route::get('/fotos', [EmpresaController::class, 'fotos'])->name('empresa.fotos');
         Route::get('/{userId}/endereco_empresa', [EmpresaController::class, 'endereco'])->name('empresa.endereco');
         Route::post('/uploadEmpresa', [EmpresaController::class, 'uploadImage'])->name('empresa.upload');
         Route::delete('/{id}/excluirImagens', [EmpresaController::class, 'destroy'])->name('gallery.destroy');
 
-
+        // --- Rotas de Alunos (AlunosController) ---
         Route::group(['prefix' => '/alunos'], function () {
             Route::get('/', [AlunosController::class, 'index'])->name('alunos.index');
             Route::get('/{id}/show', [AlunosController::class, 'show'])->name('alunos.show');
@@ -111,13 +127,14 @@ Route::prefix('cliente')->middleware('auth')->group(function () {
             Route::post('/uploadAluno', [AlunosController::class, 'uploadImage'])->name('aluno.upload');
         });
 
+        // --- Rota do Dashboard do Cliente (EmpresaController) ---
         Route::group(['prefix' => '/dashboard'], function () {
             Route::get('/', [EmpresaController::class, 'dashboard'])->name('cliente.dashboard');
         });
 
+        // --- Rotas de Agenda (AgendaController) ---
         Route::group(['prefix' => '/agenda'], function () {
             Route::get('/', [AgendaController::class, 'index'])->name('agenda.index');
-
             Route::get('/calendario', [AgendaController::class, 'calendario'])->name('agenda.calendario');
             Route::get('/{id}/show', [AgendaController::class, 'show'])->name('agenda.show');
             Route::get('/create', [AgendaController::class, 'create'])->name('agenda.create');
@@ -128,7 +145,7 @@ Route::prefix('cliente')->middleware('auth')->group(function () {
             Route::delete('/{id}/destroy', [AgendaController::class, 'destroy'])->name('agenda.destroy');
         });
 
-
+        // --- Rotas de Modalidade (ModalidadeController) ---
         Route::group(['prefix' => '/modalidade'], function () {
             Route::get('/', [ModalidadeController::class, 'index'])->name('modalidade.index');
             Route::get('/create', [ModalidadeController::class, 'create'])->name('modalidade.create');
@@ -138,18 +155,26 @@ Route::prefix('cliente')->middleware('auth')->group(function () {
             Route::delete('{id}/destroy', [ModalidadeController::class, 'destroy'])->name('admin.modalidade.destroy');
         });
 
+        // --- Rota de Perfil de Usuário (UserController) ---
         Route::get('{id}/profile', [UserController::class, 'profile'])->name('usuario.profile');
     });
 
+    // --- Rota para Agendamentos do Professor (AgendamentoControllerApi) ---
     Route::get('/professor/agendamentos', [AgendamentoControllerApi::class, 'getAgendamentos']);
 });
 
 
-
+// --------------------------------------------------
+// Rotas de Pagamento (middleware 'auth')
+// --------------------------------------------------
 Route::prefix('pagamento')->middleware('auth')->group(function () {
     Route::post('/stripe', [PagamentoController::class, 'pagamentoStripe'])->name('pagamento.stripe');
 });
 
+
+// --------------------------------------------------
+// Rotas do Manager
+// --------------------------------------------------
 Route::group(['prefix' => '/manager'], function () {
     Route::get('/', [EmpresaController::class, 'dashboard'])->name('admin.dashboard');
     // Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
@@ -157,4 +182,10 @@ Route::group(['prefix' => '/manager'], function () {
     // Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
 });
 
-Route::prefix('admin')->middleware('auth')->group(function () {});
+
+// --------------------------------------------------
+// Rotas do Admin (middleware 'auth')
+// --------------------------------------------------
+Route::prefix('admin')->middleware('auth')->group(function () {
+    // Coloque aqui as rotas específicas de Admin, se necessário.
+});
