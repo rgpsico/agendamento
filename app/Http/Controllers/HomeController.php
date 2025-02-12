@@ -44,11 +44,13 @@ class HomeController extends Controller
 
     public function index()
     {
-        $model = $this->model::with('modalidade', 'endereco', 'galeria', 'avaliacao')->get();
+        $model = $this->model::with('modalidade', 'endereco', 'galeria', 'avaliacao')->where('status', 'ativo')->get();
         $modalidade = Modalidade::all();
+
 
         // Adiciona configuração de agendamento para cada empresa
         foreach ($model as $empresa) {
+
             $empresa->tipoAgendamento = Configuracao::get($empresa->id, 'agendamento_tipo', 'horarios');
             $empresa->whatsappNumero = Configuracao::get($empresa->id, 'whatsapp_numero', '');
         }

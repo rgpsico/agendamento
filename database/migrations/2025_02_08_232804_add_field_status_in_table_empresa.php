@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('empresas', function (Blueprint $table) {
+        Schema::table('empresa', function (Blueprint $table) {
             $table->enum('status', ['ativo', 'inativo'])->default('inativo');
         });
     }
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('empresas', function (Blueprint $table) {
+        Schema::table('empresa', function (Blueprint $table) {
             $table->dropColumn('status');
         });
     }

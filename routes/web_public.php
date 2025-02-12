@@ -3,6 +3,7 @@
 use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -42,6 +43,9 @@ Route::get('/{id}/checkoutsucesso', [HomeController::class, 'checkoutSucesso'])-
 Route::post('/agendar', [AgendaController::class, 'store'])->name('agendamento.pagamento');
 
 
+Route::get('/notificacoes/usuario', [NotificationController::class, 'getUserNotifications']);
+Route::get('/notificacoes/empresa', [NotificationController::class, 'getEmpresaNotifications']);
+Route::post('/notificacao/lida/{id}', [NotificationController::class, 'markAsRead']);
 
 Route::prefix('public')->group(function () {
     // Route::group(['prefix' => '/categoria'], function () {
