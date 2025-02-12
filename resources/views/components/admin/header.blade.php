@@ -112,7 +112,7 @@
 								</ul>
 							</div>
 							<div class="topnav-dropdown-footer">
-								<a href="#">View all Notifications</a>
+								<a href="#">Todas Notificações</a>
 							</div>
 						</div>
 					</li>
