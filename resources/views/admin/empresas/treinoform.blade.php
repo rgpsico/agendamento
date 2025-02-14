@@ -1,7 +1,7 @@
 <x-admin.layout title="Listar Alunos">
     <div class="page-wrapper">
         <div class="content container-fluid">
-        
+           
             <!-- Page Header -->
            <x-header.titulo pageTitle="{{$pageTitle}}" />
             <!-- /Page Header -->
@@ -11,7 +11,7 @@
                 </div>
                 <div class="card-body">
                     <x-alert/>
-                    <form action="{{route('empresa.update')}}" method="POST" enctype="multipart/form-data">
+                    <form action="{{route('empresa.update',['id' => Auth::user()->id ])}}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <input type="hidden"  name="user_id" value="{{Auth::user()->id}}" />
 
