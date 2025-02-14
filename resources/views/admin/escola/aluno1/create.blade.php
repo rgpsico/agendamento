@@ -7,7 +7,7 @@
            
             @include('admin.empresas._partials.modal')
             <div class="row">
-                <form action="{{route('empresa.update',['id' => Auth::user()->id ])}}" method="POST" enctype="multipart/form-data">
+                <form action="{{route('empresa.update',['id' => Auth::user()->empresa_id ])}}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <input type="hidden"  name="user_id" value="{{Auth::user()->id}}" />
 
