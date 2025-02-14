@@ -11,6 +11,7 @@
                 </div>
                 <div class="card-body">
                     <x-alert/>
+                    {{dd('aaaa')}}
                     <form action="{{route('empresa.update',['id' => Auth::user()->id ])}}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <input type="hidden"  name="user_id" value="{{Auth::user()->id}}" />
