@@ -10,7 +10,7 @@ class Empresa extends Model
     use HasFactory;
 
 
-    protected $table = 'empresa';
+
 
 
 
@@ -21,6 +21,8 @@ class Empresa extends Model
     protected $keyType = 'string';
 
     protected $fillable = ['user_id', 'avatar', 'nome', 'descricao', 'telefone', 'cnpj', 'valor_aula_de', 'valor_aula_ate', 'modalidade_id', 'banners'];
+
+    protected $table = 'empresa';
 
     public function endereco()
     {
