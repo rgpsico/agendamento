@@ -92,6 +92,37 @@ class EmpresaController extends Controller
         return view('admin.' . $this->view . '.' . $viewSuffix, $mergedData);
     }
 
+    public function store(Request $request)
+    {
+        $data = $request->validate([
+            'avatar' => 'nullable|image|max:2048',
+            'banner' => 'nullable|image|max:2048',
+            'nome' => 'required|max:255',
+            'descricao' => 'required',
+            'telefone' => 'required',
+            'cnpj' => 'required|unique:empresas,cnpj',
+            'valor_aula_de' => 'required',
+            'valor_aula_ate' => 'required',
+            'modalidade_id' => 'required',
+        ]);
+
+        // Criar a empresa
+        $empresa = Empresa::create($data);
+
+        // Processar arquivos
+        if ($request->hasFile('avatar')) {
+            $avatar = $request->file('avatar')->store('avatars', 'public');
+            $empresa->update(['avatar' => $avatar]);
+        }
+
+        if ($request->hasFile('banner')) {
+            $banner = $request->file('banner')->store('banners', 'public');
+            $empresa->update(['banners' => $banner]);
+        }
+
+        return response()->json(['message' => 'Empresa criada com sucesso!', 'empresa' => $empresa], 201);
+    }
+
 
     public function update(Request $request, $id)
     {
