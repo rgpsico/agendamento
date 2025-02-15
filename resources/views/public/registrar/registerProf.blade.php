@@ -218,6 +218,7 @@
   <div class="main-wrapper">
     <div class="register-box">
       <div class="row">
+        
         <!-- Área da Logo -->
         <div class="col-12 col-md-6 col-sm-12 login-left d-flex align-items-center justify-content-center">
           <img class="img-fluid" src="{{ asset('admin/img/registresep.png') }}" alt="Logo">
@@ -237,38 +238,40 @@
               <!-- Campo Nome -->
               <div class="form-group">
                 <label for="nome">Nome</label>
-                <input type="text" name="nome" id="nome" class="form-control" placeholder="Digite seu nome" required>
-              </div>
-
-              <!-- Campo Email -->
-              <div class="form-group">
+                <input type="text" name="nome" id="nome" class="form-control @error('nome') is-invalid @enderror" value="{{ old('nome') }}" placeholder="Digite seu nome" required>
+                @error('nome')
+                    <small class="text-danger">{{ $message }}</small>
+                @enderror
+            </div>
+            
+            <div class="form-group">
                 <label for="email">Email</label>
-                <input type="email" name="email" id="email" class="form-control" placeholder="Digite seu email" required>
-              </div>
-
-              <!-- Campo Senha -->
-              <div class="form-group">
+                <input type="email" name="email" id="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email') }}" placeholder="Digite seu email" required>
+                @error('email')
+                    <small class="text-danger">{{ $message }}</small>
+                @enderror
+            </div>
+            
+            <div class="form-group">
                 <label for="senha">Senha</label>
-                <input type="password" name="senha" id="senha" class="form-control" placeholder="Digite sua senha" required>
-              </div>
-
-              <!-- Campo Repetir Senha -->
-              <div class="form-group">
-                <label for="confirmar_senha">Repetir Senha</label>
-                <input type="password" name="confirmar_senha" id="confirmar_senha" class="form-control" placeholder="Repita sua senha" required>
-              </div>
-
-              <!-- Campo Modalidade -->
-              <div class="form-group">
+                <input type="password" name="senha" id="senha" class="form-control @error('senha') is-invalid @enderror" placeholder="Digite sua senha" required>
+                @error('senha')
+                    <small class="text-danger">{{ $message }}</small>
+                @enderror
+            </div>
+            
+            <div class="form-group">
                 <label for="modalidade_id">Modalidade</label>
-                <select name="modalidade_id" class="form-control" id="modalidade_id" required>
-                  @foreach ($modalidade as $value)
-                    <option value="{{ $value->id }}">{{ $value->nome }}</option>
-                  @endforeach
+                <select name="modalidade_id" class="form-control @error('modalidade_id') is-invalid @enderror" id="modalidade_id" required>
+                    @foreach ($modalidade as $value)
+                        <option value="{{ $value->id }}" {{ old('modalidade_id') == $value->id ? 'selected' : '' }}>{{ $value->nome }}</option>
+                    @endforeach
                 </select>
-              </div>
-
-              <!-- Botão de Registro -->
+                @error('modalidade_id')
+                    <small class="text-danger">{{ $message }}</small>
+                @enderror
+            </div>
+            <!-- Botão de Registro -->
               <div class="form-group mb-3">
                 <button class="btn btn-primary" type="submit">Registrar</button>
               </div>
