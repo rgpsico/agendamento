@@ -40,12 +40,11 @@ class UserController extends Controller
     public function store(Request $request)
     {
 
-
-        $request->validate([
-            'nome' => 'required',
-            'email' => 'required|unique:usuarios,email',
-            'senha' => 'required',
-        ]);
+        // $request->validate([
+        //     'nome' => 'required',
+        //     'email' => 'required|unique:usuarios,email',
+        //     'senha' => 'required',
+        // ]);
 
         // Stripe::setApiKey(env('STRIPE_SECRET'));
 

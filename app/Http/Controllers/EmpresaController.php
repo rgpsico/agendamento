@@ -94,66 +94,92 @@ class EmpresaController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'avatar' => 'nullable|image|max:2048',
-            'banner' => 'nullable|image|max:2048',
-            'nome' => 'required|max:255',
-            'descricao' => 'required',
-            'telefone' => 'required',
-            'cnpj' => 'required|unique:empresas,cnpj',
-            'valor_aula_de' => 'required',
-            'valor_aula_ate' => 'required',
-            'modalidade_id' => 'required',
-        ]);
+        try {
+            $data = $request->validate([
+                'avatar' => 'nullable|image|max:2048',
+                'banner' => 'nullable|image|max:2048',
+                'nome' => 'required|max:255',
+                'descricao' => 'required',
+                'telefone' => 'required',
+                'cnpj' => 'required|unique:empresa,cnpj',
+                'valor_aula_de' => 'required',
+                'valor_aula_ate' => 'required',
+                'modalidade_id' => 'required',
+            ], [
+                'nome.required' => 'O nome é obrigatório.',
+                'descricao.required' => 'A descrição é obrigatória.',
+                'telefone.required' => 'O telefone é obrigatório.',
+                'cnpj.required' => 'O CNPJ é obrigatório.',
+                'cnpj.unique' => 'Já existe uma empresa com este CNPJ.',
+                'valor_aula_de.required' => 'O valor inicial da aula é obrigatório.',
+                'valor_aula_ate.required' => 'O valor final da aula é obrigatório.',
+                'modalidade_id.required' => 'A modalidade é obrigatória.',
+                'avatar.image' => 'O avatar deve ser uma imagem.',
+                'avatar.max' => 'O avatar não pode ser maior que 2MB.',
+                'banner.image' => 'O banner deve ser uma imagem.',
+                'banner.max' => 'O banner não pode ser maior que 2MB.',
+            ]);
 
-        // Criar a empresa
-        $empresa = Empresa::create($data);
+            // Criar a empresa
+            $data['user_id'] = intval($request->user_id);
+            $empresa = Empresa::create($data);
 
-        // Processar arquivos
-        if ($request->hasFile('avatar')) {
-            $avatar = $request->file('avatar')->store('avatars', 'public');
-            $empresa->update(['avatar' => $avatar]);
+            // Processar arquivos (se existirem)
+            if ($request->hasFile('avatar')) {
+                $avatar = $request->file('avatar')->store('avatars', 'public');
+                $empresa->update(['avatar' => $avatar]);
+            }
+
+            if ($request->hasFile('banner')) {
+                $banner = $request->file('banner')->store('banners', 'public');
+                $empresa->update(['banner' => $banner]);
+            }
+
+            return redirect()->back()->with('success', 'Empresa criada com sucesso!');
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['error' => 'Erro ao criar empresa: ' . $e->getMessage()])->withInput();
         }
-
-        if ($request->hasFile('banner')) {
-            $banner = $request->file('banner')->store('banners', 'public');
-            $empresa->update(['banners' => $banner]);
-        }
-
-        return response()->json(['message' => 'Empresa criada com sucesso!', 'empresa' => $empresa], 201);
     }
 
 
     public function update(Request $request, $id)
     {
-        $data = $request->validate([
-            'avatar' => 'nullable|image|max:2048',
-            'nome' => 'required|max:255',
-            'descricao' => 'required',
-            'telefone' => 'required',
-            'cnpj' => 'required',
-            'valor_aula_de' => 'required',
-            'valor_aula_ate' => 'required',
-            'modalidade_id' => 'required',
-        ]);
+        try {
+            //code...
 
-        $empresa = Empresa::findOrFail($id);
+            $data = $request->validate([
+                'avatar' => 'nullable|image|max:2048',
+                'nome' => 'required|max:255',
+                'descricao' => 'required',
+                'telefone' => 'required',
+                'cnpj' => 'required',
+                'valor_aula_de' => 'required',
+                'valor_aula_ate' => 'required',
+                'modalidade_id' => 'required',
+            ]);
 
-        // Atualizar dados
-        $empresa->update($data);
+            $empresa = Empresa::findOrFail($id);
 
-        // Processar arquivos
-        if ($request->hasFile('avatar')) {
-            $avatar = $request->file('avatar')->store('avatars', 'public');
-            $empresa->update(['avatar' => $avatar]);
+            // Atualizar dados
+
+
+            // Processar arquivos
+            if ($request->hasFile('avatar')) {
+                $avatar = $request->file('avatar')->store('avatars', 'public');
+                $empresa->update(['avatar' => $avatar]);
+            }
+
+            if ($request->hasFile('banner')) {
+                $banner = $request->file('banner')->store('banners', 'public');
+                $empresa->update(['banners' => $banner]);
+            }
+
+            $empresa->update($data);
+
+            return redirect()->back()->with('success', 'Empresa criada com sucesso!');
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['error' => 'Erro ao criar empresa: ' . $e->getMessage()])->withInput();
         }
-
-        if ($request->hasFile('banner')) {
-            $banner = $request->file('banner')->store('banners', 'public');
-            $empresa->update(['banners' => $banner]);
-        }
-
-        return response()->json(['message' => 'Empresa atualizada com sucesso!']);
     }
 
 
