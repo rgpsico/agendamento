@@ -40,11 +40,11 @@ class UserController extends Controller
     public function store(Request $request)
     {
 
-        // $request->validate([
-        //     'nome' => 'required',
-        //     'email' => 'required|unique:usuarios,email',
-        //     'senha' => 'required',
-        // ]);
+        $request->validate([
+            'nome' => 'required',
+            'email' => 'required|unique:usuarios,email',
+            'senha' => 'required',
+        ]);
 
         // Stripe::setApiKey(env('STRIPE_SECRET'));
 
@@ -62,10 +62,6 @@ class UserController extends Controller
 
         // $accountId = $account->id;
         // dd($accountId);
-
-
-
-
 
         $user = new Usuario;
         $user->nome = $request->nome;
@@ -130,11 +126,13 @@ class UserController extends Controller
     public function show($id)
     {
         $user = Usuario::find($id);
+
         return view('users.show', compact('user'));
     }
 
     public function edit($id)
     {
+        dd('aaa');
         $user = Usuario::find($id);
         return view('users.edit', compact('user'));
     }

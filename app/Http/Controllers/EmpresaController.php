@@ -122,6 +122,7 @@ class EmpresaController extends Controller
 
             // Criar a empresa
             $data['user_id'] = intval($request->user_id);
+
             $empresa = Empresa::create($data);
 
             // Processar arquivos (se existirem)
@@ -145,7 +146,7 @@ class EmpresaController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            //code...
+
 
             $data = $request->validate([
                 'avatar' => 'nullable|image|max:2048',
@@ -158,7 +159,8 @@ class EmpresaController extends Controller
                 'modalidade_id' => 'required',
             ]);
 
-            $empresa = Empresa::findOrFail($id);
+
+            $empresa = Empresa::where('id', $id);
 
             // Atualizar dados
 
@@ -176,9 +178,9 @@ class EmpresaController extends Controller
 
             $empresa->update($data);
 
-            return redirect()->back()->with('success', 'Empresa criada com sucesso!');
+            return redirect()->back()->with('success', 'Empresa atualizada com sucesso!');
         } catch (\Exception $e) {
-            return redirect()->back()->withErrors(['error' => 'Erro ao criar empresa: ' . $e->getMessage()])->withInput();
+            return redirect()->back()->withErrors(['error' => 'Erro ao atualizar empresa: ' . $e->getMessage()])->withInput();
         }
     }
 
@@ -392,6 +394,7 @@ class EmpresaController extends Controller
 
     public function configuracao($userId)
     {
+
         $model = Empresa::where('user_id', $userId)->first();
         $modalidades = Modalidade::all();
         return view(
