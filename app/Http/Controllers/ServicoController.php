@@ -146,6 +146,21 @@ class ServicoController extends Controller
             $servicos->imagem = $filename;
         }
 
+        if ($request->tipo_agendamento === 'DIA') {
+            $vagasTotais = $request->vagas ?? 1; // Garante que não seja null
+
+            for ($i = 0; $i < 30; $i++) {
+                $data = now()->addDays($i)->format('Y-m-d');
+
+                DisponibilidadeServico::create([
+                    'servico_id' => $id,
+                    'data' => $data,
+                    'vagas_totais' => $vagasTotais,
+                    'vagas_reservadas' => 0
+                ]);
+            }
+        }
+
         $servicos->save();
 
         return redirect()->route('admin.servico.edit', ['id' => $servicos->id])->with('success', 'Serviço atualizado com sucesso!');
