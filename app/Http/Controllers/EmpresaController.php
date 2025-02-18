@@ -143,45 +143,52 @@ class EmpresaController extends Controller
     }
 
 
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        try {
+        $data = $request->validate([
+            'avatar' => 'nullable|image|max:2048',
+            'nome' => 'required|max:255',
+            'descricao' => 'required',
+            'telefone' => 'required',
+            'cnpj' => 'required',
+
+            'valor_aula_de' => 'required',
+            'valor_aula_ate' => 'required',
+            'modalidade_id' => 'required',
+        ]);
 
 
-            $data = $request->validate([
-                'avatar' => 'nullable|image|max:2048',
-                'nome' => 'required|max:255',
-                'descricao' => 'required',
-                'telefone' => 'required',
-                'cnpj' => 'required',
-                'valor_aula_de' => 'required',
-                'valor_aula_ate' => 'required',
-                'modalidade_id' => 'required',
-            ]);
+        $data = $request->all();
 
+        $data['user_id'] = $request->user_id;
 
-            $empresa = Empresa::where('id', $id);
-            $empresa->update($data);
-            // Atualizar dados
+        // Processar o arquivo de avatar, se houver 
 
-
-            // Processar arquivos
-            if ($request->hasFile('avatar')) {
-                $avatar = $request->file('avatar')->store('avatars', 'public');
-                $empresa->update(['avatar' => $avatar]);
-            }
-
-            if ($request->hasFile('banner')) {
-                $banner = $request->file('banner')->store('banners', 'public');
-                $empresa->update(['banners' => $banner]);
-            }
-
-
-
-            return redirect()->back()->with('success', 'Empresa atualizada com sucesso!');
-        } catch (\Exception $e) {
-            return redirect()->back()->withErrors(['error' => 'Erro ao atualizar empresa: ' . $e->getMessage()])->withInput();
+        if ($request->hasFile('avatar')) {
+            $file = $request->file('avatar');
+            $filename = time() . '.' . $file->getClientOriginalExtension();
+            $path = public_path('/avatar');
+            $file->move($path, $filename);
+            $data['avatar'] = $filename;
         }
+
+        if ($request->hasFile('banner')) {
+
+            $file = $request->file('banner');
+            $filenameBanners = time() . '.' . $file->getClientOriginalExtension();
+            $path = public_path('/banner');
+            $file->move($path, $filenameBanners);
+            $data['banners'] = $filenameBanners;
+        }
+
+
+        // Atualizar a empresa existente ou criar uma nova
+        $empresa = Empresa::updateOrCreate(
+            ['user_id' => $data['user_id']],
+            $data
+        );
+
+        return redirect()->back()->with('success', 'Empresa atualizada com sucesso!');
     }
 
 
