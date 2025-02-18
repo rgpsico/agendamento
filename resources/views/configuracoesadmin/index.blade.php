@@ -12,6 +12,7 @@
                 <li class="nav-item">
                     <a class="nav-link active" data-bs-toggle="tab" href="#gerais">Gerais</a>
                 </li>
+            @if(Auth::user()->isAdmin)
                 <li class="nav-item">
                     <a class="nav-link" data-bs-toggle="tab" href="#login">Login & Registro</a>
                 </li>
@@ -21,6 +22,7 @@
                 <li class="nav-item">
                     <a class="nav-link" data-bs-toggle="tab" href="#tipoSistema">Tipo de Sistema</a>
                 </li>
+            @endif
             </ul>
 
             <!-- Conteúdo das Abas -->
@@ -49,11 +51,12 @@
                 </div>
 
                 <!-- Aba: Login & Registro -->
+                @if(Auth::user()->isAdmin)
                 <div class="tab-pane fade" id="login">
                     <form action="{{ route('configuracoesGeral.salvar') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="form-group">
-                            <label>Imagem da Tela de Login:</label>
+                            <label>Imagem da Tela de LoginAA:</label>
                             <input type="file" name="login_image" class="form-control">
                             @if($loginImage)
                                 <div class="mt-2">
@@ -124,6 +127,7 @@
                     </form>
                 </div>
             </div>
+            @endif
         </div>
     </div>
 
