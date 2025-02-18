@@ -113,7 +113,7 @@ class ServicoController extends Controller
         $model = $this->model->find($id);
 
         // Busca o número de vagas na tabela DisponibilidadeServico
-        $numero_de_vagas = DisponibilidadeServico::where('servico_id', $id)->value('value');
+        $numero_de_vagas = DisponibilidadeServico::where('servico_id', $id)->value('vagas_totais');
 
         return view(
             $this->view . '.create',
