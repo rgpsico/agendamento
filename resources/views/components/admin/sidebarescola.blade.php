@@ -101,6 +101,7 @@
                                <i class="fe fe-credit-card"></i> <span> Tipos de Pagamento</span>
                             </a>
                         </li>
+                        <li><a href="{{ route('configuracoes.indexAdmin') }}">Sistema Geral</a></li>
                         @endisset
                     </ul>
                 </li>
@@ -159,7 +160,7 @@
                         <li><a href="{{ route('configuracoes.usuarios') }}">Usuários</a></li>
                         <li><a href="{{ route('configuracoes.index') }}">Sistema</a></li>
                         @if(Auth::user()->isAdmin)
-                        <li><a href="{{ route('configuracoes.indexAdmin') }}">Sistema Geral</a></li>
+                     
                         @endif
                     </ul>
                 </li>
