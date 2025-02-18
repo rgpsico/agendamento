@@ -161,7 +161,7 @@ class EmpresaController extends Controller
 
 
             $empresa = Empresa::where('id', $id);
-
+            $empresa->update($data);
             // Atualizar dados
 
 
@@ -176,7 +176,7 @@ class EmpresaController extends Controller
                 $empresa->update(['banners' => $banner]);
             }
 
-            $empresa->update($data);
+
 
             return redirect()->back()->with('success', 'Empresa atualizada com sucesso!');
         } catch (\Exception $e) {
