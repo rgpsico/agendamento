@@ -1,7 +1,7 @@
 <div class="form-group">                         
     <div class="mb-3">      
         @isset($model->avatar)
-            <img src="{{ asset('avatar/' . $model->avatar) }}" width="150" height="150" alt="Logo da Escola de Surf">
+            <img src="{{ asset($model->avatar) }}" width="150" height="150" alt="Logo da Escola de Surf">
         @endisset
     </div>
     <label>{{$label ?? 'Logo da Empresa'}}</label>
