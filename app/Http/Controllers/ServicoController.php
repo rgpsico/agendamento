@@ -112,9 +112,13 @@ class ServicoController extends Controller
     {
         $model = $this->model->find($id);
 
+        // Busca o número de vagas na tabela DisponibilidadeServico
+        $numero_de_vagas = DisponibilidadeServico::where('servico_id', $id)->value('value');
+
         return view(
             $this->view . '.create',
             [
+                'numero_de_vagas' => $numero_de_vagas, // Corrigido: adicionada a vírgula
                 'pageTitle' => $this->pageTitle,
                 'model' => $model,
                 'view' => $this->view,
@@ -122,6 +126,7 @@ class ServicoController extends Controller
             ]
         );
     }
+
 
 
     public function update(ServicoRequest $request, $id)

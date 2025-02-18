@@ -20,7 +20,7 @@
     <div class="form-group" id="vagas_container" style="display: none;">
         <label for="vagas">Número de Vagas</label>
         <input type="number" name="vagas" id="vagas" class="form-control" min="1" 
-            value="{{ old('vagas', $model->vagas_totais ?? '') }}">
+        value="{{ old('vagas', $numero_de_vagas ?? '') }}">
     </div>
     
 
