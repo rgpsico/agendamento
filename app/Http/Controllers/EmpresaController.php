@@ -126,14 +126,22 @@ class EmpresaController extends Controller
             $empresa = Empresa::create($data);
 
             // Processar arquivos (se existirem)
+
             if ($request->hasFile('avatar')) {
-                $avatar = $request->file('avatar')->store('avatars', 'public');
-                $empresa->update(['avatar' => $avatar]);
+                $file = $request->file('avatar');
+                $filename = time() . '.' . $file->getClientOriginalExtension();
+                $path = public_path('/avatar');
+                $file->move($path, $filename);
+                $data['avatar'] = $filename;
             }
 
             if ($request->hasFile('banner')) {
-                $banner = $request->file('banner')->store('banners', 'public');
-                $empresa->update(['banner' => $banner]);
+
+                $file = $request->file('banner');
+                $filenameBanners = time() . '.' . $file->getClientOriginalExtension();
+                $path = public_path('/banner');
+                $file->move($path, $filenameBanners);
+                $data['banners'] = $filenameBanners;
             }
 
             return redirect()->back()->with('success', 'Empresa criada com sucesso!');
