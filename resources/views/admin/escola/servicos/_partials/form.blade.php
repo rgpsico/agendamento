@@ -18,7 +18,7 @@
 <x-text-input name="tempo_de_aula" size="30" label="Tempo de Aula" :value="$model->tempo_de_aula ?? ''" />
 
     <div class="form-group" id="vagas_container" style="display: none;">
-        <label for="vagas">Número de Vagas</label>
+        <label for="vagas">Número de Vagas  </label>
         <input type="number" name="vagas" id="vagas" class="form-control" min="1" 
         value="{{ old('vagas', $numero_de_vagas ?? '') }}">
     </div>
