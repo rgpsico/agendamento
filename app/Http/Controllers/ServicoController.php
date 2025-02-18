@@ -111,6 +111,7 @@ class ServicoController extends Controller
     public function edit($id)
     {
         $model = $this->model->find($id);
+
         return view(
             $this->view . '.create',
             [
@@ -121,6 +122,7 @@ class ServicoController extends Controller
             ]
         );
     }
+
 
     public function update(ServicoRequest $request, $id)
     {

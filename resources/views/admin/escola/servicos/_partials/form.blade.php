@@ -19,8 +19,10 @@
 
     <div class="form-group" id="vagas_container" style="display: none;">
         <label for="vagas">Número de Vagas</label>
-        <input type="number" name="vagas" id="vagas" class="form-control" min="1" value="{{ old('vagas', $model->vagas_totais ?? '') }}">
+        <input type="number" name="vagas" id="vagas" class="form-control" min="1" 
+            value="{{ old('vagas', $model->vagas_totais ?? '') }}">
     </div>
+    
 
 <!-- Adicionando o Tipo de Serviço -->
 <div class="form-group">
@@ -34,12 +36,14 @@
     document.addEventListener("DOMContentLoaded", function() {
         const tipoAgendamentoSelect = document.getElementById("tipo_agendamento");
         const vagasContainer = document.getElementById("vagas_container");
+        const vagasInput = document.getElementById("vagas");
 
         function toggleVagasField() {
             if (tipoAgendamentoSelect.value === "DIA") {
                 vagasContainer.style.display = "block";
             } else {
                 vagasContainer.style.display = "none";
+                vagasInput.value = '';
             }
         }
 
