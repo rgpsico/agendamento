@@ -22,6 +22,7 @@ class SiteController extends Controller
             ->with(['servicos', 'depoimentos', 'contatos'])
             ->firstOrFail();
 
+
         return view('site.publico', compact('site'));
     }
 
@@ -30,49 +31,105 @@ class SiteController extends Controller
      */
     public function edit()
     {
-        $empresaId = Auth::user()->empresa->id;
+        $empresa = Auth::user()->empresa;
 
         $site = EmpresaSite::firstOrCreate(
-            ['empresa_id' => $empresaId],
+            ['empresa_id' => $empresa->id],
             [
-                'slug' => Str::slug(Auth::user()->empresa->nome_fantasia),
-                'titulo' => Auth::user()->empresa->nome_fantasia,
+                'slug' => Str::slug($empresa->nome_fantasia),
+                'titulo' => $empresa->nome_fantasia,
                 'descricao' => null,
+                'cores' => [
+                    'primaria' => '#0ea5e9',
+                    'secundaria' => '#38b2ac'
+                ],
             ]
-        );
+        )->refresh(); // força carregar o que realmente está salvo no banco
 
         return view('admin.site.configuracoes', compact('site'));
     }
+
+
 
     /**
      * Salva as configurações atualizadas do site
      */
     public function update(Request $request, EmpresaSite $site)
     {
-        $request->validate([
+        // Remova a linha dd($request->all()) após a depuração
+
+        $validated = $request->validate([
             'titulo' => 'required|string|max:255',
             'descricao' => 'nullable|string',
-            'logo' => 'nullable|image',
-            'capa' => 'nullable|image',
-            'cores' => 'nullable|array',
+            'cores' => 'required|array',
+            'cores.primaria' => 'required|string',
+            'cores.secundaria' => 'required|string',
+            'sobre_titulo' => 'nullable|string|max:255',
+            'sobre_descricao' => 'nullable|string',
+            'sobre_itens' => 'nullable|string', // validando o JSON como string
         ]);
 
-        $dados = $request->only(['titulo', 'descricao']);
+        $data = [
+            'titulo' => $request->titulo,
+            'descricao' => $request->descricao,
+            'cores' => [
+                'primaria' => $request->input('cores.primaria', $request->input('cores')['primaria'] ?? '#0ea5e9'),
+                'secundaria' => $request->input('cores.secundaria', $request->input('cores')['secundaria'] ?? '#38b2ac'),
+            ],
+            'sobre_titulo' => $request->sobre_titulo,
+            'sobre_descricao' => $request->sobre_descricao,
+        ];
 
+        // Processamento do JSON dos itens do Sobre Nós
+        if ($request->filled('sobre_itens')) {
+            try {
+                $data['sobre_itens'] = json_decode($request->sobre_itens, true);
+
+                // Verificação adicional - se json_decode falhar, retornará null
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    return redirect()->back()
+                        ->withInput()
+                        ->withErrors(['sobre_itens' => 'O formato JSON dos itens está inválido.']);
+                }
+            } catch (\Exception $e) {
+                return redirect()->back()
+                    ->withInput()
+                    ->withErrors(['sobre_itens' => 'Erro ao processar os itens: ' . $e->getMessage()]);
+            }
+        }
+
+        // Upload do logo
         if ($request->hasFile('logo')) {
-            $dados['logo'] = $request->file('logo')->store('sites/logos', 'public');
+            // Remover o arquivo antigo se existir
+            if (!empty($site->logo) && Storage::disk('public')->exists($site->logo)) {
+                Storage::disk('public')->delete($site->logo);
+            }
+
+            $data['logo'] = $request->file('logo')->store('sites/logos', 'public');
         }
 
+        // Upload da capa
         if ($request->hasFile('capa')) {
-            $dados['capa'] = $request->file('capa')->store('sites/capas', 'public');
+            // Remover o arquivo antigo se existir
+            if (!empty($site->capa) && Storage::disk('public')->exists($site->capa)) {
+                Storage::disk('public')->delete($site->capa);
+            }
+
+            $data['capa'] = $request->file('capa')->store('sites/capas', 'public');
         }
 
-        if ($request->has('cores')) {
-            $dados['cores'] = json_encode($request->cores);
+        // Upload da imagem sobre nós
+        if ($request->hasFile('sobre_imagem')) {
+            // Remover o arquivo antigo se existir
+            if (!empty($site->sobre_imagem) && Storage::disk('public')->exists($site->sobre_imagem)) {
+                Storage::disk('public')->delete($site->sobre_imagem);
+            }
+
+            $data['sobre_imagem'] = $request->file('sobre_imagem')->store('sites/sobre', 'public');
         }
 
-        $site->update($dados);
+        $site->update($data);
 
-        return redirect()->back()->with('success', 'Site atualizado com sucesso!');
+        return redirect()->back()->with('success', 'Configurações do site atualizadas com sucesso!');
     }
 }

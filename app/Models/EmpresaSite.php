@@ -21,12 +21,18 @@ class EmpresaSite extends Model
         'cores',
         'descricao',
         'ativo',
+        'sobre_titulo',
+        'sobre_descricao',
+        'sobre_imagem',
+        'sobre_itens',
     ];
 
     protected $casts = [
-        'cores' => 'array', // transforma JSON em array automático
+        'cores' => 'array',
+        'sobre_itens' => 'array',
         'ativo' => 'boolean',
     ];
+
 
     // Relacionamento com a empresa
     public function empresa()

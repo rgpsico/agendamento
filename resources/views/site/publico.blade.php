@@ -82,6 +82,30 @@
                 animation: float 3s ease-in-out infinite;
             }
         </style>
+
+@php
+$corPrimaria = $site->cores['primaria'] ?? '#0ea5e9';  // fallback azul padrão
+$corSecundaria = $site->cores['secundaria'] ?? '#38b2ac';
+@endphp
+
+<style>
+.wave-bg {
+    background: linear-gradient(135deg, {{ $corSecundaria }} 0%, {{ $corPrimaria }} 100%);
+}
+.text-wave {
+    color: {{ $corPrimaria }};
+}
+.bg-wave {
+    background-color: {{ $corPrimaria }};
+}
+.border-wave {
+    border-color: {{ $corPrimaria }};
+}
+.hover-bg-wave:hover {
+    background-color: {{ $corPrimaria }};
+}
+</style>
+
     </head>
     
 <body class="font-sans bg-gray-50">
@@ -95,8 +119,8 @@
         <div class="container mx-auto px-6 py-4">
             <div class="flex items-center justify-between">
                 <div class="flex items-center">
-                    <img src="https://via.placeholder.com/50" alt="Logo {{ $site->titulo }}" class="h-12 w-12 rounded-full">
-                    <span class="ml-3 text-xl font-bold">{{ $site->titulo }}</span>
+                    <img src="{{ asset('storage/' . $site->logo) }}" alt="Logo {{ $site->titulo }}" class="h-12 w-350 rounded-full">
+                  
                 </div>
                 <div class="hidden md:flex space-x-8">
                     <a href="#home" class="nav-link">Início</a>
@@ -117,9 +141,9 @@
         <div class="container mx-auto px-6 flex flex-col md:flex-row items-center">
             <div class="md:w-1/2 mb-10 md:mb-0">
                 <h1 class="text-4xl md:text-6xl font-bold leading-tight mb-4">{{ $site->titulo }}</h1>
-                <p class="text-xl mb-8">{{ $site->descricao }}</p>
+                <p class="text-xl mb-8 p-2">{{ $site->descricao }}</p>
                 <div class="flex space-x-4">
-                    <a href="#surf" class="bg-white text-teal-600 hover:bg-gray-100 px-6 py-3 rounded-full font-semibold transition duration-300">Aulas de Surf</a>
+                    <a href="#surf" class="bg-white text-wave hover:bg-gray-100 px-6 py-3 rounded-full font-semibold transition duration-300">Aulas de Surf</a>
                     <a href="#tours" class="border-2 border-white text-white hover:bg-white hover:text-teal-600 px-6 py-3 rounded-full font-semibold transition duration-300">Passeios</a>
                 </div>
             </div>
@@ -162,7 +186,11 @@
                                     @endforeach
                                 </ul>
                             @endif
-                            
+                            <ul class="mb-4 text-gray-600">
+                                <li class="mb-1"><i class="fas fa-check text-teal-500 mr-2"></i> Equipamento incluído</li>
+                                <li class="mb-1"><i class="fas fa-check text-teal-500 mr-2"></i> 2 horas de aula</li>
+                                <li class="mb-1"><i class="fas fa-check text-teal-500 mr-2"></i> Teoria e prática</li>
+                            </ul>
                             <div class="flex justify-between items-center">
                                 <span class="text-2xl font-bold text-teal-600">R$ {{ number_format($servico->preco, 2, ',', '.') }}</span>
                                 <a href="#contact" class="bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded-full transition duration-300">Reservar</a>
@@ -258,47 +286,34 @@
     <section id="about" class="py-20 bg-white">
         <div class="container mx-auto px-6">
             <div class="flex flex-col md:flex-row items-center">
-                <div class="md:w-1/2 mb-10 md:mb-0">
-                    @if($site->capa)
-                    <img src="{{ asset('storage/' . $site->capa) }}" alt="Imagem principal do site" class="rounded-lg shadow-xl floating max-w-full h-auto">
+                @if($site->sobre_imagem)
+                    <div class="md:w-1/2 mb-10 md:mb-0">
+                        <img src="{{ asset('storage/' . $site->sobre_imagem) }}" alt="Sobre nós" class="rounded-lg shadow-xl w-full">
+                    </div>
                 @endif
-                </div>
+    
                 <div class="md:w-1/2 md:pl-12">
-                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-6">Sobre Nós</h2>
-                    <p class="text-gray-600 mb-6">A {{ $site->titulo }} nasceu da paixão pelo surf e pela natureza. Nossa equipe é formada por surfistas profissionais e guias turísticos certificados, todos comprometidos em proporcionar experiências inesquecíveis.</p>
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-6">{{ $site->sobre_titulo ?? 'Sobre Nós' }}</h2>
+                    <p class="text-gray-600 mb-6">{{ $site->sobre_descricao }}</p>
+    
                     <div class="mb-6">
-                        <div class="flex items-start mb-4">
-                            <div class="bg-teal-100 p-3 rounded-full mr-4">
-                                <i class="fas fa-medal text-teal-600 text-xl"></i>
+                        @foreach($site->sobre_itens ?? [] as $item)
+                            <div class="flex items-start mb-4">
+                                <div class="bg-teal-100 p-3 rounded-full mr-4">
+                                    <i class="fas {{ $item['icone'] ?? 'fa-star' }} text-teal-600 text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-semibold text-gray-800 mb-1">{{ $item['titulo'] }}</h3>
+                                    <p class="text-gray-600">{{ $item['descricao'] }}</p>
+                                </div>
                             </div>
-                            <div>
-                                <h3 class="text-xl font-semibold text-gray-800 mb-1">Instrutores Certificados</h3>
-                                <p class="text-gray-600">Todos os nossos instrutores possuem certificação internacional.</p>
-                            </div>
-                        </div>
-                        <div class="flex items-start mb-4">
-                            <div class="bg-teal-100 p-3 rounded-full mr-4">
-                                <i class="fas fa-shield-alt text-teal-600 text-xl"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-xl font-semibold text-gray-800 mb-1">Segurança em Primeiro Lugar</h3>
-                                <p class="text-gray-600">Equipamentos de qualidade e protocolos de segurança rigorosos.</p>
-                            </div>
-                        </div>
-                        <div class="flex items-start">
-                            <div class="bg-teal-100 p-3 rounded-full mr-4">
-                                <i class="fas fa-heart text-teal-600 text-xl"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-xl font-semibold text-gray-800 mb-1">Sustentabilidade</h3>
-                                <p class="text-gray-600">Comprometidos com a preservação do meio ambiente.</p>
-                            </div>
-                        </div>
+                        @endforeach
                     </div>
                 </div>
             </div>
         </div>
     </section>
+    
 
     <!-- Testimonials -->
     <section class="py-20 bg-gray-100">
