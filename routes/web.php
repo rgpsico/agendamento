@@ -27,6 +27,9 @@ Route::get('/google/callback', [SocialLiteController::class, 'alunoGoogleCallbac
 // Route::get('/google-calendar/auth', [GoogleCalendarController::class, 'authenticate'])->name('google.calendar.auth');
 // Route::get('/google-calendar/events', [GoogleCalendarController::class, 'listEvents'])->name('google.calendar.events');
 
+
+Route::get('/site/{slug}', [SiteController::class, 'mostrar'])->name('site.publico');
+
 Route::prefix('admin/site')->middleware(['auth'])->group(function () {
     Route::get('configuracoes', [SiteController::class, 'edit'])->name('admin.site.configuracoes');
     Route::resource('servicos', SiteController::class)->names('admin.site.servicos');
