@@ -10,8 +10,7 @@ use Spatie\GoogleCalendar\Event;
 use Inertia\Inertia;
 
 use App\Http\Controllers\GoogleController;
-
-
+use App\Http\Controllers\SiteController;
 
 Route::get('/google/prof/redirect', [SocialLiteController::class, 'professorRedirectToGoogle'])->name('prof.login.google');
 Route::get('/google/prof/callback', [SocialLiteController::class, 'professorGoogleCallback'])->name('prof.handle.google');
@@ -26,6 +25,7 @@ Route::get('/google/callback', [SocialLiteController::class, 'alunoGoogleCallbac
 // Route::get('/google-calendar/auth', [GoogleCalendarController::class, 'authenticate'])->name('google.calendar.auth');
 // Route::get('/google-calendar/events', [GoogleCalendarController::class, 'listEvents'])->name('google.calendar.events');
 
+Route::get('/teste/{slug}', [SiteController::class, 'mostrar']);
 
 
 
