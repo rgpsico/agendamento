@@ -56,8 +56,6 @@ class SiteController extends Controller
      */
     public function update(Request $request, EmpresaSite $site)
     {
-        // Remova a linha dd($request->all()) após a depuração
-
         $validated = $request->validate([
             'titulo' => 'required|string|max:255',
             'descricao' => 'nullable|string',
@@ -66,65 +64,45 @@ class SiteController extends Controller
             'cores.secundaria' => 'required|string',
             'sobre_titulo' => 'nullable|string|max:255',
             'sobre_descricao' => 'nullable|string',
-            'sobre_itens' => 'nullable|string', // validando o JSON como string
+            'sobre_itens' => 'nullable|array',
+            'sobre_itens.*.icone' => 'nullable|string|max:255',
+            'sobre_itens.*.titulo' => 'nullable|string|max:255',
+            'sobre_itens.*.descricao' => 'nullable|string',
         ]);
 
         $data = [
             'titulo' => $request->titulo,
             'descricao' => $request->descricao,
             'cores' => [
-                'primaria' => $request->input('cores.primaria', $request->input('cores')['primaria'] ?? '#0ea5e9'),
-                'secundaria' => $request->input('cores.secundaria', $request->input('cores')['secundaria'] ?? '#38b2ac'),
+                'primaria' => $request->input('cores.primaria', '#0ea5e9'),
+                'secundaria' => $request->input('cores.secundaria', '#38b2ac'),
             ],
             'sobre_titulo' => $request->sobre_titulo,
             'sobre_descricao' => $request->sobre_descricao,
+            'sobre_itens' => $request->input('sobre_itens', []),
         ];
-
-        // Processamento do JSON dos itens do Sobre Nós
-        if ($request->filled('sobre_itens')) {
-            try {
-                $data['sobre_itens'] = json_decode($request->sobre_itens, true);
-
-                // Verificação adicional - se json_decode falhar, retornará null
-                if (json_last_error() !== JSON_ERROR_NONE) {
-                    return redirect()->back()
-                        ->withInput()
-                        ->withErrors(['sobre_itens' => 'O formato JSON dos itens está inválido.']);
-                }
-            } catch (\Exception $e) {
-                return redirect()->back()
-                    ->withInput()
-                    ->withErrors(['sobre_itens' => 'Erro ao processar os itens: ' . $e->getMessage()]);
-            }
-        }
 
         // Upload do logo
         if ($request->hasFile('logo')) {
-            // Remover o arquivo antigo se existir
             if (!empty($site->logo) && Storage::disk('public')->exists($site->logo)) {
                 Storage::disk('public')->delete($site->logo);
             }
-
             $data['logo'] = $request->file('logo')->store('sites/logos', 'public');
         }
 
         // Upload da capa
         if ($request->hasFile('capa')) {
-            // Remover o arquivo antigo se existir
             if (!empty($site->capa) && Storage::disk('public')->exists($site->capa)) {
                 Storage::disk('public')->delete($site->capa);
             }
-
             $data['capa'] = $request->file('capa')->store('sites/capas', 'public');
         }
 
-        // Upload da imagem sobre nós
+        // Upload imagem da seção sobre nós
         if ($request->hasFile('sobre_imagem')) {
-            // Remover o arquivo antigo se existir
             if (!empty($site->sobre_imagem) && Storage::disk('public')->exists($site->sobre_imagem)) {
                 Storage::disk('public')->delete($site->sobre_imagem);
             }
-
             $data['sobre_imagem'] = $request->file('sobre_imagem')->store('sites/sobre', 'public');
         }
 
