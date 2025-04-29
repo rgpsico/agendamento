@@ -5,9 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class SiteContato extends Model
+class SiteServico extends Model
 {
-    protected $fillable = ['site_id', 'tipo', 'valor'];
+    protected $fillable = ['titulo', 'descricao', 'imagem', 'site_id', 'tipo', 'valor'];
 
     public function site()
     {

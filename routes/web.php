@@ -10,7 +10,9 @@ use Spatie\GoogleCalendar\Event;
 use Inertia\Inertia;
 
 use App\Http\Controllers\GoogleController;
+use App\Http\Controllers\SiteContatoController;
 use App\Http\Controllers\SiteController;
+use App\Http\Controllers\SiteServicoController;
 
 Route::get('/google/prof/redirect', [SocialLiteController::class, 'professorRedirectToGoogle'])->name('prof.login.google');
 Route::get('/google/prof/callback', [SocialLiteController::class, 'professorGoogleCallback'])->name('prof.handle.google');
@@ -25,9 +27,50 @@ Route::get('/google/callback', [SocialLiteController::class, 'alunoGoogleCallbac
 // Route::get('/google-calendar/auth', [GoogleCalendarController::class, 'authenticate'])->name('google.calendar.auth');
 // Route::get('/google-calendar/events', [GoogleCalendarController::class, 'listEvents'])->name('google.calendar.events');
 
-Route::get('/teste/{slug}', [SiteController::class, 'mostrar']);
+Route::prefix('admin/site')->middleware(['auth'])->group(function () {
+    Route::get('configuracoes', [SiteController::class, 'edit'])->name('admin.site.configuracoes');
+    Route::resource('servicos', SiteController::class)->names('admin.site.servicos');
+    Route::resource('depoimentos', SiteController::class)->names('admin.site.depoimentos');
+    Route::resource('contatos', SiteController::class)->names('admin.site.contatos');
+
+    Route::get('dominios', [SiteController::class, 'dominios'])->name('admin.site.dominios')->middleware('can:admin');
+
+    Route::get('configuracoes', [SiteController::class, 'edit'])->name('admin.site.configuracoes');
+
+    // Atualizar configurações do site
+    Route::put('configuracoes/{site}', [SiteController::class, 'update'])->name('admin.site.configuracoes.update');
+});
+
+Route::prefix('admin/site/servicos')->middleware(['auth'])->name('admin.site.servicos.')->group(function () {
+    Route::get('/', [SiteServicoController::class, 'index'])->name('index');
+    Route::get('create', [SiteServicoController::class, 'create'])->name('create');
+    Route::post('store', [SiteServicoController::class, 'store'])->name('store');
+    Route::get('{servico}/edit', [SiteServicoController::class, 'edit'])->name('edit');
+    Route::put('{servico}/update', [SiteServicoController::class, 'update'])->name('update');
+    Route::delete('{servico}/destroy', [SiteServicoController::class, 'destroy'])->name('destroy');
+});
 
 
+use App\Http\Controllers\SiteDepoimentoController;
+
+Route::prefix('admin/site/depoimentos')->middleware('auth')->name('admin.site.depoimentos.')->group(function () {
+    Route::get('/', [SiteDepoimentoController::class, 'index'])->name('index');
+    Route::get('create', [SiteDepoimentoController::class, 'create'])->name('create');
+    Route::post('store', [SiteDepoimentoController::class, 'store'])->name('store');
+    Route::get('{depoimento}/edit', [SiteDepoimentoController::class, 'edit'])->name('edit');
+    Route::put('{depoimento}/update', [SiteDepoimentoController::class, 'update'])->name('update');
+    Route::delete('{depoimento}/destroy', [SiteDepoimentoController::class, 'destroy'])->name('destroy');
+});
+
+
+Route::prefix('admin/site/contatos')->middleware('auth')->name('admin.site.contatos.')->group(function () {
+    Route::get('/', [SiteContatoController::class, 'index'])->name('index');
+    Route::get('create', [SiteContatoController::class, 'create'])->name('create');
+    Route::post('store', [SiteContatoController::class, 'store'])->name('store');
+    Route::get('{contato}/edit', [SiteContatoController::class, 'edit'])->name('edit');
+    Route::put('{contato}/update', [SiteContatoController::class, 'update'])->name('update');
+    Route::delete('{contato}/destroy', [SiteContatoController::class, 'destroy'])->name('destroy');
+});
 
 
 Route::get('/google-calendar/auth', [GoogleCalendarController::class, 'authenticate'])->name('google.calendar.auth');
