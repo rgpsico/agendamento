@@ -57,6 +57,11 @@ class Usuario extends Authenticatable
         return $this->hasOne(Empresa::class, 'user_id', 'id');
     }
 
+    public function site()
+    {
+        return $this->hasOne(EmpresaSite::class);
+    }
+
 
 
 
