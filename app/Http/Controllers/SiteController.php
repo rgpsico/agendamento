@@ -139,21 +139,47 @@ class SiteController extends Controller
         return redirect()->back()->with('success', 'Configurações do site atualizadas com sucesso!');
     }
 
-    public function criarVirtualHost($dominio)
+    public function atualizarDominio(Request $request)
+    {
+        $request->validate([
+            'dominio_personalizado' => 'required|string|max:255',
+        ]);
+
+        $dominio = strtolower(trim($request->dominio_personalizado));
+        $empresa = Auth::user()->empresa;
+
+        $site = EmpresaSite::firstOrCreate(
+            ['empresa_id' => $empresa->id],
+            ['slug' => Str::slug($empresa->nome_fantasia)]
+        );
+
+        $site->dominio_personalizado = $dominio;
+        $site->save();
+
+        // Chamar criação do Virtual Host
+        try {
+            $this->criarVirtualHost($dominio);
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['erro' => 'Erro ao criar o virtual host: ' . $e->getMessage()]);
+        }
+
+        return redirect()->back()->with('success', 'Domínio atualizado e virtual host configurado!');
+    }
+
+    protected function criarVirtualHost($dominio)
     {
         $scriptPath = '/usr/local/bin/criar-vhost.sh';
 
-        $process = new Process(["sudo", "-S", $scriptPath, $dominio]);
-        $process->setInput("Um57121214\n"); // use com cuidado em ambiente de teste
-
+        $process = new Process(["sudo", $scriptPath, $dominio]);
         $process->run();
 
         if (!$process->isSuccessful()) {
             throw new ProcessFailedException($process);
         }
 
-        return response()->json(['status' => 'Virtual Host criado com sucesso!']);
+        return true;
     }
+
 
 
 

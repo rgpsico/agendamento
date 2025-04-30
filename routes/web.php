@@ -36,6 +36,8 @@ Route::prefix('admin/site/ssl')->middleware(['auth'])->name('admin.site.dominios
     Route::get('/gerar-ssl', [SiteController::class, 'gerarSSL'])->name('gerarSSL');
 });
 
+// routes/web.php
+Route::post('/admin/site/dominios/update', [SiteController::class, 'atualizarDominio'])->name('admin.site.dominios.update');
 
 Route::prefix('admin/site')->middleware(['auth'])->group(function () {
     Route::get('configuracoes', [SiteController::class, 'edit'])->name('admin.site.configuracoes');
