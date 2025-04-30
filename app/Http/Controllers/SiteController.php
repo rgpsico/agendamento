@@ -218,6 +218,7 @@ class SiteController extends Controller
 
     public function gerarSSL(Request $request)
     {
+        dd('aaaa');
         $site = EmpresaSite::where('empresa_id', Auth::user()->empresa_id)->firstOrFail();
 
         // Remove the debug statement
