@@ -42,7 +42,7 @@ class SiteController extends Controller
             ->orWhere('dominio_personalizado', $subdomain)
             ->with(['servicos', 'depoimentos', 'contatos'])
             ->firstOrFail();
-
+        dd($site);
         return view('site.publico', compact('site'));
     }
 
