@@ -58,16 +58,7 @@
                         <div class="form-group d-flex gap-2">
                             <button type="submit" class="btn btn-primary">Salvar Domínio</button>
 
-                            @if($dnsStatus === true && $sslStatus === false)
-                            <form action="{{ route('admin.site.dominios.admin.site.dominios.gerarSSL') }}" method="POST" style="display: inline;">
-                                @csrf
-                                @method('POST')
-                                <button type="submit" class="btn btn-success">
-                                    Gerar SSL
-                                </button>
-                            </form>
                             
-                            @endif
 
                             <a href="{{ route('admin.site.dominios') }}" class="btn btn-secondary">
                                 Atualizar Status
@@ -78,6 +69,17 @@
                             Após salvar o domínio, a geração do SSL será feita automaticamente se o domínio estiver corretamente apontado para <strong>{{ $ipServidor }}</strong>.
                         </div>
                     </form>
+
+                    @if($dnsStatus === true && $sslStatus === false)
+                            <form action="{{ route('admin.site.dominios.admin.site.dominios.gerarSSL') }}" method="POST" style="display: inline;">
+                                @csrf
+                                @method('POST')
+                                <button type="submit" class="btn btn-success">
+                                    Gerar SSL
+                                </button>
+                            </form>
+                            
+                            @endif
                 </div>
             </div>
         </div>
