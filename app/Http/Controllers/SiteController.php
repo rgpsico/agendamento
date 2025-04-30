@@ -218,9 +218,9 @@ class SiteController extends Controller
 
     public function gerarSSL(Request $request)
     {
-        dd('aaaa');
-        $site = EmpresaSite::where('empresa_id', Auth::user()->empresa_id)->firstOrFail();
 
+        $site = EmpresaSite::where('empresa_id', Auth::user()->empresa->id)->firstOrFail();
+        dd('aaaa');
         // Remove the debug statement
         // dd("aaa");
 
