@@ -172,7 +172,10 @@ class SiteController extends Controller
             $stream = @stream_context_create(["ssl" => ["capture_peer_cert" => true]]);
             $read = @stream_socket_client("ssl://{$site->dominio_personalizado}:443", $errno, $errstr, 30, STREAM_CLIENT_CONNECT, $stream);
             $sslStatus = $read !== false;
+            $this->criarVirtualHost($site->dominio_personalizado);
         }
+
+
 
         return view('admin.site.ssl.edit', compact('site', 'dnsStatus', 'sslStatus', 'ipServidor'));
     }
