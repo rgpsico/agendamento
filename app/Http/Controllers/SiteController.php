@@ -207,17 +207,7 @@ class SiteController extends Controller
         return view('admin.site.ssl.edit', compact('site', 'dnsStatus', 'sslStatus', 'ipServidor'));
     }
 
-    public function atualizarDominio(Request $request)
-    {
-        $request->validate([
-            'dominio_personalizado' => 'required'
-        ]);
 
-        $site = EmpresaSite::where('empresa_id', Auth::user()->empresa->id)->firstOrFail();
-        $site->update(['dominio_personalizado' => $request->dominio_personalizado]);
-
-        return redirect()->route('admin.site.dominios.index')->with('success', 'Domínio atualizado com sucesso!');
-    }
 
     public function gerarSSL()
     {
