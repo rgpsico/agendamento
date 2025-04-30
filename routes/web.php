@@ -30,6 +30,8 @@ Route::get('/google/callback', [SocialLiteController::class, 'alunoGoogleCallbac
 Route::domain('yoursurf.rjpasseios.com.br')->group(function () {
 
     return 'rota personalizada pegou';
+
+
     exit;
 });
 
