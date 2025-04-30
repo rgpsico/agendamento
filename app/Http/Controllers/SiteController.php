@@ -216,15 +216,24 @@ class SiteController extends Controller
 
 
 
-    public function gerarSSL()
+    public function gerarSSL(Request $request)
     {
-        $site = EmpresaSite::where('empresa_id', Auth::user()->empresa->id)->firstOrFail();
+        $site = EmpresaSite::where('empresa_id', Auth::user()->empresa_id)->firstOrFail();
 
-        // Exemplo: Shell comando com certbot (ajustar conforme seu ambiente real)
-        $cmd = "sudo certbot --apache -d {$site->dominio_personalizado} --non-interactive --agree-tos -m suporte@seudominio.com --redirect";
+        if (!$site->dominio_personalizado) {
+            return back()->with('error', 'Domínio personalizado não configurado.');
+        }
 
-        $output = shell_exec($cmd);
+        $dominio = $site->dominio_personalizado;
+        $script = '/usr/local/bin/gerar-ssl.sh';
 
-        return redirect()->route('admin.site.dominios.index')->with('success', 'Certificado SSL gerado (ou solicitado) com sucesso!');
+        $process = Process::fromShellCommandline("sudo $script $dominio");
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            return back()->with('error', 'Erro ao gerar SSL: ' . $process->getErrorOutput());
+        }
+
+        return back()->with('success', 'SSL gerado com sucesso!');
     }
 }
