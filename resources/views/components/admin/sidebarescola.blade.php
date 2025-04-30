@@ -16,6 +16,23 @@
                         <i class="fe fe-home"></i> <span>Dashboard</span>
                     </a>
                 </li>
+                <li class="submenu">
+                    <a href="#">
+                        <i class="fas fa-globe" style="font-size: 18px;"></i>
+                        <span>Site</span> 
+                        <span class="menu-arrow"></span>
+                    </a>
+                    <ul>
+                        <li><a href="{{ route('admin.site.configuracoes') }}">Configurações do Site</a></li>
+                        <li><a href="{{ route('admin.site.servicos.index') }}">Serviços</a></li>
+                        <li><a href="{{ route('admin.site.depoimentos.index') }}">Depoimentos</a></li>
+                        <li><a href="{{ route('admin.site.contatos.index') }}">Contatos</a></li>
+                
+                        @if(Auth::user()->isAdmin)
+                            <li><a href="{{ route('admin.site.dominios') }}">Domínios e SSL</a></li>
+                        @endif
+                    </ul>
+                </li>
 
                 @isset(Auth::user()->empresa->user_id)
                 <!-- Serviços -->
@@ -165,23 +182,7 @@
                     </ul>
                 </li>
 
-                <li class="submenu">
-                    <a href="#">
-                        <i class="fas fa-globe" style="font-size: 18px;"></i>
-                        <span>Site</span> 
-                        <span class="menu-arrow"></span>
-                    </a>
-                    <ul>
-                        <li><a href="{{ route('admin.site.configuracoes') }}">Configurações do Site</a></li>
-                        <li><a href="{{ route('admin.site.servicos.index') }}">Serviços</a></li>
-                        <li><a href="{{ route('admin.site.depoimentos.index') }}">Depoimentos</a></li>
-                        <li><a href="{{ route('admin.site.contatos.index') }}">Contatos</a></li>
                 
-                        @if(Auth::user()->isAdmin)
-                            <li><a href="{{ route('admin.site.dominios') }}">Domínios e SSL</a></li>
-                        @endif
-                    </ul>
-                </li>
                 
                 @endif
             </ul>

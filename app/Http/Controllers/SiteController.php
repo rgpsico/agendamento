@@ -26,6 +26,16 @@ class SiteController extends Controller
         return view('site.publico', compact('site'));
     }
 
+    public function mostrarDominio(Request $request)
+    {
+        $dominio = $request->getHost(); // ex: www.wavemaster.com.br
+
+        $site = EmpresaSite::where('dominio_personalizado', $dominio)->firstOrFail();
+
+        return view('site.publico', compact('site'));
+    }
+
+
     /**
      * Página de edição das configurações do site (painel admin)
      */
