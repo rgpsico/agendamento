@@ -74,9 +74,9 @@
                             <form action="{{ route('admin.site.dominios.admin.site.dominios.gerarSSL') }}" method="POST" style="display: inline;">
                                 @csrf
                                 @method('POST')
-                                <button type="submit" class="btn btn-success">
-                                    Gerar SSLss
-                                </button>
+                                <input type="submit" class="btn btn-success" value=" Gerar SSLss">
+                                   
+                                
                             </form>
                             
                             @endif
