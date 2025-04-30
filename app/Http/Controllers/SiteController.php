@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Symfony\Component\Process\Process;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 
 class SiteController extends Controller
 {
@@ -82,6 +84,7 @@ class SiteController extends Controller
             'sobre_itens.*.icone' => 'nullable|string|max:255',
             'sobre_itens.*.titulo' => 'nullable|string|max:255',
             'sobre_itens.*.descricao' => 'nullable|string',
+            'dominio' => 'nullable|string|max:255'
         ]);
 
         $data = [
@@ -95,6 +98,8 @@ class SiteController extends Controller
             'sobre_descricao' => $request->sobre_descricao,
             'sobre_itens' => $request->input('sobre_itens', []),
         ];
+
+        $data['slug'] = Str::slug($request->titulo);
 
         // Upload do logo
         if ($request->hasFile('logo')) {
@@ -120,8 +125,79 @@ class SiteController extends Controller
             $data['sobre_imagem'] = $request->file('sobre_imagem')->store('sites/sobre', 'public');
         }
 
+        if ($request->filled('dominio')) {
+            $data['dominio_personalizado'] = $request->dominio;
+        }
+
         $site->update($data);
 
+        if ($request->filled('dominio')) {
+            $data['dominio_personalizado'] = $request->dominio;
+            $this->criarVirtualHost($request->dominio);
+        }
+
         return redirect()->back()->with('success', 'Configurações do site atualizadas com sucesso!');
+    }
+
+    public function criarVirtualHost($dominio)
+    {
+        $scriptPath = '/usr/local/bin/criar-vhost.sh';
+
+        $process = new Process(["sudo", $scriptPath, $dominio]);
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            throw new ProcessFailedException($process);
+        }
+
+        return response()->json(['status' => 'Virtual Host criado com sucesso!']);
+    }
+
+
+
+    public function editarDominio()
+    {
+        $site = EmpresaSite::where('empresa_id', Auth::user()->empresa->id)->firstOrFail();
+        $ipServidor = request()->server('SERVER_ADDR') ?? '191.252.92.206';
+
+        $dnsStatus = false;
+        if (!empty($site->dominio_personalizado)) {
+            $dnsRecords = dns_get_record($site->dominio_personalizado, DNS_A);
+            $ips = collect($dnsRecords)->pluck('ip')->toArray();
+            $dnsStatus = in_array($ipServidor, $ips);
+        }
+
+        $sslStatus = false;
+        if (!empty($site->dominio_personalizado)) {
+            $stream = @stream_context_create(["ssl" => ["capture_peer_cert" => true]]);
+            $read = @stream_socket_client("ssl://{$site->dominio_personalizado}:443", $errno, $errstr, 30, STREAM_CLIENT_CONNECT, $stream);
+            $sslStatus = $read !== false;
+        }
+
+        return view('admin.site.ssl.edit', compact('site', 'dnsStatus', 'sslStatus', 'ipServidor'));
+    }
+
+    public function atualizarDominio(Request $request)
+    {
+        $request->validate([
+            'dominio_personalizado' => 'required|url'
+        ]);
+
+        $site = EmpresaSite::where('empresa_id', Auth::user()->empresa->id)->firstOrFail();
+        $site->update(['dominio_personalizado' => $request->dominio_personalizado]);
+
+        return redirect()->route('admin.site.dominios.index')->with('success', 'Domínio atualizado com sucesso!');
+    }
+
+    public function gerarSSL()
+    {
+        $site = EmpresaSite::where('empresa_id', Auth::user()->empresa->id)->firstOrFail();
+
+        // Exemplo: Shell comando com certbot (ajustar conforme seu ambiente real)
+        $cmd = "sudo certbot --apache -d {$site->dominio_personalizado} --non-interactive --agree-tos -m suporte@seudominio.com --redirect";
+
+        $output = shell_exec($cmd);
+
+        return redirect()->route('admin.site.dominios.index')->with('success', 'Certificado SSL gerado (ou solicitado) com sucesso!');
     }
 }

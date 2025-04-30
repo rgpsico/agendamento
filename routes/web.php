@@ -28,6 +28,13 @@ Route::get('/google/callback', [SocialLiteController::class, 'alunoGoogleCallbac
 // Route::get('/google-calendar/events', [GoogleCalendarController::class, 'listEvents'])->name('google.calendar.events');
 
 
+Route::get('/site/{slug}', [SiteController::class, 'mostrar'])->name('site.publico');
+
+Route::prefix('admin/site/ssl')->middleware(['auth'])->name('admin.site.dominios.')->group(function () {
+    Route::get('/', [SiteController::class, 'editarDominio'])->name('index');
+    Route::post('/', [SiteController::class, 'atualizarDominio'])->name('update');
+    Route::get('/gerar-ssl', [SiteController::class, 'gerarSSL'])->name('gerarSSL');
+});
 
 
 Route::prefix('admin/site')->middleware(['auth'])->group(function () {
@@ -110,15 +117,3 @@ Route::post('/deploy', function () {
 
 Route::get('/treino', [AgendaController::class, 'treino'])->name('treino');
 Route::get('/logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
-
-
-Route::domain('{dominio_personalizado}')->group(function () {
-    Route::get('/', [SiteController::class, 'mostrarDominio']);
-});
-
-// To this:
-Route::domain('{subdomain}.rjpasseios.com.br')->group(function ($subdomain) {
-    Route::get('/', function ($subdomain) {
-        return app(SiteController::class)->mostrarDominio(request(), $subdomain);
-    });
-});

@@ -28,9 +28,10 @@
                         <li><a href="{{ route('admin.site.depoimentos.index') }}">Depoimentos</a></li>
                         <li><a href="{{ route('admin.site.contatos.index') }}">Contatos</a></li>
                 
-                        @if(Auth::user()->isAdmin)
-                            <li><a href="{{ route('admin.site.dominios') }}">Domínios e SSL</a></li>
-                        @endif
+                      
+                        <li><a href="{{ route('admin.site.dominios.index') }}">Domínios e SSL</a></li>
+
+                      
                     </ul>
                 </li>
 
