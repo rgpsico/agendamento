@@ -30,12 +30,14 @@ Route::get('/google/callback', [SocialLiteController::class, 'alunoGoogleCallbac
 
 Route::get('/site/{slug}', [SiteController::class, 'mostrar'])->name('site.publico');
 
-Route::prefix('admin/site/ssl')->middleware(['auth'])->name('admin.site.dominios.')->group(function () {
-    Route::get('/', [SiteController::class, 'editarDominio'])->name('index');
-    Route::post('/', [SiteController::class, 'atualizarDominio'])->name('update');
-    Route::post('/gerar-ssl', [SiteController::class, 'gerarSSL'])->name('admin.site.dominios.gerarSSL');
-});
-
+Route::prefix('admin/site/ssl')
+    ->middleware(['auth'])
+    ->name('admin.site.dominios.')
+    ->group(function () {
+        Route::get('/', [SiteController::class, 'editarDominio'])->name('index');
+        Route::post('/', [SiteController::class, 'atualizarDominio'])->name('update');
+        Route::post('/gerar-ssl', [SiteController::class, 'gerarSSL'])->name('gerarSSL');
+    });
 // routes/web.php
 Route::post('/admin/site/dominios/update', [SiteController::class, 'atualizarDominio'])->name('admin.site.dominios.update');
 
