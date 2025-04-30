@@ -69,7 +69,7 @@
                             Após salvar o domínio, a geração do SSL será feita automaticamente se o domínio estiver corretamente apontado para <strong>{{ $ipServidor }}</strong>.
                         </div>
                     </form>
-
+                </form>
                     @if($dnsStatus === true && $sslStatus === false)
                     <form action="{{ route('gerarSSL') }}" method="POST" style="display: inline;">
                         @csrf
