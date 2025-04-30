@@ -219,10 +219,12 @@ class SiteController extends Controller
     public function gerarSSL(Request $request)
     {
 
-        $site = EmpresaSite::where('empresa_id', Auth::user()->empresa->id)->firstOrFail();
+        $site = EmpresaSite::where('empresa_id', Auth::user()->empresa->id)->first();
 
         // Remove the debug statement
-        // dd("aaa");
+        if (!$site) {
+            return redirect()->route('admin.site.dominios')->with('error', 'Domínio não encontrado.');
+        }
 
         if (!$site->dominio_personalizado) {
             return back()->with('error', 'Domínio personalizado não configurado.');
