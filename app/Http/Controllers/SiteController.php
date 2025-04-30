@@ -218,6 +218,7 @@ class SiteController extends Controller
 
     public function gerarSSL(Request $request)
     {
+        dd("aaa");
         $site = EmpresaSite::where('empresa_id', Auth::user()->empresa_id)->firstOrFail();
 
         if (!$site->dominio_personalizado) {
