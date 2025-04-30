@@ -115,3 +115,8 @@ Route::get('/logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
 Route::domain('{dominio_personalizado}')->group(function () {
     Route::get('/', [SiteController::class, 'mostrarDominio']);
 });
+
+// To this:
+Route::domain('yousurf.rjpasseios.com.br')->group(function () {
+    Route::get('/', [SiteController::class, 'mostrarDominio']);
+});
