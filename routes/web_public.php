@@ -4,9 +4,21 @@ use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\SiteController;
 use Illuminate\Support\Facades\Route;
 
 
+
+Route::domain('{dominio_personalizado}')->group(function () {
+    Route::get('/', [SiteController::class, 'mostrarDominio']);
+});
+
+// To this:
+Route::domain('{subdomain}.rjpasseios.com.br')->group(function ($subdomain) {
+    Route::get('/', function ($subdomain) {
+        return app(SiteController::class)->mostrarDominio(request(), $subdomain);
+    });
+});
 
 Route::get('/registrar_escola', [HomeController::class, 'registerProf'])->name('public.registerProf');
 Route::get('/loginGoogle', [HomeController::class, 'handleGoogleCallback'])->name('public.googleAuth');
