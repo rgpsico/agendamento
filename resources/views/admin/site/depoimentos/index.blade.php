@@ -41,9 +41,9 @@
                                         <td>
                                             @for ($i = 1; $i <= 5; $i++)
                                                 <i class="fas fa-star{{ $i <= $depoimento->nota ? '' : '-o' }} text-warning"></i>
-                                            @endfor
+                                       w     @endfor
                                         </td>
-                                        <td>{{ Str::limit($depoimento->comentario, 50) }}</td>
+                                        <td>{{ $depoimento->comentario }}</td>
                                         <td>
                                             @if($depoimento->foto)
                                                 <img src="{{ asset('storage/' . $depoimento->foto) }}" width="50">
