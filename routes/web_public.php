@@ -38,7 +38,7 @@ Route::get('/registerAluno', [HomeController::class, 'registerAluno'])->name('ho
 
 Route::get('/login', [HomeController::class, 'login'])->name('home.login');
 
-// Route::get('/', [HomeController::class, 'index'])->name('home.index');
+Route::get('/agendamento', [HomeController::class, 'index'])->name('home.index');
 Route::get('/{id}/empresa', [HomeController::class, 'show'])->name('home.show');
 Route::get('/{id}/bokking', [HomeController::class, 'booking'])->name('home.booking');
 Route::get('/{id}/checkout', [HomeController::class, 'checkout'])->name('home.checkout');

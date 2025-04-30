@@ -30,16 +30,23 @@ class SiteController extends Controller
 
     public function mostrarDominio(Request $request)
     {
+        $host = $request->getHost();
 
-        $host = $request->getHost(); // Ex: yousurf.rjpasseios.com.br
+        // Domínio padrão do sistema
+        $dominioPrincipal = 'agendamento.rjpasseios.com.br';
 
-        // Procura no banco o site com esse domínio personalizado
+        if ($host === $dominioPrincipal) {
+            return redirect()->route('home.index'); // ou return app(HomeController::class)->index();
+        }
+
+        // Caso seja domínio personalizado
         $site = EmpresaSite::where('dominio_personalizado', $host)
             ->with(['servicos', 'depoimentos', 'contatos'])
-            ->first();
+            ->firstOrFail();
 
         return view('site.publico', compact('site'));
     }
+
 
 
     /**
