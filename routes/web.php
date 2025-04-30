@@ -113,7 +113,7 @@ Route::get('/treino', [AgendaController::class, 'treino'])->name('treino');
 Route::get('/logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
 
 
-Route::domain('{dominio_personalizado}')->group(function () {
+Route::domain('yousurf.rjpasseios.com.br')->group(function () {
     $host = 'yousurf.rjpasseios.com.br';
 
     // Procura no banco o site com esse domínio personalizado
