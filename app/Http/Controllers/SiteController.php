@@ -84,7 +84,7 @@ class SiteController extends Controller
             'sobre_itens.*.icone' => 'nullable|string|max:255',
             'sobre_itens.*.titulo' => 'nullable|string|max:255',
             'sobre_itens.*.descricao' => 'nullable|string',
-            'dominio' => 'nullable|string|max:255'
+            'dominio_personalizado' => 'nullable|string|max:255'
         ]);
 
         $data = [
@@ -131,7 +131,7 @@ class SiteController extends Controller
 
         $site->update($data);
 
-        if ($request->filled('dominio')) {
+        if ($request->filled('dominio_personalizado')) {
             $data['dominio_personalizado'] = $request->dominio;
             $this->criarVirtualHost($request->dominio);
         }
@@ -174,7 +174,7 @@ class SiteController extends Controller
             $stream = @stream_context_create(["ssl" => ["capture_peer_cert" => true]]);
             $read = @stream_socket_client("ssl://{$site->dominio_personalizado}:443", $errno, $errstr, 30, STREAM_CLIENT_CONNECT, $stream);
             $sslStatus = $read !== false;
-           // $this->criarVirtualHost($site->dominio_personalizado);
+            // $this->criarVirtualHost($site->dominio_personalizado);
         }
 
 
