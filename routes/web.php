@@ -30,7 +30,8 @@ Route::get('/google/callback', [SocialLiteController::class, 'alunoGoogleCallbac
 
 Route::get('/site/{slug}', [SiteController::class, 'mostrar'])->name('site.publico');
 
-Route::get('gerar-ssl', [SiteController::class, 'gerarSSL'])->name('admin.site.dominios.gerarSSL');
+Route::get('admin/site/dominios/gerar-ssl', [SiteController::class, 'gerarSSL'])->name('admin.site.dominios.gerarSSL')->middleware('auth');
+
 
 Route::prefix('admin/site/ssl')->middleware(['auth'])->name('admin.site.dominios.')->group(function () {
     Route::get('/', [SiteController::class, 'editarDominio'])->name('index');
