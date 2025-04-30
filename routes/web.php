@@ -55,6 +55,7 @@ Route::prefix('admin/site/servicos')->middleware(['auth'])->name('admin.site.ser
 
 
 use App\Http\Controllers\SiteDepoimentoController;
+use App\Models\EmpresaSite;
 
 Route::prefix('admin/site/depoimentos')->middleware('auth')->name('admin.site.depoimentos.')->group(function () {
     Route::get('/', [SiteDepoimentoController::class, 'index'])->name('index');
@@ -113,5 +114,12 @@ Route::get('/logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
 
 
 Route::domain('{dominio_personalizado}')->group(function () {
-    Route::get('/', [SiteController::class, 'mostrarDominio']);
+    $host = 'yousurf.rjpasseios.com.br';
+
+    // Procura no banco o site com esse domínio personalizado
+    $site = EmpresaSite::where('dominio_personalizado', $host)
+        ->with(['servicos', 'depoimentos', 'contatos'])
+        ->firstOrFail();
+
+    return view('site.publico', compact('site'));
 });
