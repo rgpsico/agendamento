@@ -28,6 +28,10 @@ Route::get('/google/callback', [SocialLiteController::class, 'alunoGoogleCallbac
 // Route::get('/google-calendar/events', [GoogleCalendarController::class, 'listEvents'])->name('google.calendar.events');
 
 
+Route::domain('{dominio_personalizado}')->group(function () {
+    Route::get('/', [SiteController::class, 'mostrarDominio']);
+});
+
 Route::get('/site/{slug}', [SiteController::class, 'mostrar'])->name('site.publico');
 
 Route::prefix('admin/site')->middleware(['auth'])->group(function () {
