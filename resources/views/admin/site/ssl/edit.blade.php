@@ -59,7 +59,7 @@
                             <button type="submit" class="btn btn-primary">Salvar Domínio</button>
 
                             @if($dnsStatus === true && $sslStatus === false)
-                                <a href="{{ route('admin.site.dominios.gerarSSL') }}" class="btn btn-success">
+                                <a href="{{ route('admin.site.dominios.admin.site.dominios.gerarSSL ') }}" class="btn btn-success">
                                     Gerar SSL
                                 </a>
                             @endif
