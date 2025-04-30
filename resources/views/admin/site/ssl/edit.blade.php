@@ -73,10 +73,10 @@
                     @if($dnsStatus === true && $sslStatus === false)
                     <form action="{{ route('admin.site.dominios.gerarSSL') }}" method="POST" style="display: inline;">
                         @csrf
+                        @method('POST')
                         <input type="submit" class="btn btn-success" value="Gerar SSL">
                     </form>
-                            
-                            @endif
+                @endif
                 </div>
             </div>
         </div>
