@@ -18,7 +18,6 @@ class SiteController extends Controller
      */
     public function mostrar($slug)
     {
-        dd($slug);
         $site = EmpresaSite::where('slug', $slug)
             ->with(['servicos', 'depoimentos', 'contatos'])
             ->firstOrFail();
@@ -29,9 +28,12 @@ class SiteController extends Controller
 
     public function mostrarDominio(Request $request)
     {
-        $dominio = $request->getHost(); // ex: www.wavemaster.com.br
-
-        $site = EmpresaSite::where('dominio_personalizado', $dominio)->firstOrFail();
+        $host = $request->getHost(); // Ex: yousurf.rjpasseios.com.br
+        dd($host);
+        // Procura no banco o site com esse domínio personalizado
+        $site = EmpresaSite::where('dominio_personalizado', $host)
+            ->with(['servicos', 'depoimentos', 'contatos'])
+            ->firstOrFail();
 
         return view('site.publico', compact('site'));
     }
