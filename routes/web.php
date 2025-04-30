@@ -28,10 +28,6 @@ Route::get('/google/callback', [SocialLiteController::class, 'alunoGoogleCallbac
 // Route::get('/google-calendar/events', [GoogleCalendarController::class, 'listEvents'])->name('google.calendar.events');
 
 
-Route::domain('{dominio_personalizado}')->group(function () {
-    dd("aaa");
-    Route::get('/teste', [SiteController::class, 'mostrarDominio']);
-});
 
 
 Route::prefix('admin/site')->middleware(['auth'])->group(function () {
@@ -114,3 +110,8 @@ Route::post('/deploy', function () {
 
 Route::get('/treino', [AgendaController::class, 'treino'])->name('treino');
 Route::get('/logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
+
+
+Route::domain('{dominio_personalizado}')->group(function () {
+    Route::get('/teste', [SiteController::class, 'mostrarDominio']);
+});
