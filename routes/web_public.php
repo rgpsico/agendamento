@@ -9,7 +9,10 @@ use Illuminate\Support\Facades\Route;
 
 
 
-Route::get('/', [SiteController::class, 'mostrarDominio']);
+Route::domain('roger.rjpasseios.com.br')->group(function () {
+    Route::get('/', [SiteController::class, 'mostrarDominio']);
+});
+
 
 Route::get('/registrar_escola', [HomeController::class, 'registerProf'])->name('public.registerProf');
 Route::get('/loginGoogle', [HomeController::class, 'handleGoogleCallback'])->name('public.googleAuth');
