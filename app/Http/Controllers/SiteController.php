@@ -33,7 +33,7 @@ class SiteController extends Controller
 
         // Procura no banco o site com esse domínio personalizado
         $site = EmpresaSite::where('dominio_personalizado', $host)
-
+            ->with(['servicos', 'depoimentos', 'contatos'])
             ->first();
 
         return view('site.publico', compact('site'));
