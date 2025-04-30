@@ -220,7 +220,7 @@ class SiteController extends Controller
     {
 
         $site = EmpresaSite::where('empresa_id', Auth::user()->empresa->id)->firstOrFail();
-        dd('aaaa');
+
         // Remove the debug statement
         // dd("aaa");
 
