@@ -9,9 +9,10 @@ use Illuminate\Support\Facades\Route;
 
 
 
-Route::domain('yousurf.rjpasseios.com.br')->group(function () {
+Route::domain('{dominio_personalizado}')->group(function () {
     Route::get('/', [SiteController::class, 'mostrarDominio']);
 });
+
 
 
 Route::get('/registrar_escola', [HomeController::class, 'registerProf'])->name('public.registerProf');
