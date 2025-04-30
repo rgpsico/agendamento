@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class SiteServico extends Model
 {
-    protected $fillable = ['titulo', 'descricao', 'imagem', 'site_id', 'tipo', 'valor'];
+    protected $fillable = ['titulo', 'descricao', 'imagem', 'site_id', 'tipo', 'preco'];
 
     protected $casts = [
         'features' => 'array', // garante que seja tratado como array
