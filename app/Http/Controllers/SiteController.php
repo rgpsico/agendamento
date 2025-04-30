@@ -159,7 +159,6 @@ class SiteController extends Controller
 
     public function editarDominio()
     {
-        dd('aaa');
         $site = EmpresaSite::where('empresa_id', Auth::user()->empresa->id)->firstOrFail();
         $ipServidor = request()->server('SERVER_ADDR') ?? '191.252.92.206';
 
@@ -175,7 +174,6 @@ class SiteController extends Controller
             $stream = @stream_context_create(["ssl" => ["capture_peer_cert" => true]]);
             $read = @stream_socket_client("ssl://{$site->dominio_personalizado}:443", $errno, $errstr, 30, STREAM_CLIENT_CONNECT, $stream);
             $sslStatus = $read !== false;
-            // $this->criarVirtualHost($site->dominio_personalizado);
         }
 
 
