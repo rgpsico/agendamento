@@ -72,6 +72,7 @@ class SiteController extends Controller
      */
     public function update(Request $request, EmpresaSite $site)
     {
+        dd($request->all());
         $validated = $request->validate([
             'titulo' => 'required|string|max:255',
             'descricao' => 'nullable|string',
