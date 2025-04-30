@@ -72,7 +72,6 @@ class SiteController extends Controller
      */
     public function update(Request $request, EmpresaSite $site)
     {
-        dd($request->all());
         $validated = $request->validate([
             'titulo' => 'required|string|max:255',
             'descricao' => 'nullable|string',
@@ -134,7 +133,7 @@ class SiteController extends Controller
 
         if ($request->filled('dominio_personalizado')) {
             $data['dominio_personalizado'] = $request->dominio;
-            $this->criarVirtualHost($request->dominio);
+            //   $this->criarVirtualHost($request->dominio);
         }
 
         return redirect()->back()->with('success', 'Configurações do site atualizadas com sucesso!');
@@ -160,6 +159,7 @@ class SiteController extends Controller
 
     public function editarDominio()
     {
+        dd('aaa');
         $site = EmpresaSite::where('empresa_id', Auth::user()->empresa->id)->firstOrFail();
         $ipServidor = request()->server('SERVER_ADDR') ?? '191.252.92.206';
 
