@@ -13,12 +13,7 @@ Route::domain('{dominio_personalizado}')->group(function () {
     Route::get('/', [SiteController::class, 'mostrarDominio']);
 });
 
-// To this:
-Route::domain('{subdomain}.rjpasseios.com.br')->group(function ($subdomain) {
-    Route::get('/', function ($subdomain) {
-        return app(SiteController::class)->mostrarDominio(request(), $subdomain);
-    });
-});
+
 
 Route::get('/registrar_escola', [HomeController::class, 'registerProf'])->name('public.registerProf');
 Route::get('/loginGoogle', [HomeController::class, 'handleGoogleCallback'])->name('public.googleAuth');
