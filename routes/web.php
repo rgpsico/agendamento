@@ -29,7 +29,7 @@ Route::get('/google/callback', [SocialLiteController::class, 'alunoGoogleCallbac
 
 
 Route::domain('{dominio_personalizado}')->group(function () {
-    Route::get('/', [SiteController::class, 'mostrarDominio']);
+    Route::get('/teste', [SiteController::class, 'mostrarDominio']);
 });
 
 
