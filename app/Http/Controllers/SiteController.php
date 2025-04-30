@@ -26,13 +26,20 @@ class SiteController extends Controller
         return view('site.publico', compact('site'));
     }
 
-    public function mostrarDominio(Request $request)
+    public function mostrarDominio(Request $request, $subdomain = null)
     {
+        $host = $request->getHost();
 
-        $host = $request->getHost(); // Ex: yousurf.rjpasseios.com.br
+        // Use either the passed subdomain or extract it from the host if needed
+        if (!$subdomain) {
+            // Extract subdomain from host if not provided directly
+            $parts = explode('.', $host);
+            $subdomain = $parts[0];
+        }
 
-        // Procura no banco o site com esse domínio personalizado
+        // Lookup in database
         $site = EmpresaSite::where('dominio_personalizado', $host)
+            ->orWhere('dominio_personalizado', $subdomain)
             ->with(['servicos', 'depoimentos', 'contatos'])
             ->firstOrFail();
 
