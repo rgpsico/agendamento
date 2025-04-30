@@ -28,7 +28,7 @@ class SiteController extends Controller
 
     public function mostrarDominio(Request $request)
     {
-        dd('aaaa');
+
         $host = $request->getHost(); // Ex: yousurf.rjpasseios.com.br
 
         // Procura no banco o site com esse domínio personalizado
