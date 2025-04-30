@@ -33,7 +33,7 @@ Route::get('/site/{slug}', [SiteController::class, 'mostrar'])->name('site.publi
 Route::prefix('admin/site/ssl')->middleware(['auth'])->name('admin.site.dominios.')->group(function () {
     Route::get('/', [SiteController::class, 'editarDominio'])->name('index');
     Route::post('/', [SiteController::class, 'atualizarDominio'])->name('update');
-    Route::get('dominios/gerar-ssl', [SiteController::class, 'gerarSSL'])->name('admin.site.dominios.gerarSSL');
+    Route::get('/gerar-ssl', [SiteController::class, 'gerarSSL'])->name('admin.site.dominios.gerarSSL');
 });
 
 // routes/web.php
