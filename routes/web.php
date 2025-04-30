@@ -27,7 +27,7 @@ Route::get('/google/callback', [SocialLiteController::class, 'alunoGoogleCallbac
 // Route::get('/google-calendar/auth', [GoogleCalendarController::class, 'authenticate'])->name('google.calendar.auth');
 // Route::get('/google-calendar/events', [GoogleCalendarController::class, 'listEvents'])->name('google.calendar.events');
 
-Route::domain('yoursurf.rjpasseios.com.br')->group(function () {
+Route::domain('http://yoursurf.rjpasseios.com.br')->group(function () {
 
     return 'rota personalizada pegou';
 
