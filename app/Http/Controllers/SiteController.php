@@ -180,7 +180,7 @@ class SiteController extends Controller
     public function atualizarDominio(Request $request)
     {
         $request->validate([
-            'dominio_personalizado' => 'required|url'
+            'dominio_personalizado' => 'required'
         ]);
 
         $site = EmpresaSite::where('empresa_id', Auth::user()->empresa->id)->firstOrFail();
