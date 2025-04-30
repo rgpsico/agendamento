@@ -33,9 +33,9 @@ Route::domain('yoursurf.rjpasseios.com.br')->group(function () {
     });
 });
 
-Route::domain('{dominio_personalizado}')->group(function () {
-    Route::get('/', [SiteController::class, 'mostrarDominio']);
-});
+// Route::domain('{dominio_personalizado}')->group(function () {
+//     Route::get('/', [SiteController::class, 'mostrarDominio']);
+// });
 
 
 Route::prefix('admin/site')->middleware(['auth'])->group(function () {
