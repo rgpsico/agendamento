@@ -117,6 +117,8 @@ Route::domain('{dominio_personalizado}')->group(function () {
 });
 
 // To this:
-Route::domain('yousurf.rjpasseios.com.br')->group(function () {
-    Route::get('/', [SiteController::class, 'mostrarDominio']);
+Route::domain('{subdomain}.rjpasseios.com.br')->group(function ($subdomain) {
+    Route::get('/', function ($subdomain) {
+        return app(SiteController::class)->mostrarDominio(request(), $subdomain);
+    });
 });
