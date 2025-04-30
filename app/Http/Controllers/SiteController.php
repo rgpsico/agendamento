@@ -35,7 +35,7 @@ class SiteController extends Controller
         $site = EmpresaSite::where('dominio_personalizado', $host)
 
             ->first();
-        dd($site);
+        dd($host);
         return view('site.publico', compact('site'));
     }
 
