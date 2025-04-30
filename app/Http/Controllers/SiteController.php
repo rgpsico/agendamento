@@ -220,7 +220,7 @@ class SiteController extends Controller
     {
 
         $site = EmpresaSite::where('empresa_id', Auth::user()->empresa_id)->firstOrFail();
-
+        dd("aaa");
         if (!$site->dominio_personalizado) {
             return back()->with('error', 'Domínio personalizado   não configurado.');
         }
