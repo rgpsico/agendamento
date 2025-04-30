@@ -10,7 +10,7 @@ use App\Models\Alunos;
 use App\Models\Modalidade;
 use App\Models\Professor;
 use App\Models\Usuario;
-use App\Service\AsaasService;
+use App\Services\AsaasService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
