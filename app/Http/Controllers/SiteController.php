@@ -143,7 +143,9 @@ class SiteController extends Controller
     {
         $scriptPath = '/usr/local/bin/criar-vhost.sh';
 
-        $process = new Process(["sudo", $scriptPath, $dominio]);
+        $process = new Process(["sudo", "-S", $scriptPath, $dominio]);
+        $process->setInput("Um57121214\n"); // use com cuidado em ambiente de teste
+
         $process->run();
 
         if (!$process->isSuccessful()) {
