@@ -120,6 +120,6 @@ Route::domain('{dominio_personalizado}')->group(function () {
     $site = EmpresaSite::where('dominio_personalizado', $host)
         ->with(['servicos', 'depoimentos', 'contatos'])
         ->firstOrFail();
-
+    dd("aaa");
     return view('site.publico', compact('site'));
 });
