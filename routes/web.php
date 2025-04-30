@@ -113,5 +113,6 @@ Route::get('/logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
 
 
 Route::domain('{dominio_personalizado}')->group(function () {
+    dd('aaa');
     Route::get('/teste', [SiteController::class, 'mostrarDominio']);
 });
