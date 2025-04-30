@@ -32,7 +32,6 @@ Route::domain('{dominio_personalizado}')->group(function () {
     Route::get('/', [SiteController::class, 'mostrarDominio']);
 });
 
-Route::get('/site/{slug}', [SiteController::class, 'mostrar'])->name('site.publico');
 
 Route::prefix('admin/site')->middleware(['auth'])->group(function () {
     Route::get('configuracoes', [SiteController::class, 'edit'])->name('admin.site.configuracoes');
