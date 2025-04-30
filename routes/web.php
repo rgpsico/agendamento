@@ -27,17 +27,11 @@ Route::get('/google/callback', [SocialLiteController::class, 'alunoGoogleCallbac
 // Route::get('/google-calendar/auth', [GoogleCalendarController::class, 'authenticate'])->name('google.calendar.auth');
 // Route::get('/google-calendar/events', [GoogleCalendarController::class, 'listEvents'])->name('google.calendar.events');
 
-Route::domain('http://yoursurf.rjpasseios.com.br')->group(function () {
 
-    return 'rota personalizada pegou';
-
-
-    exit;
+Route::domain('{dominio_personalizado}')->group(function () {
+    dd("aaa");
+    Route::get('/teste', [SiteController::class, 'mostrarDominio']);
 });
-
-// Route::domain('{dominio_personalizado}')->group(function () {
-//     Route::get('/', [SiteController::class, 'mostrarDominio']);
-// });
 
 
 Route::prefix('admin/site')->middleware(['auth'])->group(function () {
