@@ -30,7 +30,7 @@ class SiteController extends Controller
     {
 
         $host = $request->getHost(); // Ex: yousurf.rjpasseios.com.br
-        dd($host);
+
         // Procura no banco o site com esse domínio personalizado
         $site = EmpresaSite::where('dominio_personalizado', $host)
             ->with(['servicos', 'depoimentos', 'contatos'])
