@@ -167,6 +167,9 @@ class PagamentoController extends Controller
 
 
 
+        if (!$aluno) {
+            return response()->json(['erro' => 'Aluno não encontrado'], 404);
+        }
 
         $aluno->professores()->attach($professor);
 
