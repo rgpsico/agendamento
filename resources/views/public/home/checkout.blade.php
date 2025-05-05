@@ -35,13 +35,13 @@
 											<h4 class="card-title">Informações</h4>
 											<div class="row">
 												   <input type="hidden" name="professor_id" id="professor_id" value="{{$model->user_id}}">	
-													<x-input-api-validation name="nome" col="6" placeholder="Ex: Roger Silva" label="Nome" value="Roger Neves" />
+													<x-input-api-validation name="nome" col="6" placeholder="Ex: Roger Silva" label="Nome" value="" />
 
-													<x-input-api-validation name="sobre_nome" col="6" placeholder="Ex: Neves" label="Sobrenome" value="Neves" />
+													<x-input-api-validation name="sobre_nome" col="6" placeholder="Ex: Neves" label="Sobrenome" value="" />
 
-													<x-input-api-validation name="email" col="6" placeholder="Ex: exemplo@email.com" label="Email" value="rgyr2010@hotmail.com" />
+													<x-input-api-validation name="email" col="6" placeholder="Ex: exemplo@email.com" label="Email" value="" />
 
-													<x-input-api-validation name="telefone" col="6" placeholder="Ex: (00) 12345-6789" label="Telefone" value="21 990271287" />
+													<x-input-api-validation name="telefone" col="6" placeholder="Ex: (00) 12345-6789" label="Telefone" value="" />
 											
 													<div class="exist-customer my-4 mb-4">
 														Sou cliente? 
