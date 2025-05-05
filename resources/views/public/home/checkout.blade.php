@@ -64,15 +64,15 @@
 												</label> --}}
 												
 												<div class="row">													
-													<x-input-api-validation name="nome_cartao" col="6" placeholder="Ex: Roger Silva" label="Nome no Cartão"  value="Roger Neves" />												
+													<x-input-api-validation name="nome_cartao" col="6" placeholder="Ex: Luiz Silva" label="Nome no Cartão"  value="" />												
 													
-													<x-input-api-validation name="numero_cartao" col="6" placeholder="1234  5678  9876  5432" label="Numero do Cartão" value="4242 4242 4242 4242" />
+													<x-input-api-validation name="numero_cartao" col="6" placeholder="1234  5678  9876  5432" label="Numero do Cartão" value="" />
 													 
-													<x-input-api-validation name="mes_vencimento" col="4" placeholder="Mês de vencimento" label="Mês de vencimento"  value="12" />
+													<x-input-api-validation name="mes_vencimento" col="4" placeholder="Mês de vencimento" label="Mês de vencimento"  value="" />
 													
-													<x-input-api-validation name="ano_vencimento" col="4" placeholder="Ano Vencimento" label="Ano Vencimento" value="28" />
+													<x-input-api-validation name="ano_vencimento" col="4" placeholder="Ano Vencimento" label="Ano Vencimento" value="" />
 													
-													<x-input-api-validation name="cvv" col="4" placeholder="124" label="CVV"  value="124" />
+													<x-input-api-validation name="cvv" col="4" placeholder="124" label="CVV"  value="" />
 												</div>
 											</div>
 											<!-- /Credit Card Payment -->
