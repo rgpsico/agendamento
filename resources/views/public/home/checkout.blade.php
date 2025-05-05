@@ -35,9 +35,9 @@
 											<h4 class="card-title">Informações</h4>
 											<div class="row">
 												   <input type="hidden" name="professor_id" id="professor_id" value="{{$model->user_id}}">	
-													<x-input-api-validation name="nome" col="6" placeholder="Ex: Roger Silva" label="Nome" value="" />
+													<x-input-api-validation name="nome" col="6" placeholder="Ex: Fulando" label="Nome" value="" />
 
-													<x-input-api-validation name="sobre_nome" col="6" placeholder="Ex: Neves" label="Sobrenome" value="" />
+													<x-input-api-validation name="sobre_nome" col="6" placeholder="Ex: Silva" label="Sobrenome" value="" />
 
 													<x-input-api-validation name="email" col="6" placeholder="Ex: exemplo@email.com" label="Email" value="" />
 
