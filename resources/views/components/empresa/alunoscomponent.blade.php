@@ -37,10 +37,10 @@
                             </thead>
                             <tbody>                              
                                  <tr role="row" class="odd">
-                                    <td class="sorting_1">{{$value->id ?? ''}}</td>                                    
-                                    <td class="sorting_1">{{$value->nome ?? ''}}</td>   
-                                    <td class="sorting_1">{{$value->email ?? ''}}</td>
-                                    <td class="sorting_1">{{$value->telefone ?? ''}}</td>
+                                    <td class="sorting_1">{{$value->id}}</td>                                    
+                                    <td class="sorting_1">{{$value->nome}}</td>   
+                                    <td class="sorting_1">{{$value->email}}</td>
+                                    <td class="sorting_1">{{$value->telefone}}</td>
                                     <td class="text-start">
                                         <div class="actions">
                                             <a class="btn btn-sm bg-success-light" data-bs-toggle="modal" href="#edit_specialities_details">
