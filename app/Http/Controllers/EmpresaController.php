@@ -345,19 +345,28 @@ class EmpresaController extends Controller
 
 
     public function show($id)
-{
-    $empresa = Empresa::with(['user', 'endereco', 'professores.alunos.usuario'])->where('id', $id)->firstOrFail();
-    
-    // Cria endereço vazio se não existir
-    if (!$empresa->endereco) {
-        $empresa->endereco = new \App\Models\EmpresaEndereco();
+    {
+        // Busca a empresa pelo ID
+        $empresa = Empresa::with(['user', 'endereco', 'professores.alunos.usuario'])
+            ->where('id', $id)
+            ->firstOrFail();
+
+        // Cria endereço vazio se não existir
+        if (!$empresa->endereco) {
+            $empresa->endereco = new \App\Models\EmpresaEndereco();
+        }
+
+        // Obtém todos os alunos únicos da empresa através dos professores
+        $alunos = $empresa->professores()
+            ->with('alunos.usuario') // Carrega os alunos e seus usuários
+            ->get()
+            ->pluck('alunos') // Obtém todos os alunos dos professores
+            ->flatten()
+            ->unique('id') // Remove duplicatas
+            ->values(); // Reindexa a coleção
+
+        return view('admin.empresas.show', compact('empresa', 'alunos'));
     }
-
-    // Obtém todos os alunos únicos da empresa
-    $alunos = $empresa->professores->pluck('alunos')->flatten()->unique('id');
-
-    return view('admin.empresas.show', compact('empresa', 'alunos'));
-}
     
     
 
