@@ -17,6 +17,7 @@
         "proengsoft/laravel-jsvalidation": "^4.8",
         "rap2hpoutre/laravel-log-viewer": "^2.3",
         "spatie/laravel-google-calendar": "*",
+        "spatie/laravel-permission": "^6.17",
         "stripe/stripe-php": "^10.15",
         "twilio/sdk": "*"
     },
