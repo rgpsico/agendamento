@@ -72,11 +72,43 @@ class EmpresaControllerApi extends Controller
         return $empresa;
     }
 
-    public function update(Request $request, Empresa $empresa)
+    public function update(Request $request)
     {
-        $empresa->update($request->all());
-        return response()->json($empresa, 200);
+        $request->validate([
+            'empresa_id' => 'required|integer|exists:empresas,id',
+            'nome' => 'required|string|max:255',
+            'email' => 'nullable|email',
+            'celular' => 'nullable|string',
+            'endereco' => 'nullable|string',
+            'cidade' => 'nullable|string',
+            'estado' => 'nullable|string',
+            'cep' => 'nullable|string',
+            'pais' => 'nullable|string',
+            'logo' => 'nullable|image|max:2048',
+        ]);
+    
+        $empresa = Empresa::findOrFail($request->empresa_id);
+    
+        $empresa->update([
+            'nome' => $request->nome,
+            'email' => $request->email,
+            'celular' => $request->celular,
+            'endereco' => $request->endereco,
+            'cidade' => $request->cidade,
+            'estado' => $request->estado,
+            'cep' => $request->cep,
+            'pais' => $request->pais,
+        ]);
+    
+        if ($request->hasFile('logo')) {
+            $path = $request->file('logo')->store('empresas/logos', 'public');
+            $empresa->logo = $path;
+            $empresa->save();
+        }
+    
+        return response()->json(['success' => true, 'empresa' => $empresa]);
     }
+    
 
     public function destroy(Empresa $empresa)
     {

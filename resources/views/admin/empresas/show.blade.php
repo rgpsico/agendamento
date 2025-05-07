@@ -11,24 +11,20 @@
                         <div class="row align-items-center">
                             <div class="col-auto profile-image">
                                 <a href="#">
-                                    <img class="rounded-circle" alt="User Image" src="{{asset('admin/img/profiles/avatar-01.jpg')}}">
+                                    <img class="rounded-circle" alt="User Image" src="{{ asset('banner/' . $empresa->banners) }}">
                                 </a>
                             </div>
                             <div class="col ml-md-n2 profile-user-info">
-                                <h4 class="user-name mb-0">{{$model->name ?? 'Escola de surf'}}</h4>
-                                <h6 class="text-muted">{{$model->email ?? 'Escola de surf'}}</h6>
+                                <h4 class="user-name mb-0">{{$empresa->nome}}</h4>
+                                <h6 class="text-muted">{{$empresa->email }}</h6>
                                 <div class="user-Location">
-                                    <i class="fa fa-map-marker"></i> {{$model->endereco->cidade ?? 'Rio de Janeiro'}},
-                                     {{$model->endereco->nacionalidade ?? 'Brasil'}}</div>
+                                    <i class="fa fa-map-marker"></i> {{$empresa->endereco->cidade}},
+                                     {{$empresa->endereco->nacionalidade}}</div>
                                 <div class="about-text">
-                                    {{$model->descricao ?? ''}}
+                                    {{$empresa->descricao}}
                                 </div>
                             </div>
-                            <div class="col-auto profile-btn">                                
-                                <a href="" class="btn btn-primary">
-                                    Editar
-                                </a>
-                            </div>
+                          
                         </div>
                     </div>
                     <div class="profile-menu">
@@ -49,10 +45,10 @@
                     </div>	
                     <div class="tab-content profile-tab-cont">
                         
-                        <x-empresa.sobrecomponent/>
+                        <x-empresa.sobrecomponent  :empresa="$empresa"/>
                         <x-empresa.senhacomponent/>
                         <x-empresa.historicopg/>
-                        <x-empresa.alunoscomponent/>
+                        <x-empresa.alunoscomponent :alunos="$alunos"/>
                         <!-- /Change Password Tab -->
                         
                     </div>

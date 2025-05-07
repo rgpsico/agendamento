@@ -79,6 +79,8 @@ Route::post('/test-twilio', function () {
     }
 });
 
+Route::middleware('auth:sanctum')->post('/empresa/update', [EmpresaControllerApi::class, 'update']);
+
 
 Route::get('/disponibilidadedia', [DisponibilidadeServicoController::class, 'getDisponibilidade']);
 Route::post('/disponibilidade/update', [DisponibilidadeServicoController::class, 'updateDisponibilidade']);

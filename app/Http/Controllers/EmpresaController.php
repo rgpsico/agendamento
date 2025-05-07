@@ -12,6 +12,7 @@ use App\Models\Modalidade;
 use App\Models\Professor;
 use App\Models\Servicos;
 use App\Models\Usuario;
+
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -150,9 +151,11 @@ class EmpresaController extends Controller
         }
     }
 
+    
 
     public function update(Request $request)
     {
+        
         $data = $request->validate([
             'avatar' => 'nullable|image|max:2048',
             'nome' => 'required|max:255',
@@ -341,13 +344,21 @@ class EmpresaController extends Controller
 
     public function show($id)
     {
-        return $this->loadView('show');
+      
+        $empresa = Empresa::with('user', 'endereco')->where('id', $id)->firstOrFail();
+    
+        // Cria endereço vazio se não tiver
+        if (!$empresa->endereco) {
+            $empresa->endereco = new \App\Models\EmpresaEndereco();
+        }
+    
+        return view('admin.empresas.show', compact('empresa'));
     }
+    
+    
 
     public function agendatore(Request $request)
     {
-
-
 
         // Validação dos dados recebidos do formulário
         $validatedData = $request->validate([
