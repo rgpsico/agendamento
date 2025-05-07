@@ -20,7 +20,7 @@
         <div class="content container-fluid">
         
           @include('admin.empresas._partials.header')
-            @include('admin.empresas._partials.modal')
+            {{-- @include('admin.empresas._partials.modal') --}}
             <div class="row">
                 @foreach([
                     ['Total de Alunos', $numeroTotalDeAlunos, 'fe-users', 'primary'],

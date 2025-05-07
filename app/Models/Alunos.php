@@ -12,7 +12,7 @@ class Alunos extends Model
 
     public function usuario()
     {
-        return $this->belongsTo(Usuario::class, 'usuario_id');
+        return $this->belongsTo(Usuario::class, 'usuario_id', 'id');
     }
 
     public function professores()
@@ -29,5 +29,12 @@ class Alunos extends Model
     public function endereco()
     {
         return $this->hasOne(AlunoEndereco::class, 'aluno_id', 'id');
+    }
+
+  
+
+    public function alunos()
+    {
+        return $this->belongsToMany(Alunos::class, 'aluno_professor', 'professor_id', 'aluno_id');
     }
 }

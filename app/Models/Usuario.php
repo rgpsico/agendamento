@@ -52,10 +52,10 @@ class Usuario extends Authenticatable
     protected $dates = [
         'data_nascimento',
     ];
-    public function empresa()
-    {
-        return $this->hasOne(Empresa::class, 'user_id', 'id');
-    }
+    // public function empresa()
+    // {
+    //     return $this->hasOne(Empresa::class, 'user_id', 'id');
+    // }
 
     public function site()
     {
@@ -94,6 +94,7 @@ class Usuario extends Authenticatable
     {
         return $this->hasOne(Professor::class, 'usuario_id', 'id');
     }
+    
 
 
 
@@ -107,4 +108,14 @@ class Usuario extends Authenticatable
     {
         return $this->hasOne(Alunos::class, 'usuario_id', 'id');
     }
+
+    // Relacionamento com Empresa
+    public function empresa()
+    {
+        return $this->hasOne(Empresa::class, 'user_id', 'id');
+    }
+
+
+
+
 }

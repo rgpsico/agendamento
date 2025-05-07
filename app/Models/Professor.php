@@ -22,11 +22,26 @@ class Professor extends Model
 
     public $timestamps = false;
 
-    public function usuario()
+
+    public function professores()
     {
-        return $this->hasOne(Usuario::class, 'id', 'usuario_id');
+        // Busca os professores cujo usuario_id está vinculado a um usuário do tipo 'Professor'
+        return $this->hasManyThrough(
+            Professor::class, // Modelo alvo
+            Usuario::class,   // Modelo intermediário
+            'id',             // Chave estrangeira no modelo intermediário (usuarios.id)
+            'usuario_id',     // Chave estrangeira no modelo alvo (professores.usuario_id)
+            'user_id',        // Chave local em Empresa (empresa.user_id)
+            'id'              // Chave local em Usuario (usuarios.id)
+        )->where('tipo_usuario', 'Professor');
     }
 
+
+    public function usuario()
+    {
+        return $this->belongsTo(Usuario::class, 'usuario_id', 'id');
+    }
+ 
 
     public function alunos()
     {
@@ -69,6 +84,11 @@ class Professor extends Model
     public function getTotalAvaliacoesAttribute()
     {
         return $this->avaliacoes()->count();
+    }
+
+    public function empresa()
+    {
+        return $this->belongsTo(Empresa::class, 'empresa_id', 'id');
     }
 
 

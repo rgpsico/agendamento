@@ -39,9 +39,9 @@
                                 @foreach($alunos as $aluno)
                                 <tr role="row" class="odd">
                                     <td class="sorting_1">{{ $aluno->id }}</td>                                    
-                                    <td class="sorting_1">{{ $aluno->nome }}</td>   
-                                    <td class="sorting_1">{{ $aluno->email }}</td>
-                                    <td class="sorting_1">{{ $aluno->telefone }}</td>
+                                    <td class="sorting_1">{{ $aluno->usuario->nome }}</td>   
+                                    <td class="sorting_1">{{ $aluno->usuario->email }}</td>
+                                    <td class="sorting_1">{{ $aluno->usuario->telefone }}</td>
                                     <td class="text-start">
                                         <div class="actions">
                                             <a class="btn btn-sm bg-success-light" data-bs-toggle="modal" href="#edit_specialities_details">

@@ -14,7 +14,7 @@ class Empresa extends Model
 
 
 
-    protected $primaryKey = 'user_id';
+    protected $primaryKey = 'id';
 
     public $incrementing = true;
 
@@ -28,7 +28,7 @@ class Empresa extends Model
     {
         return $this->hasOne(EmpresaEndereco::class, 'empresa_id', 'id');
     }
-
+    
     public function paymentGateways()
     {
         return $this->hasMany(PagamentoGateway::class, 'empresa_id');
@@ -72,7 +72,7 @@ class Empresa extends Model
     // No modelo Empresa.php
     public function professores()
     {
-        return $this->hasMany(Professor::class, 'usuario_id', 'id');
+        return $this->hasMany(Professor::class, 'empresa_id', 'id');
     }
 
     // Acessor para WhatsApp
@@ -80,4 +80,6 @@ class Empresa extends Model
     {
         return Configuracao::get($this->id, 'whatsapp_numero', '');
     }
+
+   
 }
