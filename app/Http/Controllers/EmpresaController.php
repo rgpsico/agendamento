@@ -73,7 +73,8 @@ class EmpresaController extends Controller
             'numero_total_de_aulas' => $numeroTotalDeAulas,
             'data_inicial' => $data_inicial,
             'data_final' => $data_final,
-            'arrecadacaoPorDia' => $arrecadacaoPorDia
+            'arrecadacaoPorDia' => $arrecadacaoPorDia,
+            'empresa' => []
         ]);
     }
 
