@@ -12,7 +12,7 @@ use App\Models\Modalidade;
 use App\Models\Professor;
 use App\Models\Servicos;
 use App\Models\Usuario;
-
+use App\Models\Alunos;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -343,17 +343,19 @@ class EmpresaController extends Controller
 
 
     public function show($id)
-    {
-      
-        $empresa = Empresa::with('user', 'endereco')->where('id', $id)->firstOrFail();
+{
+    $empresa = Empresa::with(['user', 'endereco', 'professores.alunos.usuario'])->where('id', $id)->firstOrFail();
     
-        // Cria endereço vazio se não tiver
-        if (!$empresa->endereco) {
-            $empresa->endereco = new \App\Models\EmpresaEndereco();
-        }
-    
-        return view('admin.empresas.show', compact('empresa'));
+    // Cria endereço vazio se não existir
+    if (!$empresa->endereco) {
+        $empresa->endereco = new \App\Models\EmpresaEndereco();
     }
+
+    // Obtém todos os alunos únicos da empresa
+    $alunos = $empresa->professores->pluck('alunos')->flatten()->unique('id');
+
+    return view('admin.empresas.show', compact('empresa', 'alunos'));
+}
     
     
 

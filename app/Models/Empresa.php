@@ -69,6 +69,12 @@ class Empresa extends Model
         return Configuracao::get($this->id, 'agendamento_tipo', 'horarios');
     }
 
+    // No modelo Empresa.php
+    public function professores()
+    {
+        return $this->hasMany(Professor::class, 'usuario_id', 'id');
+    }
+
     // Acessor para WhatsApp
     public function getWhatsappNumeroAttribute()
     {
