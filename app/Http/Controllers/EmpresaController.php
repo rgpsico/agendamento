@@ -36,6 +36,7 @@ class EmpresaController extends Controller
 
     public function dashboard(Request $request)
     {
+     
         $professor_id = Auth::user()->professor->id ?? null;
 
         if (!$professor_id) {

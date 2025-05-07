@@ -1,5 +1,3 @@
-@isset($empresa)
-    
 
 <div class="modal fade" id="edit_personal_details" aria-hidden="true" role="dialog">
     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -135,4 +133,3 @@
         </div>
     </div>
 </div>
-@endisset
