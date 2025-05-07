@@ -28,7 +28,7 @@ class AlunosController extends Controller
     public function index()
     {
         $professor_id = Auth::user()->professor->id;
-
+       
         $professor = Professor::with('alunos.usuario')->find($professor_id);
 
         $model = $professor->alunos;
