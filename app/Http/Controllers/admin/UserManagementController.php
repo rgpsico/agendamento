@@ -85,6 +85,7 @@ class UserManagementController extends Controller
 
     public function update(Request $request, $id)
     {
+      
         $usuario = Usuario::findOrFail($id);
 
         $request->validate([
@@ -104,7 +105,7 @@ class UserManagementController extends Controller
         $usuario->syncRoles($request->roles ?? []);
         $usuario->syncPermissions($request->permissions ?? []);
 
-        return redirect()->route('admin.usuarios.index')->with('success', 'Usuário atualizado com sucesso!');
+        return redirect()->back()->with('success', 'Usuário atualizado com sucesso!');
     }
 
     public function destroy($id)

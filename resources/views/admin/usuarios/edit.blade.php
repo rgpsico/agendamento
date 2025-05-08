@@ -33,8 +33,8 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="name">Nome</label>
-                                            <input type="text" name="name" class="form-control" 
-                                                   value="{{ old('name', $user->name) }}" required>
+                                            <input type="text" name="nome" class="form-control" 
+                                                   value="{{ old('nome', $user->nome) }}" required>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
