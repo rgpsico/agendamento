@@ -13,6 +13,22 @@ use App\Http\Controllers\GoogleController;
 use App\Http\Controllers\SiteContatoController;
 use App\Http\Controllers\SiteController;
 use App\Http\Controllers\SiteServicoController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\Admin\UserManagementController;
+
+
+Route::prefix('admin/usuarios')->name('admin.usuarios.')->group(function() {
+    Route::get('/', [UserManagementController::class, 'index'])->name('index');
+    Route::get('/create', [UserManagementController::class, 'create'])->name('create');
+    Route::post('/', [UserManagementController::class, 'store'])->name('store');
+    Route::get('/{user}/edit', [UserManagementController::class, 'edit'])->name('edit');
+    Route::put('/{user}', [UserManagementController::class, 'update'])->name('update');
+    Route::delete('/{user}', [UserManagementController::class, 'destroy'])->name('destroy');
+    
+    // Rotas para permissões
+    Route::get('/{user}/permissions', [UserManagementController::class, 'getPermissions'])->name('permissions.get');
+    Route::post('/{user}/permissions', [UserManagementController::class, 'updatePermissions'])->name('permissions.update');
+});
 
 Route::get('/google/prof/redirect', [SocialLiteController::class, 'professorRedirectToGoogle'])->name('prof.login.google');
 Route::get('/google/prof/callback', [SocialLiteController::class, 'professorGoogleCallback'])->name('prof.handle.google');
@@ -27,6 +43,18 @@ Route::get('/google/callback', [SocialLiteController::class, 'alunoGoogleCallbac
 // Route::get('/google-calendar/auth', [GoogleCalendarController::class, 'authenticate'])->name('google.calendar.auth');
 // Route::get('/google-calendar/events', [GoogleCalendarController::class, 'listEvents'])->name('google.calendar.events');
 
+
+
+
+
+Route::prefix('admin')->group(function () {
+    Route::get('/usuarios', [UserManagementController::class, 'index'])->name('admin.usuarios.index');
+    Route::get('/usuarios/criar', [UserManagementController::class, 'create'])->name('admin.usuarios.create');
+    Route::post('/usuarios', [UserManagementController::class, 'store'])->name('admin.usuarios.store');
+    Route::get('/usuarios/{id}/edit', [UserManagementController::class, 'edit'])->name('admin.usuarios.edit');
+    Route::put('/usuarios/{id}', [UserManagementController::class, 'update'])->name('admin.usuarios.update');
+    Route::delete('/usuarios/{id}', [UserManagementController::class, 'destroy'])->name('admin.usuarios.destroy');
+});
 
 Route::get('/site/{slug}', [SiteController::class, 'mostrar'])->name('site.publico');
 

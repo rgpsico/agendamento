@@ -168,14 +168,14 @@
                 <li class="submenu">
                     <a href="#">
                         <i class="fas fa-cogs" style="font-size: 18px;"></i> 
-                        <span>Configuraçõesss</span> 
+                        <span>Configurações</span> 
                         <span class="menu-arrow"></span>
                     </a>
                     <ul>
                         <li><a href="{{ route('configuracoes.permissoes') }}">Permissões</a></li>
                         <li><a href="{{ route('configuracoes.pagamentos') }}">Pagamentos</a></li>
                         <li><a href="{{ route('configuracoes.empresa') }}">Empresa</a></li>
-                        <li><a href="{{ route('configuracoes.usuarios') }}">Usuários</a></li>
+                        <li><a href="{{ route('admin.usuarios.index') }}">Usuários</a></li>
                         <li><a href="{{ route('configuracoes.index') }}">Sistema</a></li>
                         @if(Auth::user()->isAdmin)
                      
