@@ -220,7 +220,7 @@
       <div class="row">
         
         <!-- Área da Logo -->
-        <div class="col-12 col-md-6 col-sm-12 login-left d-flex align-items-center justify-content-center">
+        <div class="col-12 col-md-6 col-sm-12 login-left d-flex align-items-center justify-content-center teste">
           <img class="img-fluid" src="{{ $loginImage }}" alt="Logo">
           
         </div>
