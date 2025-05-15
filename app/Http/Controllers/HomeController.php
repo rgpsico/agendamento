@@ -12,6 +12,7 @@ use App\Models\Modalidade;
 use App\Models\PagamentoGateway;
 use App\Models\Professor;
 use App\Models\Usuario;
+use App\Models\ConfiguracaoGeral;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Str;
@@ -198,9 +199,10 @@ class HomeController extends Controller
 
     public function registerProf()
     {
+    
 
         $modalidade = Modalidade::all();
-
+        $config = ConfiguracaoGeral::first();
 
         return view(
             'public.registrar.registerProf',
@@ -208,7 +210,9 @@ class HomeController extends Controller
                 'pageTitle' => $this->pageTitle,
                 'view' => $this->view,
                 'route' => $this->route,
-                'modalidade' => $modalidade
+                'modalidade' => $modalidade,
+                'loginImage' => $config->login_image ? asset('storage/' . $config->login_image) : null,
+                'registerImage' => $config->register_image ? asset('storage/' . $config->register_image) : null,
             ]
         );
     }

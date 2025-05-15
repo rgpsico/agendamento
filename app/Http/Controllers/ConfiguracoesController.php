@@ -35,6 +35,7 @@ class ConfiguracoesController extends Controller
 
     public function indexadmin()
     {
+      
         // Buscar as configurações salvas
         $config = ConfiguracaoGeral::first();
 
