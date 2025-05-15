@@ -9,7 +9,7 @@
                         <div class="row g-0">
                             <!-- Left Side - Image -->
                             <div class="col-md-6 d-none d-md-block">
-                                <img src="{{asset('admin/img/registresel.jpg')}}" class="img-fluid h-100" alt="Login" style="object-fit: cover;">
+                                <img src="{{ $loginImage }}" class="img-fluid h-100" alt="Login" style="object-fit: cover;">
                             </div>
                             <!-- Right Side - Form -->
                             <div class="col-md-6 p-5 bg-white">

@@ -231,11 +231,13 @@ class HomeController extends Controller
 
     public function login()
     {
+        $config = ConfiguracaoGeral::first();
         return view(
             'public.registrar.login',
             [
                 'pageTitle' => $this->pageTitle,
                 'view' => $this->view,
+                'loginImage' => $config->login_image ? asset('storage/' . $config->login_image) : null,
                 'route' => $this->route
             ]
         );
