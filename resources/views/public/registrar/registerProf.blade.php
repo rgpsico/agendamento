@@ -221,7 +221,8 @@
         
         <!-- Área da Logo -->
         <div class="col-12 col-md-6 col-sm-12 login-left d-flex align-items-center justify-content-center">
-          <img class="img-fluid" src="{{ asset('admin/img/registreprof.png') }}" alt="Logo">
+          <img class="img-fluid" src="{{ $loginImage }}" alt="Logo">
+          
         </div>
 
         <!-- Área do Formulário de Cadastro -->

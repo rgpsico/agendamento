@@ -56,7 +56,7 @@
                     <form action="{{ route('configuracoesGeral.salvar') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="form-group">
-                            <label>Imagem da Tela de LoginAA:</label>
+                            <label>Imagem da Tela de Login:</label>
                             <input type="file" name="login_image" class="form-control">
                             @if($loginImage)
                                 <div class="mt-2">
