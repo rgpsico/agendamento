@@ -51,7 +51,7 @@
 				@endphp
                 <div class="header-left">
                     <a href="{{route('home.index')}}" class="logo">
-						<img src="{{asset('admin/img/logo.png')}}" width="150" height="150" alt="Losssgo da Escola de Surf">		</a>
+						<img src="https://rjpasseios.com.br/wp-content/uploads/2024/12/cropped-logo-1.png" width="150" height="150" alt="Logo Rjpasseios">		</a>
 					<a href="{{route('home.index')}}" class="logo logo-small">
 						<img src="{{asset('admin/img/logo-small.png')}}" alt="Logo" width="30" height="30">
 					</a>

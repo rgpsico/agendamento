@@ -1,3 +1,55 @@
+<style>
+    .profile-pic-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.pic-holder {
+    text-align: center;
+    position: relative;
+    border-radius: 50%;
+    width: 150px;
+    height: 150px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.pic-holder .pic {
+    height: 100%;
+    width: 100%;
+    -o-object-fit: cover;
+    object-fit: cover;
+    -o-object-position: center;
+    object-position: center;
+}
+
+.pic-holder .upload-file-block {
+    cursor: pointer;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: all 0.2s;
+}
+
+.pic-holder .upload-file-block:hover {
+    opacity: 1;
+}
+    </style>
 <div class="modal fade" id="edit_personal_details" aria-hidden="true" role="dialog">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -6,43 +58,70 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <input type="hidden" class="form-control" id="aluno_id" value="{{Auth::user()->id}}">
-                <div class="modal-body">
-                    <form id="form-update-aluno">
-                        <div class="row form-row">
-                            <div class="col-12 col-sm-6">
-                                <div class="form-group">
-                                    <label>Primeiro Nome</label>
-                                    <input type="text" class="form-control" id="primeiro_nome" value="{{Auth::user()->nome}}">
-                                </div>
-                            </div>
-   
-                            <div class="col-sm-6">
-                                <div class="form-group">
-                                    <label>Data de Nascimento</label>
-                                    <div class="cal-icon">
-                                        <input type="text" class="form-control datetimepicker" id="data_nascimento" value="24-07-1983">
+                <form id="form-update-aluno" enctype="multipart/form-data">
+                    <input type="hidden" id="aluno_id" name="aluno_id" value="{{ Auth::user()->id }}">
+                    <div class="row form-row">
+                        <!-- Campo para upload de imagem -->
+                        <div class="col-12 text-center mb-3">
+                            <div class="form-group">
+                                <div class="profile-pic-wrapper">
+                                    <div class="pic-holder">
+                                        <img id="profilePic" class="pic" 
+                                             src="{{ Auth::user()->aluno && Auth::user()->aluno->avatar ? asset('storage/' . Auth::user()->aluno->avatar) : asset('assets/img/user-default.png') }}">
+                                        <label for="newProfilePhoto" class="upload-file-block">
+                                            <div class="text-center">
+                                                <div class="mb-2">
+                                                    <i class="fa fa-camera fa-2x"></i>
+                                                </div>
+                                                <div class="text-uppercase">
+                                                    Atualizar Foto
+                                                </div>
+                                            </div>
+                                        </label>
+                                        <input type="file" name="profile_image" id="newProfilePhoto" accept="image/*" style="display: none;">
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-12 col-sm-6">
-                                <div class="form-group">
-                                    <label>Email</label>
-                                    <input type="email" class="form-control" id="email" value="{{Auth::user()->email ?? ''}}">
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6">
-                                <div class="form-group">
-                                    <label>Celular</label>
-                                    <input type="text" value="{{Auth::user()->telefone ?? ''}}" id="telefone" class="form-control">
-                                </div>
-                            </div>
-                            
                         </div>
-                        <button type="submit" class="btn btn-primary w-100">Salvar Alterações</button>
-                    </form>
-                </div>
-                
+
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label>Primeiro Nome</label>
+                                <input type="text" class="form-control" id="primeiro_nome" name="primeiro_nome" 
+                                       value="{{ explode(' ', Auth::user()->nome)[0] ?? '' }}">
+                                <span class="primeiro_nome_error text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Data de Nascimento</label>
+                                <div class="cal-icon">
+                                    <input type="text" class="form-control datetimepicker" id="data_nascimento" name="data_nascimento" 
+                                           value="{{ Auth::user()->data_nascimento ? date('d-m-Y', strtotime(Auth::user()->data_nascimento)) : '' }}">
+                                    <span class="data_nascimento_error text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" class="form-control" id="email" name="email" 
+                                       value="{{ Auth::user()->email ?? '' }}">
+                                <span class="email_error text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label>Celular</label>
+                                <input type="text" class="form-control" id="telefone" name="telefone" 
+                                       value="{{ Auth::user()->telefone ?? '' }}">
+                                <span class="telefone_error text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Salvar Alterações</button>
+                </form>
             </div>
         </div>
     </div>
@@ -102,56 +181,80 @@
 
 
 <script>
-    $('#form-update-aluno').on('submit', function(e) {
-    e.preventDefault();
-
-    var alunoId = $('#aluno_id').val(); 
-
-    var formData = $(this).serialize(); // Obtém os dados do formulário
-
-    let dataBr = $('#data_nascimento').val();
-let dataParts = dataBr.split("/");
-let dataSql = new Date(+dataParts[2], dataParts[1] - 1, +dataParts[0]);
-let finalDate = dataSql.toISOString().split('T')[0];
-
-    $.ajax({
-    url: '/api/aluno/' + alunoId + '/update',
-    method: 'POST',
-    data: {
-        primeiro_nome: $('#primeiro_nome').val(),
-        ultimo_nome: $('#ultimo_nome').val(),
-        data_nascimento: finalDate,
-        email: $('#email').val(),
-        telefone: $('#telefone').val(),
-        endereco: $('#endereco').val(),
-        cidade: $('#cidade').val(),
-        estado: $('#estado').val(),
-        cep: $('#cep').val(),
-        pais: $('#pais').val()
-    },
-    success: function(response, status) {
-        alert(response.message);
-      if(response.message == 'Dados atualizados com sucesso!'){
-        $('.modal').modal('hide')
-        window.location.reload();
-        
-      }
-        
-      
-    } , error: function(response) {
-        if (response.status == 422) { // verifica se é um erro de validação
-            const errors = response.responseJSON.errors;
-            // exibe os erros no formulário
-            for (let field in errors) {
-                $(`.${field}_error`).text(errors[field][0]);
-            }
-        } else {
-            alert('Ocorreu um erro desconhecido!');
+  // Script para mostrar prévia da imagem
+$(document).ready(function() {
+    // Quando um novo arquivo é selecionado
+    $("#newProfilePhoto").change(function() {
+        var file = this.files[0];
+        if (file) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                // Atualiza a imagem de prévia
+                $("#profilePic").attr("src", e.target.result);
+            };
+            reader.readAsDataURL(file);
         }
-    }
+    });
+
+    // Modificando o script de submit para incluir upload de imagem
+    $('#form-update-aluno').on('submit', function(e) {
+        e.preventDefault();
+
+        var alunoId = $('#aluno_id').val();
+        var formData = new FormData(this);
+
+        // Fix para formatação de data
+        let dataBr = $('#data_nascimento').val();
+        let dataParts = dataBr.split('-');
+        
+        if (dataParts.length !== 3) {
+            alert('Formato de data inválido. Use DD-MM-AAAA.');
+            return;
+        }
+
+        let dataSql = new Date(+dataParts[2], +dataParts[1] - 1, +dataParts[0]);
+        if (isNaN(dataSql.getTime())) {
+            alert('Data inválida.');
+            return;
+        }
+
+        // Substitui a data no FormData
+        formData.set('data_nascimento', dataSql.toISOString().split('T')[0]);
+
+        $.ajax({
+            url: '/api/aluno/' + alunoId + '/update',
+            method: 'POST',
+            data: formData,
+            processData: false, // Necessário para enviar arquivos
+            contentType: false, // Necessário para enviar arquivos
+            success: function(response) {
+                alert(response.message);
+                if (response.message === 'Dados atualizados com sucesso!') {
+                    $('.modal').modal('hide');
+                    window.location.reload();
+                }
+            },
+            error: function(response) {
+                if (response.status === 422) {
+                    const errors = response.responseJSON.errors;
+                    // Limpa erros anteriores
+                    $('.text-danger').text('');
+                    // Exibe novos erros
+                    for (let field in errors) {
+                        $(`.${field}_error`).text(errors[field][0]);
+                    }
+                } else if (response.status === 404) {
+                    alert(response.responseJSON.message || 'Aluno ou usuário não encontrado!');
+                } else {
+                    alert('Ocorreu um erro desconhecido!');
+                }
+            }
+        });
+    });
 });
 
-});
+
+
 
 
 </script>
