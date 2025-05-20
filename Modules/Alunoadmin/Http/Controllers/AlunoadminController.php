@@ -26,7 +26,7 @@ class AlunoadminController extends Controller
     public function index(Request $request)
     {
         $config = ConfiguracaoGeral::first();
-        $title = 'Alunos';
+        $title = 'Aulas';
 
         $id = auth()->user()->aluno->id;
 

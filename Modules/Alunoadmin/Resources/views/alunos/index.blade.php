@@ -70,7 +70,11 @@
                                     <td>
                                         <h2 class="table-avatar">
                                             <a href="" class="avatar avatar-sm me-2">
-                                                <img class="avatar-img rounded-circle" src="{{ asset('admin/img/doctors/doctor-02.jpg') }}" alt="User Image">
+                                                @if($agendamento->professor && $agendamento->professor->avatar && $agendamento->professor->avatar != 'AVATAR')
+                                                    <img class="avatar-img rounded-circle" src="{{ asset('avatar/' . $agendamento->professor->avatar) }}" alt="User Image">
+                                                @else
+                                                    <img class="avatar-img rounded-circle" src="{{ asset('admin/img/doctors/doctor-02.jpg') }}" alt="User Image">
+                                                @endif
                                             </a>
                                             <a href="">{{ $agendamento->professor->usuario->nome ?? 'AQUI' }}</a>
                                         </h2>
