@@ -59,6 +59,39 @@ class AlunosControllerApi extends Controller
         }
     }
 
+
+    public function updateEndereco($id, Request $request)
+    {
+        // Validate the request
+        $request->validate([
+            'cep' => 'required|string|max:10',
+            'endereco' => 'required|string|max:255',
+            'cidade' => 'required|string|max:100',
+            'estado' => 'required|string|max:2',
+            'pais' => 'required|string|max:100',
+        ]);
+        
+        // Procura o aluno pelo usuario_id
+        $aluno = Alunos::where('usuario_id', $id)->first();
+        
+        if (!$aluno) {
+            return response()->json(['message' => 'Aluno não encontrado'], 404);
+        }
+        
+        // IMPORTANTE: Use o $aluno->id, não o $id do parâmetro da função
+        $endereco = AlunoEndereco::updateOrCreate(
+            ['aluno_id' => $aluno->id], // Agora referenciando o ID real do aluno
+            [
+                'cep' => $request->cep,
+                'endereco' => $request->endereco,
+                'cidade' => $request->cidade,
+                'estado' => $request->estado,
+                'pais' => $request->pais,
+            ]
+        );
+        
+        return response()->json(['message' => 'Endereço atualizado com sucesso!']);
+    }
     // Atualizar um usuário específico
     public function update($id, Request $request)
     {
