@@ -16,7 +16,7 @@ use App\Models\Alunos;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Support\Facades\Storage;
 class EmpresaController extends Controller
 {
     protected $pageTitle = "Empresa TESTE";
