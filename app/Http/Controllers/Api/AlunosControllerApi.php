@@ -65,39 +65,49 @@ class AlunosControllerApi extends Controller
         // Validação dos dados recebidos
         $request->validate([
             'primeiro_nome' => 'required|string|max:255',
-            //  'ultimo_nome' => 'required|string|max:255',
             'data_nascimento' => 'required|date',
             'email' => 'required|email|max:255',
             'telefone' => 'required|string|max:15',
-            // 'endereco' => 'required|string|max:255',
-            // 'cidade' => 'required|string|max:100',
-            // 'estado' => 'required|string|max:100',
-            // 'cep' => 'required|string|max:10',
-            // 'pais' => 'required|string|max:100'
+            'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
-
-        // Atualiza os dados no modelo Usuario
+    
+        // Encontra o usuário
         $usuario = Usuario::find($id);
         if (!$usuario) {
+            return response()->json(['message' => 'Usuário não encontrado!'], 404);
+        }
+    
+        // Encontra o aluno associado ao usuário
+        $aluno = Alunos::where('usuario_id', $id)->first();
+        if (!$aluno) {
             return response()->json(['message' => 'Aluno não encontrado!'], 404);
         }
-
-        $usuario->update([
-            'nome' => $request->primeiro_nome . ' ' . $request->ultimo_nome,
+    
+        // Atualiza os dados do usuário
+        $dataUpdateUsuario = [
+            'nome' => $request->primeiro_nome . ' ' . ($request->ultimo_nome ?? ''),
             'email' => $request->email,
             'data_nascimento' => $request->data_nascimento,
             'telefone' => $request->telefone,
-        ]);
-
-        // Atualiza ou cria o endereço no modelo AlunoEndereco
-        // $endereco = AlunoEndereco::firstOrNew(['aluno_id' => $id]);
-        // $endereco->update([
-        //     'endereco' => $request->endereco,
-        //     'cidade' => $request->cidade,
-        //     'estado' => $request->estado,
-        //     'cep' => $request->cep,
-        // ]);
-
+        ];
+    
+        // Atualiza os dados do usuário
+        $usuario->update($dataUpdateUsuario);
+    
+        // Processa a imagem se foi enviada
+        if ($request->hasFile('profile_image')) {
+            // Verifica se já existe uma imagem e a exclui
+            if ($aluno->avatar && Storage::exists('public/' . $aluno->avatar)) {
+                Storage::delete('public/' . $aluno->avatar);
+            }
+    
+            // Armazena a nova imagem
+            $imagePath = $request->file('profile_image')->store('avatars', 'public');
+    
+            // Atualiza o avatar na tabela alunos
+            $aluno->update(['avatar' => $imagePath]);
+        }
+    
         return response()->json(['message' => 'Dados atualizados com sucesso!']);
     }
 
