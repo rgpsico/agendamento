@@ -113,12 +113,7 @@
                             <a href="{{ route('empresa.endereco', ['userId' => Auth::user()->id]) }}">
                                <i class="fe fe-map-pin"></i> <span> Endereço</span>
                             </a>
-                        </li>
-                        <li> 
-                            <a href="{{ route('empresa.pagamento.store') }}">
-                               <i class="fe fe-credit-card"></i> <span> Tipos de Pagamento</span>
-                            </a>
-                        </li>
+                        </li>                      
                         <li><a href="{{ route('configuracoes.indexAdmin') }}">Sistema Geral</a></li>
                         @endisset
                     </ul>
@@ -134,6 +129,21 @@
                     <ul>
                         <li><a href="{{ route('pagamento.index') }}">Listar</a></li>
                         <li><a href="{{ route('empresa.pagamento.create') }}">Cadastrar</a></li>
+                    </ul>
+                </li>
+
+                <li class="submenu">
+                    <a href="#">
+                        <i class="fas fa-credit-card" style="font-size: 18px;"></i> 
+                        <span>Integrações</span> 
+                        <span class="menu-arrow"></span>
+                    </a>
+                    <ul>
+                        <li><a href="{{ route('integracoes.asaas') }}">Asaas</a></li>
+                        <li><a href="{{ route('integracoes.stripe') }}">Stripe</a></li>
+                        <li><a href="{{ route('integracoes.mercadopago') }}">Mercado Pago</a></li>
+                        <li><a href="{{ route('integracoes.configuracoes') }}">Configurações Gerais</a></li>
+                        <li><a href="{{ route('integracoes.relatorios') }}">Relatórios de Pagamentos</a></li>
                     </ul>
                 </li>
 

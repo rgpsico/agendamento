@@ -16,12 +16,12 @@ use App\Http\Controllers\ServicoController;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
-
-
+use App\Http\Controllers\IntegrationsController;
+use App\Http\Controllers\HomeController;
 
 
 Route::post('/pagamento', [StripeController::class, 'treinoStripe'])->name('stripe.pagamento');
-
+Route::get('/erro/pagamento', [PagamentoController::class, 'erroPagamento'])->name('erroPagamento');
 
 Route::prefix('usuario')->group(function () {
     Route::post('/', [UserController::class, 'store'])->name('user.store');
@@ -29,6 +29,60 @@ Route::prefix('usuario')->group(function () {
     Route::post('/login', [UserController::class, 'login'])->name('user.login');
 });
 
+Route::post('/webhook/asaas', [PagamentoController::class, 'webhookAsaas'])->name('webhook.asaas');
+
+
+
+// Grupo de rotas para gerenciamento de gateways de pagamento
+Route::prefix('empresa/pagamento')->middleware(['auth'])->group(function () {
+    // Listar todos os gateways configurados
+    Route::get('/', [PagamentoController::class, 'index'])->name('empresa.pagamento.index');
+
+    // Exibir formulário de criação de gateway
+    Route::get('/create', [PagamentoController::class, 'create'])->name('empresa.pagamento.create');
+
+    // Salvar novo gateway
+    Route::post('/store', [PagamentoController::class, 'store'])->name('empresa.pagamento.store');
+
+    // Exibir formulário de edição de gateway
+    Route::get('/{id}/edit', [PagamentoController::class, 'edit'])->name('empresa.pagamento.edit');
+
+    // Atualizar gateway existente
+    Route::put('/{id}', [PagamentoController::class, 'update'])->name('empresa.pagamento.update');
+
+    // Testar conexão com o gateway
+    Route::post('/test', [PagamentoController::class, 'test'])->name('empresa.pagamento.test');
+
+    // Processar pagamento com Asaas
+    Route::post('/asaas', [PagamentoController::class, 'pagamentoAsaas'])->name('empresa.pagamento.asaas');
+});
+
+// Rota para o webhook do Asaas (sem autenticação, pois é chamada pela API do Asaas)
+Route::post('/webhook/asaas', [PagamentoController::class, 'webhookAsaas'])->name('webhook.asaas');
+
+// Rota para página de sucesso no checkout (já mencionada no seu controlador)
+Route::get('/checkout/sucesso/{id}', [HomeController::class, 'checkoutSucesso'])->name('home.checkoutsucesso');
+
+// Rota para página de erro no pagamento (já mencionada no seu controlador)
+Route::get('/erro/pagamento', [PagamentoController::class, 'erroPagamento'])->name('erroPagamento');
+
+Route::prefix('empresa/pagamento')->group(function () {
+    Route::get('/', [PagamentoController::class, 'index'])->name('empresa.pagamento.index');
+    Route::get('/create', [PagamentoController::class, 'create'])->name('empresa.pagamento.create');
+    Route::post('/store', [PagamentoController::class, 'store'])->name('empresa.pagamento.store');
+    Route::get('/{id}/edit', [PagamentoController::class, 'edit'])->name('empresa.pagamento.edit');
+    Route::put('/{id}', [PagamentoController::class, 'update'])->name('empresa.pagamento.update');
+});
+
+
+Route::prefix('integracoes')->group(function () {
+    Route::get('/asaas', [IntegrationsController::class, 'asaas'])->name('integracoes.asaas');
+    Route::get('/stripe', [IntegrationsController::class, 'stripe'])->name('integracoes.stripe');
+    Route::get('/mercadopago', [IntegrationsController::class, 'mercadopago'])->name('integracoes.mercadopago');
+    Route::get('/configuracoes', [IntegrationsController::class, 'configuracoes'])->name('integracoes.configuracoes');
+    Route::get('/relatorios', [IntegrationsController::class, 'relatorios'])->name('integracoes.relatorios');
+    Route::post('/salvar', [IntegrationsController::class, 'salvar'])->name('integracoes.asaas.salvar');
+});
 
 Route::prefix('configuracoes')->group(function () {
     Route::get('/admin', [ConfiguracoesController::class, 'indexAdmin'])->name('configuracoes.indexAdmin');

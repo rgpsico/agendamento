@@ -154,6 +154,7 @@ class HomeController extends Controller
     public function checkoutAuth($user_id)
     {
 
+       
         $model = $this->model::with('paymentGateways')->where('user_id', $user_id)->first();
         $professor_id = Professor::with('usuario')->where('usuario_id', $user_id)->first();
 
@@ -163,7 +164,7 @@ class HomeController extends Controller
             ->value('api_key');
 
         return view(
-            $this->view . '.checkoutAuth',
+            $this->view . '.checkoutAuthAsaas',
             [
                 'pageTitle' => $this->pageTitle,
                 'token_gateway' => $token_gateway,

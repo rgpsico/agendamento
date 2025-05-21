@@ -108,3 +108,14 @@ Route::post('/treino/email', [AlunosControllerApi::class, 'treinoEmail']);
 
 Route::post('/treino/service', [AlunosControllerApi::class, 'service']);
 Route::get('/treino/cobrancas', [AlunosControllerApi::class, 'getCobrancas']);
+
+Route::post('/admin/asaas/limpar-sandbox', [PagamentoController::class, 'deleteAllPayments']);
+ 
+Route::prefix('empresa/pagamento')->group(function () {
+    Route::get('/', [PagamentoController::class, 'index'])->name('empresa.pagamento.index');
+    Route::get('/create', [PagamentoController::class, 'create'])->name('empresa.pagamento.create');
+    Route::post('/store', [PagamentoController::class, 'store'])->name('empresa.pagamento.store');
+    Route::get('/{id}/edit', [PagamentoController::class, 'edit'])->name('empresa.pagamento.edit');
+    Route::put('/{id}', [PagamentoController::class, 'update'])->name('empresa.pagamento.update');
+    Route::post('/asaas', [PagamentoController::class, 'pagamentoAsaas'])->name('empresa.pagamento.asaas');
+});

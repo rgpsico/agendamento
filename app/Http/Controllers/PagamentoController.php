@@ -9,6 +9,7 @@ use App\Models\Alunos;
 use App\Models\Empresa;
 use App\Models\PagamentoGateway;
 use App\Models\Professor;
+use App\Services\AsaasService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -19,10 +20,12 @@ use Stripe\Charge;
 class PagamentoController extends Controller
 {
     protected $aluno_professor;
+    protected $asaasService;
 
-    public function __construct(AlunoProfessor $aluno_professor)
+    public function __construct(AlunoProfessor $aluno_professor, AsaasService $asaasService)
     {
-        $this->aluno_professor  =   $aluno_professor;
+        $this->aluno_professor = $aluno_professor;
+        $this->asaasService = $asaasService;
     }
 
     public function index()
@@ -30,104 +33,85 @@ class PagamentoController extends Controller
         $empresa_id = Auth::user()->empresa->id;
         $pagamento = PagamentoGateway::where('empresa_id', $empresa_id)->get();
 
-        return view(
-            'admin.pagamento.index',
-            [
-                'pageTitle' =>  'Cadastrar Pagamento',
-                'model' => $pagamento,
-                'route' => null
-            ]
-        );
+        return view('admin.pagamento.index', [
+            'pageTitle' => 'Configurações de Pagamento',
+            'model' => $pagamento,
+            'route' => null
+        ]);
     }
 
     public function create()
     {
-        return view(
-            'admin.pagamento.create',
-            [
-                'pageTitle' =>  'Cadastrar Pagamento',
-                'model' => null
-            ]
-        );
+        return view('admin.pagamento.create', [
+            'pageTitle' => 'Cadastrar Gateway de Pagamento',
+            'model' => null
+        ]);
     }
 
     public function edit($pagamentoID)
     {
+        $model = PagamentoGateway::where('id', $pagamentoID)->firstOrFail();
 
-        $model = PagamentoGateway::where('id', $pagamentoID)->first();
-
-
-        return view(
-            'admin.pagamento.create',
-            [
-                'pageTitle' =>  'Cadastrar Pagamento',
-                'model' => $model
-            ]
-        );
+        return view('admin.pagamento.create', [
+            'pageTitle' => 'Editar Gateway de Pagamento',
+            'model' => $model
+        ]);
     }
 
     public function store(Request $request)
     {
-        // Validando os dados de entrada
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'api_key' => 'required|string'
-            // 'additional_config' => 'nullable|string', // assumindo que é um campo opcional
-            // 'empresa_id' => 'required|integer|exists:empresas,id', // Validação de existência na tabela de empresas
+            'name' => 'required|in:asaas,stripe,mercadopago',
+            'api_key' => 'required|string',
+            'mode' => 'required|in:sandbox,production',
+            'methods' => 'array|in:pix,boleto,card',
+            'split_account' => 'required|string',
+            'tariff_type' => 'required|in:fixed,percentage',
+            'tariff_value' => 'required|numeric|min:0',
+            'status' => 'required|boolean',
         ]);
 
-
         if ($request->status == 1) {
-            PagamentoGateway::where('empresa_id', $request->empresa_id)
+            PagamentoGateway::where('empresa_id', Auth::user()->empresa->id)
                 ->update(['status' => 0]);
         }
 
-        // Criando o novo pagamento com o status fornecido (pode ser 1 ou 0)
+        PagamentoGateway::create(array_merge($validated, [
+            'empresa_id' => Auth::user()->empresa->id
+        ]));
 
-        $pagamento = PagamentoGateway::create([
-            'name' => $validated['name'],
-            'api_key' => $validated['api_key'],
-            'status' => $request->status,
-            //'additional_config' => $validated['additional_config'] ?? null, // Usando o operador null coalesce
-            'empresa_id' => $request->empresa_id // Certifique-se de que este campo é esperado pelo modelo
-        ]);
-
-
-        return redirect()->route('empresa.pagamento.create')->with('success', 'Pagamento cadastrado com sucesso!');
+        return redirect()->route('empresa.pagamento.index')->with('success', 'Gateway cadastrado com sucesso!');
     }
 
     public function update(Request $request, $id)
     {
-        // Validando os dados de entrada
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|in:asaas,stripe,mercadopago',
             'api_key' => 'required|string',
-            // 'additional_config' => 'nullable|string', // Se você decidir usar este campo
+            'mode' => 'required|in:sandbox,production',
+            'methods' => 'array|in:pix,boleto,card',
+            'split_account' => 'required|string',
+            'tariff_type' => 'required|in:fixed,percentage',
+            'tariff_value' => 'required|numeric|min:0',
+            'status' => 'required|boolean',
         ]);
 
-        // Buscando o registro existente
         $pagamento = PagamentoGateway::findOrFail($id);
 
         if ($request->status == 1) {
-            PagamentoGateway::where('empresa_id', $request->empresa_id)
+            PagamentoGateway::where('empresa_id', Auth::user()->empresa->id)
                 ->update(['status' => 0]);
         }
 
-        // Atualizando o registro
-        $pagamento->update([
-            'name' => $validated['name'],
-            'api_key' => $validated['api_key'],
-            'status' => $request->status, // Se este campo for utilizado
-            'empresa_id' => $request->empresa_id, // Assumindo que empresa_id vem do request e é válido
-        ]);
+        $pagamento->update(array_merge($validated, [
+            'empresa_id' => Auth::user()->empresa->id
+        ]));
 
-        // Redirecionando para a página desejada com uma mensagem de sucesso
-        return redirect()->route('empresa.pagamento.edit', $pagamento->id)->with('success', 'Pagamento atualizado com sucesso!');
+        return redirect()->route('empresa.pagamento.index')->with('success', 'Gateway atualizado com sucesso!');
     }
 
+    
 
-
-    //acct_1P23pLPi8YEsgyY7
     public function pagamentoStripe(Request $request)
     {
 
@@ -219,68 +203,247 @@ class PagamentoController extends Controller
         }
     }
 
+    public function test(Request $request)
+    {
+        $request->validate([
+            'api_key' => 'required|string',
+            'gateway' => 'required|in:asaas,stripe,mercadopago',
+        ]);
+
+     
+        if ($request->gateway == 'asaas') {
+            try {
+                $this->asaasService->testConnection($request->api_key);
+                return response()->json(['success' => true]);
+            } catch (\Exception $e) {
+                return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+            }
+        }
+
+        return response()->json(['success' => false, 'error' => 'Gateway não suportado para teste'], 400);
+    }
+
+    public function erroPagamento()
+    {
+        $error = session('error') ?? 'Ocorreu um erro desconhecido ao processar o pagamento. Tente novamente.';
+        return view('admin.pagamento.erro', [
+            'pageTitle' => 'Erro no Pagamento',
+            'error' => $error
+        ]);
+    }
+
+
+
+    public function deleteAllPayments($apiKey, $mode)
+{
+    dd('aaa');
+    $client = new Client();
+    $url = rtrim($this->url, '/') . '/api/v3/payments';
+
+    $response = $client->request('GET', $url, [
+        'headers' => array_merge($this->headers, ['access_token' => $apiKey]),
+    ]);
+
+    $payments = json_decode($response->getBody(), true)['data'] ?? [];
+    foreach ($payments as $payment) {
+        $client->request('DELETE', $url . '/' . $payment['id'], [
+            'headers' => array_merge($this->headers, ['access_token' => $apiKey]),
+        ]);
+        \Log::info('Cobrança excluída: ' . $payment['id']);
+    }
+}
+
+    public function pagamentoAsaas(Request $request)
+{
+   
+   
+   
+  
+    $validated = $request->validate([
+        'aluno_id' => 'required|exists:alunos,id',
+        'professor_id' => 'required|exists:professores,id',
+        'valor_aula' => 'required|numeric|min:0',
+        'modalidade_id' => 'required|exists:modalidade,id',
+        'data_aula' => 'required|string',
+        'hora_aula' => 'required|string',
+        'titulo' => 'required|string',
+       // 'cpfCnpj' => 'required|string|min:11', // Adicionado validação para cpfCnpj
+    ]);
+  
+    $request->cpfCnpj = '12345678909';
+    $aluno = Alunos::with('usuario')->find($validated['aluno_id']);
+    $professor = Professor::with('usuario.empresa')->find($validated['professor_id']);
+
+    if (!$aluno || !$professor || !$professor->usuario || !$professor->usuario->empresa) {
+        return redirect()->route('erroPagamento')->with('error', 'Aluno, professor ou empresa não encontrados.');
+    }
+
+    // Verificar se o nome do aluno está presente
+    if (empty($aluno->usuario->nome) || is_null($aluno->usuario->nome)) {
+        return redirect()->route('erroPagamento')->with('error', 'O nome do aluno não foi informado no sistema.');
+    }
+  
+    $empresa = $professor->usuario->empresa;
+    $gateway = PagamentoGateway::where('empresa_id', $empresa->id)
+        ->where('name', 'asaas')
+        ->where('status', 1)
+        ->first();
+      
+    if (!$gateway) {
+        return redirect()->route('erroPagamento')->with('error', 'Nenhum gateway Asaas ativo configurado para esta empresa.');
+    }
+
+    $data_aula = self::convertToUSFormat($validated['data_aula']) . ' ' . $validated['hora_aula'];
+
+    // Limpar o CPF/CNPJ (remover caracteres não numéricos)
+    $cpfCnpj = preg_replace('/[^0-9]/', '', $request->cpfCnpj);
+
+    // Verificar se o CPF/CNPJ tem um tamanho válido
+    if (strlen($cpfCnpj) < 11 || (strlen($cpfCnpj) > 11 && strlen($cpfCnpj) < 14) || strlen($cpfCnpj) > 14) {
+        return redirect()->route('erroPagamento')->with('error', 'CPF/CNPJ inválido. O CPF deve ter 11 dígitos e o CNPJ 14 dígitos.');
+    }
+  
+    // Buscar cliente existente no Asaas pelo e-mail
+    $clienteData = [
+        'name' => $aluno->usuario->nome,
+        'email' => $aluno->usuario->email,
+        'cpfCnpj' => '12345678909', // Usar o CPF/CNPJ já formatado e validado
+    ];
+
+    \Log::info('Dados do cliente enviados: ' . json_encode($clienteData));
+
+    $clientes = $this->asaasService->getClients($gateway->api_key, $gateway->mode);
+ 
+    $clienteExistente = collect($clientes['data'] ?? [])->firstWhere('email', $aluno->usuario->email);
+
+    $clienteId = null;
+  
+    if ($clienteExistente) {
+      
+        $clienteId = $clienteExistente['id'];
+        
+        // Verificar se precisamos atualizar o CPF/CNPJ do cliente existente
+        if (empty($clienteExistente['cpfCnpj']) && !empty($cpfCnpj)) {
+            $this->asaasService->updateCustomer($clienteExistente['id'], ['cpfCnpj' => $cpfCnpj], $gateway->api_key, $gateway->mode);
+        }
+    } else {
+        // Criar novo cliente
+        $novoCliente = $this->asaasService->createCustomer($clienteData, $gateway->api_key, $gateway->mode);
+        
+        if (isset($novoCliente['errors'])) {
+            \Log::error('Erro ao criar cliente: ' . json_encode($novoCliente));
+            return redirect()->route('erroPagamento')->with('error', 'Erro ao criar cliente: ' . ($novoCliente['errors'][0]['description'] ?? 'Erro desconhecido'));
+        }
+        
+        $clienteId = $novoCliente['id'];
+    }
+
+    // Verificar se temos um ID de cliente válido
+    if (!$clienteId) {
+        return redirect()->route('erroPagamento')->with('error', 'Não foi possível criar ou encontrar o cliente no Asaas.');
+    }
+   
+    // Calcular tarifa
+    $tariff = $gateway->tariff_type == 'percentage'
+        ? $validated['valor_aula'] * ($gateway->tariff_value / 100)
+        : $gateway->tariff_value;
+
+    $valor_cobranca = $validated['valor_aula'] + $tariff;
+
+    // Criar cobrança
+    $cobrancaData = [
+        'customer' => $clienteId,
+        'billingType' => in_array('pix', $gateway->methods ?? []) ? 'PIX' : 'CREDIT_CARD',
+        'value' => $valor_cobranca,
+        'dueDate' => now()->addDays(1)->format('Y-m-d'),
+        'description' => $validated['titulo'],
+    ];
+
+    
+    // Desativar o split no sandbox para evitar o erro
+    if ($gateway->mode == 'production' && $gateway->split_account) {
+        // Em produção, adicionar o split para a tarifa do dono do SaaS
+        $cobrancaData['split'] = [
+            [
+                'walletId' => $gateway->split_account,
+                'fixedValue' => $tariff,
+            ],
+        ];
+    } else {
+        \Log::warning('Split desativado: modo sandbox.');
+        // No sandbox, usar apenas o valor da aula, sem tarifa, para simplificar os testes
+        $valor_cobranca = $validated['valor_aula'];
+        $cobrancaData['value'] = $valor_cobranca;
+    }
+  
+    \Log::info('Dados da cobrança enviados: ' . json_encode($cobrancaData));
+
+    try {
+      
+        $cobranca = $this->asaasService->cobranca($cobrancaData, $gateway->api_key, $gateway->mode);
+     
+        if (isset($cobranca['errors'])) {
+            \Log::error('Erro na resposta da cobrança: ' . json_encode($cobranca));
+            return redirect()->route('erroPagamento')->with('error', 'Erro ao criar cobrança: ' . ($cobranca['errors'][0]['description'] ?? 'Erro desconhecido'));
+        }
+
+        if ($cobranca['status'] == 'PENDING') {
+            $aluno->professores()->attach($professor);
+        
+            Agendamento::create([
+                'aluno_id' => $validated['aluno_id'],
+                'modalidade_id' => $validated['modalidade_id'],
+                'professor_id' => $validated['professor_id'],
+                'data_da_aula' => $data_aula,
+                'valor_aula' => $validated['valor_aula'],
+                'horario' => $validated['hora_aula'],
+                'gateway_id' => $gateway->id,
+                'cobranca_id' => $cobranca['id'],
+            ]);
+            
+           
+            return redirect()->route('home.checkoutsucesso', ['id' => $professor->id]);
+              
+        }
+        
+        return redirect()->route('erroPagamento')->with('error', 'Status da cobrança diferente de PENDING: ' . ($cobranca['status'] ?? 'Desconhecido'));
+    } catch (\Exception $e) {
+        \Log::error('Exceção ao criar cobrança: ' . $e->getMessage());
+        return redirect()->route('erroPagamento')->with('error', 'Erro ao criar cobrança: ' . $e->getMessage());
+    }
+}
+    // Funções de conversão mantidas como no original
     public static function convertToBRL($amount, $from_currency)
     {
-        // Defina as taxas de câmbio aqui ou use uma API de terceiros para obter as taxas de câmbio em tempo real
         $exchange_rates = [
-            'USD' => 50, // Exemplo de taxa de câmbio USD -> BRL
-            // Adicione mais taxas de câmbio conforme necessário para outras moedas
+            'USD' => 5.0, // Atualize com uma API de câmbio real
         ];
 
-        // Verifique se a moeda de origem está presente nas taxas de câmbio
         if (isset($exchange_rates[$from_currency])) {
-            // Converta o valor para BRL usando a taxa de câmbio
-            $brl_amount = $amount * $exchange_rates[$from_currency];
-            return $brl_amount;
-        } else {
-            throw new \Exception("Taxa de câmbio para '$from_currency' não encontrada.");
+            return $amount * $exchange_rates[$from_currency];
         }
+
+        throw new \Exception("Taxa de câmbio para '$from_currency' não encontrada.");
     }
-
-
-    public static function convertToUSD($amount, $from_currency)
-    {
-        // Defina as taxas de câmbio aqui ou use uma API de terceiros para obter as taxas de câmbio em tempo real
-        $exchange_rates = [
-            'BRL' => 0.18, // Exemplo de taxa de câmbio BRL -> USD
-            // Adicione mais taxas de câmbio conforme necessário para outras moedas
-        ];
-
-        // Verifique se a moeda de origem está presente nas taxas de câmbio
-        if (isset($exchange_rates[$from_currency])) {
-            // Converta o valor para USD usando a taxa de câmbio
-            $usd_amount = $amount * $exchange_rates[$from_currency];
-            return $usd_amount;
-        } else {
-            throw new \Exception("Taxa de câmbio para '$from_currency' não encontrada.");
-        }
-    }
-
-
 
     public static function convertToUSFormat($originalDate)
     {
-        // Se a data já estiver no formato correto YYYY-MM-DD, apenas a retorna
         if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $originalDate)) {
             return $originalDate;
         }
 
-        // Remove pontos após os meses (caso existam)
         $originalDate = str_replace(
             [' jan. ', ' fev. ', ' mar. ', ' abr. ', ' mai. ', ' jun. ', ' jul. ', ' ago. ', ' set. ', ' out. ', ' nov. ', ' dez. '],
             [' jan ', ' fev ', ' mar ', ' abr ', ' mai ', ' jun ', ' jul ', ' ago ', ' set ', ' out ', ' nov ', ' dez '],
             $originalDate
         );
 
-        // Divide a string para extrair dia, mês e ano
         $parts = explode(' ', trim($originalDate));
 
-        // Verifica se a data está completa (deve ter 3 partes: dia, mês, ano)
         if (count($parts) !== 3) {
             throw new \Exception("Formato de data inválido: '{$originalDate}'. Esperado: '3 fev 2025'");
         }
 
-        // Mapeamento de meses
         $months = [
             'jan' => '01',
             'fev' => '02',
@@ -296,18 +459,15 @@ class PagamentoController extends Controller
             'dez' => '12',
         ];
 
-        $day = $parts[0]; // Dia
-        $monthAbbrev = strtolower($parts[1]); // Mês abreviado (ex: 'fev')
-        $year = $parts[2]; // Ano
+        $day = $parts[0];
+        $monthAbbrev = strtolower($parts[1]);
+        $year = $parts[2];
 
-        // Verifica se o mês é válido
         if (!isset($months[$monthAbbrev])) {
             throw new \Exception("Mês inválido: '{$monthAbbrev}' na data '{$originalDate}'.");
         }
 
-        $monthNumber = $months[$monthAbbrev]; // Converte o mês para número
-
-        // Retorna a data no formato "Y-m-d"
+        $monthNumber = $months[$monthAbbrev];
         return "{$year}-{$monthNumber}-{$day}";
     }
 }
