@@ -32,6 +32,9 @@ Route::prefix('usuario')->group(function () {
 Route::post('/webhook/asaas', [PagamentoController::class, 'webhookAsaas'])->name('webhook.asaas');
 
 
+Route::get('/integracao', [PagamentoController::class, 'mostrarIntegracao'])->name('integracao.assas.escola')->middleware('auth');
+Route::post('/integrar/asaas', [PagamentoController::class, 'integrarAsaas'])->name('integrar.asaas');
+
 
 // Grupo de rotas para gerenciamento de gateways de pagamento
 Route::prefix('empresa/pagamento')->middleware(['auth'])->group(function () {

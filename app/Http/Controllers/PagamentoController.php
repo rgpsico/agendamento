@@ -16,16 +16,19 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Stripe\Stripe;
 use Stripe\Charge;
+use GuzzleHttp\Client; // Importar a classe Client do Guzzle
 
 class PagamentoController extends Controller
 {
     protected $aluno_professor;
     protected $asaasService;
+    protected $url;
 
     public function __construct(AlunoProfessor $aluno_professor, AsaasService $asaasService)
     {
         $this->aluno_professor = $aluno_professor;
         $this->asaasService = $asaasService;
+        $this->url = env("ASAAS_URL");
     }
 
     public function index()
@@ -232,11 +235,22 @@ class PagamentoController extends Controller
         ]);
     }
 
+    public function mostrarIntegracao()
+    {
+        // Verifica se o usuário está logado e é um professor
+        if (!Auth::check() || !Auth::user()->professor) {
+            return redirect()->route('login')->with('error', 'Você precisa estar logado como professor.');
+        }
+
+        return view('admin.integracoes.escolaassas');
+    }
     public function integrarAsaas(Request $request)
     {
         $professorId = $request->input('professor_id');
         $professor = Professor::with('usuario')->find($professorId);
-    
+        $asaasService = new AsaasService();
+
+        
         if (!$professor || !$professor->usuario) {
             return response()->json(['success' => false, 'message' => 'Professor não encontrado.'], 400);
         }
@@ -245,198 +259,203 @@ class PagamentoController extends Controller
         if (!$gateway) {
             return response()->json(['success' => false, 'message' => 'Gateway Asaas não configurado.'], 400);
         }
+
+       return  $wallet = $this->getCustomerWallet('cus_000006716270', $gateway->api_key, $gateway->mode);
+     
+        // $clienteData = [
+        //     'name' => $professor->usuario->nome,
+        //     'email' => $professor->usuario->email ?? 'teste@12212.com',
+        //     'cpfCnpj' => $professor->usuario->cpf ?? '71180274059',
+        //     'phone' => $professor->usuario->telefone ?? '21987654321',
+        //     // Adicionar campos adicionais que possam ajudar na ativação da conta
+        //     'mobilePhone' => $professor->usuario->celular ?? $professor->usuario->telefone ?? '21987654321',
+        //     'notificationDisabled' => false,
+        // ];
     
-        // Dados do professor para criar cliente no Asaas
-        $clienteData = [
-            'name' => $professor->usuario->nome,
-            'email' => $professor->usuario->email,
-            'cpfCnpj' => $professor->usuario->cpf ?? '98765432100', // CPF válido como fallback
-            'phone' => $professor->usuario->telefone ?? '21987654321',
+        
+    }
+    
+    public function getCustomerWallet($customerId, $apiKey, $mode)
+    {
+        $client = new Client();
+        $url = ($mode === 'sandbox' ? 'https://sandbox.asaas.com' : 'https://api.asaas.com') . "/api/v3/customers/{$customerId}";
+
+        // Definir os headers diretamente no método
+        $headers = [
+            'access_token' => $apiKey,
+            'Content-Type' => 'application/json',
         ];
+
+        \Log::info('Headers enviados para getCustomerWallet: ' . json_encode($headers));
+        \Log::info('URL da requisição: ' . $url);
+
+        try {
+            $response = $client->request('GET', $url, [
+                'headers' => $headers, // Usar $headers diretamente, sem $this->headers
+            ]);
+
+            $statusCode = $response->getStatusCode();
+            $body = json_decode($response->getBody(), true);
+
+            \Log::info('Resposta do Asaas para getCustomerWallet: ' . json_encode($body));
+
+            return ['walletId' => $body['walletId'] ?? null];
+        } catch (\Exception $e) {
+            \Log::error('Erro ao obter wallet: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+    
+    /**
+     * Método para tentar encontrar um cliente pelo CPF/CNPJ
+     */
+    public function findCustomerByCpfCnpj($cpfCnpj, $apiKey, $mode)
+    {
+        $client = new Client();
+        $url = rtrim($this->url, '/') . "/api/v3/customers?cpfCnpj=" . urlencode($cpfCnpj);
     
         try {
-            $asaasService = new AsaasService();
-            $cliente = $asaasService->createCustomer($clienteData, $gateway->api_key, $gateway->mode);
-            $customerId = $cliente['id'];
-    
-            // Obter walletId
-            $wallet = $asaasService->getCustomerWallet($customerId, $gateway->api_key, $gateway->mode);
-            $walletId = $wallet['walletId'];
-    
-            // Salvar os IDs no modelo Professor (opcional)
-            $professor->update([
-                'asaas_customer_id' => $customerId,
-                'asaas_wallet_id' => $walletId,
+            $response = $client->request('GET', $url, [
+                'headers' => array_merge($this->headers, ['access_token' => $apiKey]),
             ]);
     
-            return response()->json([
-                'success' => true,
-                'customerId' => $customerId,
-                'walletId' => $walletId,
-                'message' => 'Integração com Asaas concluída com sucesso!'
-            ]);
+            $result = $this->tratarResposta($response->getStatusCode(), json_decode($response->getBody(), true));
+            \Log::info('Resposta da busca de cliente por CPF/CNPJ: ' . json_encode($result));
+    
+            // Verificar se existe algum cliente na resposta
+            if (isset($result['data']) && is_array($result['data']) && count($result['data']) > 0) {
+                return $result['data'][0]; // Retorna o primeiro cliente encontrado
+            }
+    
+            return null;
         } catch (\Exception $e) {
-            \Log::error('Erro ao integrar com Asaas: ' . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'Erro ao integrar: ' . $e->getMessage()], 500);
+            \Log::error('Erro ao buscar cliente por CPF/CNPJ: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+    
+    /**
+     * Método para tentar criar uma carteira para o cliente (caso o Asaas tenha um endpoint específico para isso)
+     */
+    public function createCustomerWallet($customerId, $apiKey, $mode)
+    {
+        $client = new Client();
+        // Verifique na documentação do Asaas se existe um endpoint específico para criar carteiras
+        $url = rtrim($this->url, '/') . "/api/v3/customers/{$customerId}/wallet";
+    
+        try {
+            $response = $client->request('POST', $url, [
+                'headers' => array_merge($this->headers, ['access_token' => $apiKey]),
+                'json' => [
+                    'customerId' => $customerId,
+                    'active' => true
+                ]
+            ]);
+    
+            $wallet = $this->tratarResposta($response->getStatusCode(), json_decode($response->getBody(), true));
+            \Log::info('Resposta da criação de wallet: ' . json_encode($wallet));
+    
+            return $wallet;
+        } catch (\Exception $e) {
+            \Log::error('Erro ao criar wallet: ' . $e->getMessage());
+            throw $e;
         }
     }
 
     public function deleteAllPayments($apiKey, $mode)
-{
-    
-    $client = new Client();
-    $url = rtrim($this->url, '/') . '/api/v3/payments';
+    {
+        
+        $client = new Client();
+        $url = rtrim($this->url, '/') . '/api/v3/payments';
 
-    $response = $client->request('GET', $url, [
-        'headers' => array_merge($this->headers, ['access_token' => $apiKey]),
-    ]);
-
-    $payments = json_decode($response->getBody(), true)['data'] ?? [];
-    foreach ($payments as $payment) {
-        $client->request('DELETE', $url . '/' . $payment['id'], [
+        $response = $client->request('GET', $url, [
             'headers' => array_merge($this->headers, ['access_token' => $apiKey]),
         ]);
-        \Log::info('Cobrança excluída: ' . $payment['id']);
+
+        $payments = json_decode($response->getBody(), true)['data'] ?? [];
+        foreach ($payments as $payment) {
+            $client->request('DELETE', $url . '/' . $payment['id'], [
+                'headers' => array_merge($this->headers, ['access_token' => $apiKey]),
+            ]);
+            \Log::info('Cobrança excluída: ' . $payment['id']);
+        }
     }
-}
 
     public function pagamentoAsaas(Request $request)
-{
-   
-   
-   
-  
-    $validated = $request->validate([
-        'aluno_id' => 'required|exists:alunos,id',
-        'professor_id' => 'required|exists:professores,id',
-        'valor_aula' => 'required|numeric|min:0',
-        'modalidade_id' => 'required|exists:modalidade,id',
-        'data_aula' => 'required|string',
-        'hora_aula' => 'required|string',
-        'titulo' => 'required|string',
-       // 'cpfCnpj' => 'required|string|min:11', // Adicionado validação para cpfCnpj
-    ]);
-  
-    $request->cpfCnpj = '12345678909';
-    $aluno = Alunos::with('usuario')->find($validated['aluno_id']);
-    $professor = Professor::with('usuario.empresa')->find($validated['professor_id']);
+    {
+        $validated = $request->validate([
+            'aluno_id' => 'required|exists:alunos,id',
+            'professor_id' => 'required|exists:professores,id',
+            'valor_aula' => 'required|numeric|min:0',
+            'modalidade_id' => 'required|exists:modalidade,id',
+            'data_aula' => 'required|string',
+            'hora_aula' => 'required|string',
+            'titulo' => 'required|string',
+        ]);
 
-    if (!$aluno || !$professor || !$professor->usuario || !$professor->usuario->empresa) {
-        return redirect()->route('erroPagamento')->with('error', 'Aluno, professor ou empresa não encontrados.');
-    }
+        $aluno = Alunos::with('usuario')->find($validated['aluno_id']);
+        $professor = Professor::with('usuario')->find($validated['professor_id']);
 
-    // Verificar se o nome do aluno está presente
-    if (empty($aluno->usuario->nome) || is_null($aluno->usuario->nome)) {
-        return redirect()->route('erroPagamento')->with('error', 'O nome do aluno não foi informado no sistema.');
-    }
-  
-    $empresa = $professor->usuario->empresa;
-    $gateway = PagamentoGateway::where('empresa_id', $empresa->id)
-        ->where('name', 'asaas')
-        ->where('status', 1)
-        ->first();
-      
-    if (!$gateway) {
-        return redirect()->route('erroPagamento')->with('error', 'Nenhum gateway Asaas ativo configurado para esta empresa.');
-    }
-
-    $data_aula = self::convertToUSFormat($validated['data_aula']) . ' ' . $validated['hora_aula'];
-
-    // Limpar o CPF/CNPJ (remover caracteres não numéricos)
-    $cpfCnpj = preg_replace('/[^0-9]/', '', $request->cpfCnpj);
-
-    // Verificar se o CPF/CNPJ tem um tamanho válido
-    if (strlen($cpfCnpj) < 11 || (strlen($cpfCnpj) > 11 && strlen($cpfCnpj) < 14) || strlen($cpfCnpj) > 14) {
-        return redirect()->route('erroPagamento')->with('error', 'CPF/CNPJ inválido. O CPF deve ter 11 dígitos e o CNPJ 14 dígitos.');
-    }
-  
-    // Buscar cliente existente no Asaas pelo e-mail
-    $clienteData = [
-        'name' => $aluno->usuario->nome,
-        'email' => $aluno->usuario->email,
-        'cpfCnpj' => '12345678909', // Usar o CPF/CNPJ já formatado e validado
-    ];
-
-    \Log::info('Dados do cliente enviados: ' . json_encode($clienteData));
-
-    $clientes = $this->asaasService->getClients($gateway->api_key, $gateway->mode);
- 
-    $clienteExistente = collect($clientes['data'] ?? [])->firstWhere('email', $aluno->usuario->email);
-
-    $clienteId = null;
-  
-    if ($clienteExistente) {
-      
-        $clienteId = $clienteExistente['id'];
-        
-        // Verificar se precisamos atualizar o CPF/CNPJ do cliente existente
-        if (empty($clienteExistente['cpfCnpj']) && !empty($cpfCnpj)) {
-            $this->asaasService->updateCustomer($clienteExistente['id'], ['cpfCnpj' => $cpfCnpj], $gateway->api_key, $gateway->mode);
+        if (!$aluno || !$professor || !$professor->usuario || !$aluno->usuario) {
+            return redirect()->route('erroPagamento')->with('error', 'Aluno ou professor não encontrados.');
         }
-    } else {
-        // Criar novo cliente
-        $novoCliente = $this->asaasService->createCustomer($clienteData, $gateway->api_key, $gateway->mode);
+
+        $empresa = $professor->usuario->empresa;
+        $gateway = PagamentoGateway::where('empresa_id', $empresa->id)
+            ->where('name', 'asaas')
+            ->where('status', 1)
+            ->first();
+      
+        if (!$gateway) {
+            return redirect()->route('erroPagamento')->with('error', 'Nenhum gateway Asaas ativo configurado.');
+        }   
         
-        if (isset($novoCliente['errors'])) {
-            \Log::error('Erro ao criar cliente: ' . json_encode($novoCliente));
-            return redirect()->route('erroPagamento')->with('error', 'Erro ao criar cliente: ' . ($novoCliente['errors'][0]['description'] ?? 'Erro desconhecido'));
+        // Verificar se o professor tem walletId
+        if (!$professor->asaas_wallet_id) {
+            return redirect()->route('erroPagamento')->with('error', 'O professor precisa integrar com o Asaas antes de criar a cobrança.');
         }
-        
-        $clienteId = $novoCliente['id'];
-    }
-
-    // Verificar se temos um ID de cliente válido
-    if (!$clienteId) {
-        return redirect()->route('erroPagamento')->with('error', 'Não foi possível criar ou encontrar o cliente no Asaas.');
-    }
-   
-    // Calcular tarifa
-    $tariff = $gateway->tariff_type == 'percentage'
-        ? $validated['valor_aula'] * ($gateway->tariff_value / 100)
-        : $gateway->tariff_value;
-
-    $valor_cobranca = $validated['valor_aula'] + $tariff;
-
-    // Criar cobrança
-    $cobrancaData = [
-        'customer' => $clienteId,
-        'billingType' => in_array('pix', $gateway->methods ?? []) ? 'PIX' : 'CREDIT_CARD',
-        'value' => $valor_cobranca,
-        'dueDate' => now()->addDays(1)->format('Y-m-d'),
-        'description' => $validated['titulo'],
-    ];
-
     
-    // Desativar o split no sandbox para evitar o erro
-    if ($gateway->mode == 'production' && $gateway->split_account) {
-        // Em produção, adicionar o split para a tarifa do dono do SaaS
-        $cobrancaData['split'] = [
-            [
-                'walletId' => $gateway->split_account,
-                'fixedValue' => $tariff,
+        $data_aula = self::convertToUSFormat($validated['data_aula']) . ' ' . $validated['hora_aula'];
+      
+        // Criar ou buscar cliente do aluno
+        $alunoData = [
+            'name' => $aluno->usuario->nome,
+            'email' => $aluno->usuario->email,
+            'cpfCnpj' => $aluno->usuario->cpf ?? '12345678909',
+        ];
+        $clientes = $this->asaasService->getClients($gateway->api_key, $gateway->mode);
+        $alunoExistente = collect($clientes['data'] ?? [])->firstWhere('email', $aluno->usuario->email);
+        $alunoId = $alunoExistente ? $alunoExistente['id'] : $this->asaasService->createCustomer($alunoData, $gateway->api_key, $gateway->mode)['id'];
+
+        // Calcular tarifa
+        $tariff = $gateway->tariff_type == 'percentage'
+            ? $validated['valor_aula'] * ($gateway->tariff_value / 100)
+            : $gateway->tariff_value;
+        $valor_cobranca = $validated['valor_aula'] + $tariff;
+     
+        // Criar cobrança com split
+        $cobrancaData = [
+            'customer' => $alunoId,
+            'billingType' => in_array('pix', $gateway->methods ?? []) ? 'PIX' : 'CREDIT_CARD',
+            'value' => $valor_cobranca,
+            'dueDate' => now()->addDays(1)->format('Y-m-d'),
+            'description' => $validated['titulo'],
+            'split' => [
+                [
+                    'walletId' => $professor->asaas_wallet_id, // Wallet ID do professor
+                    'fixedValue' => $validated['valor_aula'], // Valor que o professor recebe
+                ],
+                [
+                    'walletId' => $gateway->split_account, // Wallet ID do dono do SaaS
+                    'fixedValue' => $tariff, // Tarifa do SaaS
+                ],
             ],
         ];
-    } else {
-        \Log::warning('Split desativado: modo sandbox.');
-        // No sandbox, usar apenas o valor da aula, sem tarifa, para simplificar os testes
-        $valor_cobranca = $validated['valor_aula'];
-        $cobrancaData['value'] = $valor_cobranca;
-    }
-  
-    \Log::info('Dados da cobrança enviados: ' . json_encode($cobrancaData));
 
-    try {
-      
         $cobranca = $this->asaasService->cobranca($cobrancaData, $gateway->api_key, $gateway->mode);
-     
-        if (isset($cobranca['errors'])) {
-            \Log::error('Erro na resposta da cobrança: ' . json_encode($cobranca));
-            return redirect()->route('erroPagamento')->with('error', 'Erro ao criar cobrança: ' . ($cobranca['errors'][0]['description'] ?? 'Erro desconhecido'));
-        }
 
         if ($cobranca['status'] == 'PENDING') {
             $aluno->professores()->attach($professor);
-        
             Agendamento::create([
                 'aluno_id' => $validated['aluno_id'],
                 'modalidade_id' => $validated['modalidade_id'],
@@ -447,18 +466,14 @@ class PagamentoController extends Controller
                 'gateway_id' => $gateway->id,
                 'cobranca_id' => $cobranca['id'],
             ]);
-            
-           
-            return redirect()->route('home.checkoutsucesso', ['id' => $professor->id]);
+
+            dd("aaa");
+            return redirect()->route('home.checkoutsucessoasaas', ['id' => $professor->id]);
               
         }
-        
-        return redirect()->route('erroPagamento')->with('error', 'Status da cobrança diferente de PENDING: ' . ($cobranca['status'] ?? 'Desconhecido'));
-    } catch (\Exception $e) {
-        \Log::error('Exceção ao criar cobrança: ' . $e->getMessage());
-        return redirect()->route('erroPagamento')->with('error', 'Erro ao criar cobrança: ' . $e->getMessage());
+
+        return redirect()->route('erroPagamento')->with('error', 'Erro ao criar cobrança: ' . ($cobranca['errorMessage'] ?? 'Desconhecido'));
     }
-}
     // Funções de conversão mantidas como no original
     public static function convertToBRL($amount, $from_currency)
     {
