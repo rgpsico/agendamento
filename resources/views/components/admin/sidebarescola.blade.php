@@ -140,6 +140,7 @@
                     </a>
                     <ul>
                         <li><a href="{{ route('integracoes.asaas') }}">Asaas</a></li>
+                        {{-- <li><a href="{{ route('integracoes.asaas') }}">Asaas Geral</a></li> --}}
                         <li><a href="{{ route('integracoes.stripe') }}">Stripe</a></li>
                         <li><a href="{{ route('integracoes.mercadopago') }}">Mercado Pago</a></li>
                         <li><a href="{{ route('integracoes.configuracoes') }}">Configurações Gerais</a></li>

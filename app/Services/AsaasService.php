@@ -131,4 +131,23 @@ class AsaasService
 
         throw new \Exception('Resposta desconhecida do servidor');
     }
+
+
+    public function getCustomerWallet($customerId, $apiKey, $mode)
+    {
+        $client = new Client();
+        $url = rtrim($this->url, '/') . "/api/v3/customers/{$customerId}";
+
+        try {
+            $response = $client->request('GET', $url, [
+                'headers' => array_merge($this->headers, ['access_token' => $apiKey]),
+            ]);
+
+            $customer = $this->tratarResposta($response->getStatusCode(), json_decode($response->getBody(), true));
+            return ['walletId' => $customer['walletId'] ?? null];
+        } catch (\Exception $e) {
+            \Log::error('Erro ao obter wallet: ' . $e->getMessage());
+            throw $e;
+        }
+    }
 }

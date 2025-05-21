@@ -232,11 +232,58 @@ class PagamentoController extends Controller
         ]);
     }
 
-
+    public function integrarAsaas(Request $request)
+    {
+        $professorId = $request->input('professor_id');
+        $professor = Professor::with('usuario')->find($professorId);
+    
+        if (!$professor || !$professor->usuario) {
+            return response()->json(['success' => false, 'message' => 'Professor não encontrado.'], 400);
+        }
+    
+        $gateway = PagamentoGateway::where('name', 'asaas')->where('status', 1)->first();
+        if (!$gateway) {
+            return response()->json(['success' => false, 'message' => 'Gateway Asaas não configurado.'], 400);
+        }
+    
+        // Dados do professor para criar cliente no Asaas
+        $clienteData = [
+            'name' => $professor->usuario->nome,
+            'email' => $professor->usuario->email,
+            'cpfCnpj' => $professor->usuario->cpf ?? '98765432100', // CPF válido como fallback
+            'phone' => $professor->usuario->telefone ?? '21987654321',
+        ];
+    
+        try {
+            $asaasService = new AsaasService();
+            $cliente = $asaasService->createCustomer($clienteData, $gateway->api_key, $gateway->mode);
+            $customerId = $cliente['id'];
+    
+            // Obter walletId
+            $wallet = $asaasService->getCustomerWallet($customerId, $gateway->api_key, $gateway->mode);
+            $walletId = $wallet['walletId'];
+    
+            // Salvar os IDs no modelo Professor (opcional)
+            $professor->update([
+                'asaas_customer_id' => $customerId,
+                'asaas_wallet_id' => $walletId,
+            ]);
+    
+            return response()->json([
+                'success' => true,
+                'customerId' => $customerId,
+                'walletId' => $walletId,
+                'message' => 'Integração com Asaas concluída com sucesso!'
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Erro ao integrar com Asaas: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Erro ao integrar: ' . $e->getMessage()], 500);
+        }
+    }
 
     public function deleteAllPayments($apiKey, $mode)
 {
-    dd('aaa');
+    
     $client = new Client();
     $url = rtrim($this->url, '/') . '/api/v3/payments';
 
