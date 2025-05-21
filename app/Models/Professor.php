@@ -17,7 +17,9 @@ class Professor extends Model
         'usuario_id',
         'especialidade',
         'sobre',
-        'avatar'
+        'avatar',
+        'asaas_customer_id', 
+        'asaas_wallet_id'
     ];
 
     public $timestamps = false;
