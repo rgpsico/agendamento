@@ -12,15 +12,7 @@ class IntegrationsController extends Controller
         return view('admin.integracoes.asaas');
     }
 
-    public function mostrarIntegracao()
-    {
-        // Verifica se o usuário está logado e é um professor
-        if (!Auth::check() || !Auth::user()->professor) {
-            return redirect()->route('login')->with('error', 'Você precisa estar logado como professor.');
-        }
-
-        return view('admin.integracoes.escolaassas');
-    }
+   
 
     public function stripe()
     {
