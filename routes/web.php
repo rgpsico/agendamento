@@ -15,7 +15,7 @@ use App\Http\Controllers\SiteController;
 use App\Http\Controllers\SiteServicoController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Admin\UserManagementController;
-
+use App\Http\Controllers\ProfessoresAsaasController;
 
 Route::prefix('admin/usuarios')->name('admin.usuarios.')->group(function() {
     Route::get('/', [UserManagementController::class, 'index'])->name('index');
@@ -45,6 +45,7 @@ Route::get('/google/callback', [SocialLiteController::class, 'alunoGoogleCallbac
 
 
 
+Route::middleware('auth')->post('/subcontas', [ProfessoresAsaasController::class, 'createSubaccount'])->name('criar-subconta-professor');
 
 
 Route::prefix('admin')->group(function () {

@@ -18,6 +18,7 @@ use Stripe\Stripe;
 use Stripe\Charge;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log; // Import the Log facade
 class PagamentoController extends Controller
 {
     protected $aluno_professor;
@@ -240,8 +241,15 @@ class PagamentoController extends Controller
             return redirect()->route('login')->with('error', 'Você precisa estar logado como professor.');
         }
 
-        return view('admin.integracoes.escolaassas');
-    }
+        $professor = Auth::user()->professor;
+        $usuario = Auth::user();
+        
+        // Verificar se já possui integração
+        $jaIntegrado = !empty($professor->asaas_wallet_id);
+        
+        return view('admin.integracoes.escolaassas', compact('professor', 'usuario', 'jaIntegrado'));
+}
+
     public function integrarAsaas(Request $request)
     {
         $professorId = $request->input('professor_id');
@@ -274,7 +282,7 @@ class PagamentoController extends Controller
             $asaasService = new AsaasService();
             $cliente = $asaasService->createCustomer($clienteData, $gateway->api_key, $gateway->mode);
             $customerId = $cliente['id'];
-            dd($customerId);
+          
             \Log::info('Cliente Asaas criado com sucesso: ' . json_encode($cliente));
     
             // Tentar obter o walletId com algumas tentativas, com intervalos entre elas
@@ -502,105 +510,172 @@ class PagamentoController extends Controller
         }
     }
 
-    public function pagamentoAsaas(Request $request)
+   public function pagamentoAsaas(Request $request)
     {
-      
-        
-        $validated = $request->validate([
-            'aluno_id' => 'required|exists:alunos,id',
-            'professor_id' => 'required|exists:professores,id',
-            'valor_aula' => 'required|numeric|min:0',
-            'modalidade_id' => 'required|exists:modalidade,id',
-            'data_aula' => 'required|string',
-            'hora_aula' => 'required|string',
-            'titulo' => 'required|string',
-        ]);
-
-        $aluno = Alunos::with('usuario')->find($validated['aluno_id']);
-        $professor = Professor::with('usuario')->find($validated['professor_id']);
-     
-        if (!$aluno || !$professor || !$professor->usuario || !$aluno->usuario) {
-            return redirect()->route('erroPagamento')->with('error', 'Aluno ou professor não encontrados.');
-        }
-
-        $empresa = $professor->usuario->empresa;
-        $gateway = PagamentoGateway::where('empresa_id', $empresa->id)
-            ->where('name', 'asaas')
-            ->where('status', 1)
-            ->first();
-      
-        if (!$gateway) {
-            dd('gateway');
-            return redirect()->route('erroPagamento')->with('error', 'Nenhum gateway Asaas ativo configurado.');
-        }   
-
-     
-     
-        // Verificar se o professor tem walletId
-        // if (!$professor->asaas_wallet_id) {
-        //     dd('professor');
-        //     return redirect()->route('erroPagamento')->with('error', 'O professor precisa integrar com o Asaas antes de criar a cobrança.');
-        // }
-  
-        $data_aula = self::convertToUSFormat($validated['data_aula']) . ' ' . $validated['hora_aula'];
-       
-        // Criar ou buscar cliente do aluno
-        $alunoData = [
-            'name' => $aluno->usuario->nome,
-            'email' => $aluno->usuario->email,
-            'cpfCnpj' => $aluno->usuario->cpf ?? '12345678909',
-        ];
-        
-        $clientes = $this->asaasService->getClients($gateway->api_key, $gateway->mode);
-        $alunoExistente = collect($clientes['data'] ?? [])->firstWhere('email', $aluno->usuario->email);
-        $alunoId = $alunoExistente ? $alunoExistente['id'] : $this->asaasService->createCustomer($alunoData, $gateway->api_key, $gateway->mode)['id'];
-
-        // Calcular tarifa
-        $tariff = $gateway->tariff_type == 'percentage'
-            ? $validated['valor_aula'] * ($gateway->tariff_value / 100)
-            : $gateway->tariff_value;
-        $valor_cobranca = $validated['valor_aula'] + $tariff;
-     
-        // Criar cobrança com split
-        $cobrancaData = [
-            'customer' => $alunoId,
-            'billingType' => in_array('pix', $gateway->methods ?? []) ? 'PIX' : 'CREDIT_CARD',
-            'value' => $valor_cobranca,
-            'dueDate' => now()->addDays(1)->format('Y-m-d'),
-            'description' => $validated['titulo'],
-            'split' => [
-                [
-                    'walletId' => $professor->asaas_wallet_id, // Wallet ID do professor
-                    'fixedValue' => $validated['valor_aula'], // Valor que o professor recebe
-                ],
-                [
-                    'walletId' => $gateway->split_account, // Wallet ID do dono do SaaS
-                    'fixedValue' => $tariff, // Tarifa do SaaS
-                ],
-            ],
-        ];
-      
-        $cobranca = $this->asaasService->cobranca($cobrancaData, $gateway->api_key, $gateway->mode);
-        
-        if ($cobranca['status'] == 'PENDING') {
-            $aluno->professores()->attach($professor);
-            Agendamento::create([
-                'aluno_id' => $validated['aluno_id'],
-                'modalidade_id' => $validated['modalidade_id'],
-                'professor_id' => $validated['professor_id'],
-                'data_da_aula' => $data_aula,
-                'valor_aula' => $validated['valor_aula'],
-                'horario' => $validated['hora_aula'],
-                'gateway_id' => $gateway->id,
-                'cobranca_id' => $cobranca['id'],
+        try {
+            // Validate request data
+            $validated = $request->validate([
+                'aluno_id' => 'required|exists:alunos,id',
+                'professor_id' => 'required|exists:professores,id',
+                'valor_aula' => 'required|numeric|min:0',
+                'modalidade_id' => 'required|exists:modalidade,id',
+                'data_aula' => 'required|string',
+                'hora_aula' => 'required|string',
+                'titulo' => 'required|string',
             ]);
 
-          
-            return redirect()->route('home.checkoutsucessoasaas', ['id' => $professor->id]);
-              
-        }
+            // Fetch aluno and professor with their associated usuario
+            $aluno = Alunos::with('usuario')->find($validated['aluno_id']);
+            $professor = Professor::with('usuario')->find($validated['professor_id']);
 
-        return redirect()->route('erroPagamento')->with('error', 'Erro ao criar cobrança: ' . ($cobranca['errorMessage'] ?? 'Desconhecido'));
+            // Check if aluno or professor exists
+            if (!$aluno || !$professor || !$professor->usuario || !$aluno->usuario) {
+                Log::error('Aluno or professor not found', [
+                    'aluno_id' => $validated['aluno_id'],
+                    'professor_id' => $validated['professor_id'],
+                ]);
+                return redirect()->route('erroPagamento')->with('error', 'Aluno ou professor não encontrados.');
+            }
+
+            // Fetch the empresa associated with the professor
+            $empresa = $professor->usuario->empresa;
+            
+            if (!$empresa) {
+                Log::error('Empresa not found for professor', [
+                    'professor_id' => $validated['professor_id'],
+                ]);
+                return redirect()->route('erroPagamento')->with('error', 'Empresa não encontrada para o professor.');
+            }
+
+            // Fetch the Asaas gateway for the empresa
+            $gateway = PagamentoGateway::where('empresa_id', $empresa->id)
+                ->where('name', 'asaas')
+                ->where('status', 1)
+                ->first();
+
+            if (!$gateway) {
+                Log::error('No active Asaas gateway found', [
+                    'empresa_id' => $empresa->id,
+                ]);
+                return redirect()->route('erroPagamento')->with('error', 'Nenhum gateway Asaas ativo configurado.');
+            }
+
+            // Verify professor's wallet ID
+            if (!$professor->asaas_wallet_id) {
+                // Log::error('Professor has no Asaas wallet ID', [
+                //     'professor_id' => $validated['professor_id'],
+                // ]);
+                return redirect()->route('erroPagamento')->with('error', 'O professor precisa integrar com o Asaas antes de criar a cobrança.');
+            }
+
+            // Verify that the professor's wallet ID and SaaS owner's wallet ID are different
+            if ($professor->asaas_wallet_id === $gateway->split_account) {
+                Log::error('Error: Professor wallet ID and SaaS wallet ID are the same', [
+                    'professor_wallet_id' => $professor->asaas_wallet_id,
+                    'saas_wallet_id' => $gateway->split_account,
+                ]);
+                return redirect()->route('erroPagamento')->with('error', 'Erro: A carteira do professor não pode ser a mesma do proprietário do SaaS.');
+            }
+
+            // Convert date to US format
+            $data_aula = self::convertToUSFormat($validated['data_aula']) . ' ' . $validated['hora_aula'];
+
+            // Create or fetch aluno customer in Asaas
+            $alunoData = [
+                'name' => $aluno->usuario->nome,
+                'email' => $aluno->usuario->email,
+                'cpfCnpj' => $aluno->usuario->cpf ?? '12345678909',
+            ];
+        
+
+            $clientes = $this->asaasService->getClients($gateway->api_key, $gateway->mode);
+            $alunoExistente = collect($clientes['data'] ?? [])->firstWhere('email', $aluno->usuario->email);
+            $alunoId = $alunoExistente ? $alunoExistente['id'] : $this->asaasService->createCustomer($alunoData, $gateway->api_key, $gateway->mode)['id'];
+          
+            // Calculate tariff
+            $tariff = $gateway->tariff_type == 'percentage'
+                ? $validated['valor_aula'] * ($gateway->tariff_value / 100)
+                : $gateway->tariff_value;
+            $valor_cobranca = $validated['valor_aula'] + $tariff;
+       
+            // Validate that the split amounts sum to the total value
+            if (abs($valor_cobranca - ($validated['valor_aula'] + $tariff)) > 0.01) {
+                Log::error('Split amount mismatch', [
+                    'valor_cobranca' => $valor_cobranca,
+                    'valor_aula' => $validated['valor_aula'],
+                    'tariff' => $tariff,
+                ]);
+                  
+                return redirect()->route('erroPagamento')->with('error', 'Erro: A soma dos valores do split não corresponde ao valor total da cobrança.');
+            }
+
+            // Create payment with split
+           $cobrancaData = [
+                'customer' => $alunoId,
+                'billingType' => in_array('pix', $gateway->methods ?? []) ? 'PIX' : 'CREDIT_CARD',
+                'value' => $valor_cobranca,
+                'dueDate' => now()->addDays(1)->format('Y-m-d'),
+                'description' => $validated['titulo'],
+                'split' => [
+                    [
+                        'walletId' => $professor->asaas_wallet_id, 
+                        'fixedValue' => $validated['valor_aula'], 
+                    ],
+                    // Remove the SaaS owner's wallet from the split
+                    // The remaining amount ($tariff) will automatically go to the main account
+                ],
+            ];
+
+            // Log the payment data for debugging
+            Log::info('Attempting to create Asaas payment', [
+                'cobrancaData' => $cobrancaData,
+                'api_key' => substr($gateway->api_key, 0, 5) . '...', // Obfuscate API key
+                'mode' => $gateway->mode,
+            ]);
+
+            // Create the payment
+            $cobranca = $this->asaasService->cobranca($cobrancaData, $gateway->api_key, $gateway->mode);
+          
+            // Check if payment was created successfully
+            if ($cobranca['status'] == 'PENDING') {
+                // Attach professor to aluno
+                $aluno->professores()->attach($professor);
+
+                // Create agendamento
+                Agendamento::create([
+                    'aluno_id' => $validated['aluno_id'],
+                    'modalidade_id' => $validated['modalidade_id'],
+                    'professor_id' => $validated['professor_id'],
+                    'data_da_aula' => $data_aula,
+                    'valor_aula' => $validated['valor_aula'],
+                    'horario' => $validated['hora_aula'],
+                    'gateway_id' => $gateway->id,
+                    'cobranca_id' => $cobranca['id'],
+                ]);
+
+                Log::info('Payment created successfully', [
+                    'cobranca_id' => $cobranca['id'],
+                    'aluno_id' => $validated['aluno_id'],
+                    'professor_id' => $validated['professor_id'],
+                ]);
+
+                return redirect()->route('home.checkoutsucesso', ['id' => $professor->id]);
+            }
+
+            Log::error('Payment creation failed', [
+                'cobranca_response' => $cobranca,
+            ]);
+            return redirect()->route('erroPagamento')->with('error', 'Erro ao criar cobrança: ' . ($cobranca['errorMessage'] ?? 'Desconhecido'));
+
+        } catch (\Exception $e) { 
+         
+            Log::error('Payment creation failed with exception', [
+                'error' => $e->getMessage(),
+                'cobrancaData' => $cobrancaData ?? null,
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return redirect()->route('erroPagamento')->with('error', 'Erro ao criar cobrança: ' . $e->getMessage());
+        }
     }
 
 

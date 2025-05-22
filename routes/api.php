@@ -130,4 +130,5 @@ Route::prefix('empresa/pagamento')->group(function () {
     Route::post('/asaas', [PagamentoController::class, 'pagamentoAsaas'])->name('empresa.pagamento.asaas');
 });
 
-Route::post('/professores/asaas/subaccount', [ProfessoresAsaasController::class, 'createSubaccount']);
+
+Route::middleware('auth')->post('/subcontas', [ProfessoresAsaasController::class, 'createSubaccount'])->name('criar-subconta-professor');

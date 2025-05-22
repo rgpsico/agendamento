@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Auth;
+
+
 class ProfessoresAsaasController extends Controller
 {
     protected $asaasService;
@@ -20,11 +23,31 @@ class ProfessoresAsaasController extends Controller
         $this->asaasService = $asaasService;
     }
 
-     public function createSubaccount(Request $request)
+
+
+
+    public function createSubaccount(Request $request)
     {
+        // Buscar o professor do usuário logado
+        $professor = Auth::user()->professor;
+       
+        if (!$professor) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Usuário não é um professor'
+            ], 403);
+        }
+
+        // Verificar se já possui wallet
+        if ($professor->asaas_wallet_id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Professor já possui subconta no Asaas'
+            ], 409);
+        }
+
         // Validação dos dados
         $validatedData = $request->validate([
-            'professor_id' => 'required|exists:professores,id',
             'name' => 'required|string|max:255',
             'email' => 'required|email',
             'cpfCnpj' => 'required|string|size:11',
@@ -42,14 +65,6 @@ class ProfessoresAsaasController extends Controller
         DB::beginTransaction();
 
         try {
-            // Buscar o professor
-            $professor = Professor::with('usuario')->findOrFail($validatedData['professor_id']);
-
-            // Verificar se já possui wallet
-            if ($professor->asaas_wallet_id) {
-                throw new \Exception('Professor já possui subconta no Asaas');
-            }
-
             // Dados para criar subconta no Asaas
             $subaccountData = [
                 'name' => $validatedData['name'],
@@ -70,15 +85,16 @@ class ProfessoresAsaasController extends Controller
                 'walletId' => env('ASAAS_WALLET_ID')
             ];
 
-            
+         
             // Fazer requisição para API do Asaas
             $response = Http::withHeaders([
                 'access_token' => env('ASAAS_KEY'),
                 'Content-Type' => 'application/json',
             ])->post('https://sandbox.asaas.com/api/v3/accounts', $subaccountData);
-            
+
             // Verificar se a requisição foi bem-sucedida
             if (!$response->successful()) {
+                dd($response);
                 throw new \Exception('Erro na API do Asaas: ' . $response->body());
             }
 
@@ -128,7 +144,7 @@ class ProfessoresAsaasController extends Controller
             Log::error('Erro ao criar subconta', [
                 'error' => $e->getMessage(),
                 'user_id' => auth()->id(),
-                'professor_id' => $validatedData['professor_id'] ?? null
+                'professor_id' => $professor->id ?? null
             ]);
             
             return response()->json([
@@ -190,5 +206,7 @@ class ProfessoresAsaasController extends Controller
                 'message' => 'Erro ao listar subcontas'
             ], 500);
         }
-    } }
+    }
+
+}
     
