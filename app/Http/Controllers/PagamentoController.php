@@ -547,7 +547,7 @@ class PagamentoController extends Controller
                 return redirect()->route('erroPagamento')->with('error', 'Empresa não encontrada para o professor.');
             }
 
-            // Fetch the Asaas gateway for the empresa
+            // Fetch the Asaas g      bateway for the empresa
             $gateway = PagamentoGateway::where('empresa_id', $empresa->id)
                 ->where('name', 'asaas')
                 ->where('status', 1)
@@ -562,9 +562,9 @@ class PagamentoController extends Controller
 
             // Verify professor's wallet ID
             if (!$professor->asaas_wallet_id) {
-                // Log::error('Professor has no Asaas wallet ID', [
-                //     'professor_id' => $validated['professor_id'],
-                // ]);
+                Log::error('Professor has no Asaas wallet ID', [
+                    'professor_id' => $validated['professor_id'],
+                ]);
                 return redirect()->route('erroPagamento')->with('error', 'O professor precisa integrar com o Asaas antes de criar a cobrança.');
             }
 

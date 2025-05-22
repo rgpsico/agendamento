@@ -1,57 +1,57 @@
-$(document).on('click', ".buscar_empresa", function() {
-  $('.listar_empresas').empty();
-  
-  // busca todos os checkboxes que foram marcados
-  var tipos_empresa = [];
-  $('.filter_empresa:checked').each(function() {
-      tipos_empresa.push($(this).data('type'));
-  });
+$(document).on('click', ".buscar_empresa", function () {
+    $('.listar_empresas').empty();
 
-  var nome_empresa = $("#nome_empresa").val(); // obtenha o valor do campo de entrada
+    // busca todos os checkboxes que foram marcados
+    var tipos_empresa = [];
+    $('.filter_empresa:checked').each(function () {
+        tipos_empresa.push($(this).data('type'));
+    });
+
+    var nome_empresa = $("#nome_empresa").val(); // obtenha o valor do campo de entrada
 
 
-  
-fetch('api/search/empresa?tipo='+tipos_empresa+'&nome_empresa='+nome_empresa)
-  .then(response => response.json())
-  .then(dadosApi => {
-      dadosApi.forEach(function(empresa) {
-          console.log(empresa)
-          // Calcule a média das avaliações\
-          let sum = 0;
-          empresa.avaliacao.forEach(function(avaliacao) {
 
-              sum += avaliacao.avaliacao;
-          });
-          let rating = sum / empresa.avaliacao.length;
+    fetch('api/search/empresa?tipo=' + tipos_empresa + '&nome_empresa=' + nome_empresa)
+        .then(response => response.json())
+        .then(dadosApi => {
+            dadosApi.forEach(function (empresa) {
+                console.log(empresa)
+                // Calcule a média das avaliações\
+                let sum = 0;
+                empresa.avaliacao.forEach(function (avaliacao) {
 
-          // Crie as estrelas de avaliação
-          let ratingHTML = '';
-          for (let i = 1; i <= 5; i++) {
-              if (i <= rating) {
-                  ratingHTML += '<i class="fas fa-star filled"></i>';
-              } else {
-                  ratingHTML += '<i class="fas fa-star"></i>';
-              }
-          }
-          ratingHTML += '<span class="d-inline-block average-rating">(' + rating.toFixed(1) + ')</span>';
+                    sum += avaliacao.avaliacao;
+                });
+                let rating = sum / empresa.avaliacao.length;
 
-          // Crie a galeria de imagens
-          let galleryHTML = '';
-          empresa.galeria.forEach(function(image) {
-              galleryHTML += `<li>
+                // Crie as estrelas de avaliação
+                let ratingHTML = '';
+                for (let i = 1; i <= 5; i++) {
+                    if (i <= rating) {
+                        ratingHTML += '<i class="fas fa-star filled"></i>';
+                    } else {
+                        ratingHTML += '<i class="fas fa-star"></i>';
+                    }
+                }
+                ratingHTML += '<span class="d-inline-block average-rating">(' + rating.toFixed(1) + ')</span>';
+
+                // Crie a galeria de imagens
+                let galleryHTML = '';
+                empresa.galeria.forEach(function (image) {
+                    galleryHTML += `<li>
                                   <a href="galeria_escola/${image.image}" data-fancybox="gallery">
                                       <img src="galeria_escola/${image.image}" alt="Feature">
                                   </a>
                               </li>`;
-          });
+                });
 
-          var row = `<div class="card">
+                var row = `<div class="card">
                           <div class="card-body">
                               <div class="doctor-widget">
                                   <div class="doc-info-left">
                                       <div class="doctor-img">
                                           <a href="${empresa.user_id}/empresa">
-                                              <img src="avatar/${empresa.avatar}" class="img-fluid" alt="${empresa.nome}">
+                                              <img src="/avatar/${empresa.avatar}" class="img-fluid" alt="${empresa.nome}">
                                           </a>
                                       </div>
                                       <div class="doc-info-cont">
@@ -90,7 +90,7 @@ fetch('api/search/empresa?tipo='+tipos_empresa+'&nome_empresa='+nome_empresa)
                           </div>
                       </div>`;
 
-          $('.listar_empresas').append(row);
-      });
-  });
+                $('.listar_empresas').append(row);
+            });
+        });
 });
