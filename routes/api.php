@@ -19,7 +19,11 @@ use App\Http\Controllers\ModalidadeController;
 use App\Http\Controllers\PagamentoController;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\TwilioController;
+use App\Http\Controllers\AsaasWalletController;
+use App\Http\Controllers\ProfessoresAsaasController;
+
 use Illuminate\Http\Request;
+
 use Illuminate\Support\Facades\Route;
 
 Route::post('/events', [GoogleCalendarController::class, 'createEvent']);
@@ -110,7 +114,13 @@ Route::post('/treino/service', [AlunosControllerApi::class, 'service']);
 Route::get('/treino/cobrancas', [AlunosControllerApi::class, 'getCobrancas']);
 
 Route::post('/admin/asaas/limpar-sandbox', [PagamentoController::class, 'deleteAllPayments']);
- 
+Route::post('/admin/asaas/getwallet', [PagamentoController::class, 'getCustomerWallet']);
+
+
+Route::get('/asaas/customer/{customerId}', [PagamentoController::class, 'getCustomer']);
+
+Route::post('/asaas/getOrCreateAsaasCustome', [PagamentoController::class, 'getOrCreateAsaasCustomer']);
+
 Route::prefix('empresa/pagamento')->group(function () {
     Route::get('/', [PagamentoController::class, 'index'])->name('empresa.pagamento.index');
     Route::get('/create', [PagamentoController::class, 'create'])->name('empresa.pagamento.create');
@@ -119,3 +129,5 @@ Route::prefix('empresa/pagamento')->group(function () {
     Route::put('/{id}', [PagamentoController::class, 'update'])->name('empresa.pagamento.update');
     Route::post('/asaas', [PagamentoController::class, 'pagamentoAsaas'])->name('empresa.pagamento.asaas');
 });
+
+Route::post('/professores/asaas/subaccount', [ProfessoresAsaasController::class, 'createSubaccount']);
