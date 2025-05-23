@@ -135,6 +135,97 @@ class AsaasService
     }
 
     /**
+     * Create PIX payment and get QR Code
+     *
+     * @param array $data - Payment data
+     * @param string $apiKey
+     * @return array
+     * @throws \Exception
+     */
+    public function createPixPayment($data, $apiKey)
+    {
+        // Força o billingType para PIX
+        $data['billingType'] = 'PIX';
+        
+        $url = rtrim($this->url, '/') . '/api/v3/payments';
+
+        Log::info('Creating PIX payment: ' . json_encode($data));
+
+        try {
+            $response = $this->client->request('POST', $url, [
+                'body' => json_encode($data),
+                'headers' => array_merge($this->headers, ['access_token' => $apiKey]),
+            ]);
+
+            $payment = $this->tratarResposta($response->getStatusCode(), json_decode($response->getBody(), true));
+
+            // Se não veio o QR Code na resposta, buscar separadamente
+            if (!isset($payment['pixTransaction']) || empty($payment['pixTransaction']['encodedImage'])) {
+                $pixData = $this->getPixQrCode($payment['id'], $apiKey);
+                $payment['pixTransaction'] = $pixData;
+            }
+
+            return $payment;
+
+        } catch (\Exception $e) {
+            Log::error('Error creating PIX payment: ' . $e->getMessage() . ' - Data: ' . json_encode($data));
+            throw new \Exception('Error creating PIX payment: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Get PIX QR Code for an existing payment
+     *
+     * @param string $paymentId
+     * @param string $apiKey
+     * @return array
+     * @throws \Exception
+     */
+    public function getPixQrCode($paymentId, $apiKey)
+    {
+        $url = rtrim($this->url, '/') . "/api/v3/payments/{$paymentId}/pixQrCode";
+
+        Log::info('Getting PIX QR Code for payment: ' . $paymentId);
+
+        try {
+            $response = $this->client->request('GET', $url, [
+                'headers' => array_merge($this->headers, ['access_token' => $apiKey]),
+            ]);
+
+            return $this->tratarResposta($response->getStatusCode(), json_decode($response->getBody(), true));
+
+        } catch (\Exception $e) {
+            Log::error('Error getting PIX QR Code: ' . $e->getMessage() . ' - Payment ID: ' . $paymentId);
+            throw new \Exception('Error getting PIX QR Code: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Check payment status
+     *
+     * @param string $paymentId
+     * @param string $apiKey
+     * @return array
+     * @throws \Exception
+     */
+    public function getPaymentStatus($paymentId, $apiKey)
+    {
+        $url = rtrim($this->url, '/') . "/api/v3/payments/{$paymentId}";
+
+        try {
+            $response = $this->client->request('GET', $url, [
+                'headers' => array_merge($this->headers, ['access_token' => $apiKey]),
+            ]);
+
+            return $this->tratarResposta($response->getStatusCode(), json_decode($response->getBody(), true));
+
+        } catch (\Exception $e) {
+            Log::error('Error checking payment status: ' . $e->getMessage() . ' - Payment ID: ' . $paymentId);
+            throw new \Exception('Error checking payment status: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Retrieve a list of customers from Asaas.
      *
      * @param string $apiKey
@@ -164,54 +255,92 @@ class AsaasService
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    // app/Services/AsaasService.php
+     public function createSubaccount($request)
+    {
+        DB::beginTransaction();
 
-    // app/Services/AsaasService.php
+        try {
+            // Busca o usuário relacionado ao professor
+            $professor = Professor::with('usuario')->findOrFail($request->professor_id);
+            $usuario = $professor->usuario;
 
-    // app/Http/Controllers/ProfessoresAsaasController.php
+            // Dados completos para o Asaas
+            $subaccountData = [
+                'name' => $request->name ?? $usuario->nome,
+                'email' => $usuario->email,
+                'cpfCnpj' => $request->cpfCnpj,
+                // ... outros campos
+            ];
 
-public function createSubaccount($request)
+            // Chamada simplificada sem precisar passar a API key
+            $response = $this->asaasService->createSubaccount($subaccountData);
+
+            // Atualizar professor
+            $professor->update([
+                'asaas_customer_id' => $response['id'],
+                'asaas_wallet_id' => $response['walletId']
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Subconta criada com sucesso!',
+                'data' => $response
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao criar subconta: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+
+    public function gerarPix(Request $request)
 {
-    DB::beginTransaction();
-
     try {
-        // Busca o usuário relacionado ao professor
-        $professor = Professor::with('usuario')->findOrFail($request->professor_id);
-        $usuario = $professor->usuario;
-
-        // Dados completos para o Asaas
-        $subaccountData = [
-            'name' => $request->name ?? $usuario->nome,
-            'email' => $usuario->email,
-            'cpfCnpj' => $request->cpfCnpj,
-            // ... outros campos
-        ];
-
-        // Chamada simplificada sem precisar passar a API key
-        $response = $this->asaasService->createSubaccount($subaccountData);
-
-        // Atualizar professor
-        $professor->update([
-            'asaas_customer_id' => $response['id'],
-            'asaas_wallet_id' => $response['walletId']
-        ]);
-
-        DB::commit();
-
+        $aluno = Auth::user()->aluno;
+        $apiKey = config('asaas.api_key'); // ou como você pega a API key
+        
+        // 1. Garantir que tem customer
+        if (!$aluno->asaas_customer_id) {
+            $customerData = [
+                'name' => $aluno->nome,
+                'email' => $aluno->email,
+                'cpfCnpj' => $aluno->cpf,
+            ];
+            $customer = $this->asaasService->createCustomer($customerData, $apiKey, 'sandbox');
+            $aluno->asaas_customer_id = $customer['id'];
+            $aluno->save();
+        }
+        
+        // 2. Criar pagamento PIX
+        $pixPayment = $this->asaasService->createPixPayment([
+            'customer' => $aluno->asaas_customer_id,
+            'value' => $request->valor_aula,
+            'dueDate' => date('Y-m-d'),
+            'description' => $request->titulo
+        ], $apiKey);
+        
         return response()->json([
             'success' => true,
-            'message' => 'Subconta criada com sucesso!',
-            'data' => $response
+            'payment_id' => $pixPayment['id'],
+            'qr_code_image' => $pixPayment['pixTransaction']['encodedImage'],
+            'pix_code' => $pixPayment['pixTransaction']['payload'],
+            'expiration_date' => $pixPayment['pixTransaction']['expirationDate']
         ]);
-
+        
     } catch (\Exception $e) {
-        DB::rollBack();
         return response()->json([
             'success' => false,
-            'message' => 'Erro ao criar subconta: ' . $e->getMessage()
+            'message' => $e->getMessage()
         ], 500);
     }
 }
+
     /**
      * Retrieve the wallet ID for a customer.
      *

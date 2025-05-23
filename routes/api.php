@@ -83,6 +83,10 @@ Route::post('/test-twilio', function () {
     }
 });
 
+
+Route::post('/gerar-pix', [PagamentoController::class, 'gerarPix'])->name('gerar.pix');
+Route::get('/verificar-pix/{id}', [PagamentoController::class, 'verificarStatusPix'])->name('verificar.pix');
+
 Route::middleware('auth:sanctum')->post('/empresa/update', [EmpresaControllerApi::class, 'update']);
 
 
