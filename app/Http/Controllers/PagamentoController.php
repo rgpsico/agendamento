@@ -8,6 +8,7 @@ use App\Models\AlunoProfessor;
 use App\Models\Alunos;
 use App\Models\Empresa;
 use App\Models\PagamentoGateway;
+use App\Models\Pagamento;
 use App\Models\Professor;
 use App\Services\AsaasService;
 use Carbon\Carbon;
@@ -19,6 +20,7 @@ use Stripe\Charge;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log; // Import the Log facade
+use Illuminate\Support\Facades\Validator;
 class PagamentoController extends Controller
 {
     protected $aluno_professor;
@@ -456,6 +458,107 @@ public function gerarPix(Request $request)
             'status' => $response->status(),
             'message' => $response->json()['errors'] ?? 'Erro desconhecido',
         ], $response->status());
+    }
+
+
+   public function criarPagamentoPresencial(Request $request)
+    {
+        // Validação dos dados do agendamento
+        $validator = Validator::make($request->all(), [
+            'aluno_id' => 'required|exists:alunos,id',
+            'professor_id' => 'required|exists:professores,id',
+            'modalidade_id' => 'required|exists:modalidade,id',
+            'data_aula' => 'required|date_format:Y-m-d',
+            'hora_aula' => 'required|date_format:H:i',
+            'valor_aula' => 'required|numeric|min:0',
+            'status' => 'required|in:PENDING,RECEIVED',
+            'titulo' => 'required|string|max:255',
+        ]);
+
+       if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        // Verificar disponibilidade do professor
+        $disponibilidade = Agendamento::where('professor_id', $request->input('professor_id'))
+            ->where('data_da_aula', $request->input('data_aula'))
+            ->where('horario', $request->input('hora_aula'))
+            ->exists();
+
+        if ($disponibilidade) {
+            return redirect()->back()->with('error', 'O professor já possui um agendamento neste horário.')->withInput();
+        }
+
+
+        // Criar o agendamento
+        $agendamento = Agendamento::create([
+            'aluno_id' => $request->input('aluno_id'),
+            'professor_id' => $request->input('professor_id'),
+            'modalidade_id' => $request->input('modalidade_id'),
+            'data_da_aula' => $request->input('data_aula'),
+            'horario' => $request->input('hora_aula'),
+            'valor_aula' => $request->input('valor_aula'),
+        ]);
+
+        // Criar o registro de pagamento
+        $pagamento = Pagamento::create([
+            'agendamento_id' => $agendamento->id,
+            'aluno_id' => $request->input('aluno_id'),
+            'pagamento_gateway_id' => null, // Não usado para pagamento presencial
+            'asaas_payment_id' => null, // Não usado para pagamento presencial
+            'status' => $request->input('status', 'PENDING'), // PENDING ou RECEIVED
+            'valor' => $request->input('valor_aula'),
+            'metodo_pagamento' => 'PRESENCIAL',
+            'data_vencimento' => null, // Não aplicável
+            'url_boleto' => null, // Não aplicável
+            'qr_code_pix' => null, // Não aplicável
+            'resposta_api' => null, // Não aplicável
+        ]);
+
+        // Redirecionar para a página de confirmação
+        return redirect()->route('home.checkoutsucesso', ['id' => $request->input('professor_id')])
+            ->with('success', 'Agendamento e pagamento presencial registrados com sucesso');
+    }
+
+
+     public function verRecibo($id)
+    {
+        // Obter o usuário autenticado (aluno)
+        $aluno = Auth::user()->aluno;
+
+        if (!$aluno) {
+            return redirect()->route('home')->with('error', 'Usuário não autorizado para visualizar o recibo.');
+        }
+
+        // Obter o professor
+        $professor = Professor::with('usuario')->findOrFail($id);
+
+        // Buscar o agendamento mais recente do aluno com este professor
+        $agendamento = Agendamento::where('aluno_id', $aluno->id)
+            ->where('professor_id', $professor->id)
+            ->latest()
+            ->first();
+
+        if (!$agendamento) {
+            return redirect()->route('home')->with('error', 'Nenhum agendamento encontrado para este professor.');
+        }
+
+        // Buscar o pagamento associado ao agendamento
+        $pagamento = Pagamento::where('agendamento_id', $agendamento->id)
+            ->where('aluno_id', $aluno->id)
+            ->first();
+
+        if (!$pagamento) {
+            return redirect()->route('home')->with('error', 'Nenhum pagamento encontrado para este agendamento.');
+        }
+
+        // Passar os dados para a view
+        return view('admin.pagamento.recibo', [
+            'agendamento' => $agendamento,
+            'pagamento' => $pagamento,
+            'professor' => $professor,
+            'aluno' => $aluno,
+        ]);
     }
 
      public function getCustomerWallet(Request $request )

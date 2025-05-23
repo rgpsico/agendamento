@@ -15,10 +15,10 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('agendamento_id');
             $table->unsignedBigInteger('aluno_id');
-            $table->string('asaas_payment_id')->unique()->collation('utf8mb4_bin');
-            $table->string('status'); // Ex.: PENDING, CONFIRMED, RECEIVED, OVERDUE, etc.
+            $table->string('asaas_payment_id')->unique()->collation('utf8mb4_bin')->nullable(); // Nullable para pagamento na hora
+            $table->string('status'); // Ex.: PENDING, RECEIVED, CONFIRMED, PRESENCIAL
             $table->decimal('valor', 10, 2); // Valor do pagamento
-            $table->string('metodo_pagamento'); // Ex.: CREDIT_CARD, PIX, BOLETO
+            $table->string('metodo_pagamento'); // Ex.: PRESENCIAL, CREDIT_CARD, PIX, BOLETO
             $table->dateTime('data_vencimento')->nullable(); // Para boletos
             $table->string('url_boleto')->nullable(); // URL do boleto, se aplicável
             $table->string('qr_code_pix')->nullable(); // QR code do Pix, se aplicável

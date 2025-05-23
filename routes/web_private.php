@@ -36,6 +36,8 @@ Route::get('/integracao', [PagamentoController::class, 'mostrarIntegracao'])->na
 Route::post('/integrar/asaas', [PagamentoController::class, 'integrarAsaas'])->name('integrar.asaas');
 
 
+Route::get('/recibo/{id}', [PagamentoController::class, 'verRecibo'])->name('recibo');
+
 // Grupo de rotas para gerenciamento de gateways de pagamento
 Route::prefix('empresa/pagamento')->middleware(['auth'])->group(function () {
     // Listar todos os gateways configurados

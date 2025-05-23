@@ -95,7 +95,21 @@
                 <div class="col-md-7 col-lg-8">
                     <div class="card">
                         <div class="card-body">
-                            <x-alert/>
+                            <!-- Exibição de Erros -->
+                            @if ($errors->any() || session('error'))
+                                <div class="alert alert-danger">
+                                    @if (session('error'))
+                                        <p>{{ session('error') }}</p>
+                                    @endif
+                                    @if ($errors->any())
+                                        <ul>
+                                            @foreach ($errors->all() as $error)
+                                                <li>{{ $error }}</li>
+                                            @endforeach
+                                        </ul>
+                                    @endif
+                                </div>
+                            @endif
                             
                             <!-- Resumo do Agendamento -->
                             <div class="payment-summary">
@@ -130,6 +144,7 @@
                                 <input type="hidden" id="valor_aula" name="valor_aula" value="">
                                 <input type="hidden" id="titulo" name="titulo" value="">
                                 <input type="hidden" id="payment_method" name="payment_method" value="">
+                                <input type="hidden" id="status" name="status" value="PENDING">
 
                                 <h4 class="card-title mb-4">Forma de Pagamento</h4>
 
@@ -166,25 +181,25 @@
                                     <div class="payment-details card-form" id="card-details">
                                         <div class="form-group">
                                             <label>Nome no Cartão</label>
-                                            <input type="text" class="form-control" name="card_name" placeholder="Nome como está no cartão">
+                                            <input type="text" class="form-control" name="card_name" placeholder="Nome como está no cartão" value="{{ old('card_name') }}">
                                         </div>
                                         <div class="form-group">
                                             <label>Número do Cartão</label>
-                                            <input type="text" class="form-control" name="card_number" placeholder="0000 0000 0000 0000" maxlength="19">
+                                            <input type="text" class="form-control" name="card_number" placeholder="0000 0000 0000 0000" maxlength="19" value="{{ old('card_number') }}">
                                         </div>
                                         <div class="form-row">
                                             <div class="form-group">
                                                 <label>Validade</label>
-                                                <input type="text" class="form-control" name="card_expiry" placeholder="MM/AA" maxlength="5">
+                                                <input type="text" class="form-control" name="card_expiry" placeholder="MM/AA" maxlength="5" value="{{ old('card_expiry') }}">
                                             </div>
                                             <div class="form-group">
                                                 <label>CVV</label>
-                                                <input type="text" class="form-control" name="card_cvv" placeholder="123" maxlength="4">
+                                                <input type="text" class="form-control" name="card_cvv" placeholder="123" maxlength="4" value="{{ old('card_cvv') }}">
                                             </div>
                                         </div>
                                         <div class="form-group">
                                             <label>CPF do Portador</label>
-                                            <input type="text" class="form-control" name="card_cpf" placeholder="000.000.000-00">
+                                            <input type="text" class="form-control" name="card_cpf" placeholder="000.000.000-00" value="{{ old('card_cpf') }}">
                                         </div>
                                     </div>
                                 </div>
@@ -192,7 +207,7 @@
                                 <!-- Opção Pagamento no Dia -->
                                 <div class="payment-method" data-method="presencial">
                                     <label class="d-flex align-items-center">
-                                        <input type="radio" name="forma_pagamento" value="presencial">
+                                        <input type="radio" name="forma_pagamento" value="presencial" {{ old('forma_pagamento') == 'presencial' ? 'checked' : '' }}>
                                         <div>
                                             <strong>Pagamento no Dia da Aula</strong>
                                             <p class="mb-0 text-muted">Pague diretamente ao professor no dia da aula</p>
@@ -207,6 +222,13 @@
                                                 <li>Confirme a forma de pagamento com o professor</li>
                                                 <li>Em caso de cancelamento, avise com 24h de antecedência</li>
                                             </ul>
+                                            <div class="form-group">
+                                                <label>Status do Pagamento</label>
+                                                <select class="form-control" name="status" id="presencial-status">
+                                                    <option value="PENDING" {{ old('status') == 'PENDING' ? 'selected' : '' }}>Pendente (pagar no dia)</option>
+                                                    <option value="RECEIVED" {{ old('status') == 'RECEIVED' ? 'selected' : '' }}>Confirmado (pago agora)</option>
+                                                </select>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -270,11 +292,23 @@
                 $('.payment-details').removeClass('active');
                 $('#' + method + '-details').addClass('active');
                 
-                // Atualizar campo hidden
+                // Atualizar campo hidden payment_method
                 $('#payment_method').val(method);
+                
+                // Atualizar campo hidden status baseado no método
+                if (method === 'presencial') {
+                    $('#status').val($('#presencial-status').val());
+                } else {
+                    $('#status').val('PENDING');
+                }
                 
                 // Atualizar texto do botão
                 updateButtonText(method);
+            });
+
+            // Atualizar status quando o select mudar
+            $('#presencial-status').on('change', function() {
+                $('#status').val($(this).val());
             });
 
             // Formatação dos campos do cartão
@@ -322,6 +356,13 @@
                     alert('Por favor, selecione uma forma de pagamento!');
                     event.preventDefault();
                     return;
+                }
+
+                // Alterar a rota com base no método de pagamento
+                if (payment_method === 'presencial') {
+                    $(this).attr('action', "{{ route('empresa.pagamento.presencial') }}");
+                } else {
+                    $(this).attr('action', "{{ route('empresa.pagamento.asaas') }}");
                 }
 
                 // Validações específicas por forma de pagamento

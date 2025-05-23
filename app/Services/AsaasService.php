@@ -299,48 +299,7 @@ class AsaasService
     }
 
 
-    public function gerarPix(Request $request)
-{
-    try {
-        $aluno = Auth::user()->aluno;
-        $apiKey = config('asaas.api_key'); // ou como você pega a API key
-        
-        // 1. Garantir que tem customer
-        if (!$aluno->asaas_customer_id) {
-            $customerData = [
-                'name' => $aluno->nome,
-                'email' => $aluno->email,
-                'cpfCnpj' => $aluno->cpf,
-            ];
-            $customer = $this->asaasService->createCustomer($customerData, $apiKey, 'sandbox');
-            $aluno->asaas_customer_id = $customer['id'];
-            $aluno->save();
-        }
-        
-        // 2. Criar pagamento PIX
-        $pixPayment = $this->asaasService->createPixPayment([
-            'customer' => $aluno->asaas_customer_id,
-            'value' => $request->valor_aula,
-            'dueDate' => date('Y-m-d'),
-            'description' => $request->titulo
-        ], $apiKey);
-        
-        return response()->json([
-            'success' => true,
-            'payment_id' => $pixPayment['id'],
-            'qr_code_image' => $pixPayment['pixTransaction']['encodedImage'],
-            'pix_code' => $pixPayment['pixTransaction']['payload'],
-            'expiration_date' => $pixPayment['pixTransaction']['expirationDate']
-        ]);
-        
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'message' => $e->getMessage()
-        ], 500);
-    }
-}
-
+    
     /**
      * Retrieve the wallet ID for a customer.
      *
