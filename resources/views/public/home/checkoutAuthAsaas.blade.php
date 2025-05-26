@@ -1,4 +1,4 @@
-<x-public.layout title="HOME">
+<x-public.layout title="Resumo do Agendamento">
     <style>
         #spinner {
             position: fixed; 

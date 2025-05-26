@@ -114,6 +114,76 @@ class PagamentoController extends Controller
         return redirect()->route('empresa.pagamento.index')->with('success', 'Gateway atualizado com sucesso!');
     }
 
+     public function generatePixQrCode(Request $request)
+    {
+        // Validate incoming request
+        $request->validate([
+            'customer_id' => 'required|string', // Asaas customer ID
+            'value' => 'required|numeric|min:0.01', // Payment value
+            'description' => 'nullable|string|max:200', // Optional description
+            'due_date' => 'nullable|date_format:Y-m-d', // Optional due date
+        ]);
+
+        $apiKey = env('ASAAS_KEY'); // Retrieve Asaas API key from .env
+        $baseUrl = 'https://api.asaas.com/v3'; // Asaas API base URL
+        $client = new Client();
+
+        try {
+            // Step 1: Create a payment
+            $paymentResponse = $client->post("$baseUrl/payments", [
+                'headers' => [
+                    'Authorization' => "Bearer $apiKey",
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json',
+                ],
+                'json' => [
+                    'customer' => $request->customer_id,
+                    'billingType' => 'PIX',
+                    'value' => $request->value,
+                    'dueDate' => $request->due_date ?? now()->addDay()->format('Y-m-d'),
+                    'description' => $request->description ?? 'Payment via Pix',
+                ],
+            ]);
+
+            $paymentData = json_decode($paymentResponse->getBody(), true);
+            $paymentId = $paymentData['id'];
+
+            // Step 2: Retrieve the Pix QR code
+            $qrCodeResponse = $client->get("$baseUrl/payments/$paymentId/pixQrCode", [
+                'headers' => [
+                    'Authorization' => "Bearer $apiKey",
+                    'Accept' => 'application/json',
+                ],
+            ]);
+
+            $qrCodeData = json_decode($qrCodeResponse->getBody(), true);
+
+            // Return the QR code data
+            return response()->json([
+                'success' => true,
+                'qr_code' => [
+                    'encoded_image' => $qrCodeData['encodedImage'], // Base64 image
+                    'payload' => $qrCodeData['payload'], // Copy-and-paste code
+                    'expiration_date' => $qrCodeData['expirationDate'],
+                ],
+            ], 200);
+
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            // Handle client errors (e.g., 400, 401, 404)
+            Log::error('Asaas API Client Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'error' => 'Failed to generate Pix QR code: ' . $e->getMessage(),
+            ], 400);
+        } catch (\Exception $e) {
+            // Handle other errors
+            Log::error('Asaas API Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'error' => 'An error occurred: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
     
 public function gerarPix(Request $request)
 {
@@ -561,6 +631,221 @@ public function gerarPix(Request $request)
         ]);
     }
 
+
+    //  private static function convertToUSFormat($date)
+    // {
+    //     $date = str_replace('/', '-', $date);
+    //     return \Carbon\Carbon::createFromFormat('d-m-Y', $date)->format('Y-m-d');
+    // }
+
+
+    public function pagamentoAsaas(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'aluno_id' => 'required|exists:alunos,id',
+                'professor_id' => 'required|exists:professores,id',
+                'valor_aula' => 'required|numeric|min:0',
+                'modalidade_id' => 'required|exists:modalidades,id',
+                'data_aula' => 'required|string',
+                'hora_aula' => 'required|string',
+                'titulo' => 'required|string',
+                'payment_method' => 'required|in:pix,cartao',
+            ]);
+
+            $aluno = Alunos::with('usuario')->find($validated['aluno_id']);
+            $professor = Professor::with('usuario')->find($validated['professor_id']);
+
+            if (!$aluno || !$professor || !$professor->usuario || !$aluno->usuario) {
+                Log::error('Aluno or professor not found', [
+                    'aluno_id' => $validated['aluno_id'],
+                    'professor_id' => $validated['professor_id'],
+                ]);
+                return redirect()->back()->with('error', 'Aluno ou professor não encontrados.');
+            }
+
+            $empresa = $professor->usuario->empresa;
+
+            if (!$empresa) {
+                Log::error('Empresa not found for professor', [
+                    'professor_id' => $validated['professor_id'],
+                ]);
+                return redirect()->back()->with('error', 'Empresa não encontrada para o professor.');
+            }
+
+            $gateway = PagamentoGateway::where('empresa_id', $empresa->id)
+                ->where('name', 'asaas')
+                ->where('status', 1)
+                ->first();
+
+            if (!$gateway) {
+                Log::error('No active Asaas gateway found', [
+                    'empresa_id' => $empresa->id,
+                ]);
+                return redirect()->back()->with('error', 'Nenhum gateway Asaas ativo configurado.');
+            }
+
+            if (!$professor->asaas_wallet_id) {
+                Log::error('Professor has no Asaas wallet ID', [
+                    'professor_id' => $validated['professor_id'],
+                ]);
+                return redirect()->back()->with('error', 'O professor precisa integrar com o Asaas antes de criar a cobrança.');
+            }
+
+            if ($professor->asaas_wallet_id === $gateway->split_account) {
+                Log::error('Error: Professor wallet ID and SaaS wallet ID are the same', [
+                    'professor_wallet_id' => $professor->asaas_wallet_id,
+                    'saas_wallet_id' => $gateway->split_account,
+                ]);
+                return redirect()->back()->with('error', 'Erro: A carteira do professor não pode ser a mesma do proprietário do SaaS.');
+            }
+
+            $data_aula = self::convertToUSFormat($validated['data_aula']) . ' ' . $validated['hora_aula'];
+
+            $alunoData = [
+                'name' => $aluno->usuario->nome,
+                'email' => $aluno->usuario->email,
+                'cpfCnpj' => $aluno->usuario->cpf ?? '12345678909',
+            ];
+
+            $clientes = $this->asaasService->getClients($gateway->api_key, $gateway->mode);
+            $alunoExistente = collect($clientes['data'] ?? [])->firstWhere('email', $aluno->usuario->email);
+            $alunoId = $alunoExistente ? $alunoExistente['id'] : $this->asaasService->createCustomer($alunoData, $gateway->api_key, $gateway->mode)['id'];
+
+            $tariff = $gateway->tariff_type == 'percentage'
+                ? $validated['valor_aula'] * ($gateway->tariff_value / 100)
+                : $gateway->tariff_value;
+            $valor_cobranca = $validated['valor_aula'] + $tariff;
+
+            if (abs($valor_cobranca - ($validated['valor_aula'] + $tariff)) > 0.01) {
+                Log::error('Split amount mismatch', [
+                    'valor_cobranca' => $valor_cobranca,
+                    'valor_aula' => $validated['valor_aula'],
+                    'tariff' => $tariff,
+                ]);
+                return redirect()->back()->with('error', 'Erro: A soma dos valores do split não corresponde ao valor total da cobrança.');
+            }
+
+            $cobrancaData = [
+                'customer' => $alunoId,
+                'billingType' => $validated['payment_method'] === 'pix' ? 'PIX' : 'CREDIT_CARD',
+                'value' => $valor_cobranca,
+                'dueDate' => now()->addDays(1)->format('Y-m-d'),
+                'description' => $validated['titulo'],
+                'split' => [
+                    [
+                        'walletId' => $professor->asaas_wallet_id,
+                        'fixedValue' => $validated['valor_aula'],
+                    ],
+                ],
+            ];
+
+            if ($validated['payment_method'] === 'cartao') {
+                $cobrancaData['creditCard'] = [
+                    'holderName' => $request->input('card_name'),
+                    'number' => str_replace(' ', '', $request->input('card_number')),
+                    'expiryMonth' => explode('/', $request->input('card_expiry'))[0],
+                    'expiryYear' => '20' . explode('/', $request->input('card_expiry'))[1],
+                    'ccv' => $request->input('card_cvv'),
+                ];
+                $cobrancaData['creditCardHolderInfo'] = [
+                    'name' => $request->input('card_name'),
+                    'email' => $aluno->usuario->email,
+                    'cpfCnpj' => str_replace(['.', '-'], '', $request->input('card_cpf')),
+                ];
+            }
+
+            Log::info('Attempting to create Asaas payment', [
+                'cobrancaData' => $cobrancaData,
+                'api_key' => substr($gateway->api_key, 0, 5) . '...',
+                'mode' => $gateway->mode,
+            ]);
+
+            $cobranca = $this->asaasService->cobranca($cobrancaData, $gateway->api_key, $gateway->mode);
+
+            if ($cobranca['status'] == 'PENDING') {
+                $aluno->professores()->attach($professor);
+
+                $agendamento = Agendamento::create([
+                    'aluno_id' => $validated['aluno_id'],
+                    'modalidade_id' => $validated['modalidade_id'],
+                    'professor_id' => $validated['professor_id'],
+                    'data_da_aula' => $data_aula,
+                    'valor_aula' => $validated['valor_aula'],
+                    'horario' => $validated['hora_aula'],
+                    'gateway_id' => $gateway->id,
+                    'cobranca_id' => $cobranca['id'],
+                ]);
+
+                $pagamento = Pagamento::create([
+                    'agendamento_id' => $agendamento->id,
+                    'aluno_id' => $validated['aluno_id'],
+                    'pagamento_gateway_id' => $gateway->id,
+                    'asaas_payment_id' => $cobranca['id'],
+                    'status' => $cobranca['status'],
+                    'valor' => $valor_cobranca,
+                    'metodo_pagamento' => $validated['payment_method'] === 'pix' ? 'PIX' : 'CREDIT_CARD',
+                    'data_vencimento' => $cobranca['dueDate'],
+                    'url_boleto' => null,
+                    'qr_code_pix' => $validated['payment_method'] === 'pix' ? $cobranca['encodedImage'] : null,
+                    'resposta_api' => json_encode($cobranca),
+                ]);
+
+                Log::info('Payment created successfully', [
+                    'cobranca_id' => $cobranca['id'],
+                    'aluno_id' => $validated['aluno_id'],
+                    'professor_id' => $validated['professor_id'],
+                ]);
+
+                if ($validated['payment_method'] === 'pix') {
+                    return redirect()->route('pix-payment', [
+                        'cobranca_id' => $cobranca['id'],
+                        'professor_id' => $professor->id,
+                    ]);
+                }
+
+                return redirect()->route('home.checkoutsucesso', ['id' => $professor->id])
+                    ->with('success', 'Agendamento e pagamento confirmados com sucesso')
+                    ->with('payment_method', $validated['payment_method']);
+            }
+
+            Log::error('Payment creation failed', [
+                'cobranca_response' => $cobranca,
+            ]);
+            return redirect()->back()->with('error', 'Erro ao criar cobrança: ' . ($cobranca['errorMessage'] ?? 'Desconhecido'));
+        } catch (\Exception $e) {
+            Log::error('Payment creation failed with exception', [
+                'error' => $e->getMessage(),
+                'cobrancaData' => $cobrancaData ?? null,
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return redirect()->back()->with('error', 'Erro ao criar cobrança: ' . $e->getMessage());
+        }
+    }
+
+    public function pixPayment(Request $request, $cobranca_id, $professor_id)
+    {
+        $professor = Professor::findOrFail($professor_id);
+        $aluno = Auth::user()->aluno;
+
+        if (!$aluno) {
+            return redirect()->route('home')->with('error', 'Usuário não autorizado.');
+        }
+
+        $pagamento = Pagamento::where('asaas_payment_id', $cobranca_id)
+            ->where('aluno_id', $aluno->id)
+            ->firstOrFail();
+
+        $agendamento = Agendamento::where('id', $pagamento->agendamento_id)->firstOrFail();
+
+        return view('pix-payment', [
+            'cobranca_id' => $cobranca_id,
+            'professor' => $professor,
+            'pagamento' => $pagamento,
+            'agendamento' => $agendamento,
+        ]);
+    }
+
      public function getCustomerWallet(Request $request )
     {       
       
@@ -653,7 +938,25 @@ public function gerarPix(Request $request)
         }
     }
 
-   public function pagamentoAsaas(Request $request)
+    public function checkPaymentStatus($cobranca_id)
+{
+    $pagamento = Pagamento::where('asaas_payment_id', $cobranca_id)->firstOrFail();
+    $gateway = PagamentoGateway::findOrFail($pagamento->pagamento_gateway_id);
+
+    $response = $this->asaasService->checkPaymentStatus($cobranca_id, $gateway->api_key, $gateway->mode);
+
+    if (isset($response['status'])) {
+        $pagamento->status = $response['status'];
+        $pagamento->resposta_api = json_encode($response);
+        $pagamento->save();
+
+        return response()->json(['status' => $response['status']]);
+    }
+
+    return response()->json(['error' => 'Não foi possível verificar o status do pagamento'], 500);
+}
+
+   public function pagamentoAsaas1(Request $request)
     {
         try {
             // Validate request data
@@ -820,6 +1123,8 @@ public function gerarPix(Request $request)
             return redirect()->route('erroPagamento')->with('error', 'Erro ao criar cobrança: ' . $e->getMessage());
         }
     }
+
+    
 
 
     /**

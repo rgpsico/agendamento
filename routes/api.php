@@ -21,7 +21,7 @@ use App\Http\Controllers\StripeController;
 use App\Http\Controllers\TwilioController;
 use App\Http\Controllers\AsaasWalletController;
 use App\Http\Controllers\ProfessoresAsaasController;
-
+use App\Http\Controllers\Api\PixQrController;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Route;
@@ -83,6 +83,13 @@ Route::post('/test-twilio', function () {
     }
 });
 
+Route::post('/pix-qrcode', [PixQrController::class, 'generatePixQrCode']);
+Route::post('/customers', [PixQrController::class, 'createCustomer']);
+Route::post('/pix/create-key', [PixQrController::class, 'createPixKey']);
+
+
+Route::get('/pix/keys', [PixController::class, 'listPixKeys']);
+Route::delete('/pix/keys/{pixKeyId}', [PixController::class, 'deletePixKey']);
 
 Route::post('/pagamentos/presencial', [PagamentoController::class, 'criarPagamentoPresencial'])->name('empresa.pagamento.presencial');
 Route::post('/gerar-pix', [PagamentoController::class, 'gerarPix'])->name('gerar.pix');

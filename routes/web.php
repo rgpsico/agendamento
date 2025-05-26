@@ -130,6 +130,8 @@ Route::post('/avaliacao/store', [AvaliacaoController::class, 'store'])->name('em
 Route::post('/avaliar-aula', [AvaliacaoController::class, 'storeAvaliacao'])->name('avaliacao.store');
 Route::get('/avaliacao/{agendamento_id}', [AvaliacaoController::class, 'getAvaliacoes'])->name('avaliacao.getAvaliacoes');
 
+Route::get('/check-payment-status/{cobranca_id}', [PagamentoController::class, 'checkPaymentStatus'])->name('check-payment-status');
+
 Route::get('/test', function () {
     return Inertia::render('Test');
 });
