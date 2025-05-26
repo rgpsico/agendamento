@@ -16,6 +16,7 @@
                         <i class="fe fe-home"></i> <span>Dashboard</span>
                     </a>
                 </li>
+                @isset(Auth::user()->empresa->user_id)
                 <li class="submenu">
                     <a href="#">
                         <i class="fas fa-globe" style="font-size: 18px;"></i>
@@ -34,6 +35,7 @@
                       
                     </ul>
                 </li>
+                @endisset
 
                 @isset(Auth::user()->empresa->user_id)
                 <!-- Serviços -->
@@ -50,7 +52,7 @@
                 </li>
                 @endisset
 
-                @isset(Auth::user()->professor->id)
+                @isset(Auth::user()->empresa->user_id)
                 <!-- Horários -->
                 <li class="submenu">
                     <a href="#">
@@ -120,6 +122,7 @@
                 </li>
 
                 <!-- Pagamentos -->
+                @isset(Auth::user()->empresa->user_id)
                 <li class="submenu">
                     <a href="#">
                         <i class="fas fa-credit-card" style="font-size: 18px;"></i> 
@@ -131,6 +134,7 @@
                         <li><a href="{{ route('empresa.pagamento.create') }}">Cadastrar</a></li>
                     </ul>
                 </li>
+           
 
                 <li class="submenu">
                     <a href="#">
@@ -147,7 +151,7 @@
                         <li><a href="{{ route('integracoes.relatorios') }}">Relatórios de Pagamentos</a></li>
                     </ul>
                 </li>
-
+                @endisset
                 @if(Auth::user()->isAdmin)
                 <!-- Gestão de Empresas -->
                 <li class="submenu">

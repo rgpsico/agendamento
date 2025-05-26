@@ -84,7 +84,11 @@ class UserController extends Controller
                     'avatar' => 'AVATAR'
                 ]);
 
-                return redirect()->route('agenda.index')->with('success', 'Professor criado com sucesso!');
+                if (!Auth::user()->empresa) {
+                        return redirect()->route('empresa.configuracao', ['userId' => $user->id]);
+                 }
+
+              
             }
 
             if ($user->tipo_usuario == 'Aluno') {

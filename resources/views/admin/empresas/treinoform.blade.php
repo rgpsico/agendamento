@@ -1,4 +1,4 @@
-<x-admin.layout title="Listar Alunos">
+<x-admin.layout title="Cadastrar Empresa">
     <div class="page-wrapper">
         <div class="content container-fluid">
            
