@@ -22,109 +22,7 @@ class PixQrController extends Controller
 
 
 
-    /**
-     * Simulate a PIX payment in the Asaas sandbox.
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function simulatePixPayment(Request $request)
-    {
-        // Validate the incoming request
-        $request->validate([
-            'payment_id' => 'required|string',
-            'payload' => 'required|string', // The QR code copy-and-paste payload
-        ]);
-
-        $paymentId = $request->input('payment_id');
-        $payload = $request->input('payload');
-
-        try {
-            // Simulate payment using POST /v3/pix/qrCodes/pay
-            $response = Http::withHeaders([
-                'accept' => 'application/json',
-                'access_token' => env('ASAAS_API_KEY'),
-                'content-type' => 'application/json',
-            ])->post(env('ASAAS_SANDBOX_URL') . '/v3/pix/qrCodes/pay', [
-                'payload' => $payload,
-            ]);
-
-            // Log the response for debugging
-            Log::debug('Asaas API simulate payment response', [
-                'payment_id' => $paymentId,
-                'status_code' => $response->status(),
-                'response' => $response->json(),
-            ]);
-
-            if ($response->successful()) {
-                $data = $response->json();
-
-                // Check for errors in the response
-                if (isset($data['errors']) || isset($data['error'])) {
-                    $errorMessage = isset($data['errors']) ? json_encode($data['errors']) : ($data['error']['description'] ?? 'Erro desconhecido');
-                    Log::error('Asaas API simulate payment failed', [
-                        'payment_id' => $paymentId,
-                        'error' => $errorMessage,
-                    ]);
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Falha ao simular pagamento: ' . $errorMessage,
-                    ], 400);
-                }
-
-                // Assume payment was simulated successfully
-                // Verify the updated status using GET /v3/payments/{id}/status
-                $statusResponse = Http::withHeaders([
-                    'accept' => 'application/json',
-                    'access_token' => env('ASAAS_API_KEY'),
-                ])->get(env('ASAAS_SANDBOX_URL') . "/v3/payments/{$paymentId}/status");
-
-                Log::debug('Asaas API status after simulation', [
-                    'payment_id' => $paymentId,
-                    'status_code' => $statusResponse->status(),
-                    'response' => $statusResponse->json(),
-                ]);
-
-                if ($statusResponse->successful() && isset($statusResponse->json()['status'])) {
-                    return response()->json([
-                        'success' => true,
-                        'status' => $statusResponse->json()['status'], // e.g., RECEIVED
-                        'message' => 'Pagamento simulado com sucesso.',
-                    ], 200);
-                }
-
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Não foi possível verificar o status após simulação.',
-                    'response' => $statusResponse->json(),
-                ], 400);
-            }
-
-            Log::error('Asaas API simulate payment error', [
-                'payment_id' => $paymentId,
-                'status' => $response->status(),
-                'response' => $response->body(),
-            ]);
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Erro ao simular pagamento: ' . $response->reason(),
-                'status_code' => $response->status(),
-            ], $response->status());
-        } catch (\Exception $e) {
-            Log::error('Error simulating PIX payment', [
-                'payment_id' => $paymentId,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Erro interno ao simular o pagamento.',
-            ], 500);
-        }
-    }
-
+  
      public function listPixKeys(Request $request)
     {
         try {
@@ -158,47 +56,385 @@ class PixQrController extends Controller
         }
     }
 
-    public function createPixPayment(Request $request)
-    {
-        try {
-            $request->validate([
-                'customer_id' => 'required|string',
-                'value' => 'required|numeric|min:0.01',
-                'dueDate' => 'required|date',
-                'description' => 'nullable|string',
-            ]);
+    
+public function simulatePixPayment(Request $request)
+{
+    // Validate the incoming request
+    $request->validate([
+        'payment_id' => 'required|string',
+    ]);
 
-            $response = $this->client->post("{$this->baseUrl}/v3/payments", [
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'access_token' => $this->apiKey,
-                ],
-                'json' => [
-                    'customer' => $request->customer_id,
-                    'billingType' => 'PIX',
-                    'value' => $request->value,
-                    'dueDate' => $request->dueDate,
-                    'description' => $request->description ?? 'Payment via Pix',
-                ],
-            ]);
+    $paymentId = $request->input('payment_id');
 
+    try {
+        // Simulate PIX payment using Asaas sandbox API
+        $client = new \GuzzleHttp\Client();
+        $response = $client->request('POST', env('ASAAS_SANDBOX_URL') . "/v3/payments/{$paymentId}/receiveInCash", [
+            'headers' => [
+                'accept' => 'application/json',
+                'access_token' => env('ASAAS_API_KEY'),
+                'content-type' => 'application/json',
+            ],
+            'json' => [
+                'paymentDate' => now()->format('Y-m-d'), // Data atual
+                'value' => null, // null = valor total da cobrança
+                'notifyCustomer' => true, // Notificar o cliente
+            ]
+        ]);
+
+        // Log the response
+        Log::info('PIX payment simulation', [
+            'payment_id' => $paymentId,
+            'status_code' => $response->getStatusCode(),
+            'response' => json_decode($response->getBody(), true),
+        ]);
+
+        // Check if the request was successful
+        if ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300) {
             $data = json_decode($response->getBody(), true);
-            $pixQrCode = $data['encodedImage'] ?? null;
-            $pixCopyPaste = $data['payload'] ?? null;
+
+            // Check for errors
+            if (isset($data['errors']) || isset($data['error'])) {
+                $errorMessage = isset($data['errors']) ? json_encode($data['errors']) : ($data['error']['description'] ?? 'Erro desconhecido');
+                Log::error('Error simulating PIX payment', [
+                    'payment_id' => $paymentId,
+                    'error' => $errorMessage,
+                ]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Erro ao simular pagamento: ' . $errorMessage,
+                ], 400);
+            }
 
             return response()->json([
                 'success' => true,
-                'payment_id' => $data['id'],
-                'qr_code' => $pixQrCode,
-                'copy_paste' => $pixCopyPaste,
-                'message' => 'Pix payment created successfully',
-            ], 201);
+                'message' => 'Pagamento PIX simulado com sucesso',
+                'payment' => [
+                    'id' => $data['id'],
+                    'status' => $data['status'], // Deve mudar para RECEIVED ou CONFIRMED
+                    'value' => $data['value'],
+                    'paymentDate' => $data['paymentDate'] ?? null,
+                ],
+                'full_response' => $data,
+            ], 200);
+        }
 
-        } catch (\Exception $e) {
-            Log::error('Error creating Pix payment: ' . $e->getMessage());
+        // Handle unsuccessful response
+        Log::error('Failed to simulate PIX payment', [
+            'payment_id' => $paymentId,
+            'status' => $response->getStatusCode(),
+            'response' => $response->getBody()->getContents(),
+        ]);
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Erro ao simular pagamento: HTTP ' . $response->getStatusCode(),
+            'status_code' => $response->getStatusCode(),
+        ], $response->getStatusCode());
+
+    } catch (\GuzzleHttp\Exception\ClientException $e) {
+        // Handle 4xx errors
+        $response = $e->getResponse();
+        $errorBody = json_decode($response->getBody()->getContents(), true);
+        
+        Log::error('Client error simulating PIX payment', [
+            'payment_id' => $paymentId,
+            'status' => $response->getStatusCode(),
+            'error' => $errorBody,
+        ]);
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Erro de validação: ' . ($errorBody['errors'][0]['description'] ?? 'Pagamento não pode ser processado'),
+            'errors' => $errorBody['errors'] ?? [],
+        ], $response->getStatusCode());
+
+    } catch (\Exception $e) {
+        Log::error('Error simulating PIX payment', [
+            'payment_id' => $paymentId,
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+        ]);
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Erro interno ao simular pagamento PIX',
+        ], 500);
+    }
+}
+
+public function completePixPaymentFlow(Request $request)
+{
+    // Validate the incoming request
+    $request->validate([
+        'customer' => 'required|string',
+        'value' => 'required|numeric|min:0.01',
+        'description' => 'nullable|string',
+    ]);
+
+    try {
+        // Step 1: Create PIX payment
+        $paymentData = [
+            'customer' => $request->input('customer'),
+            'billingType' => 'PIX',
+            'value' => $request->input('value'),
+            'dueDate' => now()->addDays(1)->format('Y-m-d'),
+            'description' => $request->input('description', 'Pagamento PIX Teste'),
+        ];
+
+        $client = new \GuzzleHttp\Client();
+        
+        // Create payment
+        $createResponse = $client->request('POST', env('ASAAS_SANDBOX_URL') . '/v3/payments', [
+            'headers' => [
+                'accept' => 'application/json',
+                'access_token' => env('ASAAS_API_KEY'),
+                'content-type' => 'application/json',
+            ],
+            'json' => $paymentData
+        ]);
+
+        if ($createResponse->getStatusCode() < 200 || $createResponse->getStatusCode() >= 300) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to create Pix payment: ' . $e->getMessage(),
+                'message' => 'Erro ao criar pagamento',
+            ], 400);
+        }
+
+        $paymentCreated = json_decode($createResponse->getBody(), true);
+        $paymentId = $paymentCreated['id'];
+
+        // Step 2: Get QR Code
+        $qrResponse = $client->request('GET', env('ASAAS_SANDBOX_URL') . "/v3/payments/{$paymentId}/pixQrCode", [
+            'headers' => [
+                'accept' => 'application/json',
+                'access_token' => env('ASAAS_API_KEY'),
+            ],
+        ]);
+
+        $qrCodeData = null;
+        if ($qrResponse->getStatusCode() >= 200 && $qrResponse->getStatusCode() < 300) {
+            $qrCodeData = json_decode($qrResponse->getBody(), true);
+        }
+
+        // Step 3: Simulate payment (opcional - apenas para teste)
+        if ($request->input('auto_pay', false)) {
+            sleep(2); // Simula tempo para processar
+            
+            $payResponse = $client->request('POST', env('ASAAS_SANDBOX_URL') . "/v3/payments/{$paymentId}/receiveInCash", [
+                'headers' => [
+                    'accept' => 'application/json',
+                    'access_token' => env('ASAAS_API_KEY'),
+                    'content-type' => 'application/json',
+                ],
+                'json' => [
+                    'paymentDate' => now()->format('Y-m-d'),
+                    'notifyCustomer' => true,
+                ]
+            ]);
+
+            if ($payResponse->getStatusCode() >= 200 && $payResponse->getStatusCode() < 300) {
+                $paymentCreated = json_decode($payResponse->getBody(), true);
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Fluxo PIX criado com sucesso',
+            'payment' => [
+                'id' => $paymentCreated['id'],
+                'status' => $paymentCreated['status'],
+                'value' => $paymentCreated['value'],
+                'dueDate' => $paymentCreated['dueDate'],
+                'invoiceUrl' => $paymentCreated['invoiceUrl'] ?? null,
+            ],
+            'qr_code' => $qrCodeData,
+            'instructions' => [
+                'step_1' => 'Pagamento criado com status: ' . $paymentCreated['status'],
+                'step_2' => 'QR Code gerado' . ($qrCodeData ? ' ✅' : ' ❌'),
+                'step_3' => 'Para simular pagamento, chame: POST /payments/pix/simulate com payment_id',
+                'step_4' => 'Para verificar status, chame: GET /payments/status com payment_id',
+            ]
+        ], 201);
+
+    } catch (\Exception $e) {
+        Log::error('Error in complete PIX flow', [
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+        ]);
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Erro no fluxo PIX: ' . $e->getMessage(),
+        ], 500);
+    }
+}
+
+    public function createPixPayment(Request $request)
+    {
+        // Validate the incoming request
+        $request->validate([
+            'customer' => 'required|string',
+            'billingType' => 'required|string|in:PIX',
+            'value' => 'required|numeric|min:0.01',
+            'dueDate' => 'required|date',
+            'description' => 'nullable|string|max:500',
+            'externalReference' => 'nullable|string|max:255',
+            'installmentCount' => 'nullable|integer|min:1',
+            'installmentValue' => 'nullable|numeric',
+            'discount' => 'nullable|array',
+            'interest' => 'nullable|array',
+            'fine' => 'nullable|array',
+            'postalService' => 'nullable|boolean',
+        ]);
+
+        try {
+            // Prepare payment data
+            $paymentData = [
+                'customer' => $request->input('customer'),
+                'billingType' => $request->input('billingType'), // PIX
+                'value' => $request->input('value'),
+                'dueDate' => $request->input('dueDate'),
+            ];
+
+            // Add optional fields if provided
+            if ($request->has('description')) {
+                $paymentData['description'] = $request->input('description');
+            }
+
+            if ($request->has('externalReference')) {
+                $paymentData['externalReference'] = $request->input('externalReference');
+            }
+
+            if ($request->has('installmentCount')) {
+                $paymentData['installmentCount'] = $request->input('installmentCount');
+            }
+
+            if ($request->has('installmentValue')) {
+                $paymentData['installmentValue'] = $request->input('installmentValue');
+            }
+
+            if ($request->has('discount')) {
+                $paymentData['discount'] = $request->input('discount');
+            }
+
+            if ($request->has('interest')) {
+                $paymentData['interest'] = $request->input('interest');
+            }
+
+            if ($request->has('fine')) {
+                $paymentData['fine'] = $request->input('fine');
+            }
+
+            if ($request->has('postalService')) {
+                $paymentData['postalService'] = $request->input('postalService');
+            }
+
+            // Make request to Asaas API using Guzzle
+            $client = new \GuzzleHttp\Client();
+            $response = $client->request('POST', env('ASAAS_SANDBOX_URL') . '/v3/payments', [
+                'headers' => [
+                    'accept' => 'application/json',
+                    'access_token' => env('ASAAS_API_KEY'),
+                    'content-type' => 'application/json',
+                ],
+                'json' => $paymentData
+            ]);
+
+            // Log the response for debugging
+            Log::info('Asaas PIX payment created', [
+                'payment_data' => $paymentData,
+                'status_code' => $response->getStatusCode(),
+                'response' => json_decode($response->getBody(), true),
+            ]);
+
+            // Check if the request was successful
+            if ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300) {
+                $data = json_decode($response->getBody(), true);
+
+                // Check for error response
+                if (isset($data['errors']) || isset($data['error'])) {
+                    $errorMessage = isset($data['errors']) ? json_encode($data['errors']) : ($data['error']['description'] ?? 'Erro desconhecido');
+                    Log::error('Asaas API returned an error', [
+                        'payment_data' => $paymentData,
+                        'error' => $errorMessage,
+                    ]);
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Erro na criação do pagamento: ' . $errorMessage,
+                    ], 400);
+                }
+
+                // Return successful response with payment data
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Pagamento PIX criado com sucesso',
+                    'payment' => [
+                        'id' => $data['id'],
+                        'status' => $data['status'],
+                        'value' => $data['value'],
+                        'dueDate' => $data['dueDate'],
+                        'invoiceUrl' => $data['invoiceUrl'] ?? null,
+                        'bankSlipUrl' => $data['bankSlipUrl'] ?? null,
+                        'pixTransaction' => $data['pixTransaction'] ?? null,
+                    ],
+                    'full_response' => $data, // Include full response for debugging (remove in production)
+                ], 201);
+            }
+
+            // Handle unsuccessful API response
+            Log::error('Asaas API error creating payment', [
+                'payment_data' => $paymentData,
+                'status' => $response->getStatusCode(),
+                'response' => $response->getBody()->getContents(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao criar pagamento: HTTP ' . $response->getStatusCode(),
+                'status_code' => $response->getStatusCode(),
+            ], $response->getStatusCode());
+
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            // Handle 4xx errors (client errors)
+            $response = $e->getResponse();
+            $errorBody = json_decode($response->getBody()->getContents(), true);
+            
+            Log::error('Asaas API client error', [
+                'payment_data' => $paymentData ?? [],
+                'status' => $response->getStatusCode(),
+                'error' => $errorBody,
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro de validação: ' . ($errorBody['errors'][0]['description'] ?? 'Dados inválidos'),
+                'errors' => $errorBody['errors'] ?? [],
+            ], $response->getStatusCode());
+
+        } catch (\GuzzleHttp\Exception\ServerException $e) {
+            // Handle 5xx errors (server errors)
+            Log::error('Asaas API server error', [
+                'payment_data' => $paymentData ?? [],
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro interno do servidor de pagamento',
+            ], 500);
+
+        } catch (\Exception $e) {
+            // Handle any other unexpected errors
+            Log::error('Error creating PIX payment', [
+                'payment_data' => $paymentData ?? [],
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro interno ao criar pagamento PIX',
             ], 500);
         }
     }
