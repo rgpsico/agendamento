@@ -505,6 +505,7 @@ public function completePixPaymentFlow(Request $request)
 
     public function createPixKey(Request $request)
     {
+       
         try {
             $request->validate([
                 'type' => 'required|in:EVP,CPF,CNPJ,EMAIL,PHONE',
@@ -533,7 +534,7 @@ public function completePixPaymentFlow(Request $request)
 
             Log::debug('Criando chave PIX', [
                 'type' => $request->type,
-                'has_key' => isset($payload['key']),
+                'has_key' => isset($payload['key']['id']),
                 'base_url' => $baseUrl,
                 'usuario_id' => $request->usuario_id,
             ]);

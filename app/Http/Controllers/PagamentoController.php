@@ -361,7 +361,7 @@ public function gerarPix(Request $request)
         $jaIntegrado = !empty($professor->asaas_wallet_id);
         
         return view('admin.integracoes.escolaassas', compact('professor', 'usuario', 'jaIntegrado'));
-}
+    }
 
 
         public function mostrarIntegracaopix()
