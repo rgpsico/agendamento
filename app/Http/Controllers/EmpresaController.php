@@ -44,9 +44,9 @@ class EmpresaController extends Controller
      
         $professor_id = Auth::user()->professor->id ?? null;
 
-        if (!$professor_id) {
-            return redirect()->route('admin.dashboard')->with('error', 'Acesso negado.');
-        }
+        // if (!$professor_id) {
+        //     return redirect()->route('admin.dashboard')->with('error', 'Acesso negado.');
+        // }
 
         // Definir datas padrão (últimos 30 dias)
         $data_inicial = $request->input('data_inicial', Carbon::now()->subDays(30)->format('Y-m-d'));
