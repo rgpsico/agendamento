@@ -21,6 +21,110 @@ class PixQrController extends Controller
     }
 
 
+
+    /**
+     * Simulate a PIX payment in the Asaas sandbox.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function simulatePixPayment(Request $request)
+    {
+        // Validate the incoming request
+        $request->validate([
+            'payment_id' => 'required|string',
+            'payload' => 'required|string', // The QR code copy-and-paste payload
+        ]);
+
+        $paymentId = $request->input('payment_id');
+        $payload = $request->input('payload');
+
+        try {
+            // Simulate payment using POST /v3/pix/qrCodes/pay
+            $response = Http::withHeaders([
+                'accept' => 'application/json',
+                'access_token' => env('ASAAS_API_KEY'),
+                'content-type' => 'application/json',
+            ])->post(env('ASAAS_SANDBOX_URL') . '/v3/pix/qrCodes/pay', [
+                'payload' => $payload,
+            ]);
+
+            // Log the response for debugging
+            Log::debug('Asaas API simulate payment response', [
+                'payment_id' => $paymentId,
+                'status_code' => $response->status(),
+                'response' => $response->json(),
+            ]);
+
+            if ($response->successful()) {
+                $data = $response->json();
+
+                // Check for errors in the response
+                if (isset($data['errors']) || isset($data['error'])) {
+                    $errorMessage = isset($data['errors']) ? json_encode($data['errors']) : ($data['error']['description'] ?? 'Erro desconhecido');
+                    Log::error('Asaas API simulate payment failed', [
+                        'payment_id' => $paymentId,
+                        'error' => $errorMessage,
+                    ]);
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Falha ao simular pagamento: ' . $errorMessage,
+                    ], 400);
+                }
+
+                // Assume payment was simulated successfully
+                // Verify the updated status using GET /v3/payments/{id}/status
+                $statusResponse = Http::withHeaders([
+                    'accept' => 'application/json',
+                    'access_token' => env('ASAAS_API_KEY'),
+                ])->get(env('ASAAS_SANDBOX_URL') . "/v3/payments/{$paymentId}/status");
+
+                Log::debug('Asaas API status after simulation', [
+                    'payment_id' => $paymentId,
+                    'status_code' => $statusResponse->status(),
+                    'response' => $statusResponse->json(),
+                ]);
+
+                if ($statusResponse->successful() && isset($statusResponse->json()['status'])) {
+                    return response()->json([
+                        'success' => true,
+                        'status' => $statusResponse->json()['status'], // e.g., RECEIVED
+                        'message' => 'Pagamento simulado com sucesso.',
+                    ], 200);
+                }
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Não foi possível verificar o status após simulação.',
+                    'response' => $statusResponse->json(),
+                ], 400);
+            }
+
+            Log::error('Asaas API simulate payment error', [
+                'payment_id' => $paymentId,
+                'status' => $response->status(),
+                'response' => $response->body(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao simular pagamento: ' . $response->reason(),
+                'status_code' => $response->status(),
+            ], $response->status());
+        } catch (\Exception $e) {
+            Log::error('Error simulating PIX payment', [
+                'payment_id' => $paymentId,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro interno ao simular o pagamento.',
+            ], 500);
+        }
+    }
+
      public function listPixKeys(Request $request)
     {
         try {
