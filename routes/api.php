@@ -85,11 +85,13 @@ Route::post('/test-twilio', function () {
 
 Route::post('/pix-qrcode', [PixQrController::class, 'generatePixQrCode']);
 Route::post('/customers', [PixQrController::class, 'createCustomer']);
+
+Route::get('/pix/keys', [PixQrController::class, 'listPixKeys']);
 Route::post('/pix/create-key', [PixQrController::class, 'createPixKey']);
+Route::post('/pix/key/delete', [PixQrController::class, 'deletePixKey']);
 
-
-Route::get('/pix/keys', [PixController::class, 'listPixKeys']);
-Route::delete('/pix/keys/{pixKeyId}', [PixController::class, 'deletePixKey']);
+Route::get('/pix/keys', [PixQrController::class, 'listPixKeys']);
+Route::delete('/pix/keys/{pixKeyId}', [PixQrController::class, 'deletePixKey']);
 
 Route::post('/pagamentos/presencial', [PagamentoController::class, 'criarPagamentoPresencial'])->name('empresa.pagamento.presencial');
 Route::post('/gerar-pix', [PagamentoController::class, 'gerarPix'])->name('gerar.pix');
