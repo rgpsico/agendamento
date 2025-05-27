@@ -1,4 +1,4 @@
-<x-admin.layout title="Agendar de Alunos">
+<x-admin.layout title="Calendário">
    
    <!-- Modal -->
 <!-- Modal -->
@@ -47,7 +47,7 @@
             <!-- Page Header -->
             <div class="row">
                 <div class="col-10">
-                    <h3 class="page-title">Agenda</h3>
+                    <h3 class="page-title">Calendário</h3>
                     <ul class="breadcrumb">
                         <li class="breadcrumb-item">
                             <a href="">Admin</a>

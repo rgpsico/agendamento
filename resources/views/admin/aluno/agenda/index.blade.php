@@ -1,4 +1,4 @@
-<x-adminaluno.layout title="Agendar de Alunos">
+<x-adminaluno.layout title="Agenda">
     <div class="page-wrapper">
         <div class="content container-fluid">
         

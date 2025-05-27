@@ -18,7 +18,7 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\IntegrationsController;
 use App\Http\Controllers\HomeController;
-
+use App\Http\Controllers\Api\PixQrController;
 
 Route::post('/pagamento', [StripeController::class, 'treinoStripe'])->name('stripe.pagamento');
 Route::get('/erro/pagamento', [PagamentoController::class, 'erroPagamento'])->name('erroPagamento');
@@ -32,9 +32,15 @@ Route::prefix('usuario')->group(function () {
 Route::post('/webhook/asaas', [PagamentoController::class, 'webhookAsaas'])->name('webhook.asaas');
 
 
+
+Route::post('/pix/chave', [PixQrController::class, 'criarChavePix'])->name('pix.chave');
 Route::get('/integracao', [PagamentoController::class, 'mostrarIntegracao'])->name('integracao.assas.escola')->middleware('auth');
+Route::get('/integracao/pix', [PagamentoController::class, 'mostrarIntegracaopix'])->name('integracao.assas.pix')->middleware('auth');
+
 Route::post('/integrar/asaas', [PagamentoController::class, 'integrarAsaas'])->name('integrar.asaas');
 
+
+Route::get('/recibo/{id}', [PagamentoController::class, 'verRecibo'])->name('recibo');
 
 // Grupo de rotas para gerenciamento de gateways de pagamento
 Route::prefix('empresa/pagamento')->middleware(['auth'])->group(function () {

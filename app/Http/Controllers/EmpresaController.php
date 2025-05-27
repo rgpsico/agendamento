@@ -36,6 +36,11 @@ class EmpresaController extends Controller
 
     public function dashboard(Request $request)
     {
+
+        if (!Auth::user()->empresa) {
+            return redirect()->route('empresa.configuracao', ['userId' => Auth::user()->id]);
+        }
+        
      
         $professor_id = Auth::user()->professor->id ?? null;
 

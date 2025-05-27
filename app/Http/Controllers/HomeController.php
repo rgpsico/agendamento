@@ -157,8 +157,9 @@ class HomeController extends Controller
        
         $model = $this->model::with('paymentGateways')->where('user_id', $user_id)->first();
         $professor_id = Professor::with('usuario')->where('usuario_id', $user_id)->first();
-
-
+        
+      
+       
         $token_gateway = PagamentoGateway::where('empresa_id', $model->id)
             ->where('status', 1)
             ->value('api_key');
@@ -171,6 +172,7 @@ class HomeController extends Controller
                 'route' => $this->route,
                 'model'  => $model,
                 'professor' => $professor_id,
+                'user_id' => $user_id,                
                 'view' => $this->view,
             ]
         );

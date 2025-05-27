@@ -93,7 +93,10 @@
 			</div>		
 			<!-- /Page Content -->
 			<script src="{{asset('admin/js/jquery-3.6.3.min.js')}}"></script>
-            <script src="{{asset('js/home.js')}}"></script>
+            <script src="{{asset('js/home.js')}}"></script>4
+
+
+			
 			
 </x-layoutsadmin>
 
