@@ -322,358 +322,453 @@
     </div>
 
     <script src="{{ asset('admin/js/jquery-3.6.3.min.js') }}"></script>
-    <script>
-        let pixData = null;
-        let currentPaymentMethod = null;
+    <script src="{{ asset('admin/js/jquery-3.6.3.min.js') }}"></script>
+<script>
+    let pixData = null;
+    let currentPaymentMethod = null;
+    let pixStatusInterval = null; // Variável para armazenar o intervalo de polling
 
-        $(document).ready(function() {
-            // Carregar dados do localStorage
-            var diaDaSemana = localStorage.getItem('diaDaSemana');
-            var data = localStorage.getItem('data');
-            var horaDaAula = localStorage.getItem('horaDaAula');
+    $(document).ready(function() {
+        // Carregar dados do localStorage
+        var diaDaSemana = localStorage.getItem('diaDaSemana');
+        var data = localStorage.getItem('data');
+        var horaDaAula = localStorage.getItem('horaDaAula');
+        
+        $('#data_aula').val(data);
+        $('#hora_aula').val(horaDaAula);
+        
+        // Formatar data para exibição (de YYYY-MM-DD para DD/MM/YYYY)
+        if (data) {
+            var dataFormatada = formatarData(data);
+            $('#display_data_aula').text(dataFormatada);
+        }
+        $('#display_hora_aula').text(horaDaAula);
+
+        var servico = localStorage.getItem('servicos');
+        if (servico) {
+            var res = JSON.parse(servico);
+            $('#valor_aula').val(res[0].preco);
+            $('#titulo').val(res[0].titulo);
+            $('#display_valor_aula').text(res[0].preco);
+            $('#display_titulo').text(res[0].titulo);
+        }
+
+        // Manipular seleção de forma de pagamento
+        $('.payment-method').on('click', function() {
+            var method = $(this).data('method');
+            currentPaymentMethod = method;
             
-            $('#data_aula').val(data);
-            $('#hora_aula').val(horaDaAula);
+            // Marcar radio button
+            $(this).find('input[type="radio"]').prop('checked', true);
             
-            // Formatar data para exibição (de YYYY-MM-DD para DD/MM/YYYY)
-            if (data) {
-                var dataFormatada = formatarData(data);
-                $('#display_data_aula').text(dataFormatada);
+            // Atualizar visual
+            $('.payment-method').removeClass('selected');
+            $(this).addClass('selected');
+            
+            // Mostrar detalhes da forma de pagamento
+            $('.payment-details').removeClass('active');
+            $('#' + method + '-details').addClass('active');
+            
+            // Atualizar campo hidden payment_method
+            $('#payment_method').val(method);
+            
+            // Atualizar campo hidden status baseado no método
+            if (method === 'presencial') {
+                $('#status').val($('#presencial-status').val());
+            } else {
+                $('#status').val('PENDING');
             }
-            $('#display_hora_aula').text(horaDaAula);
+            
+            // Atualizar texto do botão
+            updateButtonText(method);
 
-            var servico = localStorage.getItem('servicos');
-            if (servico) {
-                var res = JSON.parse(servico);
-                $('#valor_aula').val(res[0].preco);
-                $('#titulo').val(res[0].titulo);
-                $('#display_valor_aula').text(res[0].preco);
-                $('#display_titulo').text(res[0].titulo);
+            // Resetar PIX se mudou de método
+            if (method !== 'pix') {
+                resetPixDisplay();
+                if (pixStatusInterval) {
+                    clearInterval(pixStatusInterval); // Parar polling se mudar de método
+                }
             }
-
-            // Manipular seleção de forma de pagamento
-            $('.payment-method').on('click', function() {
-                var method = $(this).data('method');
-                currentPaymentMethod = method;
-                
-                // Marcar radio button
-                $(this).find('input[type="radio"]').prop('checked', true);
-                
-                // Atualizar visual
-                $('.payment-method').removeClass('selected');
-                $(this).addClass('selected');
-                
-                // Mostrar detalhes da forma de pagamento
-                $('.payment-details').removeClass('active');
-                $('#' + method + '-details').addClass('active');
-                
-                // Atualizar campo hidden payment_method
-                $('#payment_method').val(method);
-                
-                // Atualizar campo hidden status baseado no método
-                if (method === 'presencial') {
-                    $('#status').val($('#presencial-status').val());
-                } else {
-                    $('#status').val('PENDING');
-                }
-                
-                // Atualizar texto do botão
-                updateButtonText(method);
-
-                // Resetar PIX se mudou de método
-                if (method !== 'pix') {
-                    resetPixDisplay();
-                }
-            });
-
-            // Atualizar status quando o select mudar
-            $('#presencial-status').on('change', function() {
-                $('#status').val($(this).val());
-            });
-
-            // Formatação dos campos do cartão
-            $('input[name="card_number"]').on('input', function() {
-                var value = $(this).val().replace(/\s/g, '');
-                var formattedValue = value.replace(/(.{4})/g, '$1 ').trim();
-                if (formattedValue.length > 19) formattedValue = formattedValue.substr(0, 19);
-                $(this).val(formattedValue);
-            });
-
-            $('input[name="card_expiry"]').on('input', function() {
-                var value = $(this).val().replace(/\D/g, '');
-                if (value.length >= 2) {
-                    value = value.substr(0, 2) + '/' + value.substr(2, 2);
-                }
-                $(this).val(value);
-            });
-
-            $('input[name="card_cvv"]').on('input', function() {
-                var value = $(this).val().replace(/\D/g, '');
-                $(this).val(value);
-            });
-
-            $('input[name="card_cpf"]').on('input', function() {
-                var value = $(this).val().replace(/\D/g, '');
-                value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
-                $(this).val(value);
-            });
         });
 
-        function handlePayment() {
-            if (!validateForm()) {
-                return;
-            }
+        // Atualizar status quando o select mudar
+        $('#presencial-status').on('change', function() {
+            $('#status').val($(this).val());
+        });
 
-            $('#spinner').show();
-            $('#confirm-button').prop('disabled', true);
+        // Formatação dos campos do cartão
+        $('input[name="card_number"]').on('input', function() {
+            var value = $(this).val().replace(/\s/g, '');
+            var formattedValue = value.replace(/(.{4})/g, '$1 ').trim();
+            if (formattedValue.length > 19) formattedValue = formattedValue.substr(0, 19);
+            $(this).val(formattedValue);
+        });
 
-            if (currentPaymentMethod === 'pix') {
-                generatePixPayment();
-            } else if (currentPaymentMethod === 'cartao') {
-                processCardPayment();
-            } else if (currentPaymentMethod === 'presencial') {
-                finalizeBooking();
+        $('input[name="card_expiry"]').on('input', function() {
+            var value = $(this).val().replace(/\D/g, '');
+            if (value.length >= 2) {
+                value = value.substr(0, 2) + '/' + value.substr(2, 2);
             }
+            $(this).val(value);
+        });
+
+        $('input[name="card_cvv"]').on('input', function() {
+            var value = $(this).val().replace(/\D/g, '');
+            $(this).val(value);
+        });
+
+        $('input[name="card_cpf"]').on('input', function() {
+            var value = $(this).val().replace(/\D/g, '');
+            value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+            $(this).val(value);
+        });
+
+        // Parar polling quando a página for fechada
+        $(window).on('unload', function() {
+            if (pixStatusInterval) {
+                clearInterval(pixStatusInterval);
+            }
+        });
+    });
+
+    function handlePayment() {
+        if (!validateForm()) {
+            return;
         }
 
-        function generatePixPayment() {
-            const valor = $('#valor_aula').val();
-            const data_aula = $('#data_aula').val();
-            const usuario_id = $('#usuario_id').val();
+        $('#spinner').show();
+        $('#confirm-button').prop('disabled', true);
 
-            // Calcular due_date (data da aula)
-            const due_date = data_aula;
-
-            const pixData = {
-                usuario_id: parseInt(usuario_id),
-                value: parseFloat(valor),
-                description: "Pagamento de aula particular - " + $('#titulo').val(),
-                due_date: due_date
-            };
-
-            fetch('/api/pix-qrcode', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') || $('input[name="_token"]').val()
-                },
-                body: JSON.stringify(pixData)
-            })
-            .then(response => response.json())
-            .then(data => {
-                $('#spinner').hide();
-                $('#confirm-button').prop('disabled', false);
-
-                if (data.success) {
-                    displayPixPayment(data);
-                } else {
-                    alert('Erro ao gerar PIX: ' + (data.message || 'Erro desconhecido'));
-                }
-            })
-            .catch(error => {
-                $('#spinner').hide();
-                $('#confirm-button').prop('disabled', false);
-                console.error('Erro:', error);
-                alert('Erro ao gerar PIX. Tente novamente.');
-            });
+        if (currentPaymentMethod === 'pix') {
+            generatePixPayment();
+        } else if (currentPaymentMethod === 'cartao') {
+            processCardPayment();
+        } else if (currentPaymentMethod === 'presencial') {
+            finalizeBooking();
         }
+    }
 
-        function displayPixPayment(data) {
-            // Salvar dados do PIX
-            pixData = data;
+    function generatePixPayment() {
+        const valor = $('#valor_aula').val();
+        const data_aula = $('#data_aula').val();
+        const usuario_id = $('#usuario_id').val();
 
-            // Mostrar mensagem de sucesso
-            $('#pix-success').show();
+        // Calcular due_date (data da aula)
+        const due_date = data_aula;
 
-            // Exibir QR Code
-            if (data.qr_code && data.qr_code.encoded_image) {
-                const qrImage = `<img src="data:image/png;base64,${data.qr_code.encoded_image}" alt="QR Code PIX" />`;
-                $('#qr-container').html(qrImage);
-            }
+        const pixDataRequest = {
+            usuario_id: parseInt(usuario_id),
+            value: parseFloat(valor),
+            description: "Pagamento de aula particular - " + $('#titulo').val(),
+            due_date: due_date
+        };
 
-            // Exibir código PIX
-            if (data.qr_code && data.qr_code.payload) {
-                $('#pix-code-text').text(data.qr_code.payload);
-                $('#pix-code-container').show();
-            }
+        fetch('/api/pix-qrcode', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') || $('input[name="_token"]').val()
+            },
+            body: JSON.stringify(pixDataRequest)
+        })
+        .then(response => response.json())
+        .then(data => {
+            $('#spinner').hide();
+            $('#confirm-button').prop('disabled', false);
 
-            // Exibir data de expiração
-            if (data.qr_code && data.qr_code.expiration_date) {
-                const expirationDate = new Date(data.qr_code.expiration_date).toLocaleString('pt-BR');
-                $('#expiration-date').text(expirationDate);
-                $('#pix-expiration').show();
-            }
-
-            // Mostrar botão de finalizar
-            $('#finalize-section').show();
-            $('#confirm-button').hide();
-
-            // Scroll para o QR Code
-            $('#qr-container')[0].scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function copyPixCode() {
-            const pixCode = $('#pix-code-text').text();
-            
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(pixCode).then(() => {
-                    alert('Código PIX copiado para a área de transferência!');
-                }).catch(() => {
-                    fallbackCopyTextToClipboard(pixCode);
-                });
+            if (data.success) {
+                displayPixPayment(data);
             } else {
-                fallbackCopyTextToClipboard(pixCode);
+                alert('Erro ao gerar PIX: ' + (data.message || 'Erro desconhecido'));
             }
+        })
+        .catch(error => {
+            $('#spinner').hide();
+            $('#confirm-button').prop('disabled', false);
+            console.error('Erro:', error);
+            alert('Erro ao gerar PIX. Tente novamente.');
+        });
+    }
+
+    function displayPixPayment(data) {
+        // Salvar dados do PIX
+        pixData = data;
+
+        // Mostrar mensagem de sucesso inicial
+        $('#pix-success').html(`
+            <i class="fas fa-clock fa-3x mb-3"></i>
+            <h4>Aguardando Pagamento</h4>
+            <p>Escaneie o QR Code ou copie o código PIX para efetuar o pagamento</p>
+        `).show();
+
+        // Exibir QR Code
+        if (data.qr_code && data.qr_code.encoded_image) {
+            const qrImage = `<img src="data:image/png;base64,${data.qr_code.encoded_image}" alt="QR Code PIX" />`;
+            $('#qr-container').html(qrImage);
         }
 
-        function fallbackCopyTextToClipboard(text) {
-            const textArea = document.createElement("textarea");
-            textArea.value = text;
-            document.body.appendChild(textArea);
-            textArea.focus();
-            textArea.select();
+        // Exibir código PIX
+        if (data.qr_code && data.qr_code.payload) {
+            $('#pix-code-text').text(data.qr_code.payload);
+            $('#pix-code-container').show();
+        }
+
+        // Exibir data de expiração
+        if (data.qr_code && data.qr_code.expiration_date) {
+            const expirationDate = new Date(data.qr_code.expiration_date).toLocaleString('pt-BR');
+            $('#expiration-date').text(expirationDate);
+            $('#pix-expiration').show();
+        }
+
+        // Mostrar botão de finalizar, mas desabilitado
+        $('#finalize-section').show();
+        $('#finalize-section button').prop('disabled', true);
+        $('#confirm-button').hide();
+
+        // Iniciar polling para verificar o status do pagamento
+        pixStatusInterval = setInterval(checkPixPaymentStatus, 20000); // Verificar a cada 10 segundos
+
+        // Scroll para o QR Code
+        $('#qr-container')[0].scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function checkPixPaymentStatus() {
+        try {
             
-            try {
-                document.execCommand('copy');
-                alert('Código PIX copiado para a área de transferência!');
-            } catch (err) {
-                alert('Erro ao copiar código PIX. Copie manualmente.');
+       
+        if (!pixData || !pixData.payment || !pixData.payment.id) {
+            if (pixStatusInterval) {
+                clearInterval(pixStatusInterval);
             }
-            
-            document.body.removeChild(textArea);
+            return;
         }
 
-        function processCardPayment() {
-            // Para pagamento com cartão, submeter o formulário normalmente
-            $('#payment-form').attr('action', "{{ route('empresa.pagamento.asaas') }}");
-            $('#payment-form').submit();
-        }
+        $('#spinner').show();
 
-        function finalizeBooking() {
-            // Preparar dados para finalizar o agendamento
-            const formData = {
-                aluno_id: $('input[name="aluno_id"]').val(),
-                professor_id: $('input[name="professor_id"]').val(),
-                modalidade_id: $('input[name="modalidade_id"]').val(),
-                data_aula: $('#data_aula').val(),
-                hora_aula: $('#hora_aula').val(),
-                valor_aula: $('#valor_aula').val(),
-                titulo: $('#titulo').val(),
-                payment_method: currentPaymentMethod,
-                status: currentPaymentMethod === 'presencial' ? $('#presencial-status').val() : 'PENDING',
-                _token: $('input[name="_token"]').val()
-            };
+        fetch('/api/pix-status', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') || $('input[name="_token"]').val()
+            },
+            body: JSON.stringify({
+                payment_id: pixData.payment.id
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            $('#spinner').hide();
 
-            // Se for PIX, adicionar dados do pagamento
-            if (pixData && currentPaymentMethod === 'pix') {
-                formData.payment_id = pixData.payment.id;
-                formData.invoice_url = pixData.payment.invoice_url;
-            }
-
-            $('#spinner').show();
-
-            // Determinar a rota baseada no método de pagamento
-            let actionUrl;
-            if (currentPaymentMethod === 'presencial') {
-                actionUrl = "{{ route('empresa.pagamento.presencial') }}";
+            if (data.success && data.status === 'RECEIVED') {
+                // Pagamento confirmado
+                $('#pix-success').html(`
+                    <i class="fas fa-check-circle fa-3x mb-3"></i>
+                    <h4>Pagamento Confirmado!</h4>
+                    <p>Seu pagamento via PIX foi recebido com sucesso. Clique abaixo para finalizar o agendamento.</p>
+                `);
+                $('#finalize-section button').prop('disabled', false); // Habilitar botão de finalizar
+                clearInterval(pixStatusInterval); // Parar o polling
+            } else if (data.success && data.status === 'PENDING') {
+                // Pagamento ainda pendente
+                $('#pix-success').html(`
+                    <i class="fas fa-clock fa-3x mb-3"></i>
+                    <h4>Aguardando Pagamento</h4>
+                    <p>Estamos aguardando a confirmação do seu pagamento via PIX.</p>
+                `);
+                $('#finalize-section button').prop('disabled', true); // Manter botão desabilitado
             } else {
-                actionUrl = "{{ route('empresa.pagamento.asaas') }}";
+                // Erro ou pagamento não encontrado
+                $('#pix-success').html(`
+                    <i class="fas fa-exclamation-circle fa-3x mb-3"></i>
+                    <h4>Erro ao Verificar Pagamento</h4>
+                    <p>Ocorreu um erro ao verificar o status do pagamento. Tente novamente.</p>
+                `);
+                $('#finalize-section').hide();
+                $('#confirm-button').show();
+                $('#confirm-button').prop('disabled', false);
+                clearInterval(pixStatusInterval); // Parar o polling
             }
-
-            // Criar um formulário temporário para submeter
-            const form = $('<form>', {
-                method: 'POST',
-                action: actionUrl
-            });
-
-            // Adicionar todos os campos
-            Object.keys(formData).forEach(key => {
-                form.append($('<input>', {
-                    type: 'hidden',
-                    name: key,
-                    value: formData[key]
-                }));
-            });
-
-            // Submeter formulário
-            $('body').append(form);
-            form.submit();
-        }
-
-        function validateForm() {
-            const data_aula = $('#data_aula').val();
-            const hora_aula = $('#hora_aula').val();
-            const valor_aula = $('#valor_aula').val();
-            const titulo = $('#titulo').val();
-
-            if (!data_aula || !hora_aula || !valor_aula || !titulo) {
-                alert('Dados do agendamento incompletos!');
-                return false;
-            }
-
-            if (!currentPaymentMethod) {
-                alert('Por favor, selecione uma forma de pagamento!');
-                return false;
-            }
-
-            // Validações específicas por forma de pagamento
-            if (currentPaymentMethod === 'cartao') {
-                const cardName = $('input[name="card_name"]').val();
-                const cardNumber = $('input[name="card_number"]').val().replace(/\s/g, '');
-                const cardExpiry = $('input[name="card_expiry"]').val();
-                const cardCvv = $('input[name="card_cvv"]').val();
-                const cardCpf = $('input[name="card_cpf"]').val();
-
-                if (!cardName || !cardNumber || !cardExpiry || !cardCvv || !cardCpf) {
-                    alert('Por favor, preencha todos os dados do cartão!');
-                    return false;
-                }
-
-                if (cardNumber.length !== 16) {
-                    alert('Número do cartão deve ter 16 dígitos!');
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        function updateButtonText(method) {
-            const button = $('#confirm-button');
-            switch(method) {
-                case 'pix':
-                    button.html('<i class="fas fa-qrcode"></i> Gerar PIX');
-                    break;
-                case 'cartao':
-                    button.html('<i class="fas fa-credit-card"></i> Pagar com Cartão');
-                    break;
-                case 'presencial':
-                    button.html('<i class="fas fa-handshake"></i> Confirmar Agendamento');
-                    break;
-                default:
-                    button.html('<i class="fas fa-lock"></i> Confirmar Agendamento');
-            }
-        }
-
-        function resetPixDisplay() {
-            $('#pix-success').hide();
-            $('#qr-container').html('<span class="text-muted">QR Code será gerado aqui</span>');
-            $('#pix-code-container').hide();
-            $('#pix-expiration').hide();
+        })
+        .catch(error => {
+            $('#spinner').hide();
+            console.error('Erro ao verificar status do PIX:', error);
+            $('#pix-success').html(`
+                <i class="fas fa-exclamation-circle fa-3x mb-3"></i>
+                <h4>Erro ao Verificar Pagamento</h4>
+                <p>Ocorreu um erro ao verificar o status do pagamento. Tente novamente.</p>
+            `);
             $('#finalize-section').hide();
             $('#confirm-button').show();
-            pixData = null;
+            $('#confirm-button').prop('disabled', false);
+            clearInterval(pixStatusInterval); // Parar o polling
+        });
+         } catch (error) {
+            console.log(error)   
+        }
+    }
+
+    function copyPixCode() {
+        const pixCode = $('#pix-code-text').text();
+        
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(pixCode).then(() => {
+                alert('Código PIX copiado para a área de transferência!');
+            }).catch(() => {
+                fallbackCopyTextToClipboard(pixCode);
+            });
+        } else {
+            fallbackCopyTextToClipboard(pixCode);
+        }
+    }
+
+    function fallbackCopyTextToClipboard(text) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        
+        try {
+            document.execCommand('copy');
+            alert('Código PIX copiado para a área de transferência!');
+        } catch (err) {
+            alert('Erro ao copiar código PIX. Copie manualmente.');
+        }
+        
+        document.body.removeChild(textArea);
+    }
+
+    function processCardPayment() {
+        // Para pagamento com cartão, submeter o formulário normalmente
+        $('#payment-form').attr('action', "{{ route('empresa.pagamento.asaas') }}");
+        $('#payment-form').submit();
+    }
+
+    function finalizeBooking() {
+        // Preparar dados para finalizar o agendamento
+        const formData = {
+            aluno_id: $('input[name="aluno_id"]').val(),
+            professor_id: $('input[name="professor_id"]').val(),
+            modalidade_id: $('input[name="modalidade_id"]').val(),
+            data_aula: $('#data_aula').val(),
+            hora_aula: $('#hora_aula').val(),
+            valor_aula: $('#valor_aula').val(),
+            titulo: $('#titulo').val(),
+            payment_method: currentPaymentMethod,
+            status: currentPaymentMethod === 'presencial' ? $('#presencial-status').val() : 'RECEIVED', // Alterar para RECEIVED para PIX confirmado
+            _token: $('input[name="_token"]').val()
+        };
+
+        // Se for PIX, adicionar dados do pagamento
+        if (pixData && currentPaymentMethod === 'pix') {
+            formData.payment_id = pixData.payment.id;
+            formData.invoice_url = pixData.payment.invoice_url;
         }
 
-        // Função para formatar data de YYYY-MM-DD para DD/MM/YYYY
-        function formatarData(data) {
-            if (!data) return '';
-            
-            const partes = data.split('-');
-            if (partes.length === 3) {
-                return partes[2] + '/' + partes[1] + '/' + partes[0];
-            }
-            return data;
+        $('#spinner').show();
+
+        // Determinar a rota baseada no método de pagamento
+        let actionUrl;
+        if (currentPaymentMethod === 'presencial') {
+            actionUrl = "{{ route('empresa.pagamento.presencial') }}";
+        } else {
+            actionUrl = "{{ route('empresa.pagamento.asaas') }}";
         }
-    </script>
+
+        // Criar um formulário temporário para submeter
+        const form = $('<form>', {
+            method: 'POST',
+            action: actionUrl
+        });
+
+        // Adicionar todos os campos
+        Object.keys(formData).forEach(key => {
+            form.append($('<input>', {
+                type: 'hidden',
+                name: key,
+                value: formData[key]
+            }));
+        });
+
+        // Submeter formulário
+        $('body').append(form);
+        form.submit();
+    }
+
+    function validateForm() {
+        const data_aula = $('#data_aula').val();
+        const hora_aula = $('#hora_aula').val();
+        const valor_aula = $('#valor_aula').val();
+        const titulo = $('#titulo').val();
+
+        if (!data_aula || !hora_aula || !valor_aula || !titulo) {
+            alert('Dados do agendamento incompletos!');
+            return false;
+        }
+
+        if (!currentPaymentMethod) {
+            alert('Por favor, selecione uma forma de pagamento!');
+            return false;
+        }
+
+        // Validações específicas por forma de pagamento
+        if (currentPaymentMethod === 'cartao') {
+            const cardName = $('input[name="card_name"]').val();
+            const cardNumber = $('input[name="card_number"]').val().replace(/\s/g, '');
+            const cardExpiry = $('input[name="card_expiry"]').val();
+            const cardCvv = $('input[name="card_cvv"]').val();
+            const cardCpf = $('input[name="card_cpf"]').val();
+
+            if (!cardName || !cardNumber || !cardExpiry || !cardCvv || !cardCpf) {
+                alert('Por favor, preencha todos os dados do cartão!');
+                return false;
+            }
+
+            if (cardNumber.length !== 16) {
+                alert('Número do cartão deve ter 16 dígitos!');
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    function updateButtonText(method) {
+        const button = $('#confirm-button');
+        switch(method) {
+            case 'pix':
+                button.html('<i class="fas fa-qrcode"></i> Gerar PIX');
+                break;
+            case 'cartao':
+                button.html('<i class="fas fa-credit-card"></i> Pagar com Cartão');
+                break;
+            case 'presencial':
+                button.html('<i class="fas fa-handshake"></i> Confirmar Agendamento');
+                break;
+            default:
+                button.html('<i class="fas fa-lock"></i> Confirmar Agendamento');
+        }
+    }
+
+    function resetPixDisplay() {
+        $('#pix-success').hide();
+        $('#qr-container').html('<span class="text-muted">QR Code será gerado aqui</span>');
+        $('#pix-code-container').hide();
+        $('#pix-expiration').hide();
+        $('#finalize-section').hide();
+        $('#confirm-button').show();
+        pixData = null;
+    }
+
+    // Função para formatar data de YYYY-MM-DD para DD/MM/YYYY
+    function formatarData(data) {
+        if (!data) return '';
+        
+        const partes = data.split('-');
+        if (partes.length === 3) {
+            return partes[2] + '/' + partes[1] + '/' + partes[0];
+        }
+        return data;
+    }
+</script>
 </x-public.layout>

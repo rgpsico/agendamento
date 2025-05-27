@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Log;
 use App\Models\Professor;
+use Illuminate\Support\Facades\Http;
+
 
 class PixQrController extends Controller
 {
@@ -528,7 +530,67 @@ private function formatPixKey($key, $type)
         }
 
 
-    
+     public function checkPixStatus(Request $request)
+    {
+        // Validate the incoming request
+        $request->validate([
+            'payment_id' => 'required|string', // Ensure payment_id is provided and is a string
+        ]);
+
+        // Get the payment ID from the request
+        $paymentId = $request->input('payment_id');
+
+        try {
+            // Make a request to the Asaas API to check payment status
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . env('ASAAS_API_KEY'),
+                'Content-Type' => 'application/json',
+            ])->get("https://api.asaas.com/v3/payments/{$paymentId}");
+
+            // Check if the request was successful
+            if ($response->successful()) {
+                $data = $response->json();
+
+                // Ensure the status field exists in the response
+                if (isset($data['status'])) {
+                    return response()->json([
+                        'success' => true,
+                        'status' => $data['status'], // e.g., PENDING, RECEIVED, etc.
+                    ], 200);
+                }
+
+                // Handle case where status is missing in the response
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Status do pagamento não encontrado na resposta da API.',
+                ], 400);
+            }
+
+            // Handle unsuccessful API response
+            Log::error('Asaas API error', [
+                'payment_id' => $paymentId,
+                'status' => $response->status(),
+                'response' => $response->body(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao consultar a API de pagamento: ' . $response->reason(),
+            ], $response->status());
+        } catch (\Exception $e) {
+            // Log any unexpected errors
+            Log::error('Error checking PIX payment status', [
+                'payment_id' => $paymentId,
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro interno ao verificar o status do pagamento.',
+            ], 500);
+        }
+    }
+
     public function generatePixQrCode(Request $request)
     {
         $request->validate([
