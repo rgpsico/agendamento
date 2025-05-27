@@ -42,8 +42,8 @@ class EmpresaController extends Controller
         }
         
      
-        $professor_id = Auth::user()->professor->id ?? null;
-
+        $professor_id = Auth::user()->professor->id;
+        dd($professor_id);
         if (!$professor_id) {
             return redirect()->route('alunos.index')->with('error', 'Acesso negado.');
         }
