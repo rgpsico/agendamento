@@ -37,16 +37,16 @@ class EmpresaController extends Controller
     public function dashboard(Request $request)
     {
 
-        // if (!Auth::user()->empresa) {
-        //     return redirect()->route('empresa.configuracao', ['userId' => Auth::user()->id]);
-        // }
+        if (Auth::user()->empresa) {
+            return redirect()->route('empresa.configuracao', ['userId' => Auth::user()->id]);
+        }
         
      
         $professor_id = Auth::user()->professor->id ?? null;
 
-        // if (!$professor_id) {
-        //     return redirect()->route('admin.dashboard')->with('error', 'Acesso negado.');
-        // }
+        if (!$professor_id) {
+            return redirect()->route('home')->with('error', 'Acesso negado.');
+        }
 
         // Definir datas padrão (últimos 30 dias)
         $data_inicial = $request->input('data_inicial', Carbon::now()->subDays(30)->format('Y-m-d'));
