@@ -65,6 +65,12 @@
             align-items: center;
             justify-content: center;
             margin: 20px auto;
+            border-radius: 8px;
+        }
+        
+        .pix-qr img {
+            max-width: 100%;
+            max-height: 100%;
         }
         
         .payment-summary {
@@ -78,6 +84,44 @@
             font-size: 1.5em;
             font-weight: bold;
             color: #28a745;
+        }
+        
+        .pix-code-container {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 1px solid #dee2e6;
+        }
+        
+        .pix-code {
+            word-break: break-all;
+            font-family: monospace;
+            font-size: 12px;
+            background-color: white;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        
+        .copy-button {
+            margin-top: 10px;
+        }
+        
+        .payment-success {
+            display: none;
+            text-align: center;
+            padding: 30px;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 8px;
+            color: #155724;
+        }
+        
+        .alert-info {
+            background-color: #d1ecf1;
+            border-color: #bee5eb;
+            color: #0c5460;
         }
     </style>
     
@@ -111,6 +155,13 @@
                                 </div>
                             @endif
                             
+                            <!-- Mensagem de Sucesso PIX -->
+                            <div class="payment-success" id="pix-success">
+                                <i class="fas fa-check-circle fa-3x mb-3"></i>
+                                <h4>PIX Gerado com Sucesso!</h4>
+                                <p>Escaneie o QR Code ou copie o código PIX para efetuar o pagamento</p>
+                            </div>
+                            
                             <!-- Resumo do Agendamento -->
                             <div class="payment-summary">
                                 <h4 class="card-title mb-3">Resumo do Agendamento</h4>
@@ -137,7 +188,7 @@
 
                                 <!-- Campos Hidden -->
                                 <input type="hidden" name="aluno_id" value="{{ Auth::user()->aluno->id ?? Auth::user()->professor->id }}">
-                                <input type="hidden" name="professor_id" value="{{ $professor->id }}">
+                                <input type="hidden" name="professor_id" value="{{ $user_id }}">
                                 <input type="hidden" name="modalidade_id" value="{{ $professor->modalidade_id ?? 1 }}">
                                 <input type="hidden" id="data_aula" name="data_aula" value="">
                                 <input type="hidden" id="hora_aula" name="hora_aula" value="">
@@ -145,6 +196,7 @@
                                 <input type="hidden" id="titulo" name="titulo" value="">
                                 <input type="hidden" id="payment_method" name="payment_method" value="">
                                 <input type="hidden" id="status" name="status" value="PENDING">
+                                <input type="hidden" id="usuario_id" name="usuario_id" value="{{ Auth::user()->id }}">
 
                                 <h4 class="card-title mb-4">Forma de Pagamento</h4>
 
@@ -160,11 +212,20 @@
                                     <div class="payment-details" id="pix-details">
                                         <div class="pix-info">
                                             <h5>Pagamento via PIX</h5>
-                                            <p>Após confirmar, você receberá o código PIX para pagamento</p>
-                                            <div class="pix-qr">
+                                            <p>Clique em "Gerar PIX" para criar o código de pagamento</p>
+                                            <div class="pix-qr" id="qr-container">
                                                 <span class="text-muted">QR Code será gerado aqui</span>
                                             </div>
-                                            <p class="text-muted">Ou use o código PIX: <strong id="pix-code">Será gerado após confirmação</strong></p>
+                                            <div class="pix-code-container" id="pix-code-container" style="display: none;">
+                                                <label><strong>Código PIX:</strong></label>
+                                                <div class="pix-code" id="pix-code-text"></div>
+                                                <button type="button" class="btn btn-sm btn-outline-primary copy-button" onclick="copyPixCode()">
+                                                    <i class="fas fa-copy"></i> Copiar Código PIX
+                                                </button>
+                                            </div>
+                                            <div id="pix-expiration" style="display: none;">
+                                                <p class="text-warning"><i class="fas fa-clock"></i> <strong>Válido até:</strong> <span id="expiration-date"></span></p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -234,7 +295,7 @@
                                 </div>
 
                                 <div class="mt-4">
-                                    <button type="submit" class="btn btn-success btn-lg btn-block" id="confirm-button">
+                                    <button type="button" class="btn btn-success btn-lg btn-block" id="confirm-button" onclick="handlePayment()">
                                         <i class="fas fa-lock"></i> Confirmar Agendamento
                                     </button>
                                     <p class="text-center text-muted mt-2">
@@ -242,6 +303,16 @@
                                     </p>
                                 </div>
                             </form>
+
+                            <!-- Botão para finalizar após PIX -->
+                            <div class="mt-4" id="finalize-section" style="display: none;">
+                                <button type="button" class="btn btn-primary btn-lg btn-block" onclick="finalizeBooking()">
+                                    <i class="fas fa-check"></i> Finalizar Agendamento
+                                </button>
+                                <p class="text-center text-muted mt-2">
+                                    <small>Clique após efetuar o pagamento PIX</small>
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -252,6 +323,9 @@
 
     <script src="{{ asset('admin/js/jquery-3.6.3.min.js') }}"></script>
     <script>
+        let pixData = null;
+        let currentPaymentMethod = null;
+
         $(document).ready(function() {
             // Carregar dados do localStorage
             var diaDaSemana = localStorage.getItem('diaDaSemana');
@@ -280,6 +354,7 @@
             // Manipular seleção de forma de pagamento
             $('.payment-method').on('click', function() {
                 var method = $(this).data('method');
+                currentPaymentMethod = method;
                 
                 // Marcar radio button
                 $(this).find('input[type="radio"]').prop('checked', true);
@@ -304,6 +379,11 @@
                 
                 // Atualizar texto do botão
                 updateButtonText(method);
+
+                // Resetar PIX se mudou de método
+                if (method !== 'pix') {
+                    resetPixDisplay();
+                }
             });
 
             // Atualizar status quando o select mudar
@@ -337,87 +417,263 @@
                 value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
                 $(this).val(value);
             });
+        });
 
-            // Validação do formulário
-            $('#payment-form').on('submit', function(event) {
-                var data_aula = $('#data_aula').val();
-                var hora_aula = $('#hora_aula').val();
-                var valor_aula = $('#valor_aula').val();
-                var titulo = $('#titulo').val();
-                var payment_method = $('#payment_method').val();
+        function handlePayment() {
+            if (!validateForm()) {
+                return;
+            }
 
-                if (!data_aula || !hora_aula || !valor_aula || !titulo) {
-                    alert('Dados do agendamento incompletos!');
-                    event.preventDefault();
-                    return;
-                }
+            $('#spinner').show();
+            $('#confirm-button').prop('disabled', true);
 
-                if (!payment_method) {
-                    alert('Por favor, selecione uma forma de pagamento!');
-                    event.preventDefault();
-                    return;
-                }
+            if (currentPaymentMethod === 'pix') {
+                generatePixPayment();
+            } else if (currentPaymentMethod === 'cartao') {
+                processCardPayment();
+            } else if (currentPaymentMethod === 'presencial') {
+                finalizeBooking();
+            }
+        }
 
-                // Alterar a rota com base no método de pagamento
-                if (payment_method === 'presencial') {
-                    $(this).attr('action', "{{ route('empresa.pagamento.presencial') }}");
+        function generatePixPayment() {
+            const valor = $('#valor_aula').val();
+            const data_aula = $('#data_aula').val();
+            const usuario_id = $('#usuario_id').val();
+
+            // Calcular due_date (data da aula)
+            const due_date = data_aula;
+
+            const pixData = {
+                usuario_id: parseInt(usuario_id),
+                value: parseFloat(valor),
+                description: "Pagamento de aula particular - " + $('#titulo').val(),
+                due_date: due_date
+            };
+
+            fetch('/api/pix-qrcode', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') || $('input[name="_token"]').val()
+                },
+                body: JSON.stringify(pixData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                $('#spinner').hide();
+                $('#confirm-button').prop('disabled', false);
+
+                if (data.success) {
+                    displayPixPayment(data);
                 } else {
-                    $(this).attr('action', "{{ route('empresa.pagamento.asaas') }}");
+                    alert('Erro ao gerar PIX: ' + (data.message || 'Erro desconhecido'));
                 }
+            })
+            .catch(error => {
+                $('#spinner').hide();
+                $('#confirm-button').prop('disabled', false);
+                console.error('Erro:', error);
+                alert('Erro ao gerar PIX. Tente novamente.');
+            });
+        }
 
-                // Validações específicas por forma de pagamento
-                if (payment_method === 'cartao') {
-                    var cardName = $('input[name="card_name"]').val();
-                    var cardNumber = $('input[name="card_number"]').val().replace(/\s/g, '');
-                    var cardExpiry = $('input[name="card_expiry"]').val();
-                    var cardCvv = $('input[name="card_cvv"]').val();
-                    var cardCpf = $('input[name="card_cpf"]').val();
+        function displayPixPayment(data) {
+            // Salvar dados do PIX
+            pixData = data;
 
-                    if (!cardName || !cardNumber || !cardExpiry || !cardCvv || !cardCpf) {
-                        alert('Por favor, preencha todos os dados do cartão!');
-                        event.preventDefault();
-                        return;
-                    }
+            // Mostrar mensagem de sucesso
+            $('#pix-success').show();
 
-                    if (cardNumber.length !== 16) {
-                        alert('Número do cartão deve ter 16 dígitos!');
-                        event.preventDefault();
-                        return;
-                    }
-                }
+            // Exibir QR Code
+            if (data.qr_code && data.qr_code.encoded_image) {
+                const qrImage = `<img src="data:image/png;base64,${data.qr_code.encoded_image}" alt="QR Code PIX" />`;
+                $('#qr-container').html(qrImage);
+            }
 
-                // Mostrar spinner
-                $('#spinner').show();
-                $(this).find('button[type="submit"]').prop('disabled', true);
+            // Exibir código PIX
+            if (data.qr_code && data.qr_code.payload) {
+                $('#pix-code-text').text(data.qr_code.payload);
+                $('#pix-code-container').show();
+            }
+
+            // Exibir data de expiração
+            if (data.qr_code && data.qr_code.expiration_date) {
+                const expirationDate = new Date(data.qr_code.expiration_date).toLocaleString('pt-BR');
+                $('#expiration-date').text(expirationDate);
+                $('#pix-expiration').show();
+            }
+
+            // Mostrar botão de finalizar
+            $('#finalize-section').show();
+            $('#confirm-button').hide();
+
+            // Scroll para o QR Code
+            $('#qr-container')[0].scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function copyPixCode() {
+            const pixCode = $('#pix-code-text').text();
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(pixCode).then(() => {
+                    alert('Código PIX copiado para a área de transferência!');
+                }).catch(() => {
+                    fallbackCopyTextToClipboard(pixCode);
+                });
+            } else {
+                fallbackCopyTextToClipboard(pixCode);
+            }
+        }
+
+        function fallbackCopyTextToClipboard(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                alert('Código PIX copiado para a área de transferência!');
+            } catch (err) {
+                alert('Erro ao copiar código PIX. Copie manualmente.');
+            }
+            
+            document.body.removeChild(textArea);
+        }
+
+        function processCardPayment() {
+            // Para pagamento com cartão, submeter o formulário normalmente
+            $('#payment-form').attr('action', "{{ route('empresa.pagamento.asaas') }}");
+            $('#payment-form').submit();
+        }
+
+        function finalizeBooking() {
+            // Preparar dados para finalizar o agendamento
+            const formData = {
+                aluno_id: $('input[name="aluno_id"]').val(),
+                professor_id: $('input[name="professor_id"]').val(),
+                modalidade_id: $('input[name="modalidade_id"]').val(),
+                data_aula: $('#data_aula').val(),
+                hora_aula: $('#hora_aula').val(),
+                valor_aula: $('#valor_aula').val(),
+                titulo: $('#titulo').val(),
+                payment_method: currentPaymentMethod,
+                status: currentPaymentMethod === 'presencial' ? $('#presencial-status').val() : 'PENDING',
+                _token: $('input[name="_token"]').val()
+            };
+
+            // Se for PIX, adicionar dados do pagamento
+            if (pixData && currentPaymentMethod === 'pix') {
+                formData.payment_id = pixData.payment.id;
+                formData.invoice_url = pixData.payment.invoice_url;
+            }
+
+            $('#spinner').show();
+
+            // Determinar a rota baseada no método de pagamento
+            let actionUrl;
+            if (currentPaymentMethod === 'presencial') {
+                actionUrl = "{{ route('empresa.pagamento.presencial') }}";
+            } else {
+                actionUrl = "{{ route('empresa.pagamento.asaas') }}";
+            }
+
+            // Criar um formulário temporário para submeter
+            const form = $('<form>', {
+                method: 'POST',
+                action: actionUrl
             });
 
-            function updateButtonText(method) {
-                var button = $('#confirm-button');
-                switch(method) {
-                    case 'pix':
-                        button.html('<i class="fas fa-qrcode"></i> Gerar PIX e Confirmar');
-                        break;
-                    case 'cartao':
-                        button.html('<i class="fas fa-credit-card"></i> Pagar com Cartão');
-                        break;
-                    case 'presencial':
-                        button.html('<i class="fas fa-handshake"></i> Confirmar Agendamento');
-                        break;
-                    default:
-                        button.html('<i class="fas fa-lock"></i> Confirmar Agendamento');
+            // Adicionar todos os campos
+            Object.keys(formData).forEach(key => {
+                form.append($('<input>', {
+                    type: 'hidden',
+                    name: key,
+                    value: formData[key]
+                }));
+            });
+
+            // Submeter formulário
+            $('body').append(form);
+            form.submit();
+        }
+
+        function validateForm() {
+            const data_aula = $('#data_aula').val();
+            const hora_aula = $('#hora_aula').val();
+            const valor_aula = $('#valor_aula').val();
+            const titulo = $('#titulo').val();
+
+            if (!data_aula || !hora_aula || !valor_aula || !titulo) {
+                alert('Dados do agendamento incompletos!');
+                return false;
+            }
+
+            if (!currentPaymentMethod) {
+                alert('Por favor, selecione uma forma de pagamento!');
+                return false;
+            }
+
+            // Validações específicas por forma de pagamento
+            if (currentPaymentMethod === 'cartao') {
+                const cardName = $('input[name="card_name"]').val();
+                const cardNumber = $('input[name="card_number"]').val().replace(/\s/g, '');
+                const cardExpiry = $('input[name="card_expiry"]').val();
+                const cardCvv = $('input[name="card_cvv"]').val();
+                const cardCpf = $('input[name="card_cpf"]').val();
+
+                if (!cardName || !cardNumber || !cardExpiry || !cardCvv || !cardCpf) {
+                    alert('Por favor, preencha todos os dados do cartão!');
+                    return false;
+                }
+
+                if (cardNumber.length !== 16) {
+                    alert('Número do cartão deve ter 16 dígitos!');
+                    return false;
                 }
             }
 
-            // Função para formatar data de YYYY-MM-DD para DD/MM/YYYY
-            function formatarData(data) {
-                if (!data) return '';
-                
-                var partes = data.split('-');
-                if (partes.length === 3) {
-                    return partes[2] + '/' + partes[1] + '/' + partes[0];
-                }
-                return data;
+            return true;
+        }
+
+        function updateButtonText(method) {
+            const button = $('#confirm-button');
+            switch(method) {
+                case 'pix':
+                    button.html('<i class="fas fa-qrcode"></i> Gerar PIX');
+                    break;
+                case 'cartao':
+                    button.html('<i class="fas fa-credit-card"></i> Pagar com Cartão');
+                    break;
+                case 'presencial':
+                    button.html('<i class="fas fa-handshake"></i> Confirmar Agendamento');
+                    break;
+                default:
+                    button.html('<i class="fas fa-lock"></i> Confirmar Agendamento');
             }
-        });
+        }
+
+        function resetPixDisplay() {
+            $('#pix-success').hide();
+            $('#qr-container').html('<span class="text-muted">QR Code será gerado aqui</span>');
+            $('#pix-code-container').hide();
+            $('#pix-expiration').hide();
+            $('#finalize-section').hide();
+            $('#confirm-button').show();
+            pixData = null;
+        }
+
+        // Função para formatar data de YYYY-MM-DD para DD/MM/YYYY
+        function formatarData(data) {
+            if (!data) return '';
+            
+            const partes = data.split('-');
+            if (partes.length === 3) {
+                return partes[2] + '/' + partes[1] + '/' + partes[0];
+            }
+            return data;
+        }
     </script>
 </x-public.layout>
