@@ -363,6 +363,24 @@ public function gerarPix(Request $request)
         return view('admin.integracoes.escolaassas', compact('professor', 'usuario', 'jaIntegrado'));
 }
 
+
+        public function mostrarIntegracaopix()
+        {
+           
+            // Verifica se o usuário está logado e é um professor
+            if (!Auth::check() || !Auth::user()->professor) {
+                return redirect()->route('login')->with('error', 'Você precisa estar logado como professor.');
+            }
+
+            $professor = Auth::user()->professor;
+            $usuario = Auth::user();
+            
+            // Verificar se já possui integração
+            $jaIntegrado = !empty($professor->asaas_wallet_id);
+            
+            return view('admin.integracoes.pix', compact('professor', 'usuario', 'jaIntegrado'));
+    }
+
     public function integrarAsaas(Request $request)
     {
         $professorId = $request->input('professor_id');

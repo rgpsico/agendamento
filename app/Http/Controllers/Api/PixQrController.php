@@ -348,6 +348,103 @@ public function deletePixKey($pixKeyId)
 }
 
 
+/**
+     * Store a new PIX key for the authenticated user's professor.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function store(Request $request)
+    {
+        // Validate the incoming request
+        $validated = $request->validate([
+            'pix_key_type' => 'required|in:cpf,email,phone,random',
+            'pix_key_value' => 'required_unless:pix_key_type,random',
+            'wallet_id' => 'required|string',
+        ]);
+
+        // Ensure the wallet_id matches the user's professor record
+        $professor = Auth::user()->professor;
+        if (!$professor || $professor->asaas_wallet_id !== $validated['wallet_id']) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Subconta Asaas inválida ou não encontrada.',
+            ], 403);
+        }
+
+        // Prepare data for Asaas API
+        $asaasData = [
+            'walletId' => $validated['wallet_id'],
+            'type' => strtoupper($validated['pix_key_type']),
+            'value' => $validated['pix_key_type'] === 'random' ? null : $validated['pix_key_value'],
+        ];
+
+        // Call Asaas API to create PIX key
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . env('ASAAS_API_KEY'),
+            'Content-Type' => 'application/json',
+        ])->post('https://api.asaas.com/v3/pix/addressKeys', $asaasData);
+
+        $data = $response->json();
+
+        if ($response->successful() && isset($data['key'])) {
+            // Update or save the PIX key in the professores table
+            $professor->asaas_pix_key = $data['key'];
+            $professor->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Chave PIX criada com sucesso!',
+                'data' => ['pix_key' => $data['key']],
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => $data['errors'][0]['description'] ?? 'Erro ao criar chave PIX.',
+        ], 400);
+    }
+
+    public function criarChavePix(Request $request)
+        {
+            $validated = $request->validate([
+                'pix_key_type' => 'required|in:cpf,email,phone,random',
+                'pix_key_value' => 'required_unless:pix_key_type,random',
+                'wallet_id' => 'required|string',
+            ]);
+
+            // Chamada à API do Asaas para criar a chave PIX
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . env('ASAAS_API_KEY'),
+                'Content-Type' => 'application/json',
+            ])->post('https://api.asaas.com/v3/pix/addressKeys', [
+                'walletId' => $validated['wallet_id'],
+                'type' => strtoupper($validated['pix_key_type']),
+                'value' => $validated['pix_key_type'] === 'random' ? null : $validated['pix_key_value'],
+            ]);
+
+            $data = $response->json();
+
+            if ($response->successful() && isset($data['key'])) {
+                // Salvar a chave PIX no banco
+                $professor = Auth::user()->professor;
+                $professor->asaas_pix_key = $data['key'];
+                $professor->save();
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Chave PIX criada com sucesso!',
+                    'data' => ['pix_key' => $data['key']],
+                ]);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => $data['errors'][0]['description'] ?? 'Erro ao criar chave PIX.',
+            ], 400);
+        }
+
+
     
     public function generatePixQrCode(Request $request)
 {
