@@ -533,9 +533,6 @@
     }
 
     function checkPixPaymentStatus() {
-        try {
-            
-       
         if (!pixData || !pixData.payment || !pixData.payment.id) {
             if (pixStatusInterval) {
                 clearInterval(pixStatusInterval);
@@ -602,9 +599,6 @@
             $('#confirm-button').prop('disabled', false);
             clearInterval(pixStatusInterval); // Parar o polling
         });
-         } catch (error) {
-            console.log(error)   
-        }
     }
 
     function copyPixCode() {
