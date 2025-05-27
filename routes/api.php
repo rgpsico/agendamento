@@ -89,6 +89,8 @@ Route::post('/customers', [PixQrController::class, 'createCustomer']);
 Route::get('/pix/keys', [PixQrController::class, 'listPixKeys']);
 Route::post('/pix/create-key', [PixQrController::class, 'createPixKey']);
 Route::post('/pix/key/delete', [PixQrController::class, 'deletePixKey']);
+Route::post('/pix-status', [PixQrController::class, 'checkPixStatus']);
+
 
 Route::get('/pix/keys', [PixQrController::class, 'listPixKeys']);
 Route::delete('/pix/keys/{pixKeyId}', [PixQrController::class, 'deletePixKey']);
