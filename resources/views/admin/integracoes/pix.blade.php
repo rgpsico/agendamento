@@ -1,3 +1,4 @@
+
 <x-admin.layout title="Gerenciar Chave PIX">
     <div class="page-wrapper">
         <div class="content container-fluid">
@@ -16,7 +17,7 @@
                                     <div class="alert alert-info" role="alert">
                                         <h5 class="alert-heading">Chave PIX Registrada</h5>
                                         <p><strong>Chave PIX:</strong> {{ json_decode(Auth::user()->professor->asaas_pix_key)->key }}</p>
-                                        <button type="button" class="btn btn-sm btn-outline-primary ms-2" onclick="copiarTexto('{{ Auth::user()->professor->asaas_pix_key }}')">Copiar</button>
+                                        <button type="button" class="btn btn-sm btn-outline-primary ms-2" onclick="copiarTexto('{{ json_decode(Auth::user()->professor->asaas_pix_key)->key }}')">Copiar</button>
                                     </div>
                                 @else
                                     <!-- Formulário para criar chave PIX -->
@@ -80,146 +81,145 @@
     <!-- /Page Wrapper -->
 
     <!-- Script para Criação da Chave PIX -->
-    <!-- Script para Criação da Chave PIX -->
-<script>
-    // Função para copiar texto
-    function copiarTexto(texto) {
-        navigator.clipboard.writeText(texto)
-            .then(() => alert('Copiado para a área de transferência!'))
-            .catch(err => console.error('Erro ao copiar: ', err));
-    }
-
-    // Mostrar/ocultar campo de valor da chave PIX
-    const pixKeyType = document.getElementById('pix_key_type');
-    if (pixKeyType) {
-        pixKeyType.addEventListener('change', function() {
-            const pixKeyValueContainer = document.getElementById('pix_key_value_container');
-            const pixKeyValue = document.getElementById('pix_key_value');
-            const pixKeyValueHint = document.getElementById('pix_key_value_hint');
-
-            if (this.value === 'random') {
-                pixKeyValueContainer.style.display = 'none';
-                pixKeyValue.value = '';
-            } else {
-                pixKeyValueContainer.style.display = 'block';
-                if (this.value === 'cpf') {
-                    pixKeyValueHint.textContent = 'Digite apenas os números do CPF (11 dígitos)';
-                    pixKeyValue.value = '{{ Auth::user()->professor->cpf ?? '' }}';
-                } else if (this.value === 'email') {
-                    pixKeyValueHint.textContent = 'Digite o e-mail para a chave PIX';
-                    pixKeyValue.value = '{{ Auth::user()->email ?? '' }}';
-                } else if (this.value === 'phone') {
-                    pixKeyValueHint.textContent = 'Digite o telefone com DDD (ex: 11987654321)';
-                    pixKeyValue.value = '{{ Auth::user()->telefone ?? '' }}';
-                }
-            }
-        });
-    }
-
-    // Criar chave PIX
-    const criarPixBtn = document.getElementById('criarPixBtn');
-    if (criarPixBtn) {
-        criarPixBtn.addEventListener('click', function() {
-            const pixKeyType = document.getElementById('pix_key_type').value;
-            const pixKeyValue = document.getElementById('pix_key_value').value;
-
-            if (!pixKeyType) {
-                alert('Por favor, selecione o tipo de chave PIX.');
-                return;
-            }
-
-            if (pixKeyType !== 'random' && !pixKeyValue) {
-                alert('Por favor, informe o valor da chave PIX.');
-                return;
-            }
-
-            // Validar formato do valor da chave PIX
-            if (pixKeyType === 'cpf' && pixKeyValue.length !== 11) {
-                alert('CPF deve ter exatamente 11 dígitos.');
-                return;
-            }
-            if (pixKeyType === 'email' && !pixKeyValue.includes('@')) {
-                alert('E-mail inválido.');
-                return;
-            }
-            if (pixKeyType === 'phone' && pixKeyValue.length < 10) {
-                alert('Telefone deve ter pelo menos 10 dígitos (incluindo DDD).');
-                return;
-            }
-
-            // Mostrar loading
-            const pixLoadingSpinner = document.getElementById('pixLoadingSpinner');
-            const pixBtnText = document.getElementById('pixBtnText');
-            pixLoadingSpinner.style.display = 'inline-block';
-            pixBtnText.textContent = 'Criando...';
-            criarPixBtn.disabled = true;
-
-            // Mapear tipo de chave para o formato esperado pela API
-            const keyTypeMap = {
-                'cpf': 'CPF',
-                'email': 'EMAIL',
-                'phone': 'PHONE',
-                'random': 'EVP'
-            };
-
-            // Enviar requisição para criar chave PIX
-            fetch('/api/pix/create-key', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'Accept': 'application/json'
-                },
-                credentials: 'same-origin',
-                body: JSON.stringify({
-                    type: 'EVP',
-                    key: pixKeyType === 'random' ? null : pixKeyValue,
-                    usuario_id: '{{ Auth::user()->id }}'
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                const resultado = document.getElementById('resultado');
-                const status = document.getElementById('status');
-                const pixKey = document.getElementById('pixKey');
-                const copiarPixKey = document.getElementById('copiarPixKey');
-
-                if (data.success) {
-                    status.className = 'alert alert-success';
-                    status.textContent = 'Chave PIX criada com sucesso!';
-                    pixKey.value = data.pix_key?.key || 'Não disponível';
-                    copiarPixKey.style.display = data.pix_key?.key ? 'inline-block' : 'none';
-                    resultado.style.display = 'block';
-                    // Atualizar a página para exibir a chave PIX
-                    setTimeout(() => location.reload(), 2000);
-                } else {
-                    status.className = 'alert alert-danger';
-                    status.textContent = 'Erro: ' + (data.message || 'Falha ao criar a chave PIX');
-                    resultado.style.display = 'block';
-                }
-            })
-            .catch(error => {
-                document.getElementById('status').className = 'alert alert-danger';
-                document.getElementById('status').textContent = 'Erro na requisição: ' + error.message;
-                document.getElementById('resultado').style.display = 'block';
-            })
-            .finally(() => {
-                pixLoadingSpinner.style.display = 'none';
-                pixBtnText.textContent = 'Criar Chave PIX';
-                criarPixBtn.disabled = false;
-            });
-        });
-    }
-
-    // Funcionalidade para copiar chave PIX
-    const copiarPixKey = document.getElementById('copiarPixKey');
-    if (copiarPixKey) {
-        copiarPixKey.addEventListener('click', function() {
-            const pixKey = document.getElementById('pixKey').value;
-            navigator.clipboard.writeText(pixKey)
-                .then(() => alert('Chave PIX copiada para a área ThinkMode!'))
+    <script>
+        // Função para copiar texto
+        function copiarTexto(texto) {
+            navigator.clipboard.writeText(texto)
+                .then(() => alert('Chave PIX copiada para a área de transferência!'))
                 .catch(err => console.error('Erro ao copiar: ', err));
-        });
-    }
-</script>
+        }
+
+        // Mostrar/ocultar campo de valor da chave PIX
+        const pixKeyType = document.getElementById('pix_key_type');
+        if (pixKeyType) {
+            pixKeyType.addEventListener('change', function() {
+                const pixKeyValueContainer = document.getElementById('pix_key_value_container');
+                const pixKeyValue = document.getElementById('pix_key_value');
+                const pixKeyValueHint = document.getElementById('pix_key_value_hint');
+
+                if (this.value === 'random') {
+                    pixKeyValueContainer.style.display = 'none';
+                    pixKeyValue.value = '';
+                } else {
+                    pixKeyValueContainer.style.display = 'block';
+                    if (this.value === 'cpf') {
+                        pixKeyValueHint.textContent = 'Digite apenas os números do CPF (11 dígitos)';
+                        pixKeyValue.value = '{{ Auth::user()->professor->cpf ?? '' }}';
+                    } else if (this.value === 'email') {
+                        pixKeyValueHint.textContent = 'Digite o e-mail para a chave PIX';
+                        pixKeyValue.value = '{{ Auth::user()->email ?? '' }}';
+                    } else if (this.value === 'phone') {
+                        pixKeyValueHint.textContent = 'Digite o telefone com DDD (ex: 11987654321)';
+                        pixKeyValue.value = '{{ Auth::user()->telefone ?? '' }}';
+                    }
+                }
+            });
+        }
+
+        // Criar chave PIX
+        const criarPixBtn = document.getElementById('criarPixBtn');
+        if (criarPixBtn) {
+            criarPixBtn.addEventListener('click', function() {
+                const pixKeyType = document.getElementById('pix_key_type').value;
+                const pixKeyValue = document.getElementById('pix_key_value').value;
+
+                if (!pixKeyType) {
+                    alert('Por favor, selecione o tipo de chave PIX.');
+                    return;
+                }
+
+                if (pixKeyType !== 'random' && !pixKeyValue) {
+                    alert('Por favor, informe o valor da chave PIX.');
+                    return;
+                }
+
+                // Validar formato do valor da chave PIX
+                if (pixKeyType === 'cpf' && pixKeyValue.length !== 11) {
+                    alert('CPF deve ter exatamente 11 dígitos.');
+                    return;
+                }
+                if (pixKeyType === 'email' && !pixKeyValue.includes('@')) {
+                    alert('E-mail inválido.');
+                    return;
+                }
+                if (pixKeyType === 'phone' && pixKeyValue.length < 10) {
+                    alert('Telefone deve ter pelo menos 10 dígitos (incluindo DDD).');
+                    return;
+                }
+
+                // Mostrar loading
+                const pixLoadingSpinner = document.getElementById('pixLoadingSpinner');
+                const pixBtnText = document.getElementById('pixBtnText');
+                pixLoadingSpinner.style.display = 'inline-block';
+                pixBtnText.textContent = 'Criando...';
+                criarPixBtn.disabled = true;
+
+                // Mapear tipo de chave para o formato esperado pela API
+                const keyTypeMap = {
+                    'cpf': 'CPF',
+                    'email': 'EMAIL',
+                    'phone': 'PHONE',
+                    'random': 'EVP'
+                };
+
+                // Enviar requisição para criar chave PIX
+                fetch('/api/pix/create-key', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json'
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({
+                        type: 'EVP',
+                        key: pixKeyType === 'random' ? null : pixKeyValue,
+                        usuario_id: '{{ Auth::user()->id }}'
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const resultado = document.getElementById('resultado');
+                    const status = document.getElementById('status');
+                    const pixKey = document.getElementById('pixKey');
+                    const copiarPixKey = document.getElementById('copiarPixKey');
+
+                    if (data.success) {
+                        status.className = 'alert alert-success';
+                        status.textContent = 'Chave PIX criada com sucesso! Você agora está habilitado para usar PIX no sistema.';
+                        pixKey.value = data.pix_key?.key || 'Não disponível';
+                        copiarPixKey.style.display = data.pix_key?.key ? 'inline-block' : 'none';
+                        resultado.style.display = 'block';
+                        // Atualizar a página para exibir a chave PIX
+                        setTimeout(() => location.reload(), 2000);
+                    } else {
+                        status.className = 'alert alert-danger';
+                        status.textContent = 'Erro: ' + (data.message || 'Falha ao criar a chave PIX');
+                        resultado.style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('status').className = 'alert alert-danger';
+                    document.getElementById('status').textContent = 'Erro na requisição: ' + error.message;
+                    document.getElementById('resultado').style.display = 'block';
+                })
+                .finally(() => {
+                    pixLoadingSpinner.style.display = 'none';
+                    pixBtnText.textContent = 'Criar Chave PIX';
+                    criarPixBtn.disabled = false;
+                });
+            });
+        }
+
+        // Funcionalidade para copiar chave PIX
+        const copiarPixKey = document.getElementById('copiarPixKey');
+        if (copiarPixKey) {
+            copiarPixKey.addEventListener('click', function() {
+                const pixKey = document.getElementById('pixKey').value;
+                navigator.clipboard.writeText(pixKey)
+                    .then(() => alert('Chave PIX copiada para a área de transferência!'))
+                    .catch(err => console.error('Erro ao copiar: ', err));
+            });
+        }
+    </script>
 </x-admin.layout>
