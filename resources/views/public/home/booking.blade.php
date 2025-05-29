@@ -554,11 +554,11 @@
       <div class="container">
         <h3 class="schedule-title">Escolha Data e Horário</h3>
         
-        <div class="row">
+      <div class="row">
           <div class="col-12">
             <div class="date-display">
-              <h4 class="mb-1">{{ \Carbon\Carbon::now()->format('d F Y') }}</h4>
-              <p class="text-muted mb-0">{{ \Carbon\Carbon::now()->isoFormat('dddd') }}</p>
+              <h4 class="mb-1">{{ \Carbon\Carbon::now()->locale('pt_BR')->format('d \d\e F \d\e Y') }}</h4>
+              <p class="mb-1" style="color:#fff; text-transform:capitalize;">{{ \Carbon\Carbon::now()->locale('pt_BR')->isoFormat('dddd') }}</p>
             </div>
           </div>
         </div>

@@ -142,7 +142,7 @@
                                     @if (session('payment_method') === 'presencial')
                                         Presencial no dia da aula
                                     @elseif (session('payment_method') === 'pix')
-                                        Via PIX (aguardando pagamento)
+                                        Via PIX 
                                     @elseif (session('payment_method') === 'cartao')
                                         Via Cartão de Crédito (confirmado)
                                     @else

@@ -429,213 +429,125 @@ public function completePixPaymentFlow(Request $request)
     }
 
 
-     private static function convertToUSFormat($date)
-    {
-        $date = str_replace('/', '-', $date);
-        return \Carbon\Carbon::createFromFormat('d-m-Y', $date)->format('Y-m-d');
-    }
-
-    public function fazerAgendamentoPix(Request $request)
-    {
-        try {
-            // Validar os dados recebidos
-            $validated = $request->validate([
-                'aluno_id' => 'required|exists:alunos,id',
-                'professor_id' => 'required|exists:professores,id',
-                'valor_aula' => 'required|numeric|min:0.01', // Alterado para numeric e min:0.01
-                'modalidade_id' => 'required|exists:modalidade,id',
-                'data_aula' => 'required',
-                // 'hora_aula' => 'required',
-                'titulo' => 'required|string|max:255',
-                'payment_method' => 'required|in:pix,cartao',
-            ]);
-          
-            $aluno = Alunos::with('usuario')->find($validated['aluno_id']);
-            $professor = Professor::with('usuario')->find($validated['professor_id']);
-         
-            if (!$aluno || !$professor || !$professor->usuario || !$aluno->usuario) {
-                Log::error('Aluno or professor not found', [
-                    'aluno_id' => $validated['aluno_id'],
-                    'professor_id' => $validated['professor_id'],
-                ]);
-                return redirect()->back()->with('error', 'Aluno ou professor não encontrados.');
+private static function convertToUSFormat($date)
+{
+    $date = trim($date);
+    try {
+        // Try parsing as Y-m-d (from request) or d-m-Y (if front-end changes)
+        $formats = ['Y-m-d', 'd-m-Y'];
+        foreach ($formats as $format) {
+            try {
+                return \Carbon\Carbon::createFromFormat($format, $date)->format('Y-m-d');
+            } catch (\Exception $e) {
+                continue;
             }
-
-         
-             $empresa = $professor->usuario->empresa->id;
-             
-            if (!$empresa) {
-                Log::error('Empresa not found for professor', [
-                    'professor_id' => $validated['professor_id'],
-                ]);
-                return redirect()->back()->with('error', 'Empresa não encontrada para o professor.');
-            }
-
-            $gateway = PagamentoGateway::where('empresa_id', $empresa)
-                ->where('name', 'asaas')
-                ->where('status', 1)
-                ->first();
-
-            if (!$gateway) {
-                Log::error('No active Asaas gateway found', [
-                    'empresa_id' => $empresa->id,
-                ]);
-                return redirect()->back()->with('error', 'Nenhum gateway Asaas ativo configurado.');
-            }
-
-            if (!$professor->asaas_wallet_id) {
-                Log::error('Professor has no Asaas wallet ID', [
-                    'professor_id' => $validated['professor_id'],
-                ]);
-                return redirect()->back()->with('error', 'O professor precisa integrar com o Asaas antes de criar a cobrança.');
-            }
-
-            if ($professor->asaas_wallet_id === $gateway->split_account) {
-                Log::error('Error: Professor wallet ID and SaaS wallet ID are the same', [
-                    'professor_wallet_id' => $professor->asaas_wallet_id,
-                    'saas_wallet_id' => $gateway->split_account,
-                ]);
-                return redirect()->back()->with('error', 'Erro: A carteira do professor não pode ser a mesma do proprietário do SaaS.');
-            }
-
-            // Verificar limite noturno do PIX
-            $currentHour = now()->hour;
-            $isNocturnal = $currentHour >= 20 || $currentHour < 6; // Horário noturno: 20h às 6h
-            if ($isNocturnal && $validated['payment_method'] === 'pix' && $validated['valor_aula'] > 1000) {
-                Log::warning('Transação PIX noturna no sandbox pode estar sujeita a limites', [
-                    'valor_aula' => $validated['valor_aula'],
-                    'hora_atual' => now()->toDateTimeString(),
-                ]);
-                return redirect()->back()->with('error', 'Transações PIX noturnas (20h às 6h) no sandbox têm limite de R$ 1.000,00. Tente um valor menor ou confirme manualmente no painel da Asaas.');
-            }
-
-            $data_aula = self::convertToUSFormat($validated['data_aula']) . ' ' . $validated['hora_aula'];
-
-            $alunoData = [
-                'name' => $aluno->usuario->nome,
-                'email' => $aluno->usuario->email,
-                'cpfCnpj' => $aluno->usuario->cpf ?? '12345678909',
-            ];
-
-            $clientes = $this->asaasService->getClients($gateway->api_key, $gateway->mode);
-            $alunoExistente = collect($clientes['data'] ?? [])->firstWhere('email', $aluno->usuario->email);
-            $alunoId = $alunoExistente ? $alunoExistente['id'] : $this->asaasService->createCustomer($alunoData, $gateway->api_key, $gateway->mode)['id'];
-
-            // Calcular tarifa e valor total da cobrança
-            $tariff = $gateway->tariff_type == 'percentage'
-                ? $validated['valor_aula'] * ($gateway->tariff_value / 100)
-                : $gateway->tariff_value;
-            $valor_cobranca = round($validated['valor_aula'] + $tariff, 2); // Arredondar para evitar erros de ponto flutuante
-
-            // Verificar se a soma dos valores do split corresponde ao valor total
-            $splitTotal = round($validated['valor_aula'] + $tariff, 2);
-            if (abs($valor_cobranca - $splitTotal) > 0.01) {
-                Log::error('Split amount mismatch', [
-                    'valor_cobranca' => $valor_cobranca,
-                    'valor_aula' => $validated['valor_aula'],
-                    'tariff' => $tariff,
-                    'split_total' => $splitTotal,
-                ]);
-                return redirect()->back()->with('error', 'Erro: A soma dos valores do split não corresponde ao valor total da cobrança.');
-            }
-
-            $cobrancaData = [
-                'customer' => $alunoId,
-                'billingType' => $validated['payment_method'] === 'pix' ? 'PIX' : 'CREDIT_CARD',
-                'value' => $valor_cobranca,
-                'dueDate' => now()->addDays(1)->format('Y-m-d'),
-                'description' => $validated['titulo'],
-                'split' => [
-                    [
-                        'walletId' => $professor->asaas_wallet_id,
-                        'fixedValue' => round($validated['valor_aula'], 2),
-                    ],
-                ],
-            ];
-
-            if ($validated['payment_method'] === 'cartao') {
-                $cobrancaData['creditCard'] = [
-                    'holderName' => $request->input('card_name'),
-                    'number' => str_replace(' ', '', $request->input('card_number')),
-                    'expiryMonth' => explode('/', $request->input('card_expiry'))[0],
-                    'expiryYear' => '20' . explode('/', $request->input('card_expiry'))[1],
-                    'ccv' => $request->input('card_cvv'),
-                ];
-                $cobrancaData['creditCardHolderInfo'] = [
-                    'name' => $request->input('card_name'),
-                    'email' => $aluno->usuario->email,
-                    'cpfCnpj' => str_replace(['.', '-'], '', $request->input('card_cpf')),
-                ];
-            }
-
-            Log::info('Attempting to create Asaas payment', [
-                'cobrancaData' => $cobrancaData,
-                'api_key' => substr($gateway->api_key, 0, 5) . '...',
-                'mode' => $gateway->mode,
-            ]);
-
-            $cobranca = $this->asaasService->cobranca($cobrancaData, $gateway->api_key, $gateway->mode);
-
-            if ($cobranca['status'] == 'PENDING') {
-                $aluno->professores()->attach($professor);
-
-                $agendamento = Agendamento::create([
-                    'aluno_id' => $validated['aluno_id'],
-                    'modalidade_id' => $validated['modalidade_id'],
-                    'professor_id' => $validated['professor_id'],
-                    'data_da_aula' => $data_aula,
-                    'valor_aula' => $validated['valor_aula'],
-                    'horario' => $validated['hora_aula'],
-                    'gateway_id' => $gateway->id,
-                    'cobranca_id' => $cobranca['id'],
-                ]);
-
-                $pagamento = Pagamento::create([
-                    'agendamento_id' => $agendamento->id,
-                    'aluno_id' => $validated['aluno_id'],
-                    'pagamento_gateway_id' => $gateway->id,
-                    'asaas_payment_id' => $cobranca['id'],
-                    'status' => $cobranca['status'],
-                    'valor' => $valor_cobranca,
-                    'metodo_pagamento' => $validated['payment_method'] === 'pix' ? 'PIX' : 'CREDIT_CARD',
-                    'data_vencimento' => $cobranca['dueDate'],
-                    'url_boleto' => null,
-                    'qr_code_pix' => $validated['payment_method'] === 'pix' ? $cobranca['encodedImage'] : null,
-                    'resposta_api' => json_encode($cobranca),
-                ]);
-
-                Log::info('Payment created successfully', [
-                    'cobranca_id' => $cobranca['id'],
-                    'aluno_id' => $validated['aluno_id'],
-                    'professor_id' => $validated['professor_id'],
-                ]);
-
-                if ($validated['payment_method'] === 'pix') {
-                    return redirect()->route('pix-payment', [
-                        'cobranca_id' => $cobranca['id'],
-                        'professor_id' => $professor->id,
-                    ]);
-                }
-
-                return redirect()->route('home.checkoutsucesso', ['id' => $professor->id])
-                    ->with('success', 'Agendamento e pagamento confirmados com sucesso')
-                    ->with('payment_method', $validated['payment_method']);
-            }
-
-            Log::error('Payment creation failed', [
-                'cobranca_response' => $cobranca,
-            ]);
-            return redirect()->back()->with('error', 'Erro ao criar cobrança: ' . (isset($cobranca['errors']) ? json_encode($cobranca['errors']) : 'Erro desconhecido'));
-        } catch (\Exception $e) {
-            Log::error('Payment creation failed with exception', [
-                'error' => $e->getMessage(),
-                'cobrancaData' => $cobrancaData ?? null,
-                'trace' => $e->getTraceAsString(),
-            ]);
-            return redirect()->back()->with('error', 'Erro ao criar cobrança: ' . $e->getMessage());
         }
+        throw new \Exception('Invalid date format for data_aula. Expected: Y-m-d or d-m-Y');
+    } catch (\Exception $e) {
+        Log::error('Date parsing failed', [
+            'input_date' => $date,
+            'error' => $e->getMessage(),
+        ]);
+        throw $e;
     }
+}
 
+public function fazerAgendamentoPix(Request $request)
+{
+    try {
+        // Validate the request
+        $validated = $request->validate([
+            'aluno_id' => 'required|exists:alunos,id',
+            'professor_id' => 'required|exists:professores,id',
+            'valor_aula' => 'required|numeric|min:0.01',
+            'modalidade_id' => 'required|exists:modalidade,id',
+            'data_aula' => 'required|date_format:Y-m-d',
+            'hora_aula' => 'required|date_format:H:i',
+            'titulo' => 'required|string|max:255',
+        ]);
+
+        // Log request data for debugging
+        Log::info('Dados da requisição de agendamento', $request->all());
+
+        // Combine date and time into a DATETIME format
+        $data_aula = \Carbon\Carbon::createFromFormat('Y-m-d H:i', $validated['data_aula'] . ' ' . $validated['hora_aula'])->format('Y-m-d H:i:s');
+
+        // Verificar se aluno e professor existem
+        $aluno = Alunos::with('usuario')->find($validated['aluno_id']);
+        $professor = Professor::with('usuario')->find($validated['professor_id']);
+
+        if (!$aluno || !$professor || !$professor->usuario || !$aluno->usuario) {
+            Log::error('Aluno ou professor não encontrados', [
+                'aluno_id' => $validated['aluno_id'],
+                'professor_id' => $validated['professor_id'],
+            ]);
+            return redirect()->back()->with('error', 'Aluno ou professor não encontrados.');
+        }
+
+        // Verificar se já existe um agendamento no mesmo horário para o professor
+        $agendamentoExistente = Agendamento::where('professor_id', $validated['professor_id'])
+            ->where('data_da_aula', $data_aula)
+            ->where('status', '!=', 'cancelado') // Assumindo que existe um campo status
+            ->first();
+
+        if ($agendamentoExistente) {
+            Log::warning('Tentativa de agendamento em horário já ocupado', [
+                'professor_id' => $validated['professor_id'],
+                'data_aula' => $data_aula,
+            ]);
+            return redirect()->back()->with('error', 'O professor já possui um agendamento neste horário.');
+        }
+
+        // Verificar se a data/hora não é no passado
+        $agora = now();
+        $dataHoraAula = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $data_aula);
+        
+        if ($dataHoraAula->isPast()) {
+            return redirect()->back()->with('error', 'Não é possível agendar aulas para datas/horários que já passaram.');
+        }
+
+        // Vincular aluno ao professor (se ainda não estiver vinculado)
+        if (!$aluno->professores()->where('professor_id', $professor->id)->exists()) {
+            $aluno->professores()->attach($professor->id);
+        }
+
+        // Criar o agendamento
+        $agendamento = Agendamento::create([
+            'aluno_id' => $validated['aluno_id'],
+            'modalidade_id' => $validated['modalidade_id'],
+            'professor_id' => $validated['professor_id'],
+            'data_da_aula' => $data_aula,
+            'valor_aula' => $validated['valor_aula'],
+            'horario' => $validated['hora_aula'],
+            'titulo' => $validated['titulo'],
+            'status' => 'agendado', // Status inicial
+        ]);
+
+        Log::info('Agendamento criado com sucesso', [
+            'agendamento_id' => $agendamento->id,
+            'aluno_id' => $validated['aluno_id'],
+            'professor_id' => $validated['professor_id'],
+            'data_aula' => $data_aula,
+        ]);
+
+        // Opcional: Enviar notificações por email ou WhatsApp
+        // $this->notificarAgendamento($agendamento);
+
+        return redirect()->route('home.checkoutsucesso', ['id' => $professor->id])
+            ->with('success', 'Agendamento realizado com sucesso!')
+            ->with('payment_method', 'pix') // Método padrão para agendamento simples
+            ->with('agendamento_id', $agendamento->id);
+
+    } catch (\Exception $e) {
+        Log::error('Erro ao criar agendamento', [
+            'error' => $e->getMessage(),
+            'request_data' => $request->all(),
+            'trace' => $e->getTraceAsString(),
+        ]);
+        
+        return redirect()->back()->with('error', 'Erro ao criar agendamento: ' . $e->getMessage());
+    }
+}
 
 
   public function payPixQrCode(Request $request)
