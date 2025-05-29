@@ -1,3 +1,4 @@
+
 <x-admin.layout title="Gerenciar Chave PIX">
     <div class="page-wrapper">
         <div class="content container-fluid">
@@ -15,8 +16,8 @@
                                 @if(Auth::user()->professor->asaas_pix_key)
                                     <div class="alert alert-info" role="alert">
                                         <h5 class="alert-heading">Chave PIX Registrada</h5>
-                                        <p><strong>Chave PIX:</strong> {{ Auth::user()->professor->asaas_pix_key }}</p>
-                                        <button type="button" class="btn btn-sm btn-outline-primary ms-2" onclick="copiarTexto('{{ Auth::user()->professor->asaas_pix_key }}')">Copiar</button>
+                                        <p><strong>Chave PIX:</strong> {{ json_decode(Auth::user()->professor->asaas_pix_key)->key }}</p>
+                                        <button type="button" class="btn btn-sm btn-outline-primary ms-2" onclick="copiarTexto('{{ json_decode(Auth::user()->professor->asaas_pix_key)->key }}')">Copiar</button>
                                     </div>
                                 @else
                                     <!-- Formulário para criar chave PIX -->
@@ -84,7 +85,7 @@
         // Função para copiar texto
         function copiarTexto(texto) {
             navigator.clipboard.writeText(texto)
-                .then(() => alert('Copiado para a área de transferência!'))
+                .then(() => alert('Chave PIX copiada para a área de transferência!'))
                 .catch(err => console.error('Erro ao copiar: ', err));
         }
 
@@ -153,8 +154,16 @@
                 pixBtnText.textContent = 'Criando...';
                 criarPixBtn.disabled = true;
 
+                // Mapear tipo de chave para o formato esperado pela API
+                const keyTypeMap = {
+                    'cpf': 'CPF',
+                    'email': 'EMAIL',
+                    'phone': 'PHONE',
+                    'random': 'EVP'
+                };
+
                 // Enviar requisição para criar chave PIX
-                fetch('', {
+                fetch('/api/pix/create-key', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -163,9 +172,9 @@
                     },
                     credentials: 'same-origin',
                     body: JSON.stringify({
-                        pix_key_type: pixKeyType,
-                        pix_key_value: pixKeyValue,
-                        wallet_id: '{{ Auth::user()->professor->asaas_wallet_id }}'
+                        type: 'EVP',
+                        key: pixKeyType === 'random' ? null : pixKeyValue,
+                        usuario_id: '{{ Auth::user()->id }}'
                     })
                 })
                 .then(response => response.json())
@@ -177,15 +186,15 @@
 
                     if (data.success) {
                         status.className = 'alert alert-success';
-                        status.textContent = 'Chave PIX criada com sucesso!';
-                        pixKey.value = data.data.pix_key || 'Não disponível';
-                        copiarPixKey.style.display = data.data.pix_key ? 'inline-block' : 'none';
+                        status.textContent = 'Chave PIX criada com sucesso! Você agora está habilitado para usar PIX no sistema.';
+                        pixKey.value = data.pix_key?.key || 'Não disponível';
+                        copiarPixKey.style.display = data.pix_key?.key ? 'inline-block' : 'none';
                         resultado.style.display = 'block';
                         // Atualizar a página para exibir a chave PIX
                         setTimeout(() => location.reload(), 2000);
                     } else {
                         status.className = 'alert alert-danger';
-                        status.textContent = 'Erro: ' + data.message;
+                        status.textContent = 'Erro: ' + (data.message || 'Falha ao criar a chave PIX');
                         resultado.style.display = 'block';
                     }
                 })

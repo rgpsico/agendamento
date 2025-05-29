@@ -35,10 +35,10 @@ function renderDates() {
   $daySlot.append('<li class="right-arrow"><a href="#"><i class="fa fa-chevron-right"></i></a></li>');
 }
 
-$(document).ready(function() {
+$(document).ready(function () {
   renderDates();
 
-  $(document).on('click', '.day-slot .left-arrow', function(e) {
+  $(document).on('click', '.day-slot .left-arrow', function (e) {
     e.preventDefault();
     if (currentStartIndex > 0) {
       currentStartIndex--;
@@ -46,7 +46,7 @@ $(document).ready(function() {
     }
   });
 
-  $(document).on('click', '.day-slot .right-arrow', function(e) {
+  $(document).on('click', '.day-slot .right-arrow', function (e) {
     e.preventDefault();
     if (currentStartIndex < dates.length - 7) {
       currentStartIndex++;
@@ -54,35 +54,35 @@ $(document).ready(function() {
     }
   });
 
-  $(document).on('click', '.day-slot li', function(e) {
+  $(document).on('click', '.day-slot li', function (e) {
     e.preventDefault();
     $('.submit-btn').addClass('disabled');
 
     if (!$(this).hasClass('left-arrow') && !$(this).hasClass('right-arrow')) {
-        $('.day-slot li').removeClass('selected-date');
-        $(this).addClass('selected-date');
+      $('.day-slot li').removeClass('selected-date');
+      $(this).addClass('selected-date');
 
-        const dayOfWeek = $(this).find('span:first').text();
-        const fullDate = $(this).find('.slot-date').text() + ' ' + $(this).find('.slot-year').text();
-        let data_selecionada = converterData(fullDate);
+      const dayOfWeek = $(this).find('span:first').text();
+      const fullDate = $(this).find('.slot-date').text() + ' ' + $(this).find('.slot-year').text();
+      let data_selecionada = converterData(fullDate);
 
-        $('.dia_da_semana').val(dayOfWeek);
-        $('.data').val(data_selecionada);
+      $('.dia_da_semana').val(dayOfWeek);
+      $('.data').val(data_selecionada);
 
-        const servicoSelecionado = $('.card-selected').data('tipo_agendamento');
-        const servicoId = $('.card-selected').data('servico_id');
+      const servicoSelecionado = $('.card-selected').data('tipo_agendamento');
+      const servicoId = $('.card-selected').data('servico_id');
 
-        if (servicoSelecionado === 'DIA') {
-            buscarDisponibilidade(servicoId, data_selecionada);
-        } else {
-            buscarHorarios(dayOfWeek, data_selecionada);
-        }
+      if (servicoSelecionado === 'DIA') {
+        buscarDisponibilidade(servicoId, data_selecionada);
+      } else {
+        buscarHorarios(dayOfWeek, data_selecionada);
+      }
     }
-});
+  });
 
 
 
-  $(document).on('click', '.timing', function(e) {
+  $(document).on('click', '.timing', function (e) {
     e.preventDefault();
 
     $('.timing').removeClass('selected');
@@ -93,7 +93,7 @@ $(document).ready(function() {
     $('.submit-btn').removeClass('disabled');
   });
 
-  $('.submit-btn').on('click', function(e) {
+  $('.submit-btn').on('click', function (e) {
     e.preventDefault();
 
     var diaDaSemana = $('.dia_da_semana').val();
@@ -102,28 +102,28 @@ $(document).ready(function() {
     var tipoAgendamento = $('.card-selected').data('tipo_agendamento');
 
     if (tipoAgendamento === 'DIA' && data) {
-        // Apenas armazena a data e segue para pagamento
-        localStorage.setItem('diaDaSemana', diaDaSemana);
-        localStorage.setItem('data', data);
+      // Apenas armazena a data e segue para pagamento
+      localStorage.setItem('diaDaSemana', diaDaSemana);
+      localStorage.setItem('data', data);
 
-        window.location.href = $(this).attr('href');
-    } 
-    else if (tipoAgendamento === 'HORARIO' && data && horaDaAula) {
-        // Serviço com horário precisa da hora também
-        localStorage.setItem('diaDaSemana', diaDaSemana);
-        localStorage.setItem('data', data);
-        localStorage.setItem('horaDaAula', horaDaAula);
-
-        window.location.href = $(this).attr('href');
-    } 
-    else {
-        alert('Por favor, preencha a data e o horário corretamente.');
+      window.location.href = $(this).attr('href');
     }
-});
+    else if (tipoAgendamento === 'HORARIO' && data && horaDaAula) {
+      // Serviço com horário precisa da hora também
+      localStorage.setItem('diaDaSemana', diaDaSemana);
+      localStorage.setItem('data', data);
+      localStorage.setItem('horaDaAula', horaDaAula);
+
+      window.location.href = $(this).attr('href');
+    }
+    else {
+      alert('Por favor, preencha a data e o horário corretamente.');
+    }
+  });
 
 
   // Corrigindo a seleção do serviço
-  $('.card_servicos').on('click', function() {
+  $('.card_servicos').on('click', function () {
     localStorage.removeItem('servicos');
     $('.time-slot ul').empty();
     $('.submit-btn').addClass('disabled');
@@ -133,10 +133,10 @@ $(document).ready(function() {
     $(this).addClass('card-selected');
 
     const servico = {
-        id: $(this).data('servico_id'),
-        titulo: $(this).data('servico_titulo'),
-        preco: $(this).data('servico_preco'),
-        tipo_agendamento: $(this).data('tipo_agendamento')
+      id: $(this).data('servico_id'),
+      titulo: $(this).data('servico_titulo'),
+      preco: $(this).data('servico_preco'),
+      tipo_agendamento: $(this).data('tipo_agendamento')
     };
 
     console.log(servico);
@@ -146,34 +146,34 @@ $(document).ready(function() {
 
     // Ajusta a interface conforme o tipo de serviço
     if (servico.tipo_agendamento === 'DIA') {
-        $('.time-slot ul').html(`
+      $('.time-slot ul').html(`
             <li class="text-info">
                 <strong>Este serviço não possui horários específicos.</strong>
             </li>
         `);
-        $('.submit-btn').addClass('disabled'); // Botão desativado até que o usuário escolha um dia
+      $('.submit-btn').addClass('disabled'); // Botão desativado até que o usuário escolha um dia
     } else {
-        $('.time-slot ul').empty(); // Limpa horários anteriores
+      $('.time-slot ul').empty(); // Limpa horários anteriores
     }
-});
+  });
 
 
 
 
 
-function buscarDisponibilidade(servicoId, dataSelecionada) {
-  $.ajax({
+  function buscarDisponibilidade(servicoId, dataSelecionada) {
+    $.ajax({
       url: '/api/disponibilidadedia',
       method: 'GET',
       data: {
-          servico_id: servicoId,
-          data: dataSelecionada
+        servico_id: servicoId,
+        data: dataSelecionada
       },
-      success: function(response) {
-          $('.time-slot ul').html('');
+      success: function (response) {
+        $('.time-slot ul').html('');
 
-          if (response.vagas_disponiveis > 0) {
-              $('.time-slot ul').html(`
+        if (response.vagas_disponiveis > 0) {
+          $('.time-slot ul').html(`
                   <li class="text-success">
                       <strong>Vagas Disponíveis: ${response.vagas_disponiveis}</strong>
                   </li>
@@ -181,114 +181,114 @@ function buscarDisponibilidade(servicoId, dataSelecionada) {
                       <strong>Este serviço não possui horários específicos.</strong>
                   </li>
               `);
-              $('.submit-btn').removeClass('disabled');
-          } else {
-              $('.time-slot ul').html(`
+          $('.submit-btn').removeClass('disabled');
+        } else {
+          $('.time-slot ul').html(`
                   <li class="text-danger">
                       <strong>Nenhuma vaga disponível para esta data.</strong>
                   </li>
               `);
-              $('.submit-btn').addClass('disabled');
-          }
+          $('.submit-btn').addClass('disabled');
+        }
       },
-      error: function() {
-          $('.time-slot ul').html(`
+      error: function () {
+        $('.time-slot ul').html(`
               <li class="text-danger">
                   <strong>Erro ao carregar disponibilidade.</strong>
               </li>
           `);
-          $('.submit-btn').addClass('disabled');
+        $('.submit-btn').addClass('disabled');
       }
-  });
-}
-
-
-
-
-function buscarHorarios(dayOfWeek, data_selecionada) {
-  const dayMapping = {
-    'seg.': 1, 'ter.': 2, 'qua.': 3, 'qui.': 4,
-    'sex.': 5, 'sáb.': 6, 'dom.': 7
-  };
-
-  const dayNumber = dayMapping[dayOfWeek];
-  const professorId = $('#professor_id').val();
-  const servicoSelecionado = $('.card-selected').data('servico_id'); // Pega corretamente o ID do serviço selecionado
-
-  if (!servicoSelecionado) {
-    alert("Selecione um serviço antes de escolher o horário.");
-    return;
+    });
   }
 
-  console.log("Serviço Selecionado ID:", servicoSelecionado);
 
-  $('#spinner').show();
-  
-  $.ajax({
-    url: '/api/disponibilidade',
-    method: 'GET',
-    data: {
-      day: dayNumber,
-      data_select: data_selecionada,
-      professor_id: professorId,
-      servico_id: servicoSelecionado
-    },
-    success: function(response) {
-      $('.time-slot ul').html('');
-      $('#spinner').hide();
 
-      if (response.length === 0) {
-        $('.time-slot ul').append('<li class="text-danger">Nenhum horário disponível</li>');
-      } else {
-        response.forEach(function(time) {
-          const timeElement = `<li>
+
+  function buscarHorarios(dayOfWeek, data_selecionada) {
+    const dayMapping = {
+      'seg.': 1, 'ter.': 2, 'qua.': 3, 'qui.': 4,
+      'sex.': 5, 'sáb.': 6, 'dom.': 7
+    };
+
+    const dayNumber = dayMapping[dayOfWeek];
+    const professorId = $('#professor_id').val();
+    const servicoSelecionado = $('.card-selected').data('servico_id'); // Pega corretamente o ID do serviço selecionado
+
+    if (!servicoSelecionado) {
+      alert("Selecione um serviço antes de escolher o horário.");
+      return;
+    }
+
+    console.log("Serviço Selecionado ID:", servicoSelecionado);
+
+    $('#spinner').show();
+
+    $.ajax({
+      url: '/api/disponibilidade',
+      method: 'GET',
+      data: {
+        day: dayNumber,
+        data_select: data_selecionada,
+        professor_id: professorId,
+        servico_id: servicoSelecionado
+      },
+      success: function (response) {
+        $('.time-slot ul').html('');
+        $('#spinner').hide();
+
+        if (response.length === 0) {
+          $('.time-slot ul').append('<li class="text-danger">Nenhum horário disponível</li>');
+        } else {
+          response.forEach(function (time) {
+            const timeElement = `<li>
             <a class="timing" href="#">
               <span>${time}</span>
             </a>
           </li>`;
-          $('.time-slot ul').append(timeElement);
-        });
+            $('.time-slot ul').append(timeElement);
+          });
+        }
+      },
+      error: function () {
+        $('#spinner').hide();
+        $('.time-slot ul').html('<li class="text-danger">Erro ao carregar horários</li>');
       }
-    },
-    error: function() {
-      $('#spinner').hide();
-      $('.time-slot ul').html('<li class="text-danger">Erro ao carregar horários</li>');
+    });
+  }
+
+  function converterData(dateString) {
+    const monthMapping = {
+      'jan.': '01', 'fev.': '02', 'mar.': '03', 'abr.': '04',
+      'mai.': '05', 'jun.': '06', 'jul.': '07', 'ago.': '08',
+      'set.': '09', 'out.': '10', 'nov.': '11', 'dez.': '12'
+    };
+
+    const parts = dateString.split(' ');
+    const day = parts[0].padStart(2, '0');
+    const month = monthMapping[parts[1]];
+    const year = parts[2];
+
+    return year + '-' + month + '-' + day;
+  }
+
+  function toggleServico(servico) {
+    let servicos = localStorage.getItem('servicos');
+
+    if (!servicos) {
+      servicos = [];
+    } else {
+      servicos = JSON.parse(servicos);
     }
-  });
-}
 
-function converterData(dateString) {
-  const monthMapping = {
-    'jan.': '01', 'fev.': '02', 'mar.': '03', 'abr.': '04',
-    'mai.': '05', 'jun.': '06', 'jul.': '07', 'ago.': '08',
-    'set.': '09', 'out.': '10', 'nov.': '11', 'dez.': '12'
-  };
+    const index = servicos.findIndex(s => s.id === servico.id);
 
-  const parts = dateString.split(' ');
-  const day = parts[0].padStart(2, '0');
-  const month = monthMapping[parts[1]];
-  const year = parts[2];
+    if (index === -1) {
+      servicos.push(servico);
+    } else {
+      servicos.splice(index, 1);
+    }
 
-  return year + '-' + month + '-' + day;
-}
-
-function toggleServico(servico) {
-  let servicos = localStorage.getItem('servicos');
-
-  if (!servicos) {
-    servicos = [];
-  } else {
-    servicos = JSON.parse(servicos);
+    localStorage.setItem('servicos', JSON.stringify(servicos));
   }
-
-  const index = servicos.findIndex(s => s.id === servico.id);
-
-  if (index === -1) {
-    servicos.push(servico);
-  } else {
-    servicos.splice(index, 1);
-  }
-
-  localStorage.setItem('servicos', JSON.stringify(servicos));
-}
 });

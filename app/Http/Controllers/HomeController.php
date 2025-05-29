@@ -95,6 +95,7 @@ class HomeController extends Controller
     public function booking($id)
     {
 
+       
 
         $model = $this->model::with('servicos')->where('user_id', $id)->first();
 
@@ -104,7 +105,7 @@ class HomeController extends Controller
 
         $professor_id = $this->professor->where('usuario_id', $id)->value('id');
 
-
+        
         // Array de dias da semana
         $diasDaSemana = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
 

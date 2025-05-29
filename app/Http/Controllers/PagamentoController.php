@@ -361,7 +361,7 @@ public function gerarPix(Request $request)
         $jaIntegrado = !empty($professor->asaas_wallet_id);
         
         return view('admin.integracoes.escolaassas', compact('professor', 'usuario', 'jaIntegrado'));
-}
+    }
 
 
         public function mostrarIntegracaopix()
@@ -563,9 +563,13 @@ public function gerarPix(Request $request)
             'titulo' => 'required|string|max:255',
         ]);
 
+     
+
        if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
+   
+     
 
         // Verificar disponibilidade do professor
         $disponibilidade = Agendamento::where('professor_id', $request->input('professor_id'))
@@ -573,11 +577,14 @@ public function gerarPix(Request $request)
             ->where('horario', $request->input('hora_aula'))
             ->exists();
 
+            
+        
         if ($disponibilidade) {
-            return redirect()->back()->with('error', 'O professor já possui um agendamento neste horário.')->withInput();
+         
+            return redirect()->back()->with('error', 'O professor já possui um agendamento neste horário. Procure uma nova data ou horário diferente')->withInput();
         }
 
-
+  
         // Criar o agendamento
         $agendamento = Agendamento::create([
             'aluno_id' => $request->input('aluno_id'),

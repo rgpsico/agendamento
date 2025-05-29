@@ -18,11 +18,17 @@ class Empresa extends Model
 
     public $incrementing = true;
 
-    protected $keyType = 'string';
+    protected $keyType = 'int';
 
     protected $fillable = ['user_id', 'avatar', 'nome', 'descricao', 'telefone', 'cnpj', 'valor_aula_de', 'valor_aula_ate', 'modalidade_id', 'banners'];
 
     protected $table = 'empresa';
+
+
+      public function site()
+    {
+        return $this->hasOne(EmpresaSite::class, 'empresa_id', 'id');
+    }
 
     public function endereco()
     {
@@ -54,10 +60,7 @@ class Empresa extends Model
         return $this->hasMany(EmpresaAvaliacao::class, 'empresa_id', 'id');
     }
 
-    public function site()
-    {
-        return $this->hasOne(EmpresaSite::class, 'empresa_id', 'id');
-    }
+ 
     public function servicos()
     {
         return $this->hasMany(Servicos::class, 'empresa_id', 'id');
