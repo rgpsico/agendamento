@@ -14,10 +14,6 @@ use App\Models\PagamentoGateway;
 use App\Models\AlunoProfessor;
 use App\Services\AsaasService;
 use App\Models\AsaasWebhookLog;
-
-
-
-
 use Illuminate\Support\Facades\Http;
 
 
@@ -35,78 +31,132 @@ class PixQrController extends Controller
         $this->baseUrl = env('ASAAS_ENV') === 'sandbox' ? env('ASAAS_SANDBOX_URL') : env('ASAAS_URL');
     }
 
-public function handleAsaasWebhook(Request $request)
-    {
-        // Log para confirmar que o webhook foi chamado
-        Log::warning('Asaas webhook aqui', ['payload' => $request->all()]);
 
-        // Obter o payload do webhook
-        $payload = $request->all();
+     public function handleAsaasWebhook(Request $request)
+{
+    // Log para confirmar que o webhook foi chamado
+    Log::warning('Asaas webhook aqui', ['payload' => $request->all()]);
 
-        // Verificar o token de autenticação
-        $asaasToken = $request->header('asaas-access-token');
-        if ($asaasToken !== '123456@') {
-            Log::warning('Asaas Webhook: Token inválido', ['token' => $asaasToken]);
-            AsaasWebhookLog::create([
-                'event' => $payload['event'] ?? null,
-                'payload' => $payload,
-                'status' => 'invalid_token',
-                'message' => 'Token inválido: ' . $asaasToken,
-                'payment_id' => null,
-            ]);
-            return response()->json(['error' => 'Token inválido'], 401);
-        }
+    // Obter o payload do webhook
+    $payload = $request->all();
 
-        // Verificar se o payload é um JSON válido com as chaves esperadas
-        if (!is_array($payload) || !isset($payload['event']) || !isset($payload['payment'])) {
-            // Verificar se o payload é uma string PIX
-            $rawInput = $request->getContent();
-            $message = preg_match('/^00020101/', $rawInput)
-                ? 'Recebido código PIX em vez de JSON'
-                : 'Payload inválido';
-            Log::warning('Asaas Webhook: ' . $message, ['payload' => $payload]);
-            AsaasWebhookLog::create([
-                'event' => null,
-                'payload' => $payload,
-                'status' => 'invalid_payload',
-                'message' => $message,
-                'payment_id' => null,
-            ]);
-            return response()->json(['error' => $message], 400);
-        }
-
-        // Processar eventos de pagamento
-        switch ($payload['event']) {
-            case 'PAYMENT_RECEIVED':
-            case 'PAYMENT_CONFIRMED':
-                $payment = $payload['payment'];
-                Log::info('Asaas Webhook: Pagamento processado', ['payment_id' => $payment['id']]);
-                AsaasWebhookLog::create([
-                    'event' => $payload['event'],
-                    'payload' => $payload,
-                    'status' => 'success',
-                    'message' => 'Pagamento processado com sucesso',
-                    'payment_id' => $payment['id'],
-                ]);
-                // Exemplo: Atualizar status no banco
-                // Payment::where('asaas_id', $payment['id'])->update(['status' => 'confirmed']);
-                break;
-
-            default:
-                Log::info('Asaas Webhook: Evento não tratado', ['event' => $payload['event']]);
-                AsaasWebhookLog::create([
-                    'event' => $payload['event'],
-                    'payload' => $payload,
-                    'status' => 'unhandled_event',
-                    'message' => 'Evento não tratado: ' . $payload['event'],
-                    'payment_id' => $payload['payment']['id'] ?? null,
-                ]);
-                break;
-        }
-
-        // Responder com status 200 para confirmar recebimento
-        return response()->json(['received' => true], 200);
+    // Verificar o token de autenticação
+    $asaasToken = $request->header('asaas-access-token');
+    if ($asaasToken !== '123456@') {
+        Log::warning('Asaas Webhook: Token inválido', ['token' => $asaasToken]);
+        AsaasWebhookLog::create([
+            'event' => $payload['event'] ?? null,
+            'payload' => $payload,
+            'status' => 'invalid_token',
+            'message' => 'Token inválido: ' . $asaasToken,
+            'payment_id' => null,
+        ]);
+        return response()->json(['error' => 'Token inválido'], 401);
     }
+
+    // Verificar se o payload é um JSON válido com as chaves esperadas
+    if (!is_array($payload) || !isset($payload['event']) || !isset($payload['payment'])) {
+        // Verificar se o payload é uma string PIX
+        $rawInput = $request->getContent();
+        $message = preg_match('/^00020101/', $rawInput)
+            ? 'Recebido código PIX em vez de JSON'
+            : 'Payload inválido';
+        Log::warning('Asaas Webhook: ' . $message, ['payload' => $payload]);
+        AsaasWebhookLog::create([
+            'event' => null,
+            'payload' => $payload,
+            'status' => 'invalid_payload',
+            'message' => $message,
+            'payment_id' => null,
+        ]);
+        return response()->json(['error' => $message], 400);
+    }
+
+    // **ENVIAR DADOS PARA O ENDPOINT EXTERNO**
+        $resultadoEnvio = $this->enviarDadosParaEndpoint($payload);
+
+    if ($resultadoEnvio) {
+        Log::info('Asaas Webhook: Dados enviados para endpoint externo com sucesso', [
+            'payment_id' => $payload['payment']['id'] ?? null,
+            'response' => $resultadoEnvio
+        ]);
+    } else {
+        Log::error('Asaas Webhook: Falha ao enviar dados para endpoint externo', [
+            'payment_id' => $payload['payment']['id'] ?? null,
+            'payload' => $payload
+        ]);
+    }
+
+    // Processar eventos de pagamento
+    switch ($payload['event']) {
+        case 'PAYMENT_RECEIVED':
+        case 'PAYMENT_CONFIRMED':
+            $payment = $payload['payment'];
+            Log::info('Asaas Webhook: Pagamento processado', ['payment_id' => $payment['id']]);
+            AsaasWebhookLog::create([
+                'event' => $payload['event'],
+                'payload' => $payload,
+                'status' => 'success',
+                'message' => 'Pagamento processado com sucesso',
+                'payment_id' => $payment['id'],
+                'external_endpoint_response' => $resultadoEnvio, // Adicionar resposta do endpoint externo
+            ]);
+            // Exemplo: Atualizar status no banco
+            // Payment::where('asaas_id', $payment['id'])->update(['status' => 'confirmed']);
+            break;
+
+        default:
+            Log::info('Asaas Webhook: Evento não tratado', ['event' => $payload['event']]);
+            AsaasWebhookLog::create([
+                'event' => $payload['event'],
+                'payload' => $payload,
+                'status' => 'unhandled_event',
+                'message' => 'Evento não tratado: ' . $payload['event'],
+                'payment_id' => $payload['payment']['id'] ?? null,
+                'external_endpoint_response' => $resultadoEnvio, // Adicionar resposta do endpoint externo
+            ]);
+            break;
+    }
+
+    // Responder com status 200 para confirmar recebimento
+    return response()->json(['received' => true], 200);
+}
+
+/**
+ * Envia dados para o endpoint externo
+ * 
+ * @param array $data - Os dados que serão enviados no payload
+ * @return array|null
+ */
+private function enviarDadosParaEndpoint(array $data): ?array
+{
+    try {
+        $response = Http::timeout(30) // Timeout de 30 segundos
+            ->retry(3, 1000) // Tentar 3 vezes com 1 segundo de intervalo
+            ->post('https://www.comunidadeppg.com.br:3000/enviarpedidoparaentregadores', $data);
+        
+        if ($response->successful()) {
+            return $response->json();
+        }
+        
+        Log::error('Erro ao enviar dados para endpoint externo', [
+            'status' => $response->status(),
+            'response' => $response->body(),
+            'data_sent' => $data
+        ]);
+        
+        return null;
+        
+    } catch (\Exception $e) {
+        Log::error('Exceção ao enviar dados para endpoint externo', [
+            'message' => $e->getMessage(),
+            'data_sent' => $data,
+            'trace' => $e->getTraceAsString()
+        ]);
+        
+        return null;
+    }
+}
 
 
 
