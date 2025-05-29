@@ -83,6 +83,7 @@ Route::post('/test-twilio', function () {
     }
 });
 
+Route::post('/web-hook', [PixQrController::class, 'handleAsaasWebhook']);
 
 Route::post('/pix-qrcode', [PixQrController::class, 'generatePixQrCode']);
 Route::post('/customers', [PixQrController::class, 'createCustomer']);

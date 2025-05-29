@@ -33,7 +33,45 @@ class PixQrController extends Controller
     }
 
 
+public function handleAsaasWebhook(Request $request)
+    {
+        // Log para confirmar que o webhook foi chamado
+        Log::warning('Asaas webhook aqui', ['payload' => $request->all()]);
 
+        // Verificar o token de autenticação
+        $asaasToken = $request->header('asaas-access-token');
+        if ($asaasToken !== '123456@') {
+            Log::warning('Asaas Webhook: Token inválido', ['token' => $asaasToken]);
+            return response()->json(['error' => 'Token inválido'], 401);
+        }
+
+        // Obter o payload do webhook
+        $payload = $request->all();
+
+        // Verificar se o evento é relacionado a pagamento
+        if (!isset($payload['event']) || !isset($payload['payment'])) {
+            Log::warning('Asaas Webhook: Payload inválido', ['payload' => $payload]);
+            return response()->json(['error' => 'Payload inválido'], 400);
+        }
+
+        // Processar eventos de pagamento
+        switch ($payload['event']) {
+            case 'PAYMENT_RECEIVED':
+            case 'PAYMENT_CONFIRMED':
+                $payment = $payload['payment'];
+                Log::info('Asaas Webhook: Pagamento processado', ['payment_id' => $payment['id']]);
+                // Exemplo: Atualizar status no banco
+                // Payment::where('asaas_id', $payment['id'])->update(['status' => 'confirmed']);
+                break;
+
+            default:
+                Log::info('Asaas Webhook: Evento não tratado', ['event' => $payload['event']]);
+                break;
+        }
+
+        // Responder com status 200 para confirmar recebimento
+        return response()->json(['received' => true], 200);
+    }
   
      public function listPixKeys(Request $request)
     {
