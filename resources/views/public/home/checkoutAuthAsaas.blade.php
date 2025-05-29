@@ -777,48 +777,48 @@
     // Handle 'enviarpedidoentregadores' event
     socket.on('enviarpedidoentregadores', function(data) {
         console.log('pedido para entregador:', data);
-        
-        // Call function to show delivery details
-        mostrarDetalhesEntrega(data);
-        
-        // Activate audio and play notification sound
-        ativarAudio();
-        reproduzirSomNotificacao();
+
+        // Verificar se existe pixData e se os IDs coincidem
+
+        if(data.event == "PAYMENT_RECEIVED" )
+        {
+        if(pixData && pixData.payment && pixData.payment.id && data.payment.id == pixData.payment.id) {
+            console.log('IDs coincidem! Finalizando booking...');
+            
+            // Parar o polling se estiver rodando
+            if (pixStatusInterval) {
+                clearInterval(pixStatusInterval);
+            }
+            
+            // Atualizar a interface para mostrar pagamento confirmado
+            $('#pix-success').html(`
+                <i class="fas fa-check-circle fa-3x mb-3"></i>
+                <h4>Pagamento Confirmado!</h4>
+                <p>Seu pagamento via PIX foi recebido com sucesso. Finalizando agendamento...</p>
+            `);
+            
+            // Finalizar o booking
+           finalizeBooking();
+        } else {
+            console.log('IDs não coincidem ou pixData não existe');
+            console.log('pixData:', pixData);
+            console.log('data recebido:', data);
+        }
+    }
     });
 
     // Handle disconnection
     socket.on('disconnect', function() {
         console.log('Desconectado do servidor Socket.IO.');
     });
+});
 
     // Example implementations of the functions
-    function mostrarDetalhesEntrega(data) {
-        // Example: Update a div with delivery details
-        $('#delivery-details').html(`
-            <h3>Detalhes do Pedido</h3>
-            <p>ID do Pagamento: ${data.paymentId}</p>
-            <p>Status: ${data.status}</p>
-        `);
-        // Optionally redirect to next screen
-        if (data.status === 'confirmed') {
-            window.location.href = '/proxima-tela';
-        }
-    }
+   
 
-    function ativarAudio() {
-        // Example: Enable an audio element
-        $('#notification-audio').prop('muted', false);
-    }
 
-    function reproduzirSomNotificacao() {
-        // Example: Play a notification sound
-        var audio = $('#notification-audio')[0];
-        if (audio) {
-            audio.play().catch(function(error) {
-                console.error('Erro ao reproduzir som:', error);
-            });
-        }
-    }
-});
+
+  
+
 </script>
 </x-public.layout>
