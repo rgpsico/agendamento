@@ -13,7 +13,7 @@ use App\Models\Pagamento;
 use App\Models\PagamentoGateway;
 use App\Models\AlunoProfessor;
 use App\Services\AsaasService;
-use App\Services\AsaasWebhookLog;
+use App\Models\AsaasWebhookLog;
 
 
 
