@@ -529,7 +529,7 @@ function displayPixPayment(data) {
     $('#confirm-button').hide();
 
     // Iniciar polling para verificar o status do pagamento a cada 5 segundos
-    pixStatusInterval = setInterval(checkPixPaymentStatus, 5000);
+    pixStatusInterval = setInterval(checkPixPaymentStatus, 10000);
 
     // Scroll para o QR Code
     $('#qr-container')[0].scrollIntoView({ behavior: 'smooth' });
