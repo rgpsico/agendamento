@@ -576,6 +576,8 @@ public function gerarPix(Request $request)
             ->where('data_da_aula', $request->input('data_aula'))
             ->where('horario', $request->input('hora_aula'))
             ->exists();
+
+            
         
         if ($disponibilidade) {
          
