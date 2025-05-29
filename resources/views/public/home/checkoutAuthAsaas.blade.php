@@ -322,6 +322,7 @@
 
     <script src="{{ asset('admin/js/jquery-3.6.3.min.js') }}"></script>
     <script src="{{ asset('admin/js/jquery-3.6.3.min.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
 <script>
     let pixData = null;
     let currentPaymentMethod = null;
@@ -763,5 +764,61 @@
         }
         return data;
     }
+
+    $(document).ready(function() {
+    // Initialize Socket.IO connection
+    var socket = io('https://www.comunidadeppg.com.br:3000');
+
+    // Handle connection
+    socket.on('connect', function() {
+        console.log('Conectado ao servidor Socket.IO.');
+    });
+
+    // Handle 'enviarpedidoentregadores' event
+    socket.on('enviarpedidoentregadores', function(data) {
+        console.log('pedido para entregador:', data);
+        
+        // Call function to show delivery details
+        mostrarDetalhesEntrega(data);
+        
+        // Activate audio and play notification sound
+        ativarAudio();
+        reproduzirSomNotificacao();
+    });
+
+    // Handle disconnection
+    socket.on('disconnect', function() {
+        console.log('Desconectado do servidor Socket.IO.');
+    });
+
+    // Example implementations of the functions
+    function mostrarDetalhesEntrega(data) {
+        // Example: Update a div with delivery details
+        $('#delivery-details').html(`
+            <h3>Detalhes do Pedido</h3>
+            <p>ID do Pagamento: ${data.paymentId}</p>
+            <p>Status: ${data.status}</p>
+        `);
+        // Optionally redirect to next screen
+        if (data.status === 'confirmed') {
+            window.location.href = '/proxima-tela';
+        }
+    }
+
+    function ativarAudio() {
+        // Example: Enable an audio element
+        $('#notification-audio').prop('muted', false);
+    }
+
+    function reproduzirSomNotificacao() {
+        // Example: Play a notification sound
+        var audio = $('#notification-audio')[0];
+        if (audio) {
+            audio.play().catch(function(error) {
+                console.error('Erro ao reproduzir som:', error);
+            });
+        }
+    }
+});
 </script>
 </x-public.layout>
