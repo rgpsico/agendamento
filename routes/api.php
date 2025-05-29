@@ -83,9 +83,12 @@ Route::post('/test-twilio', function () {
     }
 });
 
+
 Route::post('/pix-qrcode', [PixQrController::class, 'generatePixQrCode']);
 Route::post('/customers', [PixQrController::class, 'createCustomer']);
-
+Route::post('/pix-webhook', [PixQrController::class, 'handleWebhook']);
+Route::post('/pay-pix', [PixQrController::class, 'payPixQrCode']);
+Route::post('/pix-simulate', [PixQrController::class, 'simulatePixPayment']);
 Route::get('/pix/keys', [PixQrController::class, 'listPixKeys']);
 Route::post('/pix/create-key', [PixQrController::class, 'createPixKey']);
 Route::post('/pix/key/delete', [PixQrController::class, 'deletePixKey']);
@@ -148,7 +151,7 @@ Route::prefix('empresa/pagamento')->group(function () {
     Route::post('/store', [PagamentoController::class, 'store'])->name('empresa.pagamento.store');
     Route::get('/{id}/edit', [PagamentoController::class, 'edit'])->name('empresa.pagamento.edit');
     Route::put('/{id}', [PagamentoController::class, 'update'])->name('empresa.pagamento.update');
-    Route::post('/asaas', [PagamentoController::class, 'pagamentoAsaas'])->name('empresa.pagamento.asaas');
+    // Route::post('/asaas', [PagamentoController::class, 'pagamentoAsaas'])->name('empresa.pagamento.asaas');
 });
 
 

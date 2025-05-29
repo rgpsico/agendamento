@@ -7,14 +7,26 @@ use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Log;
 use App\Models\Professor;
+use App\Models\Alunos;
+use App\Models\Agendamento;
+use App\Models\Pagamento;
+use App\Models\PagamentoGateway;
+use App\Models\AlunoProfessor;
+use App\Services\AsaasService;
+
+
 use Illuminate\Support\Facades\Http;
 
 
 class PixQrController extends Controller
 {
 
-        public function __construct()
+    protected $aluno_professor, $asaasService;
+
+        public function __construct(AlunoProfessor $aluno_professor, AsaasService $asaasService)
     {
+        $this->aluno_professor = $aluno_professor;
+        $this->asaasService = $asaasService;
         $this->client = new Client();
         $this->apiKey = env('ASAAS_API_KEY');
         $this->baseUrl = env('ASAAS_ENV') === 'sandbox' ? env('ASAAS_SANDBOX_URL') : env('ASAAS_URL');
@@ -57,111 +69,7 @@ class PixQrController extends Controller
     }
 
     
-public function simulatePixPayment(Request $request)
-{
-    // Validate the incoming request
-    $request->validate([
-        'payment_id' => 'required|string',
-    ]);
 
-    $paymentId = $request->input('payment_id');
-
-    try {
-        // Simulate PIX payment using Asaas sandbox API
-        $client = new \GuzzleHttp\Client();
-        $response = $client->request('POST', env('ASAAS_SANDBOX_URL') . "/v3/payments/{$paymentId}/receiveInCash", [
-            'headers' => [
-                'accept' => 'application/json',
-                'access_token' => env('ASAAS_API_KEY'),
-                'content-type' => 'application/json',
-            ],
-            'json' => [
-                'paymentDate' => now()->format('Y-m-d'), // Data atual
-                'value' => null, // null = valor total da cobrança
-                'notifyCustomer' => true, // Notificar o cliente
-            ]
-        ]);
-
-        // Log the response
-        Log::info('PIX payment simulation', [
-            'payment_id' => $paymentId,
-            'status_code' => $response->getStatusCode(),
-            'response' => json_decode($response->getBody(), true),
-        ]);
-
-        // Check if the request was successful
-        if ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300) {
-            $data = json_decode($response->getBody(), true);
-
-            // Check for errors
-            if (isset($data['errors']) || isset($data['error'])) {
-                $errorMessage = isset($data['errors']) ? json_encode($data['errors']) : ($data['error']['description'] ?? 'Erro desconhecido');
-                Log::error('Error simulating PIX payment', [
-                    'payment_id' => $paymentId,
-                    'error' => $errorMessage,
-                ]);
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Erro ao simular pagamento: ' . $errorMessage,
-                ], 400);
-            }
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Pagamento PIX simulado com sucesso',
-                'payment' => [
-                    'id' => $data['id'],
-                    'status' => $data['status'], // Deve mudar para RECEIVED ou CONFIRMED
-                    'value' => $data['value'],
-                    'paymentDate' => $data['paymentDate'] ?? null,
-                ],
-                'full_response' => $data,
-            ], 200);
-        }
-
-        // Handle unsuccessful response
-        Log::error('Failed to simulate PIX payment', [
-            'payment_id' => $paymentId,
-            'status' => $response->getStatusCode(),
-            'response' => $response->getBody()->getContents(),
-        ]);
-
-        return response()->json([
-            'success' => false,
-            'message' => 'Erro ao simular pagamento: HTTP ' . $response->getStatusCode(),
-            'status_code' => $response->getStatusCode(),
-        ], $response->getStatusCode());
-
-    } catch (\GuzzleHttp\Exception\ClientException $e) {
-        // Handle 4xx errors
-        $response = $e->getResponse();
-        $errorBody = json_decode($response->getBody()->getContents(), true);
-        
-        Log::error('Client error simulating PIX payment', [
-            'payment_id' => $paymentId,
-            'status' => $response->getStatusCode(),
-            'error' => $errorBody,
-        ]);
-
-        return response()->json([
-            'success' => false,
-            'message' => 'Erro de validação: ' . ($errorBody['errors'][0]['description'] ?? 'Pagamento não pode ser processado'),
-            'errors' => $errorBody['errors'] ?? [],
-        ], $response->getStatusCode());
-
-    } catch (\Exception $e) {
-        Log::error('Error simulating PIX payment', [
-            'payment_id' => $paymentId,
-            'error' => $e->getMessage(),
-            'trace' => $e->getTraceAsString(),
-        ]);
-
-        return response()->json([
-            'success' => false,
-            'message' => 'Erro interno ao simular pagamento PIX',
-        ], 500);
-    }
-}
 
 public function completePixPaymentFlow(Request $request)
 {
@@ -502,6 +410,404 @@ public function completePixPaymentFlow(Request $request)
         }
     }
 
+    public function handleWebhook(Request $request)
+    {
+        $payload = $request->all();
+
+        Log::info('Webhook recebido', ['payload' => $payload]);
+
+        if (isset($payload['event']) && in_array($payload['event'], ['PAYMENT_CONFIRMED', 'PAYMENT_RECEIVED'])) {
+            $paymentId = $payload['payment']['id'] ?? null;
+            $status = $payload['payment']['status'] ?? null;
+
+            if ($paymentId && $status === 'RECEIVED') {
+                Log::info('Pagamento confirmado via webhook', ['payment_id' => $paymentId]);
+            }
+        }
+
+        return response()->json(['success' => true], 200);
+    }
+
+
+     private static function convertToUSFormat($date)
+    {
+        $date = str_replace('/', '-', $date);
+        return \Carbon\Carbon::createFromFormat('d-m-Y', $date)->format('Y-m-d');
+    }
+
+    public function fazerAgendamentoPix(Request $request)
+    {
+        try {
+            // Validar os dados recebidos
+            $validated = $request->validate([
+                'aluno_id' => 'required|exists:alunos,id',
+                'professor_id' => 'required|exists:professores,id',
+                'valor_aula' => 'required|numeric|min:0.01', // Alterado para numeric e min:0.01
+                'modalidade_id' => 'required|exists:modalidade,id',
+                'data_aula' => 'required',
+                // 'hora_aula' => 'required',
+                'titulo' => 'required|string|max:255',
+                'payment_method' => 'required|in:pix,cartao',
+            ]);
+          
+            $aluno = Alunos::with('usuario')->find($validated['aluno_id']);
+            $professor = Professor::with('usuario')->find($validated['professor_id']);
+         
+            if (!$aluno || !$professor || !$professor->usuario || !$aluno->usuario) {
+                Log::error('Aluno or professor not found', [
+                    'aluno_id' => $validated['aluno_id'],
+                    'professor_id' => $validated['professor_id'],
+                ]);
+                return redirect()->back()->with('error', 'Aluno ou professor não encontrados.');
+            }
+
+         
+             $empresa = $professor->usuario->empresa->id;
+             
+            if (!$empresa) {
+                Log::error('Empresa not found for professor', [
+                    'professor_id' => $validated['professor_id'],
+                ]);
+                return redirect()->back()->with('error', 'Empresa não encontrada para o professor.');
+            }
+
+            $gateway = PagamentoGateway::where('empresa_id', $empresa)
+                ->where('name', 'asaas')
+                ->where('status', 1)
+                ->first();
+
+            if (!$gateway) {
+                Log::error('No active Asaas gateway found', [
+                    'empresa_id' => $empresa->id,
+                ]);
+                return redirect()->back()->with('error', 'Nenhum gateway Asaas ativo configurado.');
+            }
+
+            if (!$professor->asaas_wallet_id) {
+                Log::error('Professor has no Asaas wallet ID', [
+                    'professor_id' => $validated['professor_id'],
+                ]);
+                return redirect()->back()->with('error', 'O professor precisa integrar com o Asaas antes de criar a cobrança.');
+            }
+
+            if ($professor->asaas_wallet_id === $gateway->split_account) {
+                Log::error('Error: Professor wallet ID and SaaS wallet ID are the same', [
+                    'professor_wallet_id' => $professor->asaas_wallet_id,
+                    'saas_wallet_id' => $gateway->split_account,
+                ]);
+                return redirect()->back()->with('error', 'Erro: A carteira do professor não pode ser a mesma do proprietário do SaaS.');
+            }
+
+            // Verificar limite noturno do PIX
+            $currentHour = now()->hour;
+            $isNocturnal = $currentHour >= 20 || $currentHour < 6; // Horário noturno: 20h às 6h
+            if ($isNocturnal && $validated['payment_method'] === 'pix' && $validated['valor_aula'] > 1000) {
+                Log::warning('Transação PIX noturna no sandbox pode estar sujeita a limites', [
+                    'valor_aula' => $validated['valor_aula'],
+                    'hora_atual' => now()->toDateTimeString(),
+                ]);
+                return redirect()->back()->with('error', 'Transações PIX noturnas (20h às 6h) no sandbox têm limite de R$ 1.000,00. Tente um valor menor ou confirme manualmente no painel da Asaas.');
+            }
+
+            $data_aula = self::convertToUSFormat($validated['data_aula']) . ' ' . $validated['hora_aula'];
+
+            $alunoData = [
+                'name' => $aluno->usuario->nome,
+                'email' => $aluno->usuario->email,
+                'cpfCnpj' => $aluno->usuario->cpf ?? '12345678909',
+            ];
+
+            $clientes = $this->asaasService->getClients($gateway->api_key, $gateway->mode);
+            $alunoExistente = collect($clientes['data'] ?? [])->firstWhere('email', $aluno->usuario->email);
+            $alunoId = $alunoExistente ? $alunoExistente['id'] : $this->asaasService->createCustomer($alunoData, $gateway->api_key, $gateway->mode)['id'];
+
+            // Calcular tarifa e valor total da cobrança
+            $tariff = $gateway->tariff_type == 'percentage'
+                ? $validated['valor_aula'] * ($gateway->tariff_value / 100)
+                : $gateway->tariff_value;
+            $valor_cobranca = round($validated['valor_aula'] + $tariff, 2); // Arredondar para evitar erros de ponto flutuante
+
+            // Verificar se a soma dos valores do split corresponde ao valor total
+            $splitTotal = round($validated['valor_aula'] + $tariff, 2);
+            if (abs($valor_cobranca - $splitTotal) > 0.01) {
+                Log::error('Split amount mismatch', [
+                    'valor_cobranca' => $valor_cobranca,
+                    'valor_aula' => $validated['valor_aula'],
+                    'tariff' => $tariff,
+                    'split_total' => $splitTotal,
+                ]);
+                return redirect()->back()->with('error', 'Erro: A soma dos valores do split não corresponde ao valor total da cobrança.');
+            }
+
+            $cobrancaData = [
+                'customer' => $alunoId,
+                'billingType' => $validated['payment_method'] === 'pix' ? 'PIX' : 'CREDIT_CARD',
+                'value' => $valor_cobranca,
+                'dueDate' => now()->addDays(1)->format('Y-m-d'),
+                'description' => $validated['titulo'],
+                'split' => [
+                    [
+                        'walletId' => $professor->asaas_wallet_id,
+                        'fixedValue' => round($validated['valor_aula'], 2),
+                    ],
+                ],
+            ];
+
+            if ($validated['payment_method'] === 'cartao') {
+                $cobrancaData['creditCard'] = [
+                    'holderName' => $request->input('card_name'),
+                    'number' => str_replace(' ', '', $request->input('card_number')),
+                    'expiryMonth' => explode('/', $request->input('card_expiry'))[0],
+                    'expiryYear' => '20' . explode('/', $request->input('card_expiry'))[1],
+                    'ccv' => $request->input('card_cvv'),
+                ];
+                $cobrancaData['creditCardHolderInfo'] = [
+                    'name' => $request->input('card_name'),
+                    'email' => $aluno->usuario->email,
+                    'cpfCnpj' => str_replace(['.', '-'], '', $request->input('card_cpf')),
+                ];
+            }
+
+            Log::info('Attempting to create Asaas payment', [
+                'cobrancaData' => $cobrancaData,
+                'api_key' => substr($gateway->api_key, 0, 5) . '...',
+                'mode' => $gateway->mode,
+            ]);
+
+            $cobranca = $this->asaasService->cobranca($cobrancaData, $gateway->api_key, $gateway->mode);
+
+            if ($cobranca['status'] == 'PENDING') {
+                $aluno->professores()->attach($professor);
+
+                $agendamento = Agendamento::create([
+                    'aluno_id' => $validated['aluno_id'],
+                    'modalidade_id' => $validated['modalidade_id'],
+                    'professor_id' => $validated['professor_id'],
+                    'data_da_aula' => $data_aula,
+                    'valor_aula' => $validated['valor_aula'],
+                    'horario' => $validated['hora_aula'],
+                    'gateway_id' => $gateway->id,
+                    'cobranca_id' => $cobranca['id'],
+                ]);
+
+                $pagamento = Pagamento::create([
+                    'agendamento_id' => $agendamento->id,
+                    'aluno_id' => $validated['aluno_id'],
+                    'pagamento_gateway_id' => $gateway->id,
+                    'asaas_payment_id' => $cobranca['id'],
+                    'status' => $cobranca['status'],
+                    'valor' => $valor_cobranca,
+                    'metodo_pagamento' => $validated['payment_method'] === 'pix' ? 'PIX' : 'CREDIT_CARD',
+                    'data_vencimento' => $cobranca['dueDate'],
+                    'url_boleto' => null,
+                    'qr_code_pix' => $validated['payment_method'] === 'pix' ? $cobranca['encodedImage'] : null,
+                    'resposta_api' => json_encode($cobranca),
+                ]);
+
+                Log::info('Payment created successfully', [
+                    'cobranca_id' => $cobranca['id'],
+                    'aluno_id' => $validated['aluno_id'],
+                    'professor_id' => $validated['professor_id'],
+                ]);
+
+                if ($validated['payment_method'] === 'pix') {
+                    return redirect()->route('pix-payment', [
+                        'cobranca_id' => $cobranca['id'],
+                        'professor_id' => $professor->id,
+                    ]);
+                }
+
+                return redirect()->route('home.checkoutsucesso', ['id' => $professor->id])
+                    ->with('success', 'Agendamento e pagamento confirmados com sucesso')
+                    ->with('payment_method', $validated['payment_method']);
+            }
+
+            Log::error('Payment creation failed', [
+                'cobranca_response' => $cobranca,
+            ]);
+            return redirect()->back()->with('error', 'Erro ao criar cobrança: ' . (isset($cobranca['errors']) ? json_encode($cobranca['errors']) : 'Erro desconhecido'));
+        } catch (\Exception $e) {
+            Log::error('Payment creation failed with exception', [
+                'error' => $e->getMessage(),
+                'cobrancaData' => $cobrancaData ?? null,
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return redirect()->back()->with('error', 'Erro ao criar cobrança: ' . $e->getMessage());
+        }
+    }
+
+
+
+  public function payPixQrCode(Request $request)
+    {       
+        $request->validate([
+            'value' => 'required|numeric|min:0.01',
+            'payload' => 'required|string' // QR Code payload é obrigatório
+        ]);
+
+        $payload = $request->input('payload');
+        $value = $request->input('value');
+        $scheduleDate = $request->input('scheduleDate'); // Opcional
+
+        try {
+            // Criar cliente HTTP para a requisição
+            $client = new \GuzzleHttp\Client();
+            
+            // Preparar dados para envio
+            $requestData = [
+                'qrCode' => [
+                    'payload' => $payload
+                ],
+                'value' => $value
+            ];
+
+            // Adicionar scheduleDate se fornecido
+            if ($scheduleDate) {
+                $requestData['scheduleDate'] = $scheduleDate;
+            }
+
+            $response = $client->request('POST', env('ASAAS_SANDBOX_URL') . "/v3/pix/qrCodes/pay", [
+                'headers' => [
+                    'accept' => 'application/json',
+                    'access_token' => env('ASAAS_API_KEY'),
+                    'content-type' => 'application/json',
+                ],
+                'json' => $requestData,
+            ]);
+
+            // Log da resposta para depuração
+            Log::debug('Asaas PIX QR Code payment response', [
+                'status_code' => $response->getStatusCode(),
+                'response' => json_decode($response->getBody(), true),
+                'payload' => $payload,
+                'value' => $value,
+            ]);
+
+            // Verificar se a requisição foi bem-sucedida
+            if ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300) {
+                $data = json_decode($response->getBody(), true);
+                
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Pagamento PIX realizado com sucesso!',
+                    'data' => $data,
+                ], 200);
+            }
+
+            // Log de erro caso a requisição falhe
+            Log::error('Asaas PIX payment error', [
+                'status' => $response->getStatusCode(),
+                'response' => $response->getBody()->getContents(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao realizar o pagamento PIX: HTTP ' . $response->getStatusCode(),
+            ], $response->getStatusCode());
+
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            // Erro específico do cliente HTTP (4xx)
+            $response = $e->getResponse();
+            $errorBody = json_decode($response->getBody()->getContents(), true);
+            
+            Log::error('Asaas PIX payment client error', [
+                'status' => $response->getStatusCode(),
+                'error' => $errorBody,
+                'payload' => $payload,
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro na requisição: ' . ($errorBody['errors'][0]['description'] ?? 'Erro desconhecido'),
+                'errors' => $errorBody['errors'] ?? [],
+            ], $response->getStatusCode());
+
+        } catch (\Exception $e) {
+            // Log de erro em caso de exceção geral
+            Log::error('Error processing PIX QR Code payment', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro interno ao processar o pagamento PIX.',
+            ], 500);
+        }
+    }
+
+    public function simulatePixPayment(Request $request)
+    {
+     
+        // Validar o request
+        $request->validate([
+            'payment_id' => 'required|string',
+        ]);
+
+        $paymentId = $request->input('payment_id');
+
+        try {
+            // Fazer uma chamada à API da Asaas para simular o pagamento (endpoint específico do sandbox)
+            $client = new \GuzzleHttp\Client();
+            $response = $client->request('POST', env('ASAAS_SANDBOX_URL') . "/v3/payments/{$paymentId}/simulate", [
+                'headers' => [
+                    'accept' => 'application/json',
+                    'access_token' => env('ASAAS_API_KEY'),
+                ],
+            ]);
+
+            // Log para depuração
+            Log::debug('Asaas API response for payment simulation', [
+                'payment_id' => $paymentId,
+                'status_code' => $response->getStatusCode(),
+                'response' => json_decode($response->getBody(), true),
+            ]);
+
+            if ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300) {
+                $data = json_decode($response->getBody(), true);
+
+                // Verificar se a simulação foi bem-sucedida
+                if (isset($data['status']) && $data['status'] === 'RECEIVED') {
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Pagamento simulado com sucesso!',
+                        'status' => $data['status'],
+                        'data' => $data,
+                    ], 200);
+                }
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Falha ao simular o pagamento.',
+                    'data' => $data,
+                ], 400);
+            }
+
+            Log::error('Asaas API error on payment simulation', [
+                'payment_id' => $paymentId,
+                'status' => $response->getStatusCode(),
+                'response' => $response->getBody()->getContents(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao simular o pagamento: HTTP ' . $response->getStatusCode(),
+            ], $response->getStatusCode());
+
+        } catch (\Exception $e) {
+            dd($e);
+            Log::error('Error simulating PIX payment', [
+                'payment_id' => $paymentId,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro interno ao simular o pagamento.',
+            ], 500);
+        }
+    }
 
     public function createPixKey(Request $request)
     {

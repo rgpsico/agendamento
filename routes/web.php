@@ -5,6 +5,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SocialLiteController;
 use App\Http\Controllers\GoogleCalendarController;
 use App\Http\Controllers\AvaliacaoController;
+use App\Http\Controllers\Api\PixQrController;
 use Illuminate\Support\Facades\Route;
 use Spatie\GoogleCalendar\Event;
 use Inertia\Inertia;
@@ -16,7 +17,10 @@ use App\Http\Controllers\SiteServicoController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\ProfessoresAsaasController;
+use App\Http\Controllers\PagamentoController;
 
+
+Route::post('/pagamentos/presencial', [PagamentoController::class, 'criarPagamentoPresencial'])->name('empresa.pagamento.presencial');
 Route::prefix('admin/usuarios')->name('admin.usuarios.')->group(function() {
     Route::get('/', [UserManagementController::class, 'index'])->name('index');
     Route::get('/create', [UserManagementController::class, 'create'])->name('create');
@@ -131,7 +135,7 @@ Route::post('/avaliar-aula', [AvaliacaoController::class, 'storeAvaliacao'])->na
 Route::get('/avaliacao/{agendamento_id}', [AvaliacaoController::class, 'getAvaliacoes'])->name('avaliacao.getAvaliacoes');
 
 Route::get('/check-payment-status/{cobranca_id}', [PagamentoController::class, 'checkPaymentStatus'])->name('check-payment-status');
-
+Route::post('/asaas', [PixQrController::class, 'fazerAgendamentoPix'])->name('empresa.pagamento.asaas');
 Route::get('/test', function () {
     return Inertia::render('Test');
 });
