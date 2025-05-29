@@ -7,7 +7,10 @@ use App\Models\DiaDaSemana;
 use App\Models\Disponibilidade;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use App\Models\Agendamento;
 use Illuminate\Support\Facades\DB;
+
+
 
 class DisponibilidadeControllerApi extends Controller
 {
@@ -18,34 +21,63 @@ class DisponibilidadeControllerApi extends Controller
         return response()->json($users);
     }
 
-    public function disponibilidade(Request $request)
+ 
+   public function disponibilidade(Request $request)
     {
         $day = $request->input('day');
-        $data_selecionada = $request->input("data_select");
-        $professor_id = $request->input("professor_id");
-        $servico_id = $request->input("servico_id"); // Novo parâmetro
+        $data_selecionada = $request->input('data_select');
+        $professor_id = $request->input('professor_id');
+        $servico_id = $request->input('servico_id');
+
+        // Debug: Vamos ver o que está sendo enviado
+        \Log::info('Parâmetros recebidos:', [
+            'day' => $day,
+            'data_selecionada' => $data_selecionada,
+            'professor_id' => $professor_id,
+            'servico_id' => $servico_id
+        ]);
+
+        // Obtém todos os horários já agendados para o professor e a data selecionada
+        $horariosAgendados = DB::table('agendamentos')
+            ->where('data_da_aula', $data_selecionada)
+            ->where('professor_id', $professor_id)
+            ->pluck('horario')
+            ->map(function($horario) {
+                return Carbon::parse($horario)->format('H:i');
+            })
+            ->toArray();
+
+        
+
+        // Debug: Ver os horários agendados
+        \Log::info('Horários agendados:', $horariosAgendados);
 
         // Obtém todas as disponibilidades do serviço selecionado naquele dia
         $schedules = Disponibilidade::where('id_dia', $day)
             ->where('id_servico', $servico_id)
             ->get();
 
+        // Debug: Ver as disponibilidades
+        \Log::info('Disponibilidades encontradas:', $schedules->toArray());
+
         $timeslots = [];
 
         foreach ($schedules as $schedule) {
             $start = Carbon::parse($schedule->hora_inicio)->format('H:i');
-
-            // Verifica se o horário já foi agendado
-            $alreadyBooked = DB::table('agendamentos')
-                ->where('data_da_aula', $data_selecionada)
-                ->where('horario', $start)
-                ->where('professor_id', $professor_id)
-                ->exists();
-
-            if (!$alreadyBooked) {
+            
+            // Debug: Ver cada comparação
+            \Log::info('Comparando:', [
+                'horario_disponivel' => $start,
+                'esta_agendado' => in_array($start, $horariosAgendados)
+            ]);
+            
+            if (!in_array($start, $horariosAgendados)) {
                 $timeslots[] = $start;
             }
         }
+
+        // Debug: Ver resultado final
+        \Log::info('Horários disponíveis finais:', $timeslots);
 
         return response()->json($timeslots);
     }
