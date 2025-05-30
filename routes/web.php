@@ -20,6 +20,9 @@ use App\Http\Controllers\ProfessoresAsaasController;
 use App\Http\Controllers\PagamentoController;
 
 
+  Route::get('/', [UserManagementController::class, 'index'])->name('register.aluno');
+    Route::get('/create', [UserManagementController::class, 'create'])->name('register.professor');
+
 Route::post('/pagamentos/presencial', [PagamentoController::class, 'criarPagamentoPresencial'])->name('empresa.pagamento.presencial');
 Route::prefix('admin/usuarios')->name('admin.usuarios.')->group(function() {
     Route::get('/', [UserManagementController::class, 'index'])->name('index');
