@@ -180,6 +180,24 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
         
+
+        .sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Fundo escurecido */
+    z-index: 1000;
+    opacity: 0; /* Invisível por padrão */
+    visibility: hidden; /* Remove do fluxo visual */
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.sidebar-overlay.opened {
+    opacity: 1; /* Visível quando ativo */
+    visibility: visible;
+}
     </style>
 </head>
 <body>
@@ -295,13 +313,20 @@
     // Mobile menu control
     $('#mobile_btn').click(function(e) {
         e.preventDefault();
+        $('.sidebar-overlay').removeClass('opened');
         $('.main-menu-wrapper').addClass('active'); // Add the active class to show the menu
     });
 
     $('#menu_close').click(function(e) {
-        e.preventDefault();
-        $('.main-menu-wrapper').removeClass('active'); // Remove the active class to hide the menu
+    e.preventDefault();
+    $('.sidebar-overlay').removeClass('opened');
+    $('.main-menu-wrapper').removeClass('active');
+    // Opcional: forçar ocultação imediata
+    $('.sidebar-overlay').css({
+        'opacity': '0',
+        'visibility': 'hidden'
     });
+});
 
     // Close the menu when clicking outside (optional, for better UX)
     $(document).click(function(e) {
