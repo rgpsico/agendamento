@@ -198,6 +198,34 @@
     opacity: 1; /* Visível quando ativo */
     visibility: visible;
 }
+
+/* Estilos padrão já definidos inline no HTML */
+.navbar-brand.logo {
+    margin-right: 10%;
+    width: 200px;
+}
+
+/* Media query para dispositivos móveis */
+@media (max-width: 768px) {
+    .navbar-brand.logo {
+        margin-right: 0; /* Remove a margem direita */
+        margin-left: 10px; /* Opcional: pequena margem à esquerda */
+        width: 150px; /* Reduz o tamanho do logo para mobile, se necessário */
+        display: block; /* Garante que o elemento seja um bloco */
+        float: left; /* Alinha ao canto esquerdo */
+        width: 50%;
+        /* Ou, alternativamente, use position: absolute para controle total */
+        /* position: absolute; */
+        /* left: 10px; */
+        /* top: 10px; */
+    }
+
+    /* Ajusta a imagem dentro do <a> */
+    .navbar-brand.logo img {
+        width: 100%; /* Garante que a imagem respeite o width do contêiner */
+        height: auto; /* Mantém a proporção */
+    }
+}
     </style>
 </head>
 <body>
@@ -220,9 +248,11 @@
                     </span>
                 </a>
                 <!-- Logo -->
+                <div class="div-logo" style="margin-left:30%;">
                 <a href="{{ route('home.index') }}" class="navbar-brand logo">
                     <img src="https://rjpasseios.com.br/wp-content/uploads/2024/12/cropped-logo-1.png" class="img-fluid" alt="Logo">
                 </a>
+                </div>
             </div>
 
             <div class="main-menu-wrapper">
