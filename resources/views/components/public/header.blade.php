@@ -30,16 +30,147 @@
     <!-- Main CSS -->
     <link rel="stylesheet" href="{{ asset('template/assets/css/custom.css') }}">
 
-    <!-- Google tag (gtag.js) -->
-  {{-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-4ZMP2C63TR"> --}}
-  </script>
-  {{-- <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
+    <!-- Custom Modal Styles -->
+    <style>
+        .modal-content {
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            border: none;
+            overflow: hidden;
+        }
 
-    gtag('config', 'G-4ZMP2C63TR');
-  </script> --}}
+        .modal-header {
+            background: linear-gradient(45deg, #00c4e0, #007a99);
+            color: white;
+            border-bottom: none;
+            padding: 20px;
+        }
+
+        .modal-title {
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+
+        .modal-body {
+            padding: 30px;
+            background: #f8f9fa;
+        }
+
+        .nav-tabs {
+            border-bottom: 2px solid #00c4e0;
+        }
+
+        .nav-tabs .nav-link {
+            color: #007a99;
+            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 10px 10px 0 0;
+            transition: all 0.3s ease;
+        }
+
+        .nav-tabs .nav-link.active {
+            background: #00c4e0;
+            color: white;
+            border: none;
+        }
+
+        .nav-tabs .nav-link:hover {
+            background: rgba(0, 196, 224, 0.1);
+            color: #003b4d;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+            padding: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #00c4e0;
+            box-shadow: 0 0 8px rgba(0, 196, 224, 0.3);
+        }
+
+        .btn-register {
+            background: linear-gradient(45deg, #ff6f61, #ff3d00);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-register:hover {
+            background: linear-gradient(45deg, #ff3d00, #d32f2f);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 61, 0, 0.4);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #003b4d;
+        }
+
+        .tab-content {
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 576px) {
+            .modal-body {
+                padding: 20px;
+            }
+
+            .modal-title {
+                font-size: 1.2rem;
+            }
+
+            .nav-tabs .nav-link {
+                padding: 8px 15px;
+                font-size: 0.9rem;
+            }
+
+            .form-control {
+                padding: 10px;
+            }
+        }
+
+        /* Ajustes no header para consistência */
+        .header {
+            background: linear-gradient(135deg, #00c4e0 0%, #007a99 50%, #003b4d 100%);
+            box-shadow: 0 4px 20px rgba(0, 196, 224, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .header.scrolled {
+            background: rgba(0, 196, 224, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #ff6f61, #ff3d00);
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(45deg, #ff3d00, #d32f2f);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 61, 0, 0.4);
+        }
+
+        .btn-outline-primary, .btn-outline-danger {
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-primary:hover, .btn-outline-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+    </style>
 </head>
 <body>
 
@@ -67,7 +198,7 @@
 
                     <div class="main-menu-wrapper">
                         <div class="menu-header">
-                            <a href="" class="menu-logo">
+                            <a href="{{ route('home.index') }}" class="menu-logo">
                                 <img src="https://rjpasseios.com.br/wp-content/uploads/2024/12/cropped-logo-1.png" class="img-fluid" alt="Logo">
                             </a>
                             <a id="menu_close" class="menu-close" href="javascript:void(0);">
@@ -76,52 +207,105 @@
                         </div>
 
                         <!-- Menu -->
-						<ul class="main-nav d-flex align-items-center">
-							@if(auth()->check()) 
-								<li class="nav-item me-3">
-									<span class="text-dark fw-bold" style="color:#000;">Bem-vindo, {{ auth()->user()->nome }}!</span>
-								</li>
-						
-								@if(auth()->user()->tipo_usuario == 'Professor')
-									<li class="nav-item" style="color:#000;">
-										<a href="{{ route('cliente.dashboard') }}"  class="btn btn-outline-primary" style="color:#000;">
-											<i class="fas fa-user-cog"></i> Admin
-										</a>                                        
-									</li>
-								@elseif(auth()->user()->tipo_usuario == 'Aluno')    
-									<li class="nav-item">
-										<a href="{{ route('alunos.aulas') }}"  class="btn btn-outline-primary" style="color:#000;">
-											<i class="fas fa-book"></i> Minhas Aulas
-										</a>                                        
-									</li>
-								@endif
-						
-								<li class="nav-item ms-2" style="color:#000;">
-									<a href="{{ route('user.logout') }}"  class="btn btn-outline-danger" style="color:#000;">
-										<i class="fas fa-sign-out-alt"></i> Sair
-										
-									</a>                                        
-								</li>
-							@else
-								{{-- Caso não haja usuário autenticado, mostre as opções de login --}}
-								<li class="nav-item">
-									<a href="{{ route('home.login') }}" class="btn btn-primary">
-										<i class="fas fa-sign-in-alt"></i> Login
-									</a>
-								</li>
-							@endif
-						</ul>
-						
+                        <ul class="main-nav d-flex align-items-center">
+                            @if(auth()->check()) 
+                                <li class="nav-item me-3">
+                                    <span class="text-dark fw-bold" style="color:#000;">Bem-vindo, {{ auth()->user()->nome }}!</span>
+                                </li>
+                        
+                                @if(auth()->user()->tipo_usuario == 'Professor')
+                                    <li class="nav-item">
+                                        <a href="{{ route('cliente.dashboard') }}" class="btn btn-outline-primary" style="color:#000;">
+                                            <i class="fas fa-user-cog"></i> Admin
+                                        </a>                                        
+                                    </li>
+                                @elseif(auth()->user()->tipo_usuario == 'Aluno')    
+                                    <li class="nav-item">
+                                        <a href="{{ route('alunos.aulas') }}" class="btn btn-outline-primary" style="color:#000;">
+                                            <i class="fas fa-book"></i> Minhas Aulas
+                                        </a>                                        
+                                    </li>
+                                @endif
+                        
+                                <li class="nav-item ms-2">
+                                    <a href="{{ route('user.logout') }}" class="btn btn-outline-danger" style="color:#000;">
+                                        <i class="fas fa-sign-out-alt"></i> Sair
+                                    </a>                                        
+                                </li>
+                            @else
+                                <li class="nav-item">
+                                    <a href="{{ route('home.login') }}" class="btn btn-primary">
+                                        <i class="fas fa-sign-in-alt"></i> Login
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="#" data-bs-toggle="modal" data-bs-target="#registerModal" class="btn btn-primary">
+                                        <i class="fas fa-user-plus"></i> Registre-se
+                                    </a>
+                                </li>
+                            @endif
+                        </ul>
                     </div>
                 </nav>
             </div>
         </header>
         <!-- /Header -->
+
+        <!-- Register Modal -->
+        
+        <!-- /Register Modal -->
     </div>
 
     <!-- Scripts -->
-    <script src="{{ asset('template/assets/js/jquery.min.js') }}"></script>
+    <script src="{{ asset('admin/js/jquery-3.6.4.min.js') }}"></script>
     <script src="{{ asset('template/assets/js/bootstrap.bundle.min.js') }}"></script>
+
+    <!-- Script para efeito de scroll no header e controle do modal -->
+    <script>
+        $(document).ready(function() {
+            // Verificar se jQuery e Bootstrap estão carregados
+            if (typeof $ === 'undefined') {
+                console.error('jQuery não está carregado.');
+            }
+            if (typeof bootstrap === 'undefined') {
+                console.error('Bootstrap JavaScript não está carregado.');
+            }
+
+            // Efeito de scroll no header
+            $(window).scroll(function() {
+                if ($(this).scrollTop() > 50) {
+                    $('.header').addClass('scrolled');
+                } else {
+                    $('.header').removeClass('scrolled');
+                }
+            });
+
+            // Animação suave para o menu mobile
+            $('#mobile_btn').click(function(e) {
+                e.preventDefault();
+                $('.main-menu-wrapper').slideToggle(300);
+            });
+
+            $('#menu_close').click(function() {
+                $('.main-menu-wrapper').slideUp(300);
+            });
+
+            // Validação básica dos formulários no front-end
+            $('form').on('submit', function(e) {
+                const senha = $(this).find('input[name="senha"]').val();
+                const confirmarSenha = $(this).find('input[name="confirmar_senha"]').val();
+                if (senha !== confirmarSenha) {
+                    e.preventDefault();
+                    alert('As senhas não coincidem!');
+                }
+            });
+
+            // Forçar abertura do modal (para teste)
+            $('#registerModal').on('show.bs.modal', function() {
+                console.log('Modal está sendo exibido.');
+            });
+        });
+    </script>
 
 </body>
 </html>
