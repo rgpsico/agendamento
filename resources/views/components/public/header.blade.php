@@ -138,6 +138,15 @@
             }
         }
 
+        .main-menu-wrapper {
+    display: none;
+}
+
+.main-menu-wrapper.active {
+    display: block;
+}
+
+
         /* Ajustes no header para consistência */
         .header {
             background: linear-gradient(135deg, #00c4e0 0%, #007a99 50%, #003b4d 100%);
@@ -170,6 +179,7 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
+        
     </style>
 </head>
 <body>
@@ -178,77 +188,78 @@
     <div class="main-wrapper">
         
         <!-- Header -->
-        <header class="header header-fixed header-one">
-            <div class="container">
-                <nav class="navbar navbar-expand-lg header-nav">
-                    <div class="navbar-header">
-                        <!-- Botão Mobile -->
-                        <a id="mobile_btn" href="{{ route('home.index') }}">
-                            <span class="bar-icon">
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                            </span>
-                        </a>
-                        <!-- Logo -->
-                        <a href="{{ route('home.index') }}" class="navbar-brand logo">
-                            <img src="https://rjpasseios.com.br/wp-content/uploads/2024/12/cropped-logo-1.png" class="img-fluid" alt="Logo">
-                        </a>
-                    </div>
-
-                    <div class="main-menu-wrapper">
-                        <div class="menu-header">
-                            <a href="{{ route('home.index') }}" class="menu-logo">
-                                <img src="https://rjpasseios.com.br/wp-content/uploads/2024/12/cropped-logo-1.png" class="img-fluid" alt="Logo">
-                            </a>
-                            <a id="menu_close" class="menu-close" href="javascript:void(0);">
-                                <i class="fas fa-times"></i>
-                            </a>
-                        </div>
-
-                        <!-- Menu -->
-                        <ul class="main-nav d-flex align-items-center">
-                            @if(auth()->check()) 
-                                <li class="nav-item me-3">
-                                    <span class="text-dark fw-bold" style="color:#000;">Bem-vindo, {{ auth()->user()->nome }}!</span>
-                                </li>
-                        
-                                @if(auth()->user()->tipo_usuario == 'Professor')
-                                    <li class="nav-item">
-                                        <a href="{{ route('cliente.dashboard') }}" class="btn btn-outline-primary" style="color:#000;">
-                                            <i class="fas fa-user-cog"></i> Admin
-                                        </a>                                        
-                                    </li>
-                                @elseif(auth()->user()->tipo_usuario == 'Aluno')    
-                                    <li class="nav-item">
-                                        <a href="{{ route('alunos.aulas') }}" class="btn btn-outline-primary" style="color:#000;">
-                                            <i class="fas fa-book"></i> Minhas Aulas
-                                        </a>                                        
-                                    </li>
-                                @endif
-                        
-                                <li class="nav-item ms-2">
-                                    <a href="{{ route('user.logout') }}" class="btn btn-outline-danger" style="color:#000;">
-                                        <i class="fas fa-sign-out-alt"></i> Sair
-                                    </a>                                        
-                                </li>
-                            @else
-                                <li class="nav-item">
-                                    <a href="{{ route('home.login') }}" class="btn btn-primary">
-                                        <i class="fas fa-sign-in-alt"></i> Login
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="#" data-bs-toggle="modal" data-bs-target="#registerModal" class="btn btn-primary">
-                                        <i class="fas fa-user-plus"></i> Registre-se
-                                    </a>
-                                </li>
-                            @endif
-                        </ul>
-                    </div>
-                </nav>
+       <!-- Header -->
+<header class="header header-fixed header-one">
+    <div class="container">
+        <nav class="navbar navbar-expand-lg header-nav">
+            <div class="navbar-header">
+                <!-- Botão Mobile -->
+                <a id="mobile_btn" href="javascript:void(0);">
+                    <span class="bar-icon">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </span>
+                </a>
+                <!-- Logo -->
+                <a href="{{ route('home.index') }}" class="navbar-brand logo">
+                    <img src="https://rjpasseios.com.br/wp-content/uploads/2024/12/cropped-logo-1.png" class="img-fluid" alt="Logo">
+                </a>
             </div>
-        </header>
+
+            <div class="main-menu-wrapper">
+                <div class="menu-header">
+                    <a href="{{ route('home.index') }}" class="menu-logo">
+                        <img src="https://rjpasseios.com.br/wp-content/uploads/2024/12/cropped-logo-1.png" class="img-fluid" alt="Logo">
+                    </a>
+                    <a id="menu_close" class="menu-close" href="javascript:void(0);">
+                        <i class="fas fa-times"></i>
+                    </a>
+                </div>
+
+                <!-- Menu -->
+                <ul class="main-nav d-flex align-items-center">
+                    @if(auth()->check()) 
+                        <li class="nav-item me-3">
+                            <span class="text-dark fw-bold" style="color:#000;">Bem-vindo, {{ auth()->user()->nome }}!</span>
+                        </li>
+                
+                        @if(auth()->user()->tipo_usuario == 'Professor')
+                            <li class="nav-item">
+                                <a href="{{ route('cliente.dashboard') }}" class="btn btn-outline-primary" style="color:#000;">
+                                    <i class="fas fa-user-cog"></i> Admin
+                                </a>                                        
+                            </li>
+                        @elseif(auth()->user()->tipo_usuario == 'Aluno')    
+                            <li class="nav-item">
+                                <a href="{{ route('alunos.aulas') }}" class="btn btn-outline-primary" style="color:#000;">
+                                    <i class="fas fa-book"></i> Minhas Aulas
+                                </a>                                        
+                            </li>
+                        @endif
+                
+                        <li class="nav-item ms-2">
+                            <a href="{{ route('user.logout') }}" class="btn btn-outline-danger" style="color:#000;">
+                                <i class="fas fa-sign-out-alt"></i> Sair
+                            </a>                                        
+                        </li>
+                    @else
+                        <li class="nav-item">
+                            <a href="{{ route('home.login') }}" class="btn btn-primary">
+                                <i class="fas fa-sign-in-alt"></i> Login
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" data-bs-toggle="modal" data-bs-target="#registerModal" class="btn btn-primary">
+                                <i class="fas fa-user-plus"></i> Registre-se
+                            </a>
+                        </li>
+                    @endif
+                </ul>
+            </div>
+        </nav>
+    </div>
+</header>
         <!-- /Header -->
 
         <!-- Register Modal -->
@@ -262,49 +273,53 @@
 
     <!-- Script para efeito de scroll no header e controle do modal -->
     <script>
-        $(document).ready(function() {
-            // Verificar se jQuery e Bootstrap estão carregados
-            if (typeof $ === 'undefined') {
-                console.error('jQuery não está carregado.');
-            }
-            if (typeof bootstrap === 'undefined') {
-                console.error('Bootstrap JavaScript não está carregado.');
-            }
+       $(document).ready(function() {
 
-            // Efeito de scroll no header
-            $(window).scroll(function() {
-                if ($(this).scrollTop() > 50) {
-                    $('.header').addClass('scrolled');
-                } else {
-                    $('.header').removeClass('scrolled');
-                }
-            });
+    // Verify if jQuery and Bootstrap are loaded
+    if (typeof $ === 'undefined') {
+        console.error('jQuery is not loaded.');
+    }
+    if (typeof bootstrap === 'undefined') {
+        console.error('Bootstrap JavaScript is not loaded.');
+    }
 
-            // Animação suave para o menu mobile
-            $('#mobile_btn').click(function(e) {
-                e.preventDefault();
-                $('.main-menu-wrapper').slideToggle(300);
-            });
+    // Header scroll effect
+    $(window).scroll(function() {
+        if ($(this).scrollTop() > 50) {
+            $('.header').addClass('scrolled');
+        } else {
+            $('.header').removeClass('scrolled');
+        }
+    });
 
-            $('#menu_close').click(function() {
-                $('.main-menu-wrapper').slideUp(300);
-            });
+    // Mobile menu control
+    $('#mobile_btn').click(function(e) {
+        e.preventDefault();
+        $('.main-menu-wrapper').addClass('active'); // Add the active class to show the menu
+    });
 
-            // Validação básica dos formulários no front-end
-            // $('form').on('submit', function(e) {
-            //     const senha = $(this).find('input[name="senha"]').val();
-            //     const confirmarSenha = $(this).find('input[name="confirmar_senha"]').val();
-            //     if (senha !== confirmarSenha) {
-            //         e.preventDefault();
-            //         alert('As senhas não coincidem!');
-            //     }
-            // });
+    $('#menu_close').click(function(e) {
+        e.preventDefault();
+        $('.main-menu-wrapper').removeClass('active'); // Remove the active class to hide the menu
+    });
 
-            // Forçar abertura do modal (para teste)
-            $('#registerModal').on('show.bs.modal', function() {
-                console.log('Modal está sendo exibido.');
-            });
-        });
+    // Close the menu when clicking outside (optional, for better UX)
+    $(document).click(function(e) {
+        if (!$(e.target).closest('.main-menu-wrapper, #mobile_btn').length) {
+            $('.main-menu-wrapper').removeClass('active');
+        }
+    });
+
+    // Prevent clicks inside the menu from closing it
+    $('.main-menu-wrapper').click(function(e) {
+        e.stopPropagation();
+    });
+
+    // Force modal to open (for testing)
+    $('#registerModal').on('show.bs.modal', function() {
+        console.log('Modal is being displayed.');
+    });
+});
     </script>
 
 </body>
