@@ -109,6 +109,12 @@
 										<i class="fas fa-sign-in-alt"></i> Login
 									</a>
 								</li>
+                                
+                                <li class="nav-item" id="">
+									<a href="" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#registerModal">
+										<i class="fas fa-sign-in-alt"></i> Registrar-se
+									</a>
+								</li>
 							@endif
 						</ul>
 						
@@ -122,6 +128,48 @@
     <!-- Scripts -->
     <script src="{{ asset('template/assets/js/jquery.min.js') }}"></script>
     <script src="{{ asset('template/assets/js/bootstrap.bundle.min.js') }}"></script>
-
+ <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Validação de confirmação de senha
+            function validatePasswordMatch(passwordId, confirmPasswordId) {
+                const password = document.getElementById(passwordId);
+                const confirmPassword = document.getElementById(confirmPasswordId);
+                
+                function checkMatch() {
+                    if (password.value !== confirmPassword.value) {
+                        confirmPassword.setCustomValidity('As senhas não coincidem');
+                    } else {
+                        confirmPassword.setCustomValidity('');
+                    }
+                }
+                
+                password.addEventListener('input', checkMatch);
+                confirmPassword.addEventListener('input', checkMatch);
+            }
+            
+            // Aplicar validação para ambos os formulários
+            validatePasswordMatch('alunoSenha', 'alunoConfirmarSenha');
+            validatePasswordMatch('professorSenha', 'professorConfirmarSenha');
+            
+            // Handlers para os formulários (para demonstração)
+            document.getElementById('alunoForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                alert('Cadastro de aluno enviado! (Demonstração)');
+                // Aqui você colocaria a lógica real de envio
+            });
+            
+            document.getElementById('professorForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                alert('Cadastro de professor enviado! (Demonstração)');
+                // Aqui você colocaria a lógica real de envio
+            });
+            
+            // Log quando o modal for aberto
+            const registerModal = document.getElementById('registerModal');
+            registerModal.addEventListener('show.bs.modal', function() {
+                console.log('Modal de registro está sendo exibido.');
+            });
+        });
+    </script>
 </body>
 </html>
