@@ -291,14 +291,14 @@
             });
 
             // Validação básica dos formulários no front-end
-            $('form').on('submit', function(e) {
-                const senha = $(this).find('input[name="senha"]').val();
-                const confirmarSenha = $(this).find('input[name="confirmar_senha"]').val();
-                if (senha !== confirmarSenha) {
-                    e.preventDefault();
-                    alert('As senhas não coincidem!');
-                }
-            });
+            // $('form').on('submit', function(e) {
+            //     const senha = $(this).find('input[name="senha"]').val();
+            //     const confirmarSenha = $(this).find('input[name="confirmar_senha"]').val();
+            //     if (senha !== confirmarSenha) {
+            //         e.preventDefault();
+            //         alert('As senhas não coincidem!');
+            //     }
+            // });
 
             // Forçar abertura do modal (para teste)
             $('#registerModal').on('show.bs.modal', function() {
