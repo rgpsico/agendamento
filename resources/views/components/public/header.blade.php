@@ -126,11 +126,14 @@
     </div>
 
     <!-- Scripts -->
-    <script src="{{ asset('template/assets/js/jquery.min.js') }}"></script>
+  
     <script src="{{ asset('template/assets/js/bootstrap.bundle.min.js') }}"></script>
  <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Validação de confirmação de senha
+            try {
+                
+         
             function validatePasswordMatch(passwordId, confirmPasswordId) {
                 const password = document.getElementById(passwordId);
                 const confirmPassword = document.getElementById(confirmPasswordId);
@@ -169,6 +172,9 @@
             registerModal.addEventListener('show.bs.modal', function() {
                 console.log('Modal de registro está sendo exibido.');
             });
+               } catch (error) {
+                console.log('aa')   
+            }
         });
     </script>
 </body>

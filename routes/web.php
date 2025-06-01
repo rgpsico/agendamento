@@ -18,7 +18,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\ProfessoresAsaasController;
 use App\Http\Controllers\PagamentoController;
-
+use App\Http\Controllers\SiteDepoimentoController;
 
   Route::get('/', [UserManagementController::class, 'index'])->name('register.aluno');
     Route::get('/create', [UserManagementController::class, 'create'])->name('register.professor');
@@ -99,7 +99,7 @@ Route::prefix('admin/site/servicos')->middleware(['auth'])->name('admin.site.ser
 });
 
 
-use App\Http\Controllers\SiteDepoimentoController;
+
 
 Route::prefix('admin/site/depoimentos')->middleware('auth')->name('admin.site.depoimentos.')->group(function () {
     Route::get('/', [SiteDepoimentoController::class, 'index'])->name('index');
@@ -139,6 +139,8 @@ Route::get('/avaliacao/{agendamento_id}', [AvaliacaoController::class, 'getAvali
 
 Route::get('/check-payment-status/{cobranca_id}', [PagamentoController::class, 'checkPaymentStatus'])->name('check-payment-status');
 Route::post('/asaas', [PixQrController::class, 'fazerAgendamentoPix'])->name('empresa.pagamento.asaas');
+
+
 Route::get('/test', function () {
     return Inertia::render('Test');
 });

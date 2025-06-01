@@ -549,6 +549,127 @@ public function gerarPix(Request $request)
     }
 
 
+    // app/Http/Controllers/PaymentController.php
+
+
+    public function pagarComCartao(Request $request)
+    {
+        // 1. Validação básica
+       $request->validate([
+            // dados do cartão
+            'card_number' => 'required',
+            'card_holder' => 'required',
+            'card_expiry_month' => 'required',
+            'card_expiry_year' => 'required',
+            'card_ccv' => 'required',
+            'value' => 'required|numeric',
+
+            // dados do titular
+            'name' => 'required',
+            'email' => 'required|email',
+            'phone' => 'required',
+            'address' => 'required',
+            'province' => 'required',
+            'postalCode' => 'required',
+            'cpfCnpj' => 'required',
+            'addressNumber' => 'required',
+
+            // dados do agendamento
+            'aluno_id' => 'required|integer',
+            'professor_id' => 'required|integer',
+            'modalidade_id' => 'required|integer',
+            'data_aula' => 'required|date',
+            'hora_aula' => 'required',
+            'titulo' => 'required|string',
+            'payment_method' => 'required|string',
+            'status' => 'required|string',
+            'usuario_id' => 'required|integer',
+        ]);
+
+
+        // 4. Criar agendamento no banco
+        $agendamento = Agendamento::create([
+            'aluno_id' => $request->aluno_id,
+            'professor_id' => $request->professor_id,
+            'modalidade_id' => $request->modalidade_id,
+            'data_da_aula' => $request->data_aula, // CORRIGIDO
+            'horario' => $request->hora_aula,      // CORRIGIDO
+            'valor_aula' => $request->value,
+            'status' => 'PENDING',
+            'usuario_id' => $request->usuario_id
+        ]);
+
+
+
+
+
+        // 2. Criação do cliente no Asaas
+        $clienteResponse = Http::withHeaders([
+            'accept' => 'application/json',
+            'access_token' =>  env("ASAAS_API_KEY"),
+        ])->post('https://sandbox.asaas.com/api/v3/customers', [
+            'name' => $request->name,
+            'email' => $request->email,
+            'cpfCnpj' => $request->cpfCnpj,
+            'phone' => $request->phone,
+            'postalCode' => $request->postalCode,
+            'address' => $request->address,
+            'addressNumber' => $request->addressNumber,
+            'province' => $request->province,
+        ]);
+
+        if (!$clienteResponse->successful()) {
+            return response()->json(['erro_criando_cliente' => $clienteResponse->json()], 400);
+        }
+
+        $clienteId = $clienteResponse->json()['id'];
+
+        // 3. Pagamento com cartão
+        $pagamentoResponse = Http::withHeaders([
+            'accept' => 'application/json',
+            'access_token' => env('ASAAS_API_KEY'),
+        ])->post('https://sandbox.asaas.com/api/v3/payments', [
+            'customer' => $clienteId,
+            'billingType' => 'CREDIT_CARD',
+            'value' => $request->value,
+            'dueDate' => now()->format('Y-m-d'),
+            'description' => 'Pagamento com cartão via Laravel',
+            'creditCard' => [
+                'holderName' => $request->card_holder,
+                'number' => $request->card_number,
+                'expiryMonth' => $request->card_expiry_month,
+                'expiryYear' => $request->card_expiry_year,
+                'ccv' => $request->card_ccv,
+            ],
+            'creditCardHolderInfo' => [
+                'name' => $request->name,
+                'email' => $request->email,
+                'cpfCnpj' => $request->cpfCnpj,
+                'postalCode' => $request->postalCode,
+                'addressNumber' => $request->addressNumber,
+                'addressComplement' => '',
+                'phone' => $request->phone,
+                'mobilePhone' => $request->phone,
+            ]
+        ]);
+
+        if (!$pagamentoResponse->successful()) {
+            return response()->json(['erro_pagamento' => $pagamentoResponse->json()], 400);
+        }
+
+        $redirectUrl = route('home.checkoutsucesso', ['id' => $request->professor_id]);
+
+        // Retornar para o front
+        return response()->json([
+            'success' => true,
+            'redirect_url' => $redirectUrl,
+            'agendamento_id' => $agendamento->id,
+            'payment_method' => 'cartao'
+        ]);
+
+    }
+
+
    public function criarPagamentoPresencial(Request $request)
     {
         // Validação dos dados do agendamento
