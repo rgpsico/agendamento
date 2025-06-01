@@ -125,6 +125,7 @@
         }
     </style>
     
+  
     <!-- Breadcrumb -->
     <x-home.breadcrumb title="PAGAMENTO"/>
     <!-- /Breadcrumb -->
@@ -230,9 +231,9 @@
                                 </div>
 
                                 <!-- Opção Cartão de Crédito -->
-                                <div class="payment-method" data-method="card">
+                               <div class="payment-method" data-method="card">
                                     <label class="d-flex align-items-center">
-                                        <input type="radio" name="forma_pagamento" value="cartao">
+                                        <input type="radio" name="forma_pagamento" value="cartao" checked>
                                         <div>
                                             <strong>Cartão de Crédito</strong>
                                             <p class="mb-0 text-muted">Pagamento seguro com cartão</p>
@@ -241,28 +242,29 @@
                                     <div class="payment-details card-form" id="card-details">
                                         <div class="form-group">
                                             <label>Nome no Cartão</label>
-                                            <input type="text" class="form-control" name="card_name" placeholder="Nome como está no cartão" value="{{ old('card_name') }}">
+                                            <input type="text" class="form-control" name="card_name" placeholder="Nome como está no cartão" value="Roger Silva">
                                         </div>
                                         <div class="form-group">
                                             <label>Número do Cartão</label>
-                                            <input type="text" class="form-control" name="card_number" placeholder="0000 0000 0000 0000" maxlength="19" value="{{ old('card_number') }}">
+                                            <input type="text" class="form-control" name="card_number" placeholder="0000 0000 0000 0000" maxlength="19" value="4111 1111 1111 1111">
                                         </div>
                                         <div class="form-row">
                                             <div class="form-group">
                                                 <label>Validade</label>
-                                                <input type="text" class="form-control" name="card_expiry" placeholder="MM/AA" maxlength="5" value="{{ old('card_expiry') }}">
+                                                <input type="text" class="form-control" name="card_expiry" placeholder="MM/AA" maxlength="5" value="12/26">
                                             </div>
                                             <div class="form-group">
                                                 <label>CVV</label>
-                                                <input type="text" class="form-control" name="card_cvv" placeholder="123" maxlength="4" value="{{ old('card_cvv') }}">
+                                                <input type="text" class="form-control" name="card_cvv" placeholder="123" maxlength="4" value="123">
                                             </div>
                                         </div>
                                         <div class="form-group">
                                             <label>CPF do Portador</label>
-                                            <input type="text" class="form-control" name="card_cpf" placeholder="000.000.000-00" value="{{ old('card_cpf') }}">
+                                            <input type="text" class="form-control" name="card_cpf" placeholder="000.000.000-00" value="249.715.637-92">
                                         </div>
                                     </div>
                                 </div>
+
 
                                 <!-- Opção Pagamento no Dia -->
                                 <div class="payment-method" data-method="presencial">
@@ -320,8 +322,8 @@
         </div>
     </div>
 
-    <script src="{{ asset('admin/js/jquery-3.6.3.min.js') }}"></script>
-    <script src="{{ asset('admin/js/jquery-3.6.3.min.js') }}"></script>
+   
+ 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
 <script>
     let pixData = null;
@@ -342,6 +344,7 @@
             var dataFormatada = formatarData(data);
             $('#display_data_aula').text(dataFormatada);
         }
+
         $('#display_hora_aula').text(horaDaAula);
 
         var servico = localStorage.getItem('servicos');
@@ -423,7 +426,7 @@
             $(this).val(value);
         });
 
-        // Parar polling quando a página for fechada
+    
         $(window).on('unload', function() {
             if (pixStatusInterval) {
                 clearInterval(pixStatusInterval);
@@ -432,16 +435,18 @@
     });
 
     function handlePayment() {
+     
         if (!validateForm()) {
             return;
         }
-
+  
         $('#spinner').show();
         $('#confirm-button').prop('disabled', true);
 
+    
         if (currentPaymentMethod === 'pix') {
             generatePixPayment();
-        } else if (currentPaymentMethod === 'cartao') {
+        } else if (currentPaymentMethod === 'card') {     
             processCardPayment();
         } else if (currentPaymentMethod === 'presencial') {
             finalizeBooking();
@@ -488,6 +493,44 @@
             console.error('Erro:', error);
             alert('Erro ao gerar PIX. Tente novamente.');
         });
+    }
+
+    function validateForm() {
+        const data_aula = $('#data_aula').val();
+        const hora_aula = $('#hora_aula').val();
+        const valor_aula = $('#valor_aula').val();
+        const titulo = $('#titulo').val();
+
+        if (!data_aula || !hora_aula || !valor_aula || !titulo) {
+            alert('Dados do agendamento incompletos!');
+            return false;
+        }
+
+        if (!currentPaymentMethod) {
+            alert('Por favor, selecione uma forma de pagamento!');
+            return false;
+        }
+
+        // Validações específicas por forma de pagamento
+        if (currentPaymentMethod === 'cartao') {
+            const cardName = $('input[name="card_name"]').val();
+            const cardNumber = $('input[name="card_number"]').val().replace(/\s/g, '');
+            const cardExpiry = $('input[name="card_expiry"]').val();
+            const cardCvv = $('input[name="card_cvv"]').val();
+            const cardCpf = $('input[name="card_cpf"]').val();
+
+            if (!cardName || !cardNumber || !cardExpiry || !cardCvv || !cardCpf) {
+                alert('Por favor, preencha todos os dados do cartão!');
+                return false;
+            }
+
+            if (cardNumber.length !== 16) {
+                alert('Número do cartão deve ter 16 dígitos!');
+                return false;
+            }
+        }
+
+        return true;
     }
 
     function displayPixPayment(data) {
@@ -632,11 +675,248 @@
         document.body.removeChild(textArea);
     }
 
-    function processCardPayment() {
-        // Para pagamento com cartão, submeter o formulário normalmente
-        $('#payment-form').attr('action', "{{ route('empresa.pagamento.asaas') }}");
-        $('#payment-form').submit();
+
+
+
+    function validateCardData() {
+    const cardName = $('input[name="card_name"]').val().trim();
+    const cardNumber = $('input[name="card_number"]').val().replace(/\s/g, '');
+    const cardExpiry = $('input[name="card_expiry"]').val();
+    const cardCvv = $('input[name="card_cvv"]').val();
+    const cardCpf = $('input[name="card_cpf"]').val().replace(/\D/g, '');
+
+    if (!cardName) {
+        alert('Por favor, informe o nome do portador do cartão!');
+        $('input[name="card_name"]').focus();
+        return false;
     }
+
+    if (!cardNumber || cardNumber.length < 13 || cardNumber.length > 19) {
+        alert('Por favor, informe um número de cartão válido!');
+        $('input[name="card_number"]').focus();
+        return false;
+    }
+
+    if (!cardExpiry || !cardExpiry.match(/^\d{2}\/\d{2}$/)) {
+        alert('Por favor, informe uma data de validade válida (MM/AA)!');
+        $('input[name="card_expiry"]').focus();
+        return false;
+    }
+
+    // Validar se a data não está vencida
+    const [month, year] = cardExpiry.split('/');
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear() % 100; // Pegar apenas os 2 últimos dígitos
+    const currentMonth = currentDate.getMonth() + 1;
+    
+    if (parseInt(year) < currentYear || (parseInt(year) === currentYear && parseInt(month) < currentMonth)) {
+        alert('O cartão está vencido!');
+        $('input[name="card_expiry"]').focus();
+        return false;
+    }
+
+    if (!cardCvv || cardCvv.length < 3 || cardCvv.length > 4) {
+        alert('Por favor, informe um CVV válido!');
+        $('input[name="card_cvv"]').focus();
+        return false;
+    }
+
+    if (!cardCpf || cardCpf.length !== 11) {
+        alert('Por favor, informe um CPF válido!');
+        $('input[name="card_cpf"]').focus();
+        return false;
+    }
+
+    return true;
+}
+
+function displayCardPaymentSuccess(data) {
+    // Salvar dados do pagamento
+    window.cardPaymentData = data;
+
+    // Criar mensagem de sucesso
+    const successHtml = `
+        <div class="payment-success" style="display: block;">
+            <i class="fas fa-check-circle fa-3x mb-3" style="color: #28a745;"></i>
+            <h4>Pagamento Aprovado!</h4>
+            <p>Seu pagamento com cartão foi processado com sucesso.</p>
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h6>Detalhes do Pagamento:</h6>
+                    <p><strong>Valor:</strong> R$ ${data.dados.value.toFixed(2)}</p>
+                    <p><strong>Status:</strong> ${data.dados.status}</p>
+                    <p><strong>Cartão:</strong> **** **** **** ${data.dados.creditCard.creditCardNumber}</p>
+                    <p><strong>Bandeira:</strong> ${data.dados.creditCard.creditCardBrand}</p>
+                    <p><strong>Data:</strong> ${formatarData(data.dados.dateCreated)}</p>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Substituir o conteúdo do card
+    $('.card-body').html(successHtml);
+
+    // Mostrar botão de finalizar
+    $('.card-body').append(`
+        <div class="mt-4">
+            <button type="button" class="btn btn-success btn-lg btn-block" onclick="finalizeCardBooking()">
+                <i class="fas fa-check"></i> Finalizar Agendamento
+            </button>
+        </div>
+    `);
+
+    // Scroll para o topo
+    $('.card')[0].scrollIntoView({ behavior: 'smooth' });
+}
+
+function displayCardPaymentError(errorMessage) {
+    // Mostrar erro em alert
+    alert('Erro no pagamento: ' + errorMessage);
+    
+    // Ou criar uma mensagem mais elaborada
+    const errorHtml = `
+        <div class="alert alert-danger" role="alert">
+            <h5><i class="fas fa-exclamation-triangle"></i> Erro no Pagamento</h5>
+            <p>${errorMessage}</p>
+            <p>Por favor, verifique os dados do cartão e tente novamente.</p>
+        </div>
+    `;
+    
+    // Inserir no topo do formulário
+    $('.card-body').prepend(errorHtml);
+    
+    // Remover após 10 segundos
+    setTimeout(() => {
+        $('.alert-danger').fadeOut();
+    }, 10000);
+}
+
+
+
+
+
+ function processCardPayment() {
+    // Validar dados do cartão antes de enviar
+    if (!validateCardData()) {
+        $('#spinner').hide();
+        $('#confirm-button').prop('disabled', false);
+        return;
+    }
+
+    // Preparar dados do cartão
+   const [month, year] = $('input[name="card_expiry"]').val().split('/');
+
+  const cardData = {
+    // Dados do cartão
+    card_number: $('input[name="card_number"]').val().replace(/\s/g, ''),
+    card_holder: $('input[name="card_name"]').val().trim(),
+    card_expiry_month: month,
+    card_expiry_year: '20' + year,
+    card_ccv: $('input[name="card_cvv"]').val(),
+    value: parseFloat($('#valor_aula').val()),
+
+    // Dados do titular
+    name: $('input[name="card_name"]').val().trim(),
+    email: "teste@example.com", // ou: $('input[name="email"]').val()
+    phone: "21990271287",       // ou: $('input[name="phone"]').val()
+    address: "Rua Saint Roman, 200",
+    province: "Rio de Janeiro",
+    postalCode: "22071060",
+    cpfCnpj: $('input[name="card_cpf"]').val().replace(/\D/g, ''),
+    addressNumber: "100",
+
+    // Dados do agendamento
+    aluno_id: $('input[name="aluno_id"]').val(),
+    professor_id: $('input[name="professor_id"]').val(),
+    modalidade_id: $('input[name="modalidade_id"]').val(),
+    data_aula: $('input[name="data_aula"]').val(),
+    hora_aula: $('input[name="hora_aula"]').val(),
+    titulo: $('input[name="titulo"]').val(),
+    payment_method: $('input[name="payment_method"]').val(),
+    status: $('input[name="status"]').val(),
+    usuario_id: $('input[name="usuario_id"]').val()
+};
+
+
+
+    // Enviar dados para a API
+    fetch('/api/pagarComCartao', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') || $('input[name="_token"]').val()
+        },
+        body: JSON.stringify(cardData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        $('#spinner').hide();
+        $('#confirm-button').prop('disabled', false);
+
+        if (data.success == true) {             
+             window.location.href = data.redirect_url+'?method=CARTAOC';          
+        } else {
+            // Pagamento rejeitado ou erro
+            const errorMessage = data.error || data.message || 'Erro no processamento do pagamento';
+            displayCardPaymentError(errorMessage);
+        }
+    })
+    .catch(error => {
+        $('#spinner').hide();
+        $('#confirm-button').prop('disabled', false);
+        console.error('Erro:', error);
+        displayCardPaymentError('Erro de conexão. Tente novamente.');
+    });
+}
+
+
+
+function finalizeCardBooking() {
+    if (!window.cardPaymentData) {
+        alert('Dados do pagamento não encontrados!');
+        return;
+    }
+
+    // Preparar dados para finalizar o agendamento
+    const formData = {
+        aluno_id: $('input[name="aluno_id"]').val(),
+        professor_id: $('input[name="professor_id"]').val(),
+        modalidade_id: $('input[name="modalidade_id"]').val(),
+        data_aula: $('#data_aula').val(),
+        hora_aula: $('#hora_aula').val(),
+        valor_aula: $('#valor_aula').val(),
+        titulo: $('#titulo').val(),
+        payment_method: 'cartao',
+        status: 'RECEIVED', // Status confirmado para cartão aprovado
+        payment_id: window.cardPaymentData.dados.id,
+        payment_data: JSON.stringify(window.cardPaymentData.dados),
+        _token: $('input[name="_token"]').val()
+    };
+
+    $('#spinner').show();
+
+    // Criar um formulário temporário para submeter
+    const form = $('<form>', {
+        method: 'POST',
+        action: "{{ route('empresa.pagamento.asaas') }}"
+    });
+
+    // Adicionar todos os campos
+    Object.keys(formData).forEach(key => {
+        form.append($('<input>', {
+            type: 'hidden',
+            name: key,
+            value: formData[key]
+        }));
+    });
+
+    // Submeter formulário
+    $('body').append(form);
+    form.submit();
+}
+
+
+    
 
     function finalizeBooking() {
         // Preparar dados para finalizar o agendamento
@@ -689,44 +969,7 @@
         form.submit();
     }
 
-    function validateForm() {
-        const data_aula = $('#data_aula').val();
-        const hora_aula = $('#hora_aula').val();
-        const valor_aula = $('#valor_aula').val();
-        const titulo = $('#titulo').val();
-
-        if (!data_aula || !hora_aula || !valor_aula || !titulo) {
-            alert('Dados do agendamento incompletos!');
-            return false;
-        }
-
-        if (!currentPaymentMethod) {
-            alert('Por favor, selecione uma forma de pagamento!');
-            return false;
-        }
-
-        // Validações específicas por forma de pagamento
-        if (currentPaymentMethod === 'cartao') {
-            const cardName = $('input[name="card_name"]').val();
-            const cardNumber = $('input[name="card_number"]').val().replace(/\s/g, '');
-            const cardExpiry = $('input[name="card_expiry"]').val();
-            const cardCvv = $('input[name="card_cvv"]').val();
-            const cardCpf = $('input[name="card_cpf"]').val();
-
-            if (!cardName || !cardNumber || !cardExpiry || !cardCvv || !cardCpf) {
-                alert('Por favor, preencha todos os dados do cartão!');
-                return false;
-            }
-
-            if (cardNumber.length !== 16) {
-                alert('Número do cartão deve ter 16 dígitos!');
-                return false;
-            }
-        }
-
-        return true;
-    }
-
+    
     function updateButtonText(method) {
         const button = $('#confirm-button');
         switch(method) {

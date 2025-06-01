@@ -137,18 +137,24 @@
                                 <p>
                                     <strong>Hora:</strong> <span class="hora_aula">Não informado</span>
                                 </p>
-                                <p>
-                                    <strong>Pagamento:</strong> 
-                                    @if (session('payment_method') === 'presencial')
-                                        Presencial no dia da aula
-                                    @elseif (session('payment_method') === 'pix')
-                                        Via PIX 
-                                    @elseif (session('payment_method') === 'cartao')
-                                        Via Cartão de Crédito (confirmado)
-                                    @else
-                                        Método não especificado
-                                    @endif
-                                </p>
+                                                        @php
+                                $method = request()->get('method'); // pega o ?method= do GET
+                        
+                            @endphp
+    
+                            <p>
+                                <strong>Pagamento:</strong>
+                                @if (session('payment_method') === 'presencial' || $method === 'presencial')
+                                    Presencial no dia da aula
+                                @elseif (session('payment_method') === 'pix' || $method === 'pix')
+                                    Via PIX
+                                @elseif (session('payment_method') === 'cartao' || $method === 'CARTAOC')
+                                    Via Cartão de Crédito (confirmado)
+                                @else
+                                    Método não especificado
+                                @endif
+                            </p>
+
                             </div>
                             <div class="col-12">
                                 <a href="{{ route('recibo', ['id' => $professor->id]) }}" class="btn btn-primary view-inv-btn">Ver Recibo</a>
