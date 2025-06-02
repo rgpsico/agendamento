@@ -30,6 +30,7 @@ class SiteController extends Controller
 
     public function mostrarDominio(Request $request)
     {
+        dd('aaa');
         $host = $request->getHost();
 
         // Domínio padrão do sistema
