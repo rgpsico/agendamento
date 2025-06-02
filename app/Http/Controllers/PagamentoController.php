@@ -599,10 +599,6 @@ public function gerarPix(Request $request)
             'usuario_id' => $request->usuario_id
         ]);
 
-
-
-
-
         // 2. Criação do cliente no Asaas
         $clienteResponse = Http::withHeaders([
             'accept' => 'application/json',
