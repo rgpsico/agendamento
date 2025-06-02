@@ -33,15 +33,15 @@ class EmpresaSite extends Model
         'ativo' => 'boolean',
     ];
 
-    // ✅ ADICIONAR: Método para customizar Route Model Binding
-    public function resolveRouteBinding($value, $field = null)
-    {
-        // Tentar encontrar o registro
-        $result = $this->where($field ?? $this->getRouteKeyName(), $value)->first();
+    // // ✅ ADICIONAR: Método para customizar Route Model Binding
+    // public function resolveRouteBinding($value, $field = null)
+    // {
+    //     // Tentar encontrar o registro
+    //     $result = $this->where($field ?? $this->getRouteKeyName(), $value)->first();
         
-        // Se não encontrar, retornar null ao invés de dar erro 404
-        return $result;
-    }
+    //     // Se não encontrar, retornar null ao invés de dar erro 404
+    //     return $result;
+    // }
 
     // Relacionamentos
     public function empresa()
