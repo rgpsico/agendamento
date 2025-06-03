@@ -249,7 +249,7 @@
                                                         <h2 class="table-avatar">
                                                             <a href="#" class="avatar avatar-sm me-2">
                                                                 <img class="avatar-img rounded-circle"
-                                                                    src="{{ $empresa->avatar ? asset('storage/' . $empresa->avatar) : asset('admin/img/patients/patient15.jpg') }}"
+                                                                    src="{{ $empresa->avatar ? asset('avatar/' . $empresa->avatar) : asset('admin/img/patients/patient15.jpg') }}"
                                                                     alt="User Image">
                                                             </a>
                                                             <a href="#">{{ $empresa->nome }}</a>
