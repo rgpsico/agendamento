@@ -160,53 +160,124 @@ class EmpresaController extends Controller
 
 
 
+
+
     public function update(Request $request)
     {
-
-        $data = $request->validate([
+        // Validação dos dados
+        $validatedData = $request->validate([
+            'empresa_id' => 'required|exists:empresa,id',
             'avatar' => 'nullable|image|max:2048',
+            'banner' => 'nullable|image|max:2048',
             'nome' => 'required|max:255',
+            'email' => 'required|email|max:255',
+            'site_url' => 'nullable|url|max:255',
             'descricao' => 'required',
-            'telefone' => 'required',
-            'cnpj' => 'required',
-
-            'valor_aula_de' => 'required',
-            'valor_aula_ate' => 'required',
-            'modalidade_id' => 'required',
+            'telefone' => 'required|max:20',
+            'cnpj' => 'required|max:18',
+            'data_vencimento' => 'required|date',
+            'valor_aula_de' => 'required|numeric|min:0',
+            'valor_aula_ate' => 'required|numeric|min:0',
+            'modalidade_id' => 'required|exists:modalidade,id',
         ]);
 
+        try {
+            // Buscar a empresa pelo ID
+            $empresa = Empresa::findOrFail($request->empresa_id);
 
-        $data = $request->all();
+            // Preparar dados para atualização
+            $dataToUpdate = [
+                'nome' => $validatedData['nome'],
+                'descricao' => $validatedData['descricao'],
+                'telefone' => $validatedData['telefone'],
+                'cnpj' => $validatedData['cnpj'],
+                'data_vencimento' => $validatedData['data_vencimento'],
+                'valor_aula_de' => $validatedData['valor_aula_de'],
+                'valor_aula_ate' => $validatedData['valor_aula_ate'],
+                'modalidade_id' => $validatedData['modalidade_id'],
+            ];
 
-        $data['user_id'] = $request->user_id;
+            // Adicionar site_url se fornecido
+            if (!empty($validatedData['site_url'])) {
+                $dataToUpdate['site_url'] = $validatedData['site_url'];
+            }
 
-        // Processar o arquivo de avatar, se houver 
+            // Processar upload do avatar
+            if ($request->hasFile('avatar')) {
+                // Deletar avatar antigo se existir
+                if ($empresa->avatar && file_exists(public_path('/avatar/' . $empresa->avatar))) {
+                    unlink(public_path('/avatar/' . $empresa->avatar));
+                }
 
-        if ($request->hasFile('avatar')) {
-            $file = $request->file('avatar');
-            $filename = time() . '.' . $file->getClientOriginalExtension();
-            $path = public_path('/avatar');
-            $file->move($path, $filename);
-            $data['avatar'] = $filename;
+                $file = $request->file('avatar');
+                $filename = 'avatar_' . $empresa->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+                $path = public_path('/avatar');
+
+                // Criar diretório se não existir
+                if (!file_exists($path)) {
+                    mkdir($path, 0755, true);
+                }
+
+                $file->move($path, $filename);
+                $dataToUpdate['avatar'] = $filename;
+            }
+
+            // Processar upload do banner
+            if ($request->hasFile('banner')) {
+                // Deletar banner antigo se existir
+                if ($empresa->banner && file_exists(public_path('/banner/' . $empresa->banner))) {
+                    unlink(public_path('/banner/' . $empresa->banner));
+                }
+
+                $file = $request->file('banner');
+                $filenameBanner = 'banner_' . $empresa->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+                $path = public_path('/banner');
+
+                // Criar diretório se não existir
+                if (!file_exists($path)) {
+                    mkdir($path, 0755, true);
+                }
+
+                $file->move($path, $filenameBanner);
+                $dataToUpdate['banner'] = $filenameBanner; // Corrigido: era 'banners'
+            }
+
+            // Atualizar o email do usuário associado (se necessário)
+            if (isset($validatedData['email']) && $empresa->user) {
+                $empresa->user->update(['email' => $validatedData['email']]);
+            }
+
+            // Atualizar a empresa
+            $empresa->update($dataToUpdate);
+
+            // Resposta para requisição AJAX
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Empresa atualizada com sucesso!',
+                    'empresa' => $empresa->fresh() // Retorna os dados atualizados
+                ]);
+            }
+
+            // Resposta para requisição normal
+            return redirect()->back()->with('success', 'Empresa atualizada com sucesso!');
+        } catch (\Exception $e) {
+            // Log do erro
+            \Log::error('Erro ao atualizar empresa: ' . $e->getMessage());
+
+            // Resposta para requisição AJAX
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Erro ao atualizar empresa: ' . $e->getMessage()
+                ], 500);
+            }
+
+            // Resposta para requisição normal
+            return redirect()->back()
+                ->with('error', 'Erro ao atualizar empresa: ' . $e->getMessage())
+                ->withInput();
         }
-
-        if ($request->hasFile('banner')) {
-
-            $file = $request->file('banner');
-            $filenameBanners = time() . '.' . $file->getClientOriginalExtension();
-            $path = public_path('/banner');
-            $file->move($path, $filenameBanners);
-            $data['banners'] = $filenameBanners;
-        }
-
-
-        // Atualizar a empresa existente ou criar uma nova
-        $empresa = Empresa::updateOrCreate(
-            ['user_id' => $data['user_id']],
-            $data
-        );
-
-        return redirect()->back()->with('success', 'Empresa atualizada com sucesso!');
     }
 
 

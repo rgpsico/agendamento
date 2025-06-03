@@ -100,7 +100,7 @@
                                     aria-label="Fechar"></button>
                             </div>
                             <form id="editEmpresaForm" method="POST" enctype="multipart/form-data">
-                                <input type="hidden" name="_token" value="csrf-token-here">
+                                <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                 <input type="hidden" name="_method" value="PUT">
                                 <input type="hidden" id="empresa_id" name="empresa_id">
 
@@ -151,8 +151,8 @@
                                             <div class="form-group mb-3">
                                                 <label for="data_vencimento" class="form-label">Data
                                                     Vencimento</label>
-                                                <input type="date" class="form-control" id="data_vencimento"
-                                                    name="data_vencimento" required>
+                                                <input type="text" class="form-control"
+                                                    id="data_vencimento_empresa" name="data_vencimento" required>
                                             </div>
                                         </div>
                                     </div>
@@ -338,6 +338,13 @@
 
     <script>
         $(document).ready(function() {
+            // Adicionar no início do seu script, dentro do $(document).ready
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+
             $('.editEmpresaBtn').click(function() {
                 let empresaId = $(this).data('id');
 
@@ -349,15 +356,17 @@
                 $('#descricao').val($(this).data('descricao'));
                 $('#telefone').val($(this).data('telefone'));
                 $('#cnpj').val($(this).data('cnpj'));
-                $('#data_vencimento').val($(this).data('data_vencimento'));
+                $('#data_vencimento_empresa').val($(this).data('data_vencimento'));
                 $('#valor_aula_de').val($(this).data('valor_aula_de'));
                 $('#valor_aula_ate').val($(this).data('valor_aula_ate'));
 
+                $('#modalidade_id option[value="' + $(this).data('modalidade_id') + '"]').prop('selected',
+                    true);
                 // Selecionar modalidade correta
                 $('#modalidade_id').val($(this).data('modalidade_id'));
 
                 // Definir action do formulário
-                $('#editEmpresaForm').attr('action', `/cliente/empresa/${empresaId}`);
+                $('#editEmpresaForm').attr('action', `/cliente/empresa/update/${empresaId}`);
 
                 console.log('Modalidade selecionada:', $(this).data('modalidade_id'));
             });
