@@ -4,6 +4,8 @@ namespace App\Services;
 
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
+
 
 class AsaasService
 {
@@ -22,6 +24,82 @@ class AsaasService
             ? env('ASAAS_URL', 'https://api.asaas.com') 
             : env('ASAAS_SANDBOX_URL', 'https://sandbox.asaas.com');
     }
+
+
+    public function criarClienteAsaas(array $dados)
+    {
+        $response = Http::withHeaders([
+            'accept' => 'application/json',
+            'access_token' => env("ASAAS_API_KEY"),
+        ])->post('https://sandbox.asaas.com/api/v3/customers', [
+            'name' => $dados['name'],
+            'email' => $dados['email'],
+            'cpfCnpj' => $dados['cpfCnpj'],
+            'phone' => $dados['phone'],
+            'postalCode' => $dados['postalCode'],
+            'address' => $dados['address'],
+            'addressNumber' => $dados['addressNumber'],
+            'province' => $dados['province'],
+        ]);
+
+        if ($response->failed()) {
+            throw new \Exception('Erro ao criar cliente no Asaas: ' . $response->body());
+        }
+
+        return $response->json();
+    }
+
+
+     public function criarPagamentoComCartao(array $dados, string $clienteId, string $walletId)
+    {
+        $response = Http::withHeaders([
+            'accept' => 'application/json',
+            'access_token' => env('ASAAS_API_KEY'),
+        ])->post('https://sandbox.asaas.com/api/v3/payments', [
+            'customer' => $clienteId,
+            'billingType' => 'CREDIT_CARD',
+            'value' => $dados['value'],
+            'dueDate' => now()->format('Y-m-d'),
+            'description' => 'Pagamento com cartão via Laravel',
+
+            'creditCard' => [
+                'holderName' => $dados['card_holder'],
+                'number' => $dados['card_number'],
+                'expiryMonth' => $dados['card_expiry_month'],
+                'expiryYear' => $dados['card_expiry_year'],
+                'ccv' => $dados['card_ccv'],
+            ],
+
+            'creditCardHolderInfo' => [
+                'name' => $dados['name'],
+                'email' => $dados['email'],
+                'cpfCnpj' => $dados['cpfCnpj'],
+                'postalCode' => $dados['postalCode'],
+                'addressNumber' => $dados['addressNumber'],
+                'addressComplement' => '',
+                'phone' => $dados['phone'],
+                'mobilePhone' => $dados['phone'],
+            ],
+
+            'split' => [
+                [
+                    'walletId' => $walletId,
+                    'fixedValue' => round($dados['value'] * 0.7, 2), // 70% para o professor
+                    'status' => 'ACTIVE',
+                    'refusalOption' => 'TRANSFER',
+                ]
+            ]
+        ]);
+
+        if ($response->failed()) {
+            Log::error('Erro no pagamento: ' . $response->body());
+            throw new \Exception('Erro ao criar pagamento: ' . $response->body());
+        }
+
+        return $response;
+    }
+
+
 
     /**
      * Test the connection to the Asaas API.

@@ -4,28 +4,42 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class Empresa extends Model
 {
     use HasFactory;
 
-
-
-
-
-
     protected $primaryKey = 'id';
-
     public $incrementing = true;
-
     protected $keyType = 'int';
-
-    protected $fillable = ['user_id', 'avatar', 'nome', 'descricao', 'telefone', 'cnpj', 'valor_aula_de', 'valor_aula_ate', 'modalidade_id', 'banners'];
-
     protected $table = 'empresa';
 
+    protected $fillable = [
+        'user_id',
+        'avatar',
+        'nome',
+        'descricao',
+        'telefone',
+        'cnpj',
+        'valor_aula_de',
+        'valor_aula_ate',
+        'modalidade_id',
+        'banners',
+        'data_vencimento',
+        'status'
+    ];
 
-      public function site()
+    protected $dates = [
+        'data_vencimento'
+    ];
+
+    protected $casts = [
+        'data_vencimento' => 'date'
+    ];
+
+    // Relacionamentos existentes
+    public function site()
     {
         return $this->hasOne(EmpresaSite::class, 'empresa_id', 'id');
     }
@@ -34,7 +48,7 @@ class Empresa extends Model
     {
         return $this->hasOne(EmpresaEndereco::class, 'empresa_id', 'id');
     }
-    
+
     public function paymentGateways()
     {
         return $this->hasMany(PagamentoGateway::class, 'empresa_id');
@@ -60,29 +74,13 @@ class Empresa extends Model
         return $this->hasMany(EmpresaAvaliacao::class, 'empresa_id', 'id');
     }
 
- 
     public function servicos()
     {
         return $this->hasMany(Servicos::class, 'empresa_id', 'id');
     }
 
-
-    public function getTipoAgendamentoAttribute()
-    {
-        return Configuracao::get($this->id, 'agendamento_tipo', 'horarios');
-    }
-
-    // No modelo Empresa.php
     public function professores()
     {
         return $this->hasMany(Professor::class, 'empresa_id', 'id');
     }
-
-    // Acessor para WhatsApp
-    public function getWhatsappNumeroAttribute()
-    {
-        return Configuracao::get($this->id, 'whatsapp_numero', '');
-    }
-
-   
 }
