@@ -40,8 +40,8 @@ class EmpresaController extends Controller
         if (!Auth::user()->empresa) {
             return redirect()->route('empresa.configuracao', ['userId' => Auth::user()->id]);
         }
-        
-     
+
+
         $professor_id = Auth::user()->professor->id ?? null;
 
         if (!$professor_id) {
@@ -158,11 +158,11 @@ class EmpresaController extends Controller
         }
     }
 
-    
+
 
     public function update(Request $request)
     {
-        
+
         $data = $request->validate([
             'avatar' => 'nullable|image|max:2048',
             'nome' => 'required|max:255',
@@ -241,16 +241,52 @@ class EmpresaController extends Controller
         return $this->loadView();
     }
 
+    // ALTERNATIVA 2: Usar helper request() diretamente
+
+
+    // ALTERNATIVA 3: Criar método separado para filtros
     public function index()
     {
-        // Buscar todas as empresas no banco de dados
-        $empresas = Empresa::all();
+        return $this->indexWithFilters();
+    }
+
+    private function indexWithFilters()
+    {
+        $request = request();
+
+        // Resto do código igual...
+        $query = Empresa::query();
+
+        if ($request->filled('nome')) {
+            $query->where('nome', 'like', '%' . $request->nome . '%');
+        }
+
+        if ($request->filled('modalidade_id')) {
+            $query->where('modalidade_id', $request->modalidade_id);
+        }
+
+        if ($request->filled('status')) {
+            if ($request->status == 'ativo') {
+                $query->where('data_vencimento', '>=', now());
+            } elseif ($request->status == 'inativo') {
+                $query->where('data_vencimento', '<', now());
+            }
+        }
+
+        $empresas = $query->get();
         $modalidades = Modalidade::all();
         $pageTitle = 'Empresa';
         $route = $this->route;
-        // Retornar para a view, caso seja Blade
-        return view('admin.empresas.index', compact('empresas', 'modalidades', 'pageTitle', 'route'));
+
+        return view('admin.empresas.index', compact(
+            'empresas',
+            'modalidades',
+            'pageTitle',
+            'route'
+        ));
     }
+
+
 
     public function create()
     {
@@ -372,8 +408,8 @@ class EmpresaController extends Controller
 
         return view('admin.empresas.show', compact('empresa', 'alunos'));
     }
-    
-    
+
+
 
     public function agendatore(Request $request)
     {
@@ -520,21 +556,44 @@ class EmpresaController extends Controller
 
     public function destroy($id)
     {
-        $image = EmpresaGaleria::find($id);
+        try {
+            $empresa = Empresa::find($id);
 
-        if ($image) {
-            // Remove o arquivo de imagem do servidor
-            $imagePath = public_path('galeria_escola/' . $image->image);
-            if (file_exists($imagePath)) {
-                unlink($imagePath);
+            if (!$empresa) {
+                return back()->with('error', 'Empresa não encontrada.');
             }
 
-            // Exclui a imagem do banco de dados
-            $image->delete();
+            // Exclusão lógica - marca como inativa definindo data de vencimento no passado
+            $empresa->update([
+                'data_vencimento' => now()->subDay(), // Define para ontem
+                'status' => 'inativo' // Se você tiver um campo status
+            ]);
 
-            return back()->with('success', 'Imagem excluída com sucesso.');
-        } else {
-            return back()->with('error', 'Imagem não encontrada.');
+            return back()->with('success', 'Empresa desativada com sucesso.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Erro ao desativar empresa: ' . $e->getMessage());
+        }
+    }
+
+    // Método adicional para reativar empresa
+    public function restore($id)
+    {
+        try {
+            $empresa = Empresa::find($id);
+
+            if (!$empresa) {
+                return back()->with('error', 'Empresa não encontrada.');
+            }
+
+            // Reativa a empresa definindo nova data de vencimento
+            $empresa->update([
+                'data_vencimento' => now()->addYear(), // Adiciona 1 ano a partir de hoje
+                'status' => 'ativo'
+            ]);
+
+            return back()->with('success', 'Empresa reativada com sucesso.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Erro ao reativar empresa: ' . $e->getMessage());
         }
     }
 }

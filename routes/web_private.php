@@ -122,6 +122,7 @@ Route::prefix('cliente')->middleware('auth')->group(function () {
     });
 
     Route::group(['prefix' => '/empresa'], function () {
+        Route::post('/{id}/restore', [EmpresaController::class, 'restore'])->name('empresa.restore');
         Route::get('/empresa/all', [EmpresaController::class, 'index'])->name('empresa.index');
         Route::get('/{id}/show', [EmpresaController::class, 'show'])->name('empresa.show');
         Route::get('/create', [EmpresaController::class, 'create'])->name('empresa.create');
