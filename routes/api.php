@@ -33,6 +33,8 @@ Route::post('empresa/gerar-boleto', [BoletoController::class, 'gerarBoleto'])->n
 Route::get('empresa/userexisterasaas/{customerId}', [BoletoController::class, 'customerExistsInAsaas'])->name('asaas.user.existirs');
 Route::get('empresa/baixarboletoasaas/{boletoId}', [BoletoController::class, 'downloadBoleto'])->name('asaas.user.downloadBoleto');
 
+Route::post('enviar-boleto', [BoletoController::class, 'sendBoletoToClient'])->name('asaas.user.sendBoletoToClient');
+
 
 
 

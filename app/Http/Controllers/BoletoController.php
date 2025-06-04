@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Empresa;
+use App\Models\Usuario;
 use GuzzleHttp\Client;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+
+use Illuminate\Http\Request;
 
 class BoletoController extends Controller
 {
@@ -38,6 +41,9 @@ class BoletoController extends Controller
     public function downloadBoleto($boletoId)
     {
         try {
+
+
+
             $url = $this->baseUri . "/v3/payments/{$boletoId}/pdf";
 
             $headers = [
@@ -73,7 +79,13 @@ class BoletoController extends Controller
 
     public function gerarBoleto(Request $request)
     {
-        $url = $this->baseUri . '/v3/payments';
+
+        $clientes = Empresa::with('user')->where('status', 'inativo')->get();
+
+        foreach ($clientes as $cliente) {
+            echo $cliente->user->email . PHP_EOL;
+        }
+
 
         $headers = [
             'accept' => 'application/json',
@@ -162,6 +174,53 @@ class BoletoController extends Controller
         } catch (\Exception $e) {
             Log::error('Erro geral ao verificar cliente: ' . $e->getMessage());
             return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function sendBoletoToClient(Request $request)
+    {
+        // Dados do cliente (recebidos via request ou já do banco)
+        $customerId = $request->customer_id;
+        $dueDate = $request->dueDate ?? now()->addDays(5)->format('Y-m-d');
+        $value = $request->value ?? 129.90;
+
+        // Criar o boleto
+        $url = env('ASAAS_SANDBOX_URL') . '/v3/payments';
+        $headers = [
+            'accept' => 'application/json',
+            'access_token' => env('ASAAS_API_KEY'),
+            'content-type' => 'application/json',
+        ];
+        $body = [
+            'billingType' => 'BOLETO',
+            'customer' => $customerId,
+            'value' => $value,
+            'dueDate' => $dueDate,
+        ];
+
+        $response = Http::withHeaders($headers)->post($url, $body);
+
+        if ($response->successful()) {
+            $boletoData = $response->json();
+
+            $link = $boletoData['bankSlipUrl'];
+            $nomeCliente = $boletoData['customer'];
+            $vencimento = $boletoData['dueDate'];
+
+            // Aqui você pode enviar por e-mail, WhatsApp, etc. Vamos só simular por enquanto:
+            return response()->json([
+                'status' => 'success',
+                'mensagem' => "Boleto enviado com sucesso!",
+                'link_boleto' => $link,
+                'vencimento' => $vencimento,
+                'valor' => $value,
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'mensagem' => 'Erro ao gerar boleto',
+                'resposta' => $response->json(),
+            ], $response->status());
         }
     }
 
