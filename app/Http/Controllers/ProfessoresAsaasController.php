@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 // app/Http/Controllers/ProfessoresAsaasController.php
 
@@ -30,7 +30,7 @@ class ProfessoresAsaasController extends Controller
     {
         // Buscar o professor do usuário logado
         $professor = Auth::user()->professor;
-       
+
         if (!$professor) {
             return response()->json([
                 'success' => false,
@@ -85,7 +85,7 @@ class ProfessoresAsaasController extends Controller
                 'walletId' => env('ASAAS_WALLET_ID')
             ];
 
-         
+
             // Fazer requisição para API do Asaas
             $response = Http::withHeaders([
                 'access_token' => env('ASAAS_KEY'),
@@ -94,7 +94,6 @@ class ProfessoresAsaasController extends Controller
 
             // Verificar se a requisição foi bem-sucedida
             if (!$response->successful()) {
-                dd($response);
                 throw new \Exception('Erro na API do Asaas: ' . $response->body());
             }
 
@@ -127,26 +126,24 @@ class ProfessoresAsaasController extends Controller
                     'asaas_account' => $asaasResponse
                 ]
             ], 201);
-
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Dados inválidos',
                 'errors' => $e->errors()
             ], 422);
-
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             // Log do erro
             Log::error('Erro ao criar subconta', [
                 'error' => $e->getMessage(),
                 'user_id' => auth()->id(),
                 'professor_id' => $professor->id ?? null
             ]);
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Erro interno do servidor',
@@ -159,7 +156,7 @@ class ProfessoresAsaasController extends Controller
     {
         try {
             $professor = Professor::findOrFail($id);
-            
+
             if (!$professor->asaas_wallet_id) {
                 return response()->json([
                     'success' => false,
@@ -174,7 +171,6 @@ class ProfessoresAsaasController extends Controller
                     'asaas_wallet_id' => $professor->asaas_wallet_id
                 ]
             ]);
-
         } catch (\Exception $e) {
             Log::error('Erro ao consultar status da subconta', [
                 'error' => $e->getMessage(),
@@ -199,7 +195,6 @@ class ProfessoresAsaasController extends Controller
                 'success' => true,
                 'data' => $professors
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -207,6 +202,4 @@ class ProfessoresAsaasController extends Controller
             ], 500);
         }
     }
-
 }
-    

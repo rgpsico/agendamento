@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\IntegrationsController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Api\PixQrController;
+use App\Http\Controllers\PaymentConfigurationController;
 
 Route::post('/pagamento', [StripeController::class, 'treinoStripe'])->name('stripe.pagamento');
 Route::get('/erro/pagamento', [PagamentoController::class, 'erroPagamento'])->name('erroPagamento');
@@ -122,6 +123,12 @@ Route::prefix('cliente')->middleware('auth')->group(function () {
     });
 
     Route::group(['prefix' => '/empresa'], function () {
+        Route::get('tipopagamento/config', [PaymentConfigurationController::class, 'index'])->name('empresa.pagamento.config.index');
+        Route::put('tipopagamento/{empresaId}', [PaymentConfigurationController::class, 'update'])->name('empresa.tipopagamento.config.update');
+        Route::put('tipopagamento', [PaymentConfigurationController::class, 'store'])->name('empresa.tipopagamento.config.store');
+        Route::post('empresa/pagamento/test', [PaymentConfigurationController::class, 'test'])->name('empresa.pagamento.config.test');
+
+
         Route::post('/{id}/restore', [EmpresaController::class, 'restore'])->name('empresa.restore');
         Route::get('/empresa/all', [EmpresaController::class, 'index'])->name('empresa.index');
         Route::get('/{id}/show', [EmpresaController::class, 'show'])->name('empresa.show');

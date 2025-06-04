@@ -13,6 +13,7 @@ use App\Models\PagamentoGateway;
 use App\Models\Professor;
 use App\Models\Usuario;
 use App\Models\ConfiguracaoGeral;
+use App\Models\PaymentConfiguration;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Str;
@@ -95,7 +96,7 @@ class HomeController extends Controller
     public function booking($id)
     {
 
-       
+
 
         $model = $this->model::with('servicos')->where('user_id', $id)->first();
 
@@ -105,7 +106,7 @@ class HomeController extends Controller
 
         $professor_id = $this->professor->where('usuario_id', $id)->value('id');
 
-        
+
         // Array de dias da semana
         $diasDaSemana = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
 
@@ -154,13 +155,17 @@ class HomeController extends Controller
 
     public function checkoutAuth($user_id)
     {
-
-       
         $model = $this->model::with('paymentGateways')->where('user_id', $user_id)->first();
         $professor_id = Professor::with('usuario')->where('usuario_id', $user_id)->first();
-        
-      
-       
+
+
+        // Buscar configuração de pagamento da empresa
+        $paymentConfig = PaymentConfiguration::getForEmpresa($user_id);
+
+        // Obter métodos de pagamento habilitados
+        $formasPagamento = $paymentConfig->getEnabledPaymentMethods();
+
+        // Buscar token do gateway
         $token_gateway = PagamentoGateway::where('empresa_id', $model->id)
             ->where('status', 1)
             ->value('api_key');
@@ -171,10 +176,12 @@ class HomeController extends Controller
                 'pageTitle' => $this->pageTitle,
                 'token_gateway' => $token_gateway,
                 'route' => $this->route,
-                'model'  => $model,
+                'model' => $model,
                 'professor' => $professor_id,
-                'user_id' => $user_id,                
+                'user_id' => $user_id,
                 'view' => $this->view,
+                'formasPagamento' => $formasPagamento,
+                'paymentConfig' => $paymentConfig // Passar toda a configuração para a view
             ]
         );
     }
@@ -203,7 +210,7 @@ class HomeController extends Controller
 
     public function registerProf()
     {
-    
+
 
         $modalidade = Modalidade::all();
         $config = ConfiguracaoGeral::first();
