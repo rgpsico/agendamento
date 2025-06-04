@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\IntegrationsController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Api\PixQrController;
+use App\Http\Controllers\BoletoController;
 use App\Http\Controllers\PaymentConfigurationController;
 
 Route::post('/pagamento', [StripeController::class, 'treinoStripe'])->name('stripe.pagamento');

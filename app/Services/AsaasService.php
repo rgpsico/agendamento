@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Models\Professor;
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 
@@ -20,8 +22,8 @@ class AsaasService
             'accept' => 'application/json',
             'content-type' => 'application/json',
         ];
-        $this->url = env('APP_ENV') === 'production' 
-            ? env('ASAAS_URL', 'https://api.asaas.com') 
+        $this->url = env('APP_ENV') === 'production'
+            ? env('ASAAS_URL', 'https://api.asaas.com')
             : env('ASAAS_SANDBOX_URL', 'https://sandbox.asaas.com');
     }
 
@@ -50,7 +52,7 @@ class AsaasService
     }
 
 
-     public function criarPagamentoComCartao(array $dados, string $clienteId, string $walletId)
+    public function criarPagamentoComCartao(array $dados, string $clienteId, string $walletId)
     {
         $response = Http::withHeaders([
             'accept' => 'application/json',
@@ -224,7 +226,7 @@ class AsaasService
     {
         // Força o billingType para PIX
         $data['billingType'] = 'PIX';
-        
+
         $url = rtrim($this->url, '/') . '/api/v3/payments';
 
         Log::info('Creating PIX payment: ' . json_encode($data));
@@ -244,7 +246,6 @@ class AsaasService
             }
 
             return $payment;
-
         } catch (\Exception $e) {
             Log::error('Error creating PIX payment: ' . $e->getMessage() . ' - Data: ' . json_encode($data));
             throw new \Exception('Error creating PIX payment: ' . $e->getMessage());
@@ -271,7 +272,6 @@ class AsaasService
             ]);
 
             return $this->tratarResposta($response->getStatusCode(), json_decode($response->getBody(), true));
-
         } catch (\Exception $e) {
             Log::error('Error getting PIX QR Code: ' . $e->getMessage() . ' - Payment ID: ' . $paymentId);
             throw new \Exception('Error getting PIX QR Code: ' . $e->getMessage());
@@ -296,7 +296,6 @@ class AsaasService
             ]);
 
             return $this->tratarResposta($response->getStatusCode(), json_decode($response->getBody(), true));
-
         } catch (\Exception $e) {
             Log::error('Error checking payment status: ' . $e->getMessage() . ' - Payment ID: ' . $paymentId);
             throw new \Exception('Error checking payment status: ' . $e->getMessage());
@@ -333,7 +332,7 @@ class AsaasService
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-     public function createSubaccount($request)
+    public function createSubaccount($request)
     {
         DB::beginTransaction();
 
@@ -347,11 +346,11 @@ class AsaasService
                 'name' => $request->name ?? $usuario->nome,
                 'email' => $usuario->email,
                 'cpfCnpj' => $request->cpfCnpj,
-                // ... outros campos
+
             ];
 
             // Chamada simplificada sem precisar passar a API key
-            $response = $this->asaasService->createSubaccount($subaccountData);
+            $response = $this->createSubaccount($subaccountData);
 
             // Atualizar professor
             $professor->update([
@@ -366,7 +365,6 @@ class AsaasService
                 'message' => 'Subconta criada com sucesso!',
                 'data' => $response
             ]);
-
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
@@ -377,7 +375,7 @@ class AsaasService
     }
 
 
-    
+
     /**
      * Retrieve the wallet ID for a customer.
      *

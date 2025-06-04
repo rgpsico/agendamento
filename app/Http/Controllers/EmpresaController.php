@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ProfessorStoreRequest;
 use App\Models\Agendamento;
 use App\Models\DiaDaSemana;
 use App\Models\Disponibilidade;
@@ -100,56 +101,41 @@ class EmpresaController extends Controller
         return view('admin.' . $this->view . '.' . $viewSuffix, $mergedData);
     }
 
-    public function store(Request $request)
+    public function store(ProfessorStoreRequest $request)
     {
         try {
-            $data = $request->validate([
-                'avatar' => 'nullable|image|max:2048',
-                'banner' => 'nullable|image|max:2048',
-                'nome' => 'required|max:255',
-                'descricao' => 'required',
-                'telefone' => 'required',
-                'cnpj' => 'required|unique:empresa,cnpj',
-                'valor_aula_de' => 'required',
-                'valor_aula_ate' => 'required',
-                'modalidade_id' => 'required',
-            ], [
-                'nome.required' => 'O nome é obrigatório.',
-                'descricao.required' => 'A descrição é obrigatória.',
-                'telefone.required' => 'O telefone é obrigatório.',
-                'cnpj.required' => 'O CNPJ é obrigatório.',
-                'cnpj.unique' => 'Já existe uma empresa com este CNPJ.',
-                'valor_aula_de.required' => 'O valor inicial da aula é obrigatório.',
-                'valor_aula_ate.required' => 'O valor final da aula é obrigatório.',
-                'modalidade_id.required' => 'A modalidade é obrigatória.',
-                'avatar.image' => 'O avatar deve ser uma imagem.',
-                'avatar.max' => 'O avatar não pode ser maior que 2MB.',
-                'banner.image' => 'O banner deve ser uma imagem.',
-                'banner.max' => 'O banner não pode ser maior que 2MB.',
-            ]);
+            // Os dados já foram validados pelo ProfessorStoreRequest
+            $data = $request->validated();
 
             // Criar a empresa
             $data['user_id'] = intval($request->user_id);
 
             $empresa = Empresa::create($data);
+            $empresaId = $empresa->id;
+
+            Professor::where('usuario_id', $request->user_id)->update([
+                'empresa_id' => $empresaId
+            ]);
 
             // Processar arquivos (se existirem)
-
             if ($request->hasFile('avatar')) {
                 $file = $request->file('avatar');
                 $filename = time() . '.' . $file->getClientOriginalExtension();
                 $path = public_path('/avatar');
                 $file->move($path, $filename);
-                $data['avatar'] = $filename;
+
+                // Atualizar a empresa com o avatar
+                $empresa->update(['avatar' => $filename]);
             }
 
             if ($request->hasFile('banner')) {
-
                 $file = $request->file('banner');
                 $filenameBanners = time() . '.' . $file->getClientOriginalExtension();
                 $path = public_path('/banner');
                 $file->move($path, $filenameBanners);
-                $data['banners'] = $filenameBanners;
+
+                // Atualizar a empresa com o banner
+                $empresa->update(['banner' => $filenameBanners]);
             }
 
             return redirect()->back()->with('success', 'Empresa criada com sucesso!');
@@ -164,6 +150,7 @@ class EmpresaController extends Controller
 
     public function update(Request $request)
     {
+
         // Validação dos dados
         $validatedData = $request->validate([
             'empresa_id' => 'required|exists:empresa,id',
@@ -175,7 +162,6 @@ class EmpresaController extends Controller
             'descricao' => 'required',
             'telefone' => 'required|max:20',
             'cnpj' => 'required|max:18',
-            'data_vencimento' => 'required|date',
             'valor_aula_de' => 'required|numeric|min:0',
             'valor_aula_ate' => 'required|numeric|min:0',
             'modalidade_id' => 'required|exists:modalidade,id',
@@ -191,7 +177,7 @@ class EmpresaController extends Controller
                 'descricao' => $validatedData['descricao'],
                 'telefone' => $validatedData['telefone'],
                 'cnpj' => $validatedData['cnpj'],
-                'data_vencimento' => $validatedData['data_vencimento'],
+                //   'data_vencimento' => $validatedData['data_vencimento'],
                 'valor_aula_de' => $validatedData['valor_aula_de'],
                 'valor_aula_ate' => $validatedData['valor_aula_ate'],
                 'modalidade_id' => $validatedData['modalidade_id'],
@@ -225,8 +211,8 @@ class EmpresaController extends Controller
             // Processar upload do banner
             if ($request->hasFile('banner')) {
                 // Deletar banner antigo se existir
-                if ($empresa->banner && file_exists(public_path('/banner/' . $empresa->banner))) {
-                    unlink(public_path('/banner/' . $empresa->banner));
+                if ($empresa->banners && file_exists(public_path('/banner/' . $empresa->banners))) {
+                    unlink(public_path('/banner/' . $empresa->banners));
                 }
 
                 $file = $request->file('banner');
@@ -239,7 +225,7 @@ class EmpresaController extends Controller
                 }
 
                 $file->move($path, $filenameBanner);
-                $dataToUpdate['banner'] = $filenameBanner; // Corrigido: era 'banners'
+                $dataToUpdate['banners'] = $filenameBanner; // Corrigido: era 'banners'
             }
 
             // Atualizar o email do usuário associado (se necessário)

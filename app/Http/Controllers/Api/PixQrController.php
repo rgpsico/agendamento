@@ -20,9 +20,9 @@ use Illuminate\Support\Facades\Http;
 class PixQrController extends Controller
 {
 
-    protected $aluno_professor, $asaasService;
+    protected $aluno_professor, $asaasService, $client, $apiKey, $baseUrl;
 
-        public function __construct(AlunoProfessor $aluno_professor, AsaasService $asaasService)
+    public function __construct(AlunoProfessor $aluno_professor, AsaasService $asaasService)
     {
         $this->aluno_professor = $aluno_professor;
         $this->asaasService = $asaasService;
@@ -32,7 +32,9 @@ class PixQrController extends Controller
     }
 
 
-     public function handleAsaasWebhook(Request $request)
+
+
+    public function handleAsaasWebhook(Request $request)
     {
         // Log para confirmar que o webhook foi chamado
         Log::warning('Asaas webhook aqui', ['payload' => $request->all()]);
@@ -54,9 +56,9 @@ class PixQrController extends Controller
             return response()->json(['error' => 'Token inválido'], 401);
         }
 
-        
+
         if (!is_array($payload) || !isset($payload['event']) || !isset($payload['payment'])) {
-            
+
             $rawInput = $request->getContent();
             $message = preg_match('/^00020101/', $rawInput)
                 ? 'Recebido código PIX em vez de JSON'
@@ -73,7 +75,7 @@ class PixQrController extends Controller
         }
 
         // **ENVIAR DADOS PARA O ENDPOINT EXTERNO**
-            $resultadoEnvio = $this->enviarDadosParaEndpoint($payload);
+        $resultadoEnvio = $this->enviarDadosParaEndpoint($payload);
 
         if ($resultadoEnvio) {
             Log::info('Asaas Webhook: Dados enviados para endpoint externo com sucesso', [
@@ -122,45 +124,44 @@ class PixQrController extends Controller
         return response()->json(['received' => true], 200);
     }
 
-        /**
-         * Envia dados para o endpoint externo
-         * 
-         * @param array $data - Os dados que serão enviados no payload
-         * @return array|null
-         */
-        private function enviarDadosParaEndpoint(array $data): ?array
-        {
-            try {
-                $response = Http::timeout(30) // Timeout de 30 segundos
-                    ->retry(3, 1000) // Tentar 3 vezes com 1 segundo de intervalo
-                    ->post('https://www.comunidadeppg.com.br:3000/enviarpedidoparaentregadores', $data);
-                
-                if ($response->successful()) {
-                    return $response->json();
-                }
-                
-                Log::error('Erro ao enviar dados para endpoint externo', [
-                    'status' => $response->status(),
-                    'response' => $response->body(),
-                    'data_sent' => $data
-                ]);
-                
-                return null;
-                
-            } catch (\Exception $e) {
-                Log::error('Exceção ao enviar dados para endpoint externo', [
-                    'message' => $e->getMessage(),
-                    'data_sent' => $data,
-                    'trace' => $e->getTraceAsString()
-                ]);
-                
-                return null;
+    /**
+     * Envia dados para o endpoint externo
+     * 
+     * @param array $data - Os dados que serão enviados no payload
+     * @return array|null
+     */
+    private function enviarDadosParaEndpoint(array $data): ?array
+    {
+        try {
+            $response = Http::timeout(30) // Timeout de 30 segundos
+                ->retry(3, 1000) // Tentar 3 vezes com 1 segundo de intervalo
+                ->post('https://www.comunidadeppg.com.br:3000/enviarpedidoparaentregadores', $data);
+
+            if ($response->successful()) {
+                return $response->json();
             }
+
+            Log::error('Erro ao enviar dados para endpoint externo', [
+                'status' => $response->status(),
+                'response' => $response->body(),
+                'data_sent' => $data
+            ]);
+
+            return null;
+        } catch (\Exception $e) {
+            Log::error('Exceção ao enviar dados para endpoint externo', [
+                'message' => $e->getMessage(),
+                'data_sent' => $data,
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return null;
         }
+    }
 
 
 
-     public function listPixKeys(Request $request)
+    public function listPixKeys(Request $request)
     {
         try {
             $request->validate([
@@ -183,7 +184,6 @@ class PixQrController extends Controller
                 'keys' => $data['data'],
                 'message' => 'Pix keys retrieved successfully',
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error listing Pix keys: ' . $e->getMessage());
             return response()->json([
@@ -193,7 +193,7 @@ class PixQrController extends Controller
         }
     }
 
-    
+
 
 
     public function completePixPaymentFlow(Request $request)
@@ -216,7 +216,7 @@ class PixQrController extends Controller
             ];
 
             $client = new \GuzzleHttp\Client();
-            
+
             // Create payment
             $createResponse = $client->request('POST', env('ASAAS_SANDBOX_URL') . '/v3/payments', [
                 'headers' => [
@@ -253,7 +253,7 @@ class PixQrController extends Controller
             // Step 3: Simulate payment (opcional - apenas para teste)
             if ($request->input('auto_pay', false)) {
                 sleep(2); // Simula tempo para processar
-                
+
                 $payResponse = $client->request('POST', env('ASAAS_SANDBOX_URL') . "/v3/payments/{$paymentId}/receiveInCash", [
                     'headers' => [
                         'accept' => 'application/json',
@@ -289,7 +289,6 @@ class PixQrController extends Controller
                     'step_4' => 'Para verificar status, chame: GET /payments/status com payment_id',
                 ]
             ], 201);
-
         } catch (\Exception $e) {
             Log::error('Error in complete PIX flow', [
                 'error' => $e->getMessage(),
@@ -429,12 +428,11 @@ class PixQrController extends Controller
                 'message' => 'Erro ao criar pagamento: HTTP ' . $response->getStatusCode(),
                 'status_code' => $response->getStatusCode(),
             ], $response->getStatusCode());
-
         } catch (\GuzzleHttp\Exception\ClientException $e) {
             // Handle 4xx errors (client errors)
             $response = $e->getResponse();
             $errorBody = json_decode($response->getBody()->getContents(), true);
-            
+
             Log::error('Asaas API client error', [
                 'payment_data' => $paymentData ?? [],
                 'status' => $response->getStatusCode(),
@@ -446,7 +444,6 @@ class PixQrController extends Controller
                 'message' => 'Erro de validação: ' . ($errorBody['errors'][0]['description'] ?? 'Dados inválidos'),
                 'errors' => $errorBody['errors'] ?? [],
             ], $response->getStatusCode());
-
         } catch (\GuzzleHttp\Exception\ServerException $e) {
             // Handle 5xx errors (server errors)
             Log::error('Asaas API server error', [
@@ -458,7 +455,6 @@ class PixQrController extends Controller
                 'success' => false,
                 'message' => 'Erro interno do servidor de pagamento',
             ], 500);
-
         } catch (\Exception $e) {
             // Handle any other unexpected errors
             Log::error('Error creating PIX payment', [
@@ -474,9 +470,9 @@ class PixQrController extends Controller
         }
     }
 
-      public function deletePixKey(Request $request)
+    public function deletePixKey(Request $request)
     {
-       
+
         try {
             // Validate request data
             $request->validate([
@@ -502,7 +498,6 @@ class PixQrController extends Controller
             ]);
 
             return response()->json($data, $response->getStatusCode());
-
         } catch (\GuzzleHttp\Exception\ClientException $e) {
             $response = $e->getResponse();
             $statusCode = $response ? $response->getStatusCode() : 500;
@@ -556,129 +551,128 @@ class PixQrController extends Controller
     }
 
 
-private static function convertToUSFormat($date)
-{
-    $date = trim($date);
-    try {
-        // Try parsing as Y-m-d (from request) or d-m-Y (if front-end changes)
-        $formats = ['Y-m-d', 'd-m-Y'];
-        foreach ($formats as $format) {
-            try {
-                return \Carbon\Carbon::createFromFormat($format, $date)->format('Y-m-d');
-            } catch (\Exception $e) {
-                continue;
+    private static function convertToUSFormat($date)
+    {
+        $date = trim($date);
+        try {
+            // Try parsing as Y-m-d (from request) or d-m-Y (if front-end changes)
+            $formats = ['Y-m-d', 'd-m-Y'];
+            foreach ($formats as $format) {
+                try {
+                    return \Carbon\Carbon::createFromFormat($format, $date)->format('Y-m-d');
+                } catch (\Exception $e) {
+                    continue;
+                }
             }
-        }
-        throw new \Exception('Invalid date format for data_aula. Expected: Y-m-d or d-m-Y');
-    } catch (\Exception $e) {
-        Log::error('Date parsing failed', [
-            'input_date' => $date,
-            'error' => $e->getMessage(),
-        ]);
-        throw $e;
-    }
-}
-
-public function fazerAgendamentoPix(Request $request)
-{
-    try {
-        // Validate the request
-        $validated = $request->validate([
-            'aluno_id' => 'required|exists:alunos,id',
-            'professor_id' => 'required|exists:professores,id',
-            'valor_aula' => 'required|numeric|min:0.01',
-            'modalidade_id' => 'required|exists:modalidade,id',
-            'data_aula' => 'required|date_format:Y-m-d',
-            'hora_aula' => 'required|date_format:H:i',
-            'titulo' => 'required|string|max:255',
-        ]);
-
-        // Log request data for debugging
-        Log::info('Dados da requisição de agendamento', $request->all());
-
-        // Combine date and time into a DATETIME format
-        $data_aula = \Carbon\Carbon::createFromFormat('Y-m-d H:i', $validated['data_aula'] . ' ' . $validated['hora_aula'])->format('Y-m-d H:i:s');
-
-        // Verificar se aluno e professor existem
-        $aluno = Alunos::with('usuario')->find($validated['aluno_id']);
-        $professor = Professor::with('usuario')->find($validated['professor_id']);
-
-        if (!$aluno || !$professor || !$professor->usuario || !$aluno->usuario) {
-            Log::error('Aluno ou professor não encontrados', [
-                'aluno_id' => $validated['aluno_id'],
-                'professor_id' => $validated['professor_id'],
+            throw new \Exception('Invalid date format for data_aula. Expected: Y-m-d or d-m-Y');
+        } catch (\Exception $e) {
+            Log::error('Date parsing failed', [
+                'input_date' => $date,
+                'error' => $e->getMessage(),
             ]);
-            return redirect()->back()->with('error', 'Aluno ou professor não encontrados.');
+            throw $e;
         }
+    }
 
-        // Verificar se já existe um agendamento no mesmo horário para o professor
-        $agendamentoExistente = Agendamento::where('professor_id', $validated['professor_id'])
-            ->where('data_da_aula', $data_aula)
-            ->where('status', '!=', 'cancelado') // Assumindo que existe um campo status
-            ->first();
+    public function fazerAgendamentoPix(Request $request)
+    {
+        try {
+            // Validate the request
+            $validated = $request->validate([
+                'aluno_id' => 'required|exists:alunos,id',
+                'professor_id' => 'required|exists:professores,id',
+                'valor_aula' => 'required|numeric|min:0.01',
+                'modalidade_id' => 'required|exists:modalidade,id',
+                'data_aula' => 'required|date_format:Y-m-d',
+                'hora_aula' => 'required|date_format:H:i',
+                'titulo' => 'required|string|max:255',
+            ]);
 
-        if ($agendamentoExistente) {
-            Log::warning('Tentativa de agendamento em horário já ocupado', [
+            // Log request data for debugging
+            Log::info('Dados da requisição de agendamento', $request->all());
+
+            // Combine date and time into a DATETIME format
+            $data_aula = \Carbon\Carbon::createFromFormat('Y-m-d H:i', $validated['data_aula'] . ' ' . $validated['hora_aula'])->format('Y-m-d H:i:s');
+
+            // Verificar se aluno e professor existem
+            $aluno = Alunos::with('usuario')->find($validated['aluno_id']);
+            $professor = Professor::with('usuario')->find($validated['professor_id']);
+
+            if (!$aluno || !$professor || !$professor->usuario || !$aluno->usuario) {
+                Log::error('Aluno ou professor não encontrados', [
+                    'aluno_id' => $validated['aluno_id'],
+                    'professor_id' => $validated['professor_id'],
+                ]);
+                return redirect()->back()->with('error', 'Aluno ou professor não encontrados.');
+            }
+
+            // Verificar se já existe um agendamento no mesmo horário para o professor
+            $agendamentoExistente = Agendamento::where('professor_id', $validated['professor_id'])
+                ->where('data_da_aula', $data_aula)
+                ->where('status', '!=', 'cancelado') // Assumindo que existe um campo status
+                ->first();
+
+            if ($agendamentoExistente) {
+                Log::warning('Tentativa de agendamento em horário já ocupado', [
+                    'professor_id' => $validated['professor_id'],
+                    'data_aula' => $data_aula,
+                ]);
+                return redirect()->back()->with('error', 'O professor já possui um agendamento neste horário.');
+            }
+
+            // Verificar se a data/hora não é no passado
+            $agora = now();
+            $dataHoraAula = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $data_aula);
+
+            if ($dataHoraAula->isPast()) {
+                return redirect()->back()->with('error', 'Não é possível agendar aulas para datas/horários que já passaram.');
+            }
+
+            // Vincular aluno ao professor (se ainda não estiver vinculado)
+            if (!$aluno->professores()->where('professor_id', $professor->id)->exists()) {
+                $aluno->professores()->attach($professor->id);
+            }
+
+            // Criar o agendamento
+            $agendamento = Agendamento::create([
+                'aluno_id' => $validated['aluno_id'],
+                'modalidade_id' => $validated['modalidade_id'],
+                'professor_id' => $validated['professor_id'],
+                'data_da_aula' => $data_aula,
+                'valor_aula' => $validated['valor_aula'],
+                'horario' => $validated['hora_aula'],
+                'titulo' => $validated['titulo'],
+                'status' => 'agendado', // Status inicial
+            ]);
+
+            Log::info('Agendamento criado com sucesso', [
+                'agendamento_id' => $agendamento->id,
+                'aluno_id' => $validated['aluno_id'],
                 'professor_id' => $validated['professor_id'],
                 'data_aula' => $data_aula,
             ]);
-            return redirect()->back()->with('error', 'O professor já possui um agendamento neste horário.');
+
+            // Opcional: Enviar notificações por email ou WhatsApp
+            // $this->notificarAgendamento($agendamento);
+
+            return redirect()->route('home.checkoutsucesso', ['id' => $professor->id])
+                ->with('success', 'Agendamento realizado com sucesso!')
+                ->with('payment_method', 'pix') // Método padrão para agendamento simples
+                ->with('agendamento_id', $agendamento->id);
+        } catch (\Exception $e) {
+            Log::error('Erro ao criar agendamento', [
+                'error' => $e->getMessage(),
+                'request_data' => $request->all(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return redirect()->back()->with('error', 'Erro ao criar agendamento: ' . $e->getMessage());
         }
-
-        // Verificar se a data/hora não é no passado
-        $agora = now();
-        $dataHoraAula = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $data_aula);
-        
-        if ($dataHoraAula->isPast()) {
-            return redirect()->back()->with('error', 'Não é possível agendar aulas para datas/horários que já passaram.');
-        }
-
-        // Vincular aluno ao professor (se ainda não estiver vinculado)
-        if (!$aluno->professores()->where('professor_id', $professor->id)->exists()) {
-            $aluno->professores()->attach($professor->id);
-        }
-
-        // Criar o agendamento
-        $agendamento = Agendamento::create([
-            'aluno_id' => $validated['aluno_id'],
-            'modalidade_id' => $validated['modalidade_id'],
-            'professor_id' => $validated['professor_id'],
-            'data_da_aula' => $data_aula,
-            'valor_aula' => $validated['valor_aula'],
-            'horario' => $validated['hora_aula'],
-            'titulo' => $validated['titulo'],
-            'status' => 'agendado', // Status inicial
-        ]);
-
-        Log::info('Agendamento criado com sucesso', [
-            'agendamento_id' => $agendamento->id,
-            'aluno_id' => $validated['aluno_id'],
-            'professor_id' => $validated['professor_id'],
-            'data_aula' => $data_aula,
-        ]);
-
-        // Opcional: Enviar notificações por email ou WhatsApp
-        // $this->notificarAgendamento($agendamento);
-
-        return redirect()->route('home.checkoutsucesso', ['id' => $professor->id])
-            ->with('success', 'Agendamento realizado com sucesso!')
-            ->with('payment_method', 'pix') // Método padrão para agendamento simples
-            ->with('agendamento_id', $agendamento->id);
-
-    } catch (\Exception $e) {
-        Log::error('Erro ao criar agendamento', [
-            'error' => $e->getMessage(),
-            'request_data' => $request->all(),
-            'trace' => $e->getTraceAsString(),
-        ]);
-        
-        return redirect()->back()->with('error', 'Erro ao criar agendamento: ' . $e->getMessage());
     }
-}
 
 
-  public function payPixQrCode(Request $request)
-    {       
+    public function payPixQrCode(Request $request)
+    {
         $request->validate([
             'value' => 'required|numeric|min:0.01',
             'payload' => 'required|string' // QR Code payload é obrigatório
@@ -691,7 +685,7 @@ public function fazerAgendamentoPix(Request $request)
         try {
             // Criar cliente HTTP para a requisição
             $client = new \GuzzleHttp\Client();
-            
+
             // Preparar dados para envio
             $requestData = [
                 'qrCode' => [
@@ -725,7 +719,7 @@ public function fazerAgendamentoPix(Request $request)
             // Verificar se a requisição foi bem-sucedida
             if ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300) {
                 $data = json_decode($response->getBody(), true);
-                
+
                 return response()->json([
                     'success' => true,
                     'message' => 'Pagamento PIX realizado com sucesso!',
@@ -743,12 +737,11 @@ public function fazerAgendamentoPix(Request $request)
                 'success' => false,
                 'message' => 'Erro ao realizar o pagamento PIX: HTTP ' . $response->getStatusCode(),
             ], $response->getStatusCode());
-
         } catch (\GuzzleHttp\Exception\ClientException $e) {
             // Erro específico do cliente HTTP (4xx)
             $response = $e->getResponse();
             $errorBody = json_decode($response->getBody()->getContents(), true);
-            
+
             Log::error('Asaas PIX payment client error', [
                 'status' => $response->getStatusCode(),
                 'error' => $errorBody,
@@ -760,7 +753,6 @@ public function fazerAgendamentoPix(Request $request)
                 'message' => 'Erro na requisição: ' . ($errorBody['errors'][0]['description'] ?? 'Erro desconhecido'),
                 'errors' => $errorBody['errors'] ?? [],
             ], $response->getStatusCode());
-
         } catch (\Exception $e) {
             // Log de erro em caso de exceção geral
             Log::error('Error processing PIX QR Code payment', [
@@ -777,7 +769,7 @@ public function fazerAgendamentoPix(Request $request)
 
     public function simulatePixPayment(Request $request)
     {
-     
+
         // Validar o request
         $request->validate([
             'payment_id' => 'required|string',
@@ -832,7 +824,6 @@ public function fazerAgendamentoPix(Request $request)
                 'success' => false,
                 'message' => 'Erro ao simular o pagamento: HTTP ' . $response->getStatusCode(),
             ], $response->getStatusCode());
-
         } catch (\Exception $e) {
             dd($e);
             Log::error('Error simulating PIX payment', [
@@ -850,7 +841,7 @@ public function fazerAgendamentoPix(Request $request)
 
     public function createPixKey(Request $request)
     {
-       
+
         try {
             $request->validate([
                 'type' => 'required|in:EVP,CPF,CNPJ,EMAIL,PHONE',
@@ -940,7 +931,6 @@ public function fazerAgendamentoPix(Request $request)
                     ],
                 ],
             ], 201);
-
         } catch (\GuzzleHttp\Exception\ClientException $e) {
             $responseBody = $e->hasResponse() ? $e->getResponse()->getBody()->getContents() : 'No response body';
             $statusCode = $e->hasResponse() ? $e->getResponse()->getStatusCode() : 400;
@@ -966,7 +956,6 @@ public function fazerAgendamentoPix(Request $request)
                 'error' => 'Erro ao criar chave PIX: ' . $errorMessage,
                 'details' => $errorData,
             ], $statusCode);
-
         } catch (\Exception $e) {
             Log::error('Erro inesperado ao criar chave PIX: ' . $e->getMessage(), [
                 'usuario_id' => $request->usuario_id,
@@ -979,72 +968,45 @@ public function fazerAgendamentoPix(Request $request)
         }
     }
 
-/**
- * Método alternativo usando endpoint correto do Asaas
- */
-public function createPixKeyAlternative(Request $request)
-{
-    // Para o Asaas, pode ser necessário usar endpoint diferente
-    $request->validate([
-        'type' => 'required|in:EVP,CPF,CNPJ,EMAIL,PHONE',
-        'key' => 'nullable|string', // Opcional para todos os tipos
-    ]);
-
-    $apiKey = env('ASAAS_API_KEY');
-    
-    if (!$apiKey) {
-        return response()->json([
-            'success' => false,
-            'error' => 'API Key do Asaas não configurada',
-        ], 500);
-    }
-
-    $baseUrl = env('ASAAS_ENV', 'sandbox') === 'sandbox'
-        ? 'https://api-sandbox.asaas.com/v3'
-        : 'https://api.asaas.com/v3';
-
-    $client = new Client();
-
-    // Payload simplificado - alguns provedores só aceitam tipo EVP para chave aleatória
-    $payload = ['type' => $request->type];
-    
-    // Se não for EVP e tiver chave, adiciona
-    if ($request->type !== 'EVP' && $request->filled('key')) {
-        $payload['key'] = $this->formatPixKey($request->key, $request->type);
-    }
-
-    Log::debug('Tentando criar chave PIX (método alternativo)', $payload);
-
-    try {
-        // Tenta primeiro o endpoint padrão
-        $response = $client->post("$baseUrl/pix/addressKeys", [
-            'headers' => [
-                'access_token' => $apiKey,
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json',
-            ],
-            'json' => $payload,
+    /**
+     * Método alternativo usando endpoint correto do Asaas
+     */
+    public function createPixKeyAlternative(Request $request)
+    {
+        // Para o Asaas, pode ser necessário usar endpoint diferente
+        $request->validate([
+            'type' => 'required|in:EVP,CPF,CNPJ,EMAIL,PHONE',
+            'key' => 'nullable|string', // Opcional para todos os tipos
         ]);
 
-        $pixKeyData = json_decode($response->getBody(), true);
+        $apiKey = env('ASAAS_API_KEY');
 
-        return response()->json([
-            'success' => true,
-            'pix_key' => $pixKeyData,
-            'method_used' => 'standard_endpoint'
-        ], 201);
+        if (!$apiKey) {
+            return response()->json([
+                'success' => false,
+                'error' => 'API Key do Asaas não configurada',
+            ], 500);
+        }
 
-    } catch (\GuzzleHttp\Exception\ClientException $e) {
-        $responseBody = $e->hasResponse() ? $e->getResponse()->getBody()->getContents() : '';
-        
-        Log::warning('Endpoint padrão falhou, tentando método alternativo', [
-            'error' => $e->getMessage(),
-            'response' => $responseBody
-        ]);
+        $baseUrl = env('ASAAS_ENV', 'sandbox') === 'sandbox'
+            ? 'https://api-sandbox.asaas.com/v3'
+            : 'https://api.asaas.com/v3';
 
-        // Se falhar, tenta endpoint alternativo (alguns provedores usam /pix/keys)
+        $client = new Client();
+
+        // Payload simplificado - alguns provedores só aceitam tipo EVP para chave aleatória
+        $payload = ['type' => $request->type];
+
+        // Se não for EVP e tiver chave, adiciona
+        if ($request->type !== 'EVP' && $request->filled('key')) {
+            $payload['key'] = $this->formatPixKey($request->key, $request->type);
+        }
+
+        Log::debug('Tentando criar chave PIX (método alternativo)', $payload);
+
         try {
-            $response = $client->post("$baseUrl/pix/keys", [
+            // Tenta primeiro o endpoint padrão
+            $response = $client->post("$baseUrl/pix/addressKeys", [
                 'headers' => [
                     'access_token' => $apiKey,
                     'Content-Type' => 'application/json',
@@ -1058,68 +1020,92 @@ public function createPixKeyAlternative(Request $request)
             return response()->json([
                 'success' => true,
                 'pix_key' => $pixKeyData,
-                'method_used' => 'alternative_endpoint'
+                'method_used' => 'standard_endpoint'
             ], 201);
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            $responseBody = $e->hasResponse() ? $e->getResponse()->getBody()->getContents() : '';
 
-        } catch (\Exception $e2) {
-            // Se ambos falharem, retorna erro original
-            $errorData = json_decode($responseBody, true);
-            
+            Log::warning('Endpoint padrão falhou, tentando método alternativo', [
+                'error' => $e->getMessage(),
+                'response' => $responseBody
+            ]);
+
+            // Se falhar, tenta endpoint alternativo (alguns provedores usam /pix/keys)
+            try {
+                $response = $client->post("$baseUrl/pix/keys", [
+                    'headers' => [
+                        'access_token' => $apiKey,
+                        'Content-Type' => 'application/json',
+                        'Accept' => 'application/json',
+                    ],
+                    'json' => $payload,
+                ]);
+
+                $pixKeyData = json_decode($response->getBody(), true);
+
+                return response()->json([
+                    'success' => true,
+                    'pix_key' => $pixKeyData,
+                    'method_used' => 'alternative_endpoint'
+                ], 201);
+            } catch (\Exception $e2) {
+                // Se ambos falharem, retorna erro original
+                $errorData = json_decode($responseBody, true);
+
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Erro ao criar chave PIX. Verifique os tipos suportados.',
+                    'available_types' => ['EVP', 'CPF', 'CNPJ', 'EMAIL', 'PHONE'],
+                    'details' => $errorData,
+                    'tried_endpoints' => [
+                        "$baseUrl/pix/addressKeys",
+                        "$baseUrl/pix/keys"
+                    ]
+                ], 400);
+            }
+        } catch (\Exception $e) {
+            Log::error('Erro inesperado: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'error' => 'Erro ao criar chave PIX. Verifique os tipos suportados.',
-                'available_types' => ['EVP', 'CPF', 'CNPJ', 'EMAIL', 'PHONE'],
-                'details' => $errorData,
-                'tried_endpoints' => [
-                    "$baseUrl/pix/addressKeys",
-                    "$baseUrl/pix/keys"
-                ]
-            ], 400);
+                'error' => 'Erro interno: ' . $e->getMessage(),
+            ], 500);
         }
-
-    } catch (\Exception $e) {
-        Log::error('Erro inesperado: ' . $e->getMessage());
-        return response()->json([
-            'success' => false,
-            'error' => 'Erro interno: ' . $e->getMessage(),
-        ], 500);
     }
-}
-private function formatPixKey($key, $type)
-{
-    switch ($type) {
-        case 'CPF':
-        case 'CNPJ':
-            // Remove caracteres especiais, mantém apenas números
-            return preg_replace('/[^0-9]/', '', $key);
-            
-        case 'EMAIL':
-            // Remove espaços e converte para minúsculo
-            return strtolower(trim($key));
-            
-        case 'PHONE':
-            // Remove caracteres especiais, mantém apenas números
-            // Formato esperado: +5511999999999
-            $cleanPhone = preg_replace('/[^0-9+]/', '', $key);
-            
-            // Se não começar com +55, adiciona
-            if (!str_starts_with($cleanPhone, '+55')) {
-                // Remove qualquer + no início e adiciona +55
-                $cleanPhone = '+55' . ltrim($cleanPhone, '+');
-            }
-            
-            return $cleanPhone;
-            
-        default:
-            return $key;
+    private function formatPixKey($key, $type)
+    {
+        switch ($type) {
+            case 'CPF':
+            case 'CNPJ':
+                // Remove caracteres especiais, mantém apenas números
+                return preg_replace('/[^0-9]/', '', $key);
+
+            case 'EMAIL':
+                // Remove espaços e converte para minúsculo
+                return strtolower(trim($key));
+
+            case 'PHONE':
+                // Remove caracteres especiais, mantém apenas números
+                // Formato esperado: +5511999999999
+                $cleanPhone = preg_replace('/[^0-9+]/', '', $key);
+
+                // Se não começar com +55, adiciona
+                if (!str_starts_with($cleanPhone, '+55')) {
+                    // Remove qualquer + no início e adiciona +55
+                    $cleanPhone = '+55' . ltrim($cleanPhone, '+');
+                }
+
+                return $cleanPhone;
+
+            default:
+                return $key;
+        }
     }
-}
 
 
 
 
 
-/**
+    /**
      * Store a new PIX key for the authenticated user's professor.
      *
      * @param Request $request
@@ -1177,43 +1163,43 @@ private function formatPixKey($key, $type)
     }
 
     public function criarChavePix(Request $request)
-        {
-            $validated = $request->validate([
-                'pix_key_type' => 'required|in:cpf,email,phone,random',
-                'pix_key_value' => 'required_unless:pix_key_type,random',
-                'wallet_id' => 'required|string',
-            ]);
+    {
+        $validated = $request->validate([
+            'pix_key_type' => 'required|in:cpf,email,phone,random',
+            'pix_key_value' => 'required_unless:pix_key_type,random',
+            'wallet_id' => 'required|string',
+        ]);
 
-            // Chamada à API do Asaas para criar a chave PIX
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . env('ASAAS_API_KEY'),
-                'Content-Type' => 'application/json',
-            ])->post('https://api.asaas.com/v3/pix/addressKeys', [
-                'walletId' => $validated['wallet_id'],
-                'type' => strtoupper($validated['pix_key_type']),
-                'value' => $validated['pix_key_type'] === 'random' ? null : $validated['pix_key_value'],
-            ]);
+        // Chamada à API do Asaas para criar a chave PIX
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . env('ASAAS_API_KEY'),
+            'Content-Type' => 'application/json',
+        ])->post('https://api.asaas.com/v3/pix/addressKeys', [
+            'walletId' => $validated['wallet_id'],
+            'type' => strtoupper($validated['pix_key_type']),
+            'value' => $validated['pix_key_type'] === 'random' ? null : $validated['pix_key_value'],
+        ]);
 
-            $data = $response->json();
+        $data = $response->json();
 
-            if ($response->successful() && isset($data['key'])) {
-                // Salvar a chave PIX no banco
-                $professor = Auth::user()->professor;
-                $professor->asaas_pix_key = $data['key'];
-                $professor->save();
-
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Chave PIX criada com sucesso!',
-                    'data' => ['pix_key' => $data['key']],
-                ]);
-            }
+        if ($response->successful() && isset($data['key'])) {
+            // Salvar a chave PIX no banco
+            $professor = Auth::user()->professor;
+            $professor->asaas_pix_key = $data['key'];
+            $professor->save();
 
             return response()->json([
-                'success' => false,
-                'message' => $data['errors'][0]['description'] ?? 'Erro ao criar chave PIX.',
-            ], 400);
+                'success' => true,
+                'message' => 'Chave PIX criada com sucesso!',
+                'data' => ['pix_key' => $data['key']],
+            ]);
         }
+
+        return response()->json([
+            'success' => false,
+            'message' => $data['errors'][0]['description'] ?? 'Erro ao criar chave PIX.',
+        ], 400);
+    }
 
 
 
@@ -1223,101 +1209,100 @@ private function formatPixKey($key, $type)
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
- 
 
-public function checkPixStatus(Request $request)
-{
-    // Validate the incoming request
-    $request->validate([
-        'payment_id' => 'required|string',
-    ]);
 
-    // Get the payment ID from the request
-    $paymentId = $request->input('payment_id');
-   
-    try {
-        // Make a request to the Asaas API status endpoint using Guzzle
-        $client = new \GuzzleHttp\Client();
-        $response = $client->request('GET', env('ASAAS_SANDBOX_URL') . "/v3/payments/{$paymentId}/status", [
-            'headers' => [
-                'accept' => 'application/json',
-                'access_token' => env('ASAAS_API_KEY'),
-            ],
+    public function checkPixStatus(Request $request)
+    {
+        // Validate the incoming request
+        $request->validate([
+            'payment_id' => 'required|string',
         ]);
 
-        // Log the full response for debugging
-        Log::debug('Asaas API response for payment status', [
-            'payment_id' => $paymentId,
-            'status_code' => $response->getStatusCode(),
-            'response' => json_decode($response->getBody(), true),
-        ]);
+        // Get the payment ID from the request
+        $paymentId = $request->input('payment_id');
 
-        // Check if the request was successful
-        if ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300) {
-            $data = json_decode($response->getBody(), true);
+        try {
+            // Make a request to the Asaas API status endpoint using Guzzle
+            $client = new \GuzzleHttp\Client();
+            $response = $client->request('GET', env('ASAAS_SANDBOX_URL') . "/v3/payments/{$paymentId}/status", [
+                'headers' => [
+                    'accept' => 'application/json',
+                    'access_token' => env('ASAAS_API_KEY'),
+                ],
+            ]);
 
-            // Check for error response (e.g., {"errors": [...]})
-            if (isset($data['errors']) || isset($data['error'])) {
-                $errorMessage = isset($data['errors']) ? json_encode($data['errors']) : ($data['error']['description'] ?? 'Erro desconhecido');
-                Log::error('Asaas API returned an error', [
+            // Log the full response for debugging
+            Log::debug('Asaas API response for payment status', [
+                'payment_id' => $paymentId,
+                'status_code' => $response->getStatusCode(),
+                'response' => json_decode($response->getBody(), true),
+            ]);
+
+            // Check if the request was successful
+            if ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300) {
+                $data = json_decode($response->getBody(), true);
+
+                // Check for error response (e.g., {"errors": [...]})
+                if (isset($data['errors']) || isset($data['error'])) {
+                    $errorMessage = isset($data['errors']) ? json_encode($data['errors']) : ($data['error']['description'] ?? 'Erro desconhecido');
+                    Log::error('Asaas API returned an error', [
+                        'payment_id' => $paymentId,
+                        'error' => $errorMessage,
+                    ]);
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Erro na API de pagamento: ' . $errorMessage,
+                    ], 400);
+                }
+
+
+                // Check for status field
+                if (isset($data['status'])) {
+                    return response()->json([
+                        'success' => true,
+                        'status' => $data['status'], // e.g., PENDING, RECEIVED, CONFIRMED, etc.
+                        'data' => $data, // Retorna todos os dados do pagamento
+                    ], 200);
+                }
+
+                // Handle case where status is missing
+                Log::warning('Asaas API missing status field', [
                     'payment_id' => $paymentId,
-                    'error' => $errorMessage,
+                    'response' => $data,
                 ]);
                 return response()->json([
                     'success' => false,
-                    'message' => 'Erro na API de pagamento: ' . $errorMessage,
+                    'message' => 'Status do pagamento não encontrado na resposta da API.',
+                    'response' => $data, // Include for debugging (remove in production)
                 ], 400);
             }
-      
 
-            // Check for status field
-            if (isset($data['status'])) {
-                return response()->json([
-                    'success' => true,
-                    'status' => $data['status'], // e.g., PENDING, RECEIVED, CONFIRMED, etc.
-                    'data' => $data, // Retorna todos os dados do pagamento
-                ], 200);
-            }
-
-            // Handle case where status is missing
-            Log::warning('Asaas API missing status field', [
+            // Handle unsuccessful API response (e.g., 404, 401)
+            Log::error('Asaas API error', [
                 'payment_id' => $paymentId,
-                'response' => $data,
+                'status' => $response->getStatusCode(),
+                'response' => $response->getBody()->getContents(),
             ]);
+
             return response()->json([
                 'success' => false,
-                'message' => 'Status do pagamento não encontrado na resposta da API.',
-                'response' => $data, // Include for debugging (remove in production)
-            ], 400);
+                'message' => 'Erro ao consultar a API de pagamento: HTTP ' . $response->getStatusCode(),
+                'status_code' => $response->getStatusCode(),
+            ], $response->getStatusCode());
+        } catch (\Exception $e) {
+            // Log any unexpected errors
+            Log::error('Error checking PIX payment status', [
+                'payment_id' => $paymentId,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro interno ao verificar o status do pagamento.',
+            ], 500);
         }
-
-        // Handle unsuccessful API response (e.g., 404, 401)
-        Log::error('Asaas API error', [
-            'payment_id' => $paymentId,
-            'status' => $response->getStatusCode(),
-            'response' => $response->getBody()->getContents(),
-        ]);
-
-        return response()->json([
-            'success' => false,
-            'message' => 'Erro ao consultar a API de pagamento: HTTP ' . $response->getStatusCode(),
-            'status_code' => $response->getStatusCode(),
-        ], $response->getStatusCode());
-
-    } catch (\Exception $e) {
-        // Log any unexpected errors
-        Log::error('Error checking PIX payment status', [
-            'payment_id' => $paymentId,
-            'error' => $e->getMessage(),
-            'trace' => $e->getTraceAsString(),
-        ]);
-
-        return response()->json([
-            'success' => false,
-            'message' => 'Erro interno ao verificar o status do pagamento.',
-        ], 500);
     }
-}
 
 
     public function generatePixQrCode(Request $request)
@@ -1437,7 +1422,6 @@ public function checkPixStatus(Request $request)
                     'expiration_date' => $qrCodeData['expirationDate'] ?? null,
                 ],
             ], 200);
-
         } catch (\GuzzleHttp\Exception\ClientException $e) {
             $responseBody = $e->hasResponse() ? $e->getResponse()->getBody()->getContents() : 'No response body';
             $statusCode = $e->hasResponse() ? $e->getResponse()->getStatusCode() : 400;
@@ -1462,7 +1446,6 @@ public function checkPixStatus(Request $request)
                 'error' => 'Erro ao gerar QR Code PIX: ' . $errorMessage,
                 'details' => $errorData,
             ], $statusCode);
-
         } catch (\GuzzleHttp\Exception\ServerException $e) {
             $responseBody = $e->hasResponse() ? $e->getResponse()->getBody()->getContents() : 'No response body';
 
@@ -1475,7 +1458,6 @@ public function checkPixStatus(Request $request)
                 'success' => false,
                 'error' => 'Erro no servidor do Asaas. Tente novamente mais tarde.',
             ], 500);
-
         } catch (\Exception $e) {
             Log::error('Erro geral na geração do QR Code PIX: ' . $e->getMessage(), [
                 'usuario_id' => $request->usuario_id,
@@ -1487,7 +1469,4 @@ public function checkPixStatus(Request $request)
             ], 500);
         }
     }
-
-    
-
 }
