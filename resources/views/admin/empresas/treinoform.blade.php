@@ -20,7 +20,7 @@
                         @endif
 
                         <input type="hidden" name="user_id" value="{{ Auth::user()->id }}" />
-                        <input type="hidden" name="empresa_id" value="{{ Auth::user()->empresa->id }}" />
+                        <input type="hidden" name="empresa_id" value="{{ Auth::user()->empresa->id ?? '' }}" />
                         <x-text-input name="nome" size="30" label="Nome Completo" :value="$model->nome ?? ''" />
                         <x-text-input name="email" size="30" label="Email" :value="$model->user->email ?? ''" />
                         <x-select-modalidade label="Modalidade" :model="$model" :modalidades="$modalidades" />
