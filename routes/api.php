@@ -22,14 +22,23 @@ use App\Http\Controllers\TwilioController;
 use App\Http\Controllers\AsaasWalletController;
 use App\Http\Controllers\ProfessoresAsaasController;
 use App\Http\Controllers\Api\PixQrController;
+use App\Http\Controllers\BoletoController;
 use Illuminate\Http\Request;
 use Twilio\Rest\Client;
 use Illuminate\Support\Facades\Route;
 
 
+
+Route::post('empresa/gerar-boleto', [BoletoController::class, 'gerarBoleto'])->name('boleto.asaas');
+Route::get('empresa/userexisterasaas/{customerId}', [BoletoController::class, 'customerExistsInAsaas'])->name('asaas.user.existirs');
+Route::get('empresa/baixarboletoasaas/{boletoId}', [BoletoController::class, 'downloadBoleto'])->name('asaas.user.downloadBoleto');
+
+
+
+
 Route::post('/events', [GoogleCalendarController::class, 'createEvent']);
-  Route::post('/pagarComCartao', [PagamentoController::class, 'pagarComCartao'])->name('empresa.pagamento.cartao');
-   
+Route::post('/pagarComCartao', [PagamentoController::class, 'pagarComCartao'])->name('empresa.pagamento.cartao');
+
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
@@ -76,7 +85,7 @@ Route::resource('dias', DiaDaSemanaControllerApi::class);
 
 Route::post('/web-hook', [PixQrController::class, 'handleAsaasWebhook']);
 Route::post('/pix-qrcode', [PixQrController::class, 'generatePixQrCode']);
-Route::post('/customers', [PixQrController::class, 'createCustomer']);
+Route::post('/customers', [PixQrController::class, 'getOrCreateAsaasCustomer']);
 Route::post('/pix-webhook', [PixQrController::class, 'handleWebhook']);
 Route::post('/pay-pix', [PixQrController::class, 'payPixQrCode']);
 Route::post('/pix-simulate', [PixQrController::class, 'simulatePixPayment']);
@@ -119,7 +128,7 @@ Route::post('/treino/service', [AlunosControllerApi::class, 'service']);
 Route::get('/treino/cobrancas', [AlunosControllerApi::class, 'getCobrancas']);
 
 
-   
+
 Route::prefix('empresa/pagamento')->group(function () {
 
     Route::get('/', [PagamentoController::class, 'index'])->name('empresa.pagamento.index');
