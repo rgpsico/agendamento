@@ -27,6 +27,7 @@ class SocialLiteController extends Controller
         try {
             $googleUser = Socialite::driver('google')->user();
             $user = Usuario::where('email', $googleUser->email)->first();
+            dd($user);
 
             if (!$user) {
                 // Crie um novo usuário ou modifique conforme suas necessidades
