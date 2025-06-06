@@ -22,22 +22,18 @@ class SocialLiteController extends Controller
 
     public function alunoGoogleCallback(Request $request)
     {
-
-
         try {
             $googleUser = Socialite::driver('google')->user();
             $user = Usuario::where('email', $googleUser->email)->first();
-            dd($user);
 
             if (!$user) {
-                // Crie um novo usuário ou modifique conforme suas necessidades
                 $user = Usuario::create([
-                    'nome' => $googleUser->email, // Aqui você deve provavelmente usar ->name ao invés de ->email
+                    'nome' => $googleUser->name ?? $googleUser->email,
                     'email' => $googleUser->email,
                     'google_id' => $googleUser->id,
-                    'tipo_usuario' => 'Aluno',
-                    'remember_token' => Str::random(60), // Gerar um token aleatório
-                    'password' => bcrypt(124) // Isso deve ser atualizado para algo mais seguro mais tarde
+                    'tipo_usuario' => 'Aluno', // Default novo usuário como aluno
+                    'remember_token' => Str::random(60),
+                    'password' => bcrypt(124)
                 ]);
 
                 Alunos::create([
@@ -45,20 +41,29 @@ class SocialLiteController extends Controller
                 ]);
             }
 
-
             Auth::login($user, true);
 
-            if (Auth::check()) {
-                return redirect()->route('alunos.fotos', ['id' => $user->id]);
-            } else {
+            if (!Auth::check()) {
                 return redirect('/')->with('error', 'Login falhou após autenticação do Google.');
+            }
+
+            // Carrega relacionamento (se for aluno)
+            $user->load('aluno');
+
+            // Redireciona com base no tipo de usuário
+            if (strtolower($user->tipo_usuario) === 'professor') {
+                return redirect()->route('admin.dashboard', ['id' => $user->id]);
+            } elseif (strtolower($user->tipo_usuario) === 'aluno') {
+                return redirect()->route('alunos.fotos', ['id' => $user->aluno->id]);
+            } else {
+                return redirect('/')->with('error', 'Tipo de usuário não reconhecido.');
             }
         } catch (\Exception $e) {
             dd($e);
-
             return redirect('/')->with('error', 'Erro ao tentar autenticar com o Google.');
         }
     }
+
 
     public function professorRedirectToGoogle()
     {
