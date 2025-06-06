@@ -39,7 +39,7 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-        dd
+
 
         $request->validate([
             'nome' => 'required',
@@ -86,10 +86,8 @@ class UserController extends Controller
                 ]);
 
                 if (!Auth::user()->empresa) {
-                        return redirect()->route('empresa.configuracao', ['userId' => $user->id]);
-                 }
-
-              
+                    return redirect()->route('empresa.configuracao', ['userId' => $user->id]);
+                }
             }
 
             if ($user->tipo_usuario == 'Aluno') {

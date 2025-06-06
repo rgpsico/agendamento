@@ -96,7 +96,7 @@ class Usuario extends Authenticatable
     {
         return $this->hasOne(Professor::class, 'usuario_id', 'id');
     }
-    
+
 
 
 
@@ -116,8 +116,4 @@ class Usuario extends Authenticatable
     {
         return $this->hasOne(Empresa::class, 'user_id', 'id');
     }
-
-
-
-
 }

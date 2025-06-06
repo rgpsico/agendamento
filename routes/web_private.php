@@ -27,7 +27,7 @@ Route::get('/erro/pagamento', [PagamentoController::class, 'erroPagamento'])->na
 
 Route::prefix('usuario')->group(function () {
     Route::post('/', [UserController::class, 'store'])->name('user.store');
-    Route::get('/', [UserController::class, 'logout'])->name('user.logout');
+    Route::get('logout/', [UserController::class, 'logout'])->name('user.logout');
     Route::post('/login', [UserController::class, 'login'])->name('user.login');
 });
 
