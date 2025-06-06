@@ -271,12 +271,12 @@ class HomeController extends Controller
             if (!$user) {
                 // Crie um novo usuário ou modifique conforme suas necessidades
                 $user = Usuario::create([
-                    'nome' => $googleUser->email, // Aqui você deve provavelmente usar ->name ao invés de ->email
+                    'nome' => $googleUser->email,
                     'email' => $googleUser->email,
                     'google_id' => $googleUser->id,
                     'tipo_usuario' => 'Aluno',
-                    'remember_token' => Str::random(60), // Gerar um token aleatório
-                    'password' => bcrypt(124) // Isso deve ser atualizado para algo mais seguro mais tarde
+                    'remember_token' => Str::random(60),
+                    'password' => bcrypt(124)
                 ]);
 
                 Alunos::create([

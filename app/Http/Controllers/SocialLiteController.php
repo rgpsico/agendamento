@@ -17,7 +17,8 @@ class SocialLiteController extends Controller
     public function alunoRedirectToGoogle()
     {
 
-        return Socialite::driver('google')->redirect();
+        $user =  Socialite::driver('google')->redirect();
+        dd($user);
     }
 
     public function alunoGoogleCallback(Request $request)
@@ -46,7 +47,7 @@ class SocialLiteController extends Controller
 
             Auth::login($user, true);
 
-
+            dd("aaa");
             return redirect()->route('alunos.fotos', ['id' => $user->id]);  // ou onde você deseja redirecionar após o login
 
         } catch (\Exception $e) {
