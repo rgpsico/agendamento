@@ -21,18 +21,18 @@ use App\Http\Controllers\PagamentoController;
 use App\Http\Controllers\SiteDepoimentoController;
 
 //   Route::get('/', [UserManagementController::class, 'index'])->name('register.aluno');
-    Route::get('/create', [UserManagementController::class, 'create'])->name('register.professor');
+Route::get('/create', [UserManagementController::class, 'create'])->name('register.professor');
 
 Route::post('/pagamentos/presencial', [PagamentoController::class, 'criarPagamentoPresencial'])->name('empresa.pagamento.presencial');
 
-Route::prefix('admin/usuarios')->name('admin.usuarios.')->group(function() {
+Route::prefix('admin/usuarios')->name('admin.usuarios.')->group(function () {
     Route::get('/', [UserManagementController::class, 'index'])->name('index');
     Route::get('/create', [UserManagementController::class, 'create'])->name('create');
     Route::post('/', [UserManagementController::class, 'store'])->name('store');
     Route::get('/{user}/edit', [UserManagementController::class, 'edit'])->name('edit');
     Route::put('/{user}', [UserManagementController::class, 'update'])->name('update');
     Route::delete('/{user}', [UserManagementController::class, 'destroy'])->name('destroy');
-    
+
     // Rotas para permissões
     Route::get('/{user}/permissions', [UserManagementController::class, 'getPermissions'])->name('permissions.get');
     Route::post('/{user}/permissions', [UserManagementController::class, 'updatePermissions'])->name('permissions.update');
@@ -44,6 +44,7 @@ Route::get('/google/prof/callback', [SocialLiteController::class, 'professorGoog
 
 Route::get('/google/aluno/redirect', [SocialLiteController::class, 'alunoRedirectToGoogle'])->name('aluno.googleAuth.redirect');
 Route::get('/google/callback', [SocialLiteController::class, 'alunoGoogleCallback'])->name('aluno.googleAuth.handle');
+Route::get('/auth/callback/google', [SocialLiteController::class, 'alunoGoogleCallback'])->name('aluno.googleAuth.handle');
 
 
 
@@ -71,7 +72,6 @@ Route::get('/site/{slug}', [SiteController::class, 'mostrar'])->name('site.publi
 Route::prefix('admin/site/ssl')->middleware(['auth'])->name('admin.site.dominios.')->group(function () {
     Route::get('/', [SiteController::class, 'editarDominio'])->name('index');
     Route::post('/', [SiteController::class, 'atualizarDominio'])->name('update');
-   
 });
 // routes/web.php
 Route::post('/admin/site/dominios/update', [SiteController::class, 'atualizarDominio'])->name('admin.site.dominios.update');
