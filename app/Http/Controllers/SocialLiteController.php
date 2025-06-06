@@ -46,13 +46,14 @@ class SocialLiteController extends Controller
 
             Auth::login($user, true);
 
-            return redirect()->route('alunos.fotos', ['id' => $user->id]);  // ou onde você deseja redirecionar após o login
-
+            if (Auth::check()) {
+                return redirect()->route('alunos.fotos', ['id' => $user->id]);
+            } else {
+                return redirect('/')->with('error', 'Login falhou após autenticação do Google.');
+            }
         } catch (\Exception $e) {
             dd($e);
-            // \Log::error('Erro com autenticação do Google: ' . $e->getMessage());
 
-            dd($e);
             return redirect('/')->with('error', 'Erro ao tentar autenticar com o Google.');
         }
     }
