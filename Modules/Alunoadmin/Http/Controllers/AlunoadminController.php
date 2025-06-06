@@ -30,23 +30,23 @@ class AlunoadminController extends Controller
 
         $id = auth()->user()->aluno->id;
 
-    
+
         $query = Agendamento::with('professor.usuario', 'modalidade')
             ->where('aluno_id', $id);
 
-      
+
         if ($request->filled('data')) {
             $query->whereDate('data_da_aula', $request->data);
         }
 
-     
+
         if ($request->filled('professor')) {
             $query->whereHas('professor.usuario', function ($q) use ($request) {
                 $q->where('nome', 'LIKE', '%' . $request->professor . '%');
             });
         }
 
-      
+
         $agendamentos = $query->get();
 
         return view('alunoadmin::alunos.index', compact('title', 'agendamentos', 'config'));
@@ -66,7 +66,7 @@ class AlunoadminController extends Controller
     public function fotos()
     {
         $title = 'Fotos';
-        $user_id = auth()->user()->aluno->id;
+        $user_id = auth()->user()->id;
         $model = Aluno_galeria::where('usuario_id', $user_id)->get();
 
         return view('alunoadmin::alunos.fotos', compact('title', 'model'));
