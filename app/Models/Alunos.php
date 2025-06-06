@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Alunos extends Model
 {
     use HasFactory;
-    protected $fillable = ['usuario_id','avatar'];
+    protected $fillable = ['usuario_id', 'avatar'];
 
     public function usuario()
     {
@@ -31,7 +31,7 @@ class Alunos extends Model
         return $this->hasOne(AlunoEndereco::class, 'aluno_id', 'id');
     }
 
-  
+
 
     public function alunos()
     {
