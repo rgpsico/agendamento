@@ -21,7 +21,7 @@ class DispararBoletosMensais extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Responsavel por disparar emails pra todos os assinates';
 
     /**
      * Execute the console command.
@@ -56,7 +56,7 @@ class DispararBoletosMensais extends Command
 
                     Mail::raw("Olá {$professor->usuario->nome}, seu boleto está disponível no link: $link", function ($message) use ($professor) {
                         $message->to($professor->usuario->email)
-                                ->subject('Seu boleto foi gerado');
+                            ->subject('Seu boleto foi gerado');
                     });
 
                     $contador++;
@@ -77,7 +77,4 @@ class DispararBoletosMensais extends Command
             $this->warn("Nenhum e-mail foi enviado.");
         }
     }
-
-
-
 }
