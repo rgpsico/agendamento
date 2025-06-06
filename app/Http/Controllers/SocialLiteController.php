@@ -44,6 +44,7 @@ class SocialLiteController extends Controller
                 ]);
             }
 
+
             Auth::login($user, true);
 
             if (Auth::check()) {
