@@ -35,6 +35,18 @@ class EmpresaControllerApi extends Controller
         return $query->get();
     }
 
+    public function verificarStatus($empresaId)
+    {
+        $empresa = Empresa::find($empresaId);
+
+        if (!$empresa) {
+            return response()->json(['error' => 'Empresa não encontrada'], 404);
+        }
+
+        $status = $empresa->status === 'ativo' || $empresa->status === 1 ? 'ativo' : 'inativo';
+        return response()->json(['status' => $status], 200);
+    }
+
     public function getAlunoByIdProfessor($id)
     {
         $professor = Professor::find($id);
@@ -86,9 +98,9 @@ class EmpresaControllerApi extends Controller
             'pais' => 'nullable|string',
             'logo' => 'nullable|image|max:2048',
         ]);
-    
+
         $empresa = Empresa::findOrFail($request->empresa_id);
-    
+
         $empresa->update([
             'nome' => $request->nome,
             'email' => $request->email,
@@ -99,16 +111,16 @@ class EmpresaControllerApi extends Controller
             'cep' => $request->cep,
             'pais' => $request->pais,
         ]);
-    
+
         if ($request->hasFile('logo')) {
             $path = $request->file('logo')->store('empresas/logos', 'public');
             $empresa->logo = $path;
             $empresa->save();
         }
-    
+
         return response()->json(['success' => true, 'empresa' => $empresa]);
     }
-    
+
 
     public function destroy(Empresa $empresa)
     {

@@ -86,7 +86,16 @@ class EmpresaController extends Controller
     }
 
 
+    public function verificarStatus($empresaId)
+    {
+        $empresa = Empresa::find($empresaId);
 
+        if (!$empresa) {
+            return null; // Ou lançar uma exceção, dependendo do caso
+        }
+
+        return $empresa->status === 'ativo' || $empresa->status === 1 ? 'ativo' : 'inativo';
+    }
 
 
     private function loadView($viewSuffix = 'index', $data = [])

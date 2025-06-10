@@ -16,6 +16,7 @@ use App\Http\Controllers\SiteController;
 use App\Http\Controllers\SiteServicoController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Admin\UserManagementController;
+use App\Http\Controllers\BoletoController;
 use App\Http\Controllers\ProfessoresAsaasController;
 use App\Http\Controllers\PagamentoController;
 use App\Http\Controllers\SiteDepoimentoController;
@@ -47,7 +48,7 @@ Route::get('/google/callback', [SocialLiteController::class, 'alunoGoogleCallbac
 Route::get('/auth/callback/google', [SocialLiteController::class, 'alunoGoogleCallback'])->name('aluno.googleAuth.handle');
 
 
-
+Route::get('/empresa/pagamento/boleto', [BoletoController::class, 'boleto'])->name('empresa.pagamento.boleto');
 
 // Route::get('/google-calendar/auth', [GoogleCalendarController::class, 'authenticate'])->name('google.calendar.auth');
 // Route::get('/google-calendar/events', [GoogleCalendarController::class, 'listEvents'])->name('google.calendar.events');

@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AsaasWebhookLog;
 use App\Models\Empresa;
-use App\Models\Usuario;
+use App\Models\Professor;
+use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -23,20 +25,100 @@ class BoletoController extends Controller
         $this->client = new Client(['base_uri' => $this->baseUri]);
     }
 
-    public function handleWebhook(Request $request)
+    public function handleAsaasWebhook(Request $request)
     {
-        try {
-            $data = $request->all();
-            if ($data['event'] === 'PAYMENT_CONFIRMED') {
-                Log::info('Boleto pago: ' . $data['payment']['id']);
-                // Atualize o status no banco de dados, se necessário
-            }
-            return response()->json(['status' => 'received']);
-        } catch (\Exception $e) {
-            Log::error('Erro no webhook: ' . $e->getMessage());
-            return response()->json(['error' => $e->getMessage()], 500);
+
+        Log::warning('Asaas webhook recebido', ['payload' => $request->all()]);
+        $payload = $request->all();
+
+        // Validar o token do Asaas
+        $asaasToken = $request->header('asaas-access-token');
+
+        if ($asaasToken !== '123456@') {
+            Log::warning('Asaas Webhook: Token inválido', ['token' => $asaasToken]);
+            AsaasWebhookLog::create([
+                'event' => $payload['event'] ?? null,
+                'payload' => $payload,
+                'status' => 'invalid_token',
+                'message' => 'Token inválido: ' . $asaasToken,
+                'payment_id' => null,
+            ]);
+            return response()->json(['error' => 'Token inválido'], 401);
         }
+
+        // Validar o payload
+        if (!isset($payload['event'], $payload['payment'])) {
+            Log::warning('Payload inválido', ['payload' => $payload]);
+            return response()->json(['error' => 'Payload inválido'], 400);
+        }
+
+        // Processar apenas pagamentos recebidos de boleto
+        if ($payload['event'] === 'PAYMENT_RECEIVED' && $payload['payment']['billingType'] === 'BOLETO') {
+            $payment = $payload['payment'];
+            $customerId = $payment['customer']; // Ex.: cus_000006746814
+            $paymentId = $payment['id']; // Ex.: pay_ybk2slp8gh48i0iy
+
+            // Buscar o professor pelo asaas_customer_id
+            $professor = Professor::where('asaas_customer_id', $customerId)->first();
+
+            if (!$professor) {
+                Log::warning('Professor não encontrado para customer_id', ['customer_id' => $customerId]);
+                return response()->json(['error' => 'Professor não encontrado'], 404);
+            }
+
+            // Buscar a empresa associada ao professor
+            $empresa = Empresa::find($professor->empresa_id);
+
+            if (!$empresa) {
+                Log::warning('Empresa não encontrada para professor', ['professor_id' => $professor->id, 'empresa_id' => $professor->empresa_id]);
+                return response()->json(['error' => 'Empresa não encontrada'], 404);
+            }
+
+
+
+
+            // Atualizar o status da empresa e a data de vencimento
+            $novaVencimento = Carbon::now()->addDays(30);
+
+            $empresa->update([
+                'status' => 'ativo',
+                'data_vencimento' => $novaVencimento->format('Y-m-d'),
+            ]);
+
+
+            AsaasWebhookLog::create([
+                'event' => $payload['event'] ?? null,
+                'payload' => $payload,
+                'status' => 'BOLETO PAGO',
+                'message' => 'Pagamento processado com sucesso BOLETO',
+                'payment_id' => $payment['id'],
+            ]);
+
+            Log::info('Empresa ativada via boleto', [
+                'empresa_id' => $empresa->id,
+                'customer_id' => $customerId,
+                'nova_data_vencimento' => $novaVencimento->format('Y-m-d'),
+            ]);
+
+            return response()->json(['received' => true], 200);
+        }
+
+        Log::info('Evento ignorado', ['event' => $payload['event'], 'billingType' => $payload['payment']['billingType'] ?? 'N/A']);
+        return response()->json(['received' => true], 200);
     }
+
+
+    public function boleto(Request $request)
+    {
+
+        $boleto = [
+            'valor' => 100.00, // Substitua pela lógica real
+            'data_vencimento' => now()->addDays(7),
+            'link' => 'https://exemplo.com/boleto.pdf', // Substitua pelo link real
+        ];
+        return view('admin.empresas.boleto', ['boleto' => $boleto, 'pageTitle' => 'Pagamento de Boleto']);
+    }
+
 
     public function downloadBoleto($boletoId)
     {
@@ -79,13 +161,14 @@ class BoletoController extends Controller
 
     public function gerarBoleto(Request $request)
     {
-
         $clientes = Empresa::with('user')->where('status', 'inativo')->get();
 
-        foreach ($clientes as $cliente) {
-            echo $cliente->user->email . PHP_EOL;
-        }
+        // foreach ($clientes as $cliente) {
+        //     echo $cliente->user->email . PHP_EOL;
+        // }
 
+        // URL correta
+        $url = $this->baseUri . "/v3/payments";
 
         $headers = [
             'accept' => 'application/json',
@@ -100,7 +183,6 @@ class BoletoController extends Controller
             'dueDate' => $request->dueDate,
         ];
 
-
         $response = Http::withHeaders($headers)->post($url, $body);
 
         if ($response->successful()) {
@@ -110,13 +192,12 @@ class BoletoController extends Controller
             ]);
         }
 
-
-
         return response()->json([
             'status' => 'error',
             'message' => $response->body()
         ], $response->status());
     }
+
 
     // Método auxiliar para verificar se o customer existe
     public function customerExistsInAsaas($customerId)
