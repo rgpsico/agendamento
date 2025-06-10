@@ -31,7 +31,7 @@ class WebhookController extends Controller
 
         // Obter o payload do webhook
         $payload = $request->all();
-
+        $resultadoEnvio = $this->enviarDadosParaEndpoint($payload);
         // Verificar o token de autenticação
         $asaasToken = $request->header('asaas-access-token');
         if ($asaasToken !== '123456@') {
@@ -65,7 +65,7 @@ class WebhookController extends Controller
         }
 
         // **ENVIAR DADOS PARA O ENDPOINT EXTERNO**
-        $resultadoEnvio = $this->enviarDadosParaEndpoint($payload);
+
 
         if ($resultadoEnvio) {
             Log::info('Asaas Webhook: Dados enviados para endpoint externo com sucesso', [
