@@ -12,6 +12,7 @@ class AsaasWebhookLog extends Model
         'status',
         'message',
         'payment_id',
+        'empresa_id'
     ];
 
     protected $casts = [

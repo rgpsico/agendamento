@@ -211,48 +211,8 @@
     </div>
 
     <!-- Modal de Empresa Inativa -->
-    <div class="modal fade" id="empresaInativaModal" tabindex="-1" aria-labelledby="empresaInativaModalLabel"
-        aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="empresaInativaModalLabel">Sistema Bloqueado</h5>
-                </div>
-                <div class="modal-body">
-                    <p>Sua empresa está <strong>inativa</strong>. Para desbloquear o acesso ao sistema, é necessário
-                        efetuar o pagamento do boleto pendente.</p>
-                    <p>Por favor, clique no botão abaixo para acessar o boleto e regularizar sua situação.</p>
-                </div>
-                <div class="modal-footer">
-                    <a href="{{ route('empresa.pagamento.boleto') }}" class="btn btn-primary">Pagar Boleto</a>
-                </div>
-            </div>
-        </div>
-    </div>
+
 
     <!-- Script para verificar o status da empresa e bloquear a sidebar -->
-    <script>
-        $(document).ready(function() {
-            $.ajax({
-                url: "{{ route('empresa.verificarStatus', ['empresaId' => Auth::user()->empresa->id]) }}",
-                method: "GET",
-                success: function(response) {
-                    // if (response.status === 'inativo') {
-                    //     // Exibir o modal
-                    //     //                       $('#empresaInativaModal').modal('show');
-                    //     // Desabilitar a sidebar
-                    //     $('#sidebar').addClass('sidebar-disabled');
-                    //     // Desabilitar todos os links da sidebar
-                    //     $('#sidebar a').each(function() {
-                    //         $(this).attr('href', 'javascript:void(0);').css('cursor',
-                    //             'not-allowed');
-                    //     });
-                    // }
-                },
-                error: function(xhr) {
-                    console.error('Erro ao verificar status da empresa:', xhr.responseText);
-                }
-            });
-        });
-    </script>
+
 </body>

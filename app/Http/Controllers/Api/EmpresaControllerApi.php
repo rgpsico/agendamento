@@ -44,7 +44,7 @@ class EmpresaControllerApi extends Controller
         }
 
         $status = $empresa->status === 'ativo' || $empresa->status === 1 ? 'ativo' : 'inativo';
-        return response()->json(['status' => $status], 200);
+        return response()->json(['status' => $status, 'empresa' => $empresa->nome], 200);
     }
 
     public function getAlunoByIdProfessor($id)

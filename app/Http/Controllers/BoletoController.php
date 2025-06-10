@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class BoletoController extends Controller
 {
@@ -27,6 +28,7 @@ class BoletoController extends Controller
 
     public function handleAsaasWebhook(Request $request)
     {
+
 
         Log::warning('Asaas webhook recebido', ['payload' => $request->all()]);
         $payload = $request->all();
@@ -92,6 +94,7 @@ class BoletoController extends Controller
                 'status' => 'BOLETO PAGO',
                 'message' => 'Pagamento processado com sucesso BOLETO',
                 'payment_id' => $payment['id'],
+                'empresa_id' => $professor->empresa_id
             ]);
 
             Log::info('Empresa ativada via boleto', [
@@ -111,11 +114,15 @@ class BoletoController extends Controller
     public function boleto(Request $request)
     {
 
+        $empresaId = Auth::user()->empresa->id;
+
+
         $boleto = [
             'valor' => 100.00, // Substitua pela lógica real
             'data_vencimento' => now()->addDays(7),
             'link' => 'https://exemplo.com/boleto.pdf', // Substitua pelo link real
         ];
+
         return view('admin.empresas.boleto', ['boleto' => $boleto, 'pageTitle' => 'Pagamento de Boleto']);
     }
 

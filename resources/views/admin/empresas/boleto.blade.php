@@ -10,8 +10,10 @@
                 </div>
                 <div class="card-body">
                     <x-alert />
+                    <p><strong>Cliente Asaas:</strong> {{ Auth::user()->professor->asaas_customer_id }}</p>
                     <div class="boleto-info">
-                        <p><strong>Empresa:</strong> {{ Auth::user()->empresa->nome ?? 'Não informado' }}</p>
+
+                        <p><strong>Empresa:</strong> {{ Auth::user()->empresa->nome }}</p>
                         <p><strong>Valor:</strong> R$ </p>
                         <p><strong>Data de Vencimento:</strong>
                         </p>
@@ -43,7 +45,7 @@
                     url: '/api/empresa/gerar-boleto',
                     method: 'POST',
                     data: {
-                        "customer_id": "cus_000006746814",
+                        "customer_id": "{{ Auth::user()->professor->asaas_customer_id }}",
                         "billingType": "BOLETO",
                         "value": 100.00,
                         "dueDate": "2025-06-11",
