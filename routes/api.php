@@ -58,6 +58,7 @@ Route::get('search/empresa', [EmpresaControllerApi::class, 'search'])->name('emp
 Route::middleware('auth:sanctum')->post('/empresa/update', [EmpresaControllerApi::class, 'update']);
 Route::get('professores/{id}/alunos', [EmpresaControllerApi::class, 'getAlunoByIdProfessor']);
 
+Route::get('empresa/verificarstatus/{empresaId}',  [EmpresaControllerApi::class, 'verificarStatus'])->name('empresa.verificarStatus');
 
 
 Route::resource('servicos', ServicoControllerApi::class);
@@ -84,6 +85,9 @@ Route::resource('dias', DiaDaSemanaControllerApi::class);
 
 
 
+Route::post('/boleto/web-hook', [BoletoController::class, 'handleAsaasWebhook']);
+
+
 
 Route::post('/web-hook', [PixQrController::class, 'handleAsaasWebhook']);
 Route::post('/pix-qrcode', [PixQrController::class, 'generatePixQrCode']);
@@ -105,6 +109,9 @@ Route::delete('/pix/keys/{pixKeyId}', [PixQrController::class, 'deletePixKey']);
 Route::post('/pagamentos/presencial', [PagamentoController::class, 'criarPagamentoPresencial'])->name('empresa.pagamento.presencial');
 Route::post('/gerar-pix', [PagamentoController::class, 'gerarPix'])->name('gerar.pix');
 Route::get('/verificar-pix/{id}', [PagamentoController::class, 'verificarStatusPix'])->name('verificar.pix');
+
+
+
 
 
 

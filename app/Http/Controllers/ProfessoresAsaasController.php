@@ -104,9 +104,25 @@ class ProfessoresAsaasController extends Controller
                 throw new \Exception('Resposta inválida da API do Asaas');
             }
 
-            // Atualizar apenas o wallet_id do professor
+            $clienteResponse = $this->asaasService->criarClienteAsaas([
+                'name' => $validatedData['name'],
+                'email' => $validatedData['email'],
+                'cpfCnpj' => $validatedData['cpfCnpj'],
+                'phone' => $validatedData['phone'],
+                'postalCode' => $validatedData['postalCode'],
+                'address' => $validatedData['address'],
+                'addressNumber' => $validatedData['addressNumber'],
+                'province' => $validatedData['province'],
+            ]);
+
+            if (!isset($clienteResponse['id'])) {
+                throw new \Exception('Erro ao criar cliente no Asaas');
+            }
+
+            // Atualizar o professor com wallet_id e customer_id
             $professor->update([
-                'asaas_wallet_id' => $asaasResponse['walletId'] ?? $asaasResponse['id']
+                'asaas_wallet_id' => $asaasResponse['walletId'] ?? $asaasResponse['id'],
+                'asaas_customer_id' => $clienteResponse['id'],
             ]);
 
             DB::commit();
