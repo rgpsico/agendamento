@@ -22,6 +22,7 @@ use App\Http\Controllers\TwilioController;
 use App\Http\Controllers\AsaasWalletController;
 use App\Http\Controllers\ProfessoresAsaasController;
 use App\Http\Controllers\Api\PixQrController;
+use App\Http\Controllers\Api\WebhookController;
 use App\Http\Controllers\BoletoController;
 use Illuminate\Http\Request;
 use Twilio\Rest\Client;
@@ -86,10 +87,12 @@ Route::resource('dias', DiaDaSemanaControllerApi::class);
 
 
 Route::post('/boleto/web-hook', [BoletoController::class, 'handleAsaasWebhook']);
+Route::post('/boleto/web-hook', [BoletoController::class, 'handleAsaasWebhook']);
 
 
+Route::post('/web-hook', [WebhookController::class, 'handleAsaasWebhook']);
 
-Route::post('/web-hook', [PixQrController::class, 'handleAsaasWebhook']);
+
 Route::post('/pix-qrcode', [PixQrController::class, 'generatePixQrCode']);
 Route::post('/customers', [PixQrController::class, 'getOrCreateAsaasCustomer']);
 Route::post('/pix-webhook', [PixQrController::class, 'handleWebhook']);
