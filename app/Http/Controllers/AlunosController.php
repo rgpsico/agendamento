@@ -27,8 +27,14 @@ class AlunosController extends Controller
 
     public function index()
     {
+
+        if (!auth()->user()->professor) {
+            auth()->logout();
+            return redirect()->back()->with('error', 'O Professor com esse e-mail não existe.');
+        }
+
         $professor_id = Auth::user()->professor->id;
-       
+
         $professor = Professor::with('alunos.usuario')->find($professor_id);
 
         $model = $professor->alunos;

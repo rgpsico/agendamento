@@ -103,6 +103,7 @@ class EmpresaController extends Controller
 
     public function store(ProfessorStoreRequest $request)
     {
+
         try {
             // Os dados já foram validados pelo ProfessorStoreRequest
             $data = $request->validated();
@@ -138,7 +139,7 @@ class EmpresaController extends Controller
                 $empresa->update(['banner' => $filenameBanners]);
             }
 
-            return redirect()->back()->with('success', 'Empresa criada com sucesso!');
+            return redirect()->route('integracao.assas.escola')->with('success', 'Empresa criada com sucesso!');
         } catch (\Exception $e) {
             return redirect()->back()->withErrors(['error' => 'Erro ao criar empresa: ' . $e->getMessage()])->withInput();
         }
