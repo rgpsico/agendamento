@@ -6,31 +6,7 @@
             <x-header.titulo pageTitle="Integração de Pagamentos" />
             <!-- /Page Header -->
             <!-- Modal de Explicação -->
-            <div class="modal fade" id="explicacaoModal" tabindex="-1" aria-labelledby="explicacaoModalLabel"
-                aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="explicacaoModalLabel">Atenção</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                aria-label="Fechar"></button>
-                        </div>
-                        <div class="modal-body">
-                            <p>Agora para ativar o seu sistema de pagamentos, é necessário integrar com o gateway
-                                <strong>Asaas</strong>.
-                            </p>
-                            <p>Por favor,Selecione Asaas no fomulario abaixo e preencha o formulário abaixo com seus
-                                dados para realizar a integração da
-                                subconta.</p>
-                            <p>Somente após a integração você poderá realizar vendas dentro da plataforma.</p>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
-                                id="entendi">Entendi</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            @include('admin.integracoes._partials.explicacaoModal')
 
             <div class="row">
                 <div class="col-sm-12">
@@ -56,11 +32,16 @@
                                 <!-- Verificar se já possui wallet -->
                                 @if (Auth::user()->professor && Auth::user()->professor->asaas_wallet_id)
                                     <div class="alert alert-success" role="alert">
+
                                         <h5 class="alert-heading">Já Integrado!</h5>
+
                                         <p>Você já possui uma subconta integrada no Asaas.</p>
+                                        <strong>Cliente_id Asaas:</strong>
+                                        {{ Auth::user()->professor->asaas_customer_id }}
                                         <hr>
                                         <p class="mb-0">
                                             <strong>Wallet ID:</strong> {{ Auth::user()->professor->asaas_wallet_id }}
+
                                             <button type="button" class="btn btn-sm btn-outline-primary ms-2"
                                                 onclick="copiarTexto('{{ Auth::user()->professor->asaas_wallet_id }}')">Copiar</button>
                                         </p>
