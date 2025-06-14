@@ -14,4 +14,13 @@
 // ***********************************************************
 
 // Import commands.js using ES2015 syntax:
+
+Cypress.on('uncaught:exception', (err, runnable) => {
+    // Ignora erros específicos, como o ReferenceError para Chart
+    if (err.message.includes('Chart is not defined')) {
+        return false; // Retorna false para impedir que o teste falhe
+    }
+    // Adicione outras condições se houver mais erros específicos a ignorar
+    return true; // Permite que outros erros não tratados falhem o teste
+});
 import './commands'

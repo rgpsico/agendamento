@@ -8,8 +8,8 @@
                 <div class="card-header">
                     <h4 class="card-title">Detalhes do Boleto</h4>
                 </div>
-                <input type="text" id="boleto-gerado-inicio" name="" value="">
-                <input type="text" id="boleto-gerado-fim" name="" value="">
+                <input type="hidden" id="boleto-gerado-inicio" name="" value="">
+                <input type="hidden" id="boleto-gerado-fim" name="" value="">
                 <div class="card-body">
                     <x-alert />
                     <p><strong>Cliente Asaas:</strong> {{ Auth::user()->professor->asaas_customer_id }}</p>
