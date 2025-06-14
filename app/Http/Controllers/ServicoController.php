@@ -210,6 +210,9 @@ class ServicoController extends Controller
             $path = public_path('/servico');
             $file->move($path, $filename);
             $servico->imagem  = $filename;
+        } else {
+            // Se não houver imagem enviada, define uma imagem padrão
+            $servico->imagem = 'imagem_padrao.jpg'; // Substitua pelo nome da imagem padrão
         }
 
         $servico->save();

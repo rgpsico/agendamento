@@ -14,6 +14,7 @@ use App\Models\Professor;
 use App\Models\Servicos;
 use App\Models\Usuario;
 use App\Models\Alunos;
+use App\Models\Feriado;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -382,6 +383,56 @@ class EmpresaController extends Controller
     }
 
 
+    public function gerarHorarios(Request $request)
+    {
+        $request->validate([
+            'servico' => 'required|integer|exists:servicos,id',
+            'duracao' => 'required|integer|min:1',
+            'intervalo' => 'required|integer|min:0',
+            'inicio' => 'required|date_format:H:i',
+            'fim' => 'required|date_format:H:i',
+            'almoco_inicio' => 'required|date_format:H:i',
+            'almoco_fim' => 'required|date_format:H:i',
+            'folga' => 'array',
+            'folga.*' => 'integer|between:1,7',
+            'feriados' => 'nullable|boolean',
+        ]);
+
+        $dados = [
+            'servico' => $request->input('servico'),
+            'professor_id' => Auth::user()->professor->id,
+            'duracao' => $request->input('duracao'),
+            'intervalo' => $request->input('intervalo'),
+            'inicio' => $request->input('inicio'),
+            'fim' => $request->input('fim'),
+            'almoco_inicio' => $request->input('almoco_inicio'),
+            'almoco_fim' => $request->input('almoco_fim'),
+            'folga' => $request->input('folga', []),
+            'feriados' => $request->has('feriados') && $request->feriados == '1',
+        ];
+
+        dispatch(new \App\Jobs\GerarHorariosJob($dados));
+
+        return redirect()->back()->with('success', 'Processamento iniciado! Seus horários estão sendo gerados.');
+    }
+
+
+
+
+
+    public function autoHorario()
+    {
+        // Busca os dias da semana no banco
+        $dias_da_semana = DiaDaSemana::all();
+        $idempresa = Auth::user()->empresa->id;
+        $servicos = Servicos::where('empresa_id', $idempresa)->get();
+
+        // Retorna a view com os dados    return view('admin.horarios.auto');
+        return view('admin.horarios.auto', [
+            'dias_da_semana' => $dias_da_semana,
+            'servicos' => $servicos
+        ]);
+    }
 
     public function disponibilidadePersonalizada()
     {

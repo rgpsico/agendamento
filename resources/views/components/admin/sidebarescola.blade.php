@@ -73,6 +73,7 @@
                             <ul>
                                 <li><a href="{{ route('empresa.disponibilidade') }}">Únicos</a></li>
                                 <li><a href="{{ route('empresa.disponibilidadePersonalizada') }}">Personalizado</a></li>
+                                <li><a href="{{ route('empresa.horarios.auto') }}">Automaticos</a></li>
                             </ul>
                         </li>
 
