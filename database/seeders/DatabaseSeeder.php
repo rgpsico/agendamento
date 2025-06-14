@@ -12,6 +12,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+
+        $this->call(FeriadosSeeder::class);
         //$this->call(MigrateRolesSeeder::class);
         // \App\Models\Usuario::factory(10)->create();
 
@@ -33,6 +35,7 @@ class DatabaseSeeder extends Seeder
         // \App\Models\Aluno_Galeria::factory(10)->create();
 
         // \App\Models\Servicos::factory(10)->create();
+
 
         // \App\Models\Disponibilidade::factory(7)->create();
     }

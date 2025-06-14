@@ -28,8 +28,13 @@ class AlunoadminController extends Controller
         $config = ConfiguracaoGeral::first();
         $title = 'Aulas';
 
-        $id = auth()->user()->aluno->id;
 
+        if (!auth()->user()->aluno) {
+            auth()->logout();
+            return redirect()->back()->with('error', 'O aluno não existe.');
+        }
+
+        $id = auth()->user()->aluno->id;
 
         $query = Agendamento::with('professor.usuario', 'modalidade')
             ->where('aluno_id', $id);

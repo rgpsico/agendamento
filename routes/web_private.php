@@ -148,6 +148,8 @@ Route::prefix('cliente')->middleware('auth')->group(function () {
 
         Route::post('/disponibilidadeperstore', [DisponibilidadeController::class, 'storeper'])->name('storeper');
         Route::get('/disponibilidadeper', [EmpresaController::class, 'disponibilidadePersonalizada'])->name('empresa.disponibilidadePersonalizada');
+        Route::get('/disponibilidadeper/horariosauto', [EmpresaController::class, 'autoHorario'])->name('empresa.horarios.auto');
+        Route::post('/disponibilidadeper/horariogerar', [EmpresaController::class, 'gerarHorarios'])->name('horario.gerar');
 
         Route::get('/disponibilidade', [EmpresaController::class, 'disponibilidade'])->name('empresa.disponibilidade');
         Route::post('/disponibilidade', [EmpresaController::class, 'cadastrarDisponibilidade'])->name('empresa.disponibilidade.store');

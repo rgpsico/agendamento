@@ -8,6 +8,8 @@
                 <div class="card-header">
                     <h4 class="card-title">Detalhes do Boleto</h4>
                 </div>
+                <input type="text" id="boleto-gerado-inicio" name="" value="">
+                <input type="text" id="boleto-gerado-fim" name="" value="">
                 <div class="card-body">
                     <x-alert />
                     <p><strong>Cliente Asaas:</strong> {{ Auth::user()->professor->asaas_customer_id }}</p>
@@ -34,7 +36,9 @@
             </div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
     <!-- Script para re-verificar status após tentativa de pagamento -->
     <script>
         $(document).ready(function() {
@@ -48,14 +52,16 @@
                         "customer_id": "{{ Auth::user()->professor->asaas_customer_id }}",
                         "billingType": "BOLETO",
                         "value": 100.00,
-                        "dueDate": "2025-06-11",
+                        "dueDate": "{{ date('Y-m-d') }}",
                         "description": "Pagamento de teste"
                     },
                     headers: {
                         'Accept': 'application/json'
                     },
                     success: function(response) {
-                        console.log(response.data)
+                        console.log(response.data.id)
+                        $('#boleto-gerado-inicio').val(response.data.id)
+
                         if (response.status === 'success') {
                             $('.boleto-info').html(`
                     <p><strong>Empresa:</strong> {{ Auth::user()->empresa->nome }}</p>
@@ -86,6 +92,48 @@
                 const d = new Date(data);
                 return d.toLocaleDateString('pt-BR');
             }
+        });
+
+
+
+        $(document).ready(function() {
+            // Initialize Socket.IO connection
+            var socket = io('https://www.comunidadeppg.com.br:3000');
+
+            // Handle connection
+            socket.on('connect', function() {
+                console.log('Conectado ao servidor Socket.IO.');
+            });
+
+            // Handle 'enviarpedidoentregadores' event
+            socket.on('enviarpedidoentregadores', function(recebendopagamento) {
+                console.log('pedido para entregador:', recebendopagamento.payment.id);
+
+                $("#boleto-gerado-fim").val(recebendopagamento.payment.id)
+                // Verificar se existe pixData e se os IDs coincidem
+
+                if (recebendopagamento.event == "PAYMENT_RECEIVED") {
+                    if ($('#boleto-gerado-inicio').val() == recebendopagamento.payment.id) {
+                        console.log("PAGAMENTO ESTA OK PODE IR PRO DASHBOAD");
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Pagamento confirmado!',
+                            text: 'Você será redirecionado para o dashboard e já pode começar a usar o sistema.',
+                            showConfirmButton: false,
+                            timer: 5000
+                        }).then(() => {
+                            window.location.href = "/cliente/empresa/dashboard";
+                        });
+                    }
+
+                }
+            });
+
+            // Handle disconnection
+            socket.on('disconnect', function() {
+                console.log('Desconectado do servidor Socket.IO.');
+            });
         });
     </script>
 
