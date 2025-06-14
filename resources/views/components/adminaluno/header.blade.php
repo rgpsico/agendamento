@@ -158,7 +158,7 @@
 
             <!-- Scripts -->
             <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+            {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script> --}}
 
             <!-- Bootstrap JS -->
             <script src="{{ asset('admin/js/bootstrap.bundle.min.js') }}"></script>

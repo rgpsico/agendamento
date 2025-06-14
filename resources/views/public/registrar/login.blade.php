@@ -47,7 +47,8 @@
                                             senha?</a>
                                     </div>
                                     <!-- Login Button -->
-                                    <button class="btn btn-primary w-100 btn-lg mb-3" type="submit">Login</button>
+                                    <button class="btn btn-primary w-100 btn-lg mb-3" type="submit"
+                                        id="login">Login</button>
                                     <!-- Divider -->
                                     <div class="login-or text-center my-4">
                                         <span class="text-muted">Ou</span>

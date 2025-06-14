@@ -14,7 +14,7 @@
             height: 40px;
         }
     </style>
-
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <div class="modal fade" id="empresaInativaModal" tabindex="-1" aria-labelledby="empresaInativaModalLabel"
         aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog modal-dialog-centered">
@@ -99,56 +99,57 @@
 
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <script>
-        var arrecadacaoDatas = {!! json_encode(array_keys($arrecadacaoPorDia->toArray())) !!};
-        var arrecadacaoValores = {!! json_encode(array_values($arrecadacaoPorDia->toArray())) !!};
+        $(document).ready(function() {
+            var arrecadacaoDatas = {!! json_encode(array_keys($arrecadacaoPorDia->toArray())) !!};
+            var arrecadacaoValores = {!! json_encode(array_values($arrecadacaoPorDia->toArray())) !!};
 
-        var ctx = document.getElementById('revenueChart').getContext('2d');
-        var revenueChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: arrecadacaoDatas,
-                datasets: [{
-                    label: 'Arrecadação',
-                    data: arrecadacaoValores,
-                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true
+            var ctx = document.getElementById('revenueChart').getContext('2d');
+            var revenueChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: arrecadacaoDatas,
+                    datasets: [{
+                        label: 'Arrecadação',
+                        data: arrecadacaoValores,
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
                     }
                 }
-            }
-        });
+            });
 
-        var aulasCanceladas = {{ $aulasCanceladas }};
-        var aulasRealizadas = {{ $realizadas }};
+            var aulasCanceladas = {{ $aulasCanceladas }};
+            var aulasRealizadas = {{ $realizadas }};
 
-        var ctx2 = document.getElementById('statusChart').getContext('2d');
-        var statusChart = new Chart(ctx2, {
-            type: 'pie',
-            data: {
-                labels: ['Aulas Feitas', 'Aulas Canceladas'],
-                datasets: [{
-                    data: [aulasRealizadas, aulasCanceladas],
-                    backgroundColor: ['rgba(75, 192, 192, 0.7)', 'rgba(255, 99, 132, 0.7)'],
-                    borderColor: ['rgba(75, 192, 192, 1)', 'rgba(255, 99, 132, 1)'],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false
-            }
+            var ctx2 = document.getElementById('statusChart').getContext('2d');
+            var statusChart = new Chart(ctx2, {
+                type: 'pie',
+                data: {
+                    labels: ['Aulas Feitas', 'Aulas Canceladas'],
+                    datasets: [{
+                        data: [aulasRealizadas, aulasCanceladas],
+                        backgroundColor: ['rgba(75, 192, 192, 0.7)', 'rgba(255, 99, 132, 0.7)'],
+                        borderColor: ['rgba(75, 192, 192, 1)', 'rgba(255, 99, 132, 1)'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
         });
     </script>
 
