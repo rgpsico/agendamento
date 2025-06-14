@@ -52,10 +52,17 @@ class PaymentConfiguration extends Model
         return $methods;
     }
 
-    public static function getForEmpresa($empresaId)
+    public static function getForEmpresa($userId)
     {
+
+        $empresa_id = Empresa::where("user_id", $userId)->value('id');
+
+        if (!$empresa_id) {
+            throw new \Exception("Nenhuma empresa encontrada para o usuário informado.");
+        }
+
         return self::firstOrCreate(
-            ['empresa_id' => $empresaId],
+            ['empresa_id' => $empresa_id],
             [
                 'pix_enabled' => true,
                 'cartao_enabled' => true,
