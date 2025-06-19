@@ -370,6 +370,10 @@
       cursor: pointer;
       transition: all 0.3s ease;
       font-weight: 500;
+      float: none !important;
+      width: auto !important;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
     }
 
     .time-slot li:hover {
