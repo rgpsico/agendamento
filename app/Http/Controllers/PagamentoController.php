@@ -357,7 +357,7 @@ class PagamentoController extends Controller
     {
         // Verifica se o usuário está logado e é um professor
         if (!Auth::check() || !Auth::user()->professor) {
-            return redirect()->route('login')->with('error', 'Você precisa estar logado como professor.');
+            return redirect()->back()->withErrors('Você precisa estar logado como professor.');
         }
 
         $professor = Auth::user()->professor;

@@ -145,6 +145,8 @@ class ProfessoresAsaasController extends Controller
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
 
+
+
             return response()->json([
                 'success' => false,
                 'message' => 'Dados inválidos',
@@ -153,7 +155,20 @@ class ProfessoresAsaasController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            // Log do erro
+            // Tenta decodificar a mensagem de erro caso seja JSON
+            $errorMessage = $e->getMessage();
+            $decodedMessage = json_decode(str_replace('Erro na API do Asaas: ', '', $errorMessage), true);
+
+            $errorDetails = [];
+
+            if (isset($decodedMessage['errors'])) {
+                // Se vierem múltiplos erros da API do Asaas, formatamos
+                foreach ($decodedMessage['errors'] as $error) {
+                    $errorDetails[$error['code']] = $error['description'];
+                    $decodedMessage  =  $errorDetails[$error['code']];
+                }
+            }
+
             Log::error('Erro ao criar subconta', [
                 'error' => $e->getMessage(),
                 'user_id' => auth()->id(),
@@ -162,9 +177,9 @@ class ProfessoresAsaasController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Erro interno do servidor',
-                'error' => config('app.debug') ? $e->getMessage() : 'Erro ao processar solicitação'
-            ], 500);
+                'message' => $errorDetails[$error['code']] ? $decodedMessage : 'Erro interno do servidor',
+                'errors' => $errorDetails[$error['code']] ?: (config('app.debug') ? $e->getMessage() : ['message' => 'Erro ao processar solicitação'])
+            ], 422);
         }
     }
 
