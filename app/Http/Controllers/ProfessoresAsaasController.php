@@ -176,6 +176,7 @@ class ProfessoresAsaasController extends Controller
             ]);
 
             return response()->json([
+
                 'success' => false,
                 'message' => $errorDetails[$error['code']] ? $decodedMessage : 'Erro interno do servidor',
                 'errors' => $errorDetails[$error['code']] ?: (config('app.debug') ? $e->getMessage() : ['message' => 'Erro ao processar solicitação'])
