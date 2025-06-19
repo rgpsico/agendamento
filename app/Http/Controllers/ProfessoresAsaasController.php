@@ -155,7 +155,7 @@ class ProfessoresAsaasController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            // Tenta decodificar a mensagem de erro caso seja JSON
+            // Tenta decodificar a mensagem de erroseja JSON
             $errorMessage = $e->getMessage();
             $decodedMessage = json_decode(str_replace('Erro na API do Asaas: ', '', $errorMessage), true);
 
