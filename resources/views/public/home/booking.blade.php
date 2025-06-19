@@ -376,6 +376,17 @@
       padding-right: 0 !important;
     }
 
+    .booking-schedule .time-slot ul {
+      margin: 0 !important;
+    }
+
+    .booking-schedule .time-slot ul li {
+      float: none !important;
+      width: auto !important;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+    }
+
     .time-slot li:hover {
       border-color: var(--primary-color);
       background: rgba(99, 102, 241, 0.05);
