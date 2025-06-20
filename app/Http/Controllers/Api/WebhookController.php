@@ -255,8 +255,12 @@ class WebhookController extends Controller
 
             $client = new \GuzzleHttp\Client();
 
+            $baseUrl = rtrim(env('ASAAS_ENV', 'sandbox') === 'production'
+                ? env('ASAAS_URL', 'https://api.asaas.com')
+                : env('ASAAS_SANDBOX_URL', 'https://api-sandbox.asaas.com/'), '/');
+
             // Create payment
-            $createResponse = $client->request('POST', env('ASAAS_SANDBOX_URL') . '/v3/payments', [
+            $createResponse = $client->request('POST', "$baseUrl/v3/payments", [
                 'headers' => [
                     'accept' => 'application/json',
                     'access_token' => env('ASAAS_API_KEY'),
@@ -276,7 +280,7 @@ class WebhookController extends Controller
             $paymentId = $paymentCreated['id'];
 
             // Step 2: Get QR Code
-            $qrResponse = $client->request('GET', env('ASAAS_SANDBOX_URL') . "/v3/payments/{$paymentId}/pixQrCode", [
+            $qrResponse = $client->request('GET', "$baseUrl/v3/payments/{$paymentId}/pixQrCode", [
                 'headers' => [
                     'accept' => 'application/json',
                     'access_token' => env('ASAAS_API_KEY'),
@@ -292,7 +296,7 @@ class WebhookController extends Controller
             if ($request->input('auto_pay', false)) {
                 sleep(2); // Simula tempo para processar
 
-                $payResponse = $client->request('POST', env('ASAAS_SANDBOX_URL') . "/v3/payments/{$paymentId}/receiveInCash", [
+                $payResponse = $client->request('POST', "$baseUrl/v3/payments/{$paymentId}/receiveInCash", [
                     'headers' => [
                         'accept' => 'application/json',
                         'access_token' => env('ASAAS_API_KEY'),
@@ -404,7 +408,10 @@ class WebhookController extends Controller
 
             // Make request to Asaas API using Guzzle
             $client = new \GuzzleHttp\Client();
-            $response = $client->request('POST', env('ASAAS_SANDBOX_URL') . '/v3/payments', [
+            $baseUrl = rtrim(env('ASAAS_ENV', 'sandbox') === 'production'
+                ? env('ASAAS_URL', 'https://api.asaas.com')
+                : env('ASAAS_SANDBOX_URL', 'https://api-sandbox.asaas.com/'), '/');
+            $response = $client->request('POST', "$baseUrl/v3/payments", [
                 'headers' => [
                     'accept' => 'application/json',
                     'access_token' => env('ASAAS_API_KEY'),
@@ -737,7 +744,10 @@ class WebhookController extends Controller
                 $requestData['scheduleDate'] = $scheduleDate;
             }
 
-            $response = $client->request('POST', env('ASAAS_SANDBOX_URL') . "/v3/pix/qrCodes/pay", [
+            $baseUrl = rtrim(env('ASAAS_ENV', 'sandbox') === 'production'
+                ? env('ASAAS_URL', 'https://api.asaas.com')
+                : env('ASAAS_SANDBOX_URL', 'https://api-sandbox.asaas.com/'), '/');
+            $response = $client->request('POST', "$baseUrl/v3/pix/qrCodes/pay", [
                 'headers' => [
                     'accept' => 'application/json',
                     'access_token' => env('ASAAS_API_KEY'),
@@ -818,7 +828,10 @@ class WebhookController extends Controller
         try {
             // Fazer uma chamada à API da Asaas para simular o pagamento (endpoint específico do sandbox)
             $client = new \GuzzleHttp\Client();
-            $response = $client->request('POST', env('ASAAS_SANDBOX_URL') . "/v3/payments/{$paymentId}/simulate", [
+            $baseUrl = rtrim(env('ASAAS_ENV', 'sandbox') === 'production'
+                ? env('ASAAS_URL', 'https://api.asaas.com')
+                : env('ASAAS_SANDBOX_URL', 'https://api-sandbox.asaas.com/'), '/');
+            $response = $client->request('POST', "$baseUrl/v3/payments/{$paymentId}/simulate", [
                 'headers' => [
                     'accept' => 'application/json',
                     'access_token' => env('ASAAS_API_KEY'),
@@ -894,9 +907,9 @@ class WebhookController extends Controller
                 ], 500);
             }
 
-            $baseUrl = env('ASAAS_ENV', 'sandbox') === 'sandbox'
-                ? 'https://api-sandbox.asaas.com/v3'
-                : 'https://api.asaas.com/v3';
+            $baseUrl = rtrim(env('ASAAS_ENV', 'sandbox') === 'production'
+                ? env('ASAAS_URL', 'https://api.asaas.com')
+                : env('ASAAS_SANDBOX_URL', 'https://api-sandbox.asaas.com/'), '/');
 
             $payload = [
                 'type' => $request->type,
@@ -1026,9 +1039,9 @@ class WebhookController extends Controller
             ], 500);
         }
 
-        $baseUrl = env('ASAAS_ENV', 'sandbox') === 'sandbox'
-            ? 'https://api-sandbox.asaas.com/v3'
-            : 'https://api.asaas.com/v3';
+        $baseUrl = rtrim(env('ASAAS_ENV', 'sandbox') === 'production'
+            ? env('ASAAS_URL', 'https://api.asaas.com')
+            : env('ASAAS_SANDBOX_URL', 'https://api-sandbox.asaas.com/'), '/');
 
         $client = new Client();
 
@@ -1262,7 +1275,10 @@ class WebhookController extends Controller
         try {
             // Make a request to the Asaas API status endpoint using Guzzle
             $client = new \GuzzleHttp\Client();
-            $response = $client->request('GET', env('ASAAS_SANDBOX_URL') . "/v3/payments/{$paymentId}/status", [
+            $baseUrl = rtrim(env('ASAAS_ENV', 'sandbox') === 'production'
+                ? env('ASAAS_URL', 'https://api.asaas.com')
+                : env('ASAAS_SANDBOX_URL', 'https://api-sandbox.asaas.com/'), '/');
+            $response = $client->request('GET', "$baseUrl/v3/payments/{$paymentId}/status", [
                 'headers' => [
                     'accept' => 'application/json',
                     'access_token' => env('ASAAS_API_KEY'),
@@ -1359,9 +1375,9 @@ class WebhookController extends Controller
             ], 500);
         }
 
-        $baseUrl = env('ASAAS_ENV', 'sandbox') === 'sandbox'
-            ? 'https://api-sandbox.asaas.com/v3'
-            : 'https://api.asaas.com/v3';
+        $baseUrl = rtrim(env('ASAAS_ENV', 'sandbox') === 'production'
+            ? env('ASAAS_URL', 'https://api.asaas.com')
+            : env('ASAAS_SANDBOX_URL', 'https://api-sandbox.asaas.com/'), '/');
 
         $professor = Professor::where('usuario_id', $request->usuario_id)->first();
         if (!$professor) {

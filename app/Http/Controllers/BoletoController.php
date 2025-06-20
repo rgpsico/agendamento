@@ -22,7 +22,9 @@ class BoletoController extends Controller
     public function __construct()
     {
         $this->apiKey = env('ASAAS_API_KEY');
-        $this->baseUri = env('ASAAS_ENV') === 'production' ? env('ASAAS_URL') : env('ASAAS_SANDBOX_URL');
+        $this->baseUri = rtrim(env('ASAAS_ENV', 'sandbox') === 'production'
+            ? env('ASAAS_URL', 'https://api.asaas.com')
+            : env('ASAAS_SANDBOX_URL', 'https://api-sandbox.asaas.com/'), '/');
         $this->client = new Client(['base_uri' => $this->baseUri]);
     }
 
@@ -273,7 +275,10 @@ class BoletoController extends Controller
         $value = $request->value ?? 129.90;
 
         // Criar o boleto
-        $url = env('ASAAS_SANDBOX_URL') . '/v3/payments';
+        $baseUrl = rtrim(env('ASAAS_ENV', 'sandbox') === 'production'
+            ? env('ASAAS_URL', 'https://api.asaas.com')
+            : env('ASAAS_SANDBOX_URL', 'https://api-sandbox.asaas.com/'), '/');
+        $url = "$baseUrl/v3/payments";
         $headers = [
             'accept' => 'application/json',
             'access_token' => env('ASAAS_API_KEY'),

@@ -526,7 +526,9 @@ class PagamentoController extends Controller
     public function getCustomer($customerId)
     {
         // Obtém a URL e a chave de API do arquivo de configuração
-        $apiUrl = env('ASAAS_SANDBOX_URL');
+        $apiUrl = rtrim(env('ASAAS_ENV', 'sandbox') === 'production'
+            ? env('ASAAS_URL', 'https://api.asaas.com')
+            : env('ASAAS_SANDBOX_URL', 'https://api-sandbox.asaas.com/'), '/');
         $apiKey = env('ASAAS_KEY');
 
 
@@ -573,10 +575,14 @@ class PagamentoController extends Controller
         $agendamento = $this->agendamentoService->criarAgendamento($request->all());
 
         // 3. Criar cliente no Asaas
+        $baseUrl = rtrim(env('ASAAS_ENV', 'sandbox') === 'production'
+            ? env('ASAAS_URL', 'https://api.asaas.com')
+            : env('ASAAS_SANDBOX_URL', 'https://api-sandbox.asaas.com/'), '/');
+
         $clienteResponse = Http::withHeaders([
             'accept' => 'application/json',
             'access_token' => env("ASAAS_API_KEY"),
-        ])->post('https://sandbox.asaas.com/api/v3/customers', [
+        ])->post("{$baseUrl}/api/v3/customers", [
             'name' => $request->name,
             'email' => $request->email,
             'cpfCnpj' => $request->cpfCnpj,
@@ -609,7 +615,7 @@ class PagamentoController extends Controller
         $pagamentoResponse = Http::withHeaders([
             'accept' => 'application/json',
             'access_token' => env('ASAAS_API_KEY'),
-        ])->post('https://sandbox.asaas.com/api/v3/payments', [
+        ])->post("{$baseUrl}/api/v3/payments", [
             'customer' => $clienteId,
             'billingType' => 'CREDIT_CARD',
             'value' => $valorTotal,
@@ -993,7 +999,10 @@ class PagamentoController extends Controller
 
         $client = new Client();
 
-        $response = $client->request('GET', 'https://api-sandbox.asaas.com/v3/wallets/', [
+        $baseUrl = rtrim(env('ASAAS_ENV', 'sandbox') === 'production'
+            ? env('ASAAS_URL', 'https://api.asaas.com')
+            : env('ASAAS_SANDBOX_URL', 'https://api-sandbox.asaas.com/'), '/');
+        $response = $client->request('GET', "$baseUrl/v3/wallets/", [
             'headers' => [
                 'accept' => 'application/json',
                 'access_token' => '$aact_hmlg_000MzkwODA2MWY2OGM3MWRlMDU2NWM3MzJlNzZmNGZhZGY6OmRiMDVhZjk3LWQzMjMtNDBlZi1iMGYyLTkzMGRlMzFiMmRiODo6JGFhY2hfOTcwODhmOTctYWYxYy00MzY0LTgzODAtOTA3MzBhOWY5NmJk',

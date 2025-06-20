@@ -87,10 +87,13 @@ class ProfessoresAsaasController extends Controller
 
 
             // Fazer requisição para API do Asaas
+            $baseUrl = rtrim(env('ASAAS_ENV', 'sandbox') === 'production'
+                ? env('ASAAS_URL', 'https://api.asaas.com')
+                : env('ASAAS_SANDBOX_URL', 'https://api-sandbox.asaas.com/'), '/');
             $response = Http::withHeaders([
                 'access_token' => env('ASAAS_KEY'),
                 'Content-Type' => 'application/json',
-            ])->post('https://sandbox.asaas.com/api/v3/accounts', $subaccountData);
+            ])->post("{$baseUrl}/api/v3/accounts", $subaccountData);
 
             // Verificar se a requisição foi bem-sucedida
             if (!$response->successful()) {
