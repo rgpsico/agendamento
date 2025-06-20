@@ -24,8 +24,10 @@ class AsaasWalletController extends Controller
      */
     public function getProfessorWallet($professorId)
     {
-        $apiKey = env('ASAAS_SANDBOX_URL');
-         $mode = 'sandbox';
+        $apiBaseUrl = rtrim(env('ASAAS_ENV', 'sandbox') === 'production'
+            ? env('ASAAS_URL', 'https://api.asaas.com')
+            : env('ASAAS_SANDBOX_URL', 'https://api-sandbox.asaas.com/'), '/');
+        $mode = env('ASAAS_ENV', 'sandbox');
         $professor = Professor::with('usuario')->find($professorId);
 
         if (!$professor || !$professor->usuario) {

@@ -41,10 +41,14 @@ class DispararBoletosMensais extends Command
                     continue; // pula se o professor não tiver asaas ou e-mail
                 }
 
+                $baseUrl = rtrim(env('ASAAS_ENV', 'sandbox') === 'production'
+                    ? env('ASAAS_URL', 'https://api.asaas.com')
+                    : env('ASAAS_SANDBOX_URL', 'https://api-sandbox.asaas.com/'), '/');
+
                 $response = Http::withHeaders([
                     'accept' => 'application/json',
                     'access_token' => env('ASAAS_API_KEY'),
-                ])->post(env('ASAAS_SANDBOX_URL') . '/v3/payments', [
+                ])->post("{$baseUrl}/v3/payments", [
                     'billingType' => 'BOLETO',
                     'customer' => $professor->asaas_customer_id,
                     'value' => 129.90,
