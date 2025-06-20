@@ -146,8 +146,8 @@
                                         </div>
                                     </div>
                                     
-                                    <!-- Mapa (opcional, se você tiver integração com Google Maps) -->
-                                    @if(isset($empresa->endereco->latitude) && isset($empresa->endereco->longitude))
+                                    <!-- Mapa baseado no CEP -->
+                                    @if(!empty($empresa->endereco->cep))
                                     <div class="mt-3">
                                         <div id="map" style="height: 200px; width: 100%;" class="rounded"></div>
                                     </div>
@@ -188,26 +188,27 @@
 }
 </style>
 
-<!-- Script para o mapa (opcional) -->
-@if(isset($empresa->endereco->latitude) && isset($empresa->endereco->longitude))
+<!-- Script para o mapa utilizando o CEP -->
+@if(!empty($empresa->endereco->cep))
 <script>
     function initMap() {
-        const location = { 
-            lat: {{ $empresa->endereco->latitude }}, 
-            lng: {{ $empresa->endereco->longitude }} 
-        };
-        const map = new google.maps.Map(document.getElementById("map"), {
-            zoom: 15,
-            center: location,
-        });
-        const marker = new google.maps.Marker({
-            position: location,
-            map: map,
-            title: "{{ $empresa->nome }}"
+        const cep = "{{ $empresa->endereco->cep }}";
+        const geocoder = new google.maps.Geocoder();
+        geocoder.geocode({ address: cep }, function(results, status) {
+            if (status === 'OK') {
+                const location = results[0].geometry.location;
+                const map = new google.maps.Map(document.getElementById("map"), {
+                    zoom: 15,
+                    center: location,
+                });
+                new google.maps.Marker({
+                    position: location,
+                    map: map,
+                    title: "{{ $empresa->nome }}"
+                });
+            }
         });
     }
 </script>
-<script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=SUA_API_KEY&callback=initMap">
-</script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=SUA_API_KEY&callback=initMap"></script>
 @endif
