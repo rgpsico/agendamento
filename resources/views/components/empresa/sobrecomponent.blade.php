@@ -152,14 +152,22 @@
                                             </div>
                                         </div>
                                     </div>
-
-                                    <!-- Mapa (opcional, se você tiver integração com Google Maps) -->
-                                    @if (isset($empresa->endereco->latitude) && isset($empresa->endereco->longitude))
-                                        <div class="mt-3">
-                                            <div id="map" style="height: 200px; width: 100%;" class="rounded">
+                                    <<<<<<< HEAD <!-- Mapa (opcional, se você tiver integração com Google Maps) -->
+                                        @if (isset($empresa->endereco->latitude) && isset($empresa->endereco->longitude))
+                                            <div class="mt-3">
+                                                <div id="map" style="height: 200px; width: 100%;" class="rounded">
+                                                </div>
                                             </div>
-                                        </div>
-                                    @endif
+                                            =======
+
+                                            <!-- Mapa baseado no CEP -->
+                                            @if (!empty($empresa->endereco->cep))
+                                                <div class="mt-3">
+                                                    <div id="map" style="height: 200px; width: 100%;"
+                                                        class="rounded"></div>
+                                                </div>
+                                                >>>>>>> e91fe1b373e8595ae1ace06384650af8086cdef2
+                                            @endif
                                 </div>
                             </div>
                         </div>
@@ -200,25 +208,26 @@
     }
 </style>
 
-<!-- Script para o mapa (opcional) -->
-@if (isset($empresa->endereco->latitude) && isset($empresa->endereco->longitude))
-    <script>
-        function initMap() {
-            const location = {
-                lat: {{ $empresa->endereco->latitude }},
-                lng: {{ $empresa->endereco->longitude }}
-            };
-            const map = new google.maps.Map(document.getElementById("map"), {
-                zoom: 15,
-                center: location,
-            });
-            const marker = new google.maps.Marker({
-                position: location,
-                map: map,
-                title: "{{ $empresa->nome }}"
-            });
-        }
-    </script>
-    <script async defer
-        src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_DRIVE_CLIENT_ID') }}&callback=initMap"></script>
-@endif
+<<<<<<< HEAD <!-- Script para o mapa (opcional) -->
+    @if (isset($empresa->endereco->latitude) && isset($empresa->endereco->longitude))
+        <script>
+            function initMap() {
+                const location = {
+                    lat: {{ $empresa->endereco->latitude }},
+                    lng: {{ $empresa->endereco->longitude }}
+                };
+                const map = new google.maps.Map(document.getElementById("map"), {
+                    zoom: 15,
+                    center: location,
+                });
+                const marker = new google.maps.Marker({
+                    position: location,
+                    map: map,
+                    title: "{{ $empresa->nome }}"
+                });
+            }
+        </script>
+        <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_DRIVE_CLIENT_ID') }}&callback=initMap"></script>
+
+    @endif
