@@ -157,10 +157,19 @@ Route::middleware('auth')->post('/subcontas', [ProfessoresAsaasController::class
 
 use Illuminate\Support\Facades\Log;
 
-Route::post('/webhook/sms', function (Request $request) {
-    Log::info('Mensagem recebida do Twilio:', $request->all());
+use App\Models\AsaasWebhookLog;
 
-    return response('<Response><Message>Recebido com sucesso</Message></Response>', 200)
+Route::post('/webhook/sms', function (Request $request) {
+    AsaasWebhookLog::create([
+        'event'      => 'twilio_sms_received',
+        'payload'    => $request->all(),
+        'status'     => 'recebido',
+        'message'    => $request->input('Body'), // corpo do SMS recebido
+        'payment_id' => null, // ou alguma lógica, se quiser usar
+        'empresa_id' => null, // ou o ID da empresa se tiver autenticação
+    ]);
+
+    return response('<Response><Message>Recebido e salvo!</Message></Response>', 200)
         ->header('Content-Type', 'text/xml');
 });
 
