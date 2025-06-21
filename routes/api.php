@@ -155,6 +155,16 @@ Route::prefix('empresa/pagamento')->group(function () {
 Route::middleware('auth')->post('/subcontas', [ProfessoresAsaasController::class, 'createSubaccount'])->name('criar-subconta-professor');
 
 
+use Illuminate\Support\Facades\Log;
+
+Route::post('/webhook/sms', function (Request $request) {
+    Log::info('Mensagem recebida do Twilio:', $request->all());
+
+    return response('<Response><Message>Recebido com sucesso</Message></Response>', 200)
+        ->header('Content-Type', 'text/xml');
+});
+
+
 Route::post('/test-twilio', function () {
     try {
         $sid = env('TWILIO_SID');
