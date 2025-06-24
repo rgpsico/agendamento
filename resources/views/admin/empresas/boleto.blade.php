@@ -51,7 +51,7 @@
                     data: {
                         "customer_id": "{{ Auth::user()->professor->asaas_customer_id }}",
                         "billingType": "BOLETO",
-                        "value": 100.00,
+                        "value": {{ env('VALOR_SISTEMA') }},
                         "dueDate": "{{ date('Y-m-d') }}",
                         "description": "Pagamento de teste"
                     },
