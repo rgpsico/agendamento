@@ -22,7 +22,7 @@ class BoletoController extends Controller
     public function __construct()
     {
         $this->apiKey = env('ASAAS_API_KEY');
-        $this->baseUri = env('ASAAS_ENV') === 'production' ? env('ASAAS_URL') : env('ASAAS_SANDBOX_URL');
+        $this->baseUri = env('ASAAS_ENV') === 'production' ? env('ASAAS_URL') : 'https://api-sandbox.asaas.com';
         $this->client = new Client(['base_uri' => $this->baseUri]);
     }
 
@@ -176,8 +176,6 @@ class BoletoController extends Controller
 
         // URL correta
         $url = $this->baseUri . "/v3/payments";
-
-        //https: //sandbox.asaas.com
 
         $headers = [
             'accept' => 'application/json',

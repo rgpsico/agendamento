@@ -610,7 +610,7 @@ class PagamentoController extends Controller
         $pagamentoResponse = Http::withHeaders([
             'accept' => 'application/json',
             'access_token' => env('ASAAS_API_KEY'),
-        ])->post('https://sandbox.asaas.com/api/v3/payments', [
+        ])->post($this->baseUri . '/api/v3/payments', [
             'customer' => $clienteId,
             'billingType' => 'CREDIT_CARD',
             'value' => $valorTotal,
