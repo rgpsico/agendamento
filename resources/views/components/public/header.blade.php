@@ -133,7 +133,7 @@
         </header>
         <!-- /Header -->
     </div>
-
+    @include('public.home._partials.modalregister')
     <!-- Scripts -->
 
     <script src="{{ asset('template/assets/js/bootstrap.bundle.min.js') }}"></script>
