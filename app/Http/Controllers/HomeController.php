@@ -230,11 +230,13 @@ class HomeController extends Controller
 
     public function registerAluno()
     {
+        $modalidade = Modalidade::all();
         return view(
             'public.registrar.registerAluno',
             [
                 'pageTitle' => $this->pageTitle,
                 'view' => $this->view,
+                'modalidade' => $modalidade,
                 'route' => $this->route
             ]
         );
@@ -242,11 +244,13 @@ class HomeController extends Controller
 
     public function login()
     {
+        $modalidade = Modalidade::all();
         $config = ConfiguracaoGeral::first();
         return view(
             'public.registrar.login',
             [
                 'pageTitle' => $this->pageTitle,
+                'modalidade' => $modalidade,
                 'view' => $this->view,
                 'loginImage' => $config->login_image ? asset('storage/' . $config->login_image) : null,
                 'route' => $this->route

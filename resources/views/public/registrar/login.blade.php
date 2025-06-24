@@ -1,5 +1,6 @@
 <x-public.layout title="Login">
     <!-- Page Content -->
+    @include('public.home._partials.modalregister')
     <div class="content top-space"
         style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #6a11cb, #2575fc);">
         <div class="container-fluid">
