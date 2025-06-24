@@ -370,15 +370,6 @@
                         document.getElementById('btnText').textContent = 'Integrar';
                         this.disabled = false;
 
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Integração realizada',
-                            text: 'Você será redirecionado para a tela de Boleto.',
-                            showConfirmButton: false,
-                            timer: 5000
-                        }).then(() => {
-                            window.location.href = "/empresa/pagamento/boleto";
-                        });
                     });
             }
         });
