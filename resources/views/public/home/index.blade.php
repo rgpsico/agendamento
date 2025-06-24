@@ -17,6 +17,7 @@
     </style>
     <!-- Breadcrumb -->
 
+    @include('public.home._partials.modalregister')
     <x-home.breadcrumb title="Busque Seu Passeio " />
     <!-- /Breadcrumb -->
 
