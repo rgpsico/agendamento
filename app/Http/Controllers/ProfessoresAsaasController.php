@@ -16,11 +16,12 @@ use Illuminate\Support\Facades\Auth;
 
 class ProfessoresAsaasController extends Controller
 {
-    protected $asaasService;
+    protected $asaasService, $baseUri;
 
     public function __construct(AsaasService $asaasService)
     {
         $this->asaasService = $asaasService;
+        $this->baseUri = env('ASAAS_ENV') === 'production' ? env('ASAAS_URL') : env('ASAAS_SANDBOX_URL');
     }
 
 
@@ -90,7 +91,7 @@ class ProfessoresAsaasController extends Controller
             $response = Http::withHeaders([
                 'access_token' => env('ASAAS_KEY'),
                 'Content-Type' => 'application/json',
-            ])->post('https://sandbox.asaas.com/api/v3/accounts', $subaccountData);
+            ])->post($this->baseUri . '/api/v3/accounts', $subaccountData);
 
             // Verificar se a requisição foi bem-sucedida
             if (!$response->successful()) {

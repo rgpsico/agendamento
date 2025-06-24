@@ -33,7 +33,7 @@ class AsaasService
         $response = Http::withHeaders([
             'accept' => 'application/json',
             'access_token' => env("ASAAS_API_KEY"),
-        ])->post('https://sandbox.asaas.com/api/v3/customers', [
+        ])->post($this->url . '/api/v3/customers', [
             'name' => $dados['name'],
             'email' => $dados['email'],
             'cpfCnpj' => $dados['cpfCnpj'],
@@ -57,7 +57,7 @@ class AsaasService
         $response = Http::withHeaders([
             'accept' => 'application/json',
             'access_token' => env('ASAAS_API_KEY'),
-        ])->post('https://sandbox.asaas.com/api/v3/payments', [
+        ])->post($this->url . '/api/v3/payments', [
             'customer' => $clienteId,
             'billingType' => 'CREDIT_CARD',
             'value' => $dados['value'],

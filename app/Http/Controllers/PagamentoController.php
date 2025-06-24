@@ -26,7 +26,7 @@ use App\Services\AgendamentoService;
 
 class PagamentoController extends Controller
 {
-    protected $aluno_professor;
+    protected $aluno_professor, $baseUri;
     protected $asaasService, $agendamentoService;
 
     public function __construct(
@@ -38,6 +38,7 @@ class PagamentoController extends Controller
         $this->aluno_professor = $aluno_professor;
         $this->asaasService = $asaasService;
         $this->agendamentoService = $agendamentoService;
+        $this->baseUri = env('ASAAS_ENV') === 'production' ? env('ASAAS_URL') : env('ASAAS_SANDBOX_URL');
     }
 
     public function index()
@@ -133,12 +134,12 @@ class PagamentoController extends Controller
         ]);
 
         $apiKey = env('ASAAS_KEY'); // Retrieve Asaas API key from .env
-        $baseUrl = 'https://api.asaas.com/v3'; // Asaas API base URL
+
         $client = new Client();
 
         try {
             // Step 1: Create a payment
-            $paymentResponse = $client->post("$baseUrl/payments", [
+            $paymentResponse = $client->post($this->baseUri . "/payments", [
                 'headers' => [
                     'Authorization' => "Bearer $apiKey",
                     'Content-Type' => 'application/json',
@@ -576,7 +577,7 @@ class PagamentoController extends Controller
         $clienteResponse = Http::withHeaders([
             'accept' => 'application/json',
             'access_token' => env("ASAAS_API_KEY"),
-        ])->post('https://sandbox.asaas.com/api/v3/customers', [
+        ])->post($this->baseUri . '/api/v3/customers', [
             'name' => $request->name,
             'email' => $request->email,
             'cpfCnpj' => $request->cpfCnpj,
@@ -609,7 +610,7 @@ class PagamentoController extends Controller
         $pagamentoResponse = Http::withHeaders([
             'accept' => 'application/json',
             'access_token' => env('ASAAS_API_KEY'),
-        ])->post('https://sandbox.asaas.com/api/v3/payments', [
+        ])->post($this->baseUri . '/api/v3/payments', [
             'customer' => $clienteId,
             'billingType' => 'CREDIT_CARD',
             'value' => $valorTotal,
