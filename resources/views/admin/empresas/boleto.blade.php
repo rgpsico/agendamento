@@ -64,10 +64,10 @@
 
                         if (response.status === 'success') {
                             $('.boleto-info').html(`
-                    <p><strong>Empresa:</strong> {{ Auth::user()->empresa->nome }}</p>
-                    <p><strong>Valor:</strong> R$ ${parseFloat(response.data.value).toFixed(2).replace('.', ',')}</p>
-                    <p><strong>Data de Vencimento:</strong> ${formatarData(response.data.dueDate)}</p>
-                    <p><strong>Status:</strong> Pendente</p>
+                        <p><strong>Empresa:</strong> {{ Auth::user()->empresa->nome }}</p>
+                        <p><strong>Valor:</strong> R$ ${parseFloat(response.data.value).toFixed(2).replace('.', ',')}</p>
+                        <p><strong>Data de Vencimento:</strong> ${formatarData(response.data.dueDate)}</p>
+                        <p><strong>Status:</strong> Pendente</p>
                 `);
 
                             $('.boleto-actions').html(`
