@@ -370,6 +370,16 @@
                         document.getElementById('btnText').textContent = 'Integrar';
                         this.disabled = false;
 
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Integração confirada!',
+                            text: 'Você será redirecionado ao pagamento do boleto.',
+                            showConfirmButton: false,
+                            timer: 5000
+                        }).then(() => {
+                            window.location.href = "/empresa/pagamento/boleto";
+                        });
+
                     });
             }
         });
