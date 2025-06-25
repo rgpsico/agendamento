@@ -4,6 +4,8 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>{{ $site->titulo }} - {{ $site->descricao ?? 'Site oficial' }}</title>
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+        <meta name="empresa-id" content="{{ $site->empresa_id }}">
     
         {{-- Favicon opcional --}}
         @if(!empty($site->favicon))
@@ -505,5 +507,6 @@ $corSecundaria = $site->cores['secundaria'] ?? '#38b2ac';
             });
         });
     </script>
+    <script src="{{ asset('js/analytics.js') }}"></script>
 </body>
 </html>

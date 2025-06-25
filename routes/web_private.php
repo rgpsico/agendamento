@@ -231,4 +231,8 @@ Route::group(['prefix' => '/manager'], function () {
     // Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
 });
 
-Route::prefix('admin')->middleware('auth')->group(function () {});
+Route::post('/analytics/event', [\App\Http\Controllers\AnalyticsController::class, 'recordEvent'])->name('analytics.event');
+
+Route::prefix('admin')->middleware('auth')->group(function () {
+    Route::get('/relatorios', [\App\Http\Controllers\AnalyticsController::class, 'dashboard'])->name('admin.analytics.dashboard');
+});
