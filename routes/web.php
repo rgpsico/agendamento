@@ -147,17 +147,5 @@ Route::get('/test', function () {
     return Inertia::render('Test');
 });
 
-Route::post('/deploy', function () {
-    $secret = "123"; // Use a mesma que foi usada no webhook do GitHub
-    $signature = hash_hmac('sha256', file_get_contents("php://input"), $secret);
-
-    if (hash_equals($signature, $_SERVER['HTTP_X_HUB_SIGNATURE'])) {
-        // Se a assinatura do webhook for válida, puxe as atualizações mais recentes feito aqui
-        shell_exec('cd .. && sudo git reset --hard HEAD && sudo git pull');
-    }
-
-    return ['status' => 'success'];
-});
-
 Route::get('/treino', [AgendaController::class, 'treino'])->name('treino');
 Route::get('/logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
