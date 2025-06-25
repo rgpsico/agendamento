@@ -5,6 +5,10 @@
     <meta charset="utf-8">
     <title>{{ $title }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    @if(!empty($empresaId))
+        <meta name="empresa-id" content="{{ $empresaId }}">
+    @endif
 
     <!-- Favicons -->
     <link href="{{ asset('template/assets/img/favicon.png') }}" rel="icon">
@@ -102,6 +106,13 @@
                                         </a>
                                     </li>
                                 @endif
+                                @if (auth()->user()->isAdmin)
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.analytics.dashboard') }}" class="btn btn-outline-secondary">
+                                            <i class="fas fa-chart-bar"></i> Relatórios
+                                        </a>
+                                    </li>
+                                @endif
 
                                 <li class="nav-item ms-2" style="color:#000;">
                                     <a href="{{ route('user.logout') }}" class="btn btn-outline-danger"
@@ -137,6 +148,7 @@
     <!-- Scripts -->
 
     <script src="{{ asset('template/assets/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('js/analytics.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Validação de confirmação de senha

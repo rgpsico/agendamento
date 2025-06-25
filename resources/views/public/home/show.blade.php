@@ -1,4 +1,4 @@
-<x-public.layout title="HOME">
+<x-public.layout title="HOME" :empresa-id="$model->id">
    
     <!-- Breadcrumb -->
 		<x-home.breadcrumb title="{{$model->nome}}"  :model="$model" />
