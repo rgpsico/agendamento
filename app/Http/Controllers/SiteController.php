@@ -52,25 +52,36 @@ class SiteController extends Controller
     /**
      * Página de edição das configurações do site (painel admin)
      */
-   public function edit()
-{
-    $empresa = Auth::user()->empresa;
+    public function edit()
+    {
+        $empresa = Auth::user()->empresa;
 
-    $site = EmpresaSite::firstOrNew(['empresa_id' => $empresa->id]);
-   
-    if (!$site->exists) {
-        $site->slug = Str::slug($empresa->nome);
-        $site->titulo = $empresa->nome;
-        $site->descricao = $empresa->descricao;
-        $site->cores = [
-            'primaria' => '#0ea5e9',
-            'secundaria' => '#38b2ac'
-        ];
-        $site->save();
+        $site = EmpresaSite::firstOrNew(['empresa_id' => $empresa->id]);
+
+        if (!$site->exists) {
+            // Gera o slug base
+            $baseSlug = Str::slug($empresa->nome);
+            $slug = $baseSlug;
+            $count = 1;
+
+            // Verifica se já existe um registro com esse slug
+            while (EmpresaSite::where('slug', $slug)->exists()) {
+                $slug = $baseSlug . '-' . $count++;
+            }
+
+            $site->slug = $slug;
+            $site->titulo = $empresa->nome;
+            $site->descricao = $empresa->descricao;
+            $site->cores = [
+                'primaria' => '#0ea5e9',
+                'secundaria' => '#38b2ac'
+            ];
+            $site->save();
+        }
+
+        return view('admin.site.configuracoes', compact('site'));
     }
 
-    return view('admin.site.configuracoes', compact('site'));
-}
 
 
 
