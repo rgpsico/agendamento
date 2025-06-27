@@ -9,26 +9,21 @@ use Carbon\Carbon;
 use Dotenv\Exception\ValidationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
+use App\Services\OpenAIService;
 
 
 
 class OpenAIController extends Controller
 {
-    public function testConnection(Request $request)
+    public function testConnection(Request $request, OpenAIService $openAIService)
     {
-        $apiKey = env('OPENAI_API_KEY');
-        if (!$apiKey) {
-            return response()->json(['error' => 'OpenAI API key not configured'], 500);
-        }
-
-        $response = Http::withToken($apiKey)
-            ->post('https://api.openai.com/v1/chat/completions', [
-                'model' => 'gpt-3.5-turbo',
-                'messages' => [
-                    ['role' => 'user', 'content' => 'Diga olá'],
-                ],
+        try {
+            $response = $openAIService->chat([
+                ['role' => 'user', 'content' => 'Diga olá'],
             ]);
+        } catch (\RuntimeException $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
 
         if ($response->successful()) {
             return response()->json($response->json());
