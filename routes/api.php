@@ -126,7 +126,10 @@ Route::post('/disponibilidade/reservar', [DisponibilidadeServicoController::clas
 Route::get('/professores/media-avaliacoes', [AvaliacaoController::class, 'mediaAvaliacoes']);
 
 Route::post('/send-whatsapp', [TwilioController::class, 'sendWhatsApp']);
-Route::get('/openai/test', [OpenAIController::class, 'testConnection']);
+Route::post('/openai/test', [OpenAIController::class, 'testConnection']);
+Route::post('/openai/consultar-horarios', [OpenAIController::class, 'consultarHorarios']);
+Route::post('/openai/chat', [OpenAIController::class, 'chatComCliente']);
+Route::post('/agendarHorario', [OpenAIController::class, 'agendarHorario']);
 
 Route::post('modalidade/{id}/update', [ModalidadeController::class, 'updateApi'])->name('modalidade.update');
 Route::delete('modalidade/{id}/destroy', [ModalidadeController::class, 'destroy'])->name('modalidade.destroy');
