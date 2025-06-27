@@ -41,6 +41,7 @@
                                 <li><a href="{{ route('admin.site.configuracoes') }}">Configurações do Site</a></li>
                                 <li><a href="{{ route('admin.site.servicos.index') }}">Serviços</a></li>
                                 <li><a href="{{ route('admin.site.depoimentos.index') }}">Depoimentos</a></li>
+                                <li><a href="{{ route('admin.site.menu.index') }}">Menu</a></li>
                                 <li><a href="{{ route('admin.site.contatos.index') }}">Contatos</a></li>
                                 <li><a href="{{ route('admin.site.dominios.index') }}">Domínios e SSL</a></li>
                             </ul>

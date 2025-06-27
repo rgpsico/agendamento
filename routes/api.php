@@ -24,6 +24,7 @@ use App\Http\Controllers\ProfessoresAsaasController;
 use App\Http\Controllers\Api\PixQrController;
 use App\Http\Controllers\Api\WebhookController;
 use App\Http\Controllers\BoletoController;
+use App\Http\Controllers\OpenAIController;
 use Illuminate\Http\Request;
 use Twilio\Rest\Client;
 use Illuminate\Support\Facades\Route;
@@ -125,6 +126,7 @@ Route::post('/disponibilidade/reservar', [DisponibilidadeServicoController::clas
 Route::get('/professores/media-avaliacoes', [AvaliacaoController::class, 'mediaAvaliacoes']);
 
 Route::post('/send-whatsapp', [TwilioController::class, 'sendWhatsApp']);
+Route::get('/openai/test', [OpenAIController::class, 'testConnection']);
 
 Route::post('modalidade/{id}/update', [ModalidadeController::class, 'updateApi'])->name('modalidade.update');
 Route::delete('modalidade/{id}/destroy', [ModalidadeController::class, 'destroy'])->name('modalidade.destroy');
