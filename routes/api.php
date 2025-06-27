@@ -130,6 +130,9 @@ Route::post('/openai/test', [OpenAIController::class, 'testConnection']);
 Route::post('/openai/consultar-horarios', [OpenAIController::class, 'consultarHorarios']);
 Route::post('/openai/chat', [OpenAIController::class, 'chatComCliente']);
 Route::post('/agendarHorario', [OpenAIController::class, 'agendarHorario']);
+Route::post('/openai/explicar-sistema', [OpenAIController::class, 'explicarSistema']);
+
+Route::post('/openai/chat-contexto', [OpenAIController::class, 'chatComContexto']);
 
 Route::post('modalidade/{id}/update', [ModalidadeController::class, 'updateApi'])->name('modalidade.update');
 Route::delete('modalidade/{id}/destroy', [ModalidadeController::class, 'destroy'])->name('modalidade.destroy');
