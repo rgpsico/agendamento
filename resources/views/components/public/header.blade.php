@@ -6,7 +6,7 @@
     <title>{{ $title }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    @if(!empty($empresaId))
+    @if (!empty($empresaId))
         <meta name="empresa-id" content="{{ $empresaId }}">
     @endif
 
@@ -34,7 +34,7 @@
 
     <!-- Main CSS -->
     <link rel="stylesheet" href="{{ asset('template/assets/css/custom.css') }}">
-
+    <link rel="stylesheet" href="{{ asset('css/home.css') }}">
     <!-- Google tag (gtag.js) -->
     {{-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-4ZMP2C63TR"> --}}
     </script>
@@ -108,7 +108,8 @@
                                 @endif
                                 @if (auth()->user()->isAdmin)
                                     <li class="nav-item">
-                                        <a href="{{ route('admin.analytics.dashboard') }}" class="btn btn-outline-secondary">
+                                        <a href="{{ route('admin.analytics.dashboard') }}"
+                                            class="btn btn-outline-secondary">
                                             <i class="fas fa-chart-bar"></i> Relatórios
                                         </a>
                                     </li>
