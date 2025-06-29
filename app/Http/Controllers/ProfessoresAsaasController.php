@@ -71,7 +71,7 @@ class ProfessoresAsaasController extends Controller
                 'name' => $validatedData['name'],
                 'email' => $validatedData['email'],
                 'cpfCnpj' => $validatedData['cpfCnpj'],
-                'companyType' => 'cpf', // Como no seu exemplo
+                'companyType' => 'cpf',
                 'phone' => $validatedData['phone'],
                 'mobilePhone' => $validatedData['mobilePhone'],
                 'birthDate' => $validatedData['birthDate'],
@@ -145,7 +145,7 @@ class ProfessoresAsaasController extends Controller
             ], 201);
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
-
+            $error = "";
 
 
             return response()->json([
