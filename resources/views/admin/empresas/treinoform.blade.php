@@ -44,7 +44,7 @@
                         <x-text-input name="nome" size="30" label="Nome Completo" :value="$model->nome ?? ''" />
                         <x-text-input name="email" size="30" label="Email" :value="$model->user->email ?? ''" />
                         <x-select-modalidade label="Modalidade" :model="$model" :modalidades="$modalidades" />
-                        <x-text-input name="cnpj" size="30" label="Cnpj" :value="$model->cnpj ?? ''" />
+                        <x-text-input name="cnpj" size="30" label="CPF/CNPJ" :value="$model->cnpj ?? ''" />
                         <x-text-area name="descricao" label="Descrição" :model="$model" />
                         <x-text-input name="telefone" size="30" label="Telefone" :value="$model->telefone ?? ''" />
                         <x-text-input name="valor_aula_de" size="30" label="Preço Minimo aula" :value="$model->valor_aula_de ?? ''"

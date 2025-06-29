@@ -44,7 +44,7 @@
                         </div>
                         <div class="col-12 col-sm-6">
                             <div class="form-group">
-                                <label>CNPJ</label>
+                                <label>CPF/CNPJ</label>
                                 <input type="text" name="cnpj" class="form-control" value="{{ $empresa->cnpj ?? '' }}">
                             </div>
                         </div>
