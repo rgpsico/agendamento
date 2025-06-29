@@ -162,6 +162,7 @@ class ProfessoresAsaasController extends Controller
             $decodedMessage = json_decode(str_replace('Erro na API do Asaas: ', '', $errorMessage), true);
 
             $errorDetails = [];
+            $error['code'] = [];
 
             if (isset($decodedMessage['errors'])) {
                 // Se vierem múltiplos erros da API do Asaas, formatamos
