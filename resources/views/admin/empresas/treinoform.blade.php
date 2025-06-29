@@ -2,6 +2,26 @@
     <div class="page-wrapper">
         <div class="content container-fluid">
 
+            <!-- Modal de boas-vindas -->
+            <div class="modal fade" id="welcomeModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Bem-vindo!</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Esse é um cadastro simples para configurar seus serviços.</p>
+                            <p>Com ele iremos gerenciar seus alunos e otimizar os agendamentos.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Continuar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /Modal de boas-vindas -->
+
             <!-- Page Header -->
             <x-header.titulo pageTitle="{{ $pageTitle }}" />
             <!-- /Page Header -->
@@ -53,4 +73,10 @@
                 </div>
             </div>
             <!-- /Page Wrapper -->
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    var modal = new bootstrap.Modal(document.getElementById('welcomeModal'));
+                    modal.show();
+                });
+            </script>
             </x-layoutsadmin>
