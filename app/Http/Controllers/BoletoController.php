@@ -177,7 +177,7 @@ class BoletoController extends Controller
         // URL correta
         $url = $this->baseUri . "/v3/payments";
 
-        dd(env('ASAAS_ENV'));
+
         $headers = [
             'accept' => 'application/json',
             'access_token' => env('ASAAS_API_KEY'),
