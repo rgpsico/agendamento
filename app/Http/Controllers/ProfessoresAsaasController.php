@@ -158,7 +158,7 @@ class ProfessoresAsaasController extends Controller
 
             // Tenta decodificar a mensagem de erroseja JSON
             $errorMessage = $e->getMessage();
-            dd($errorMessage);
+
             $decodedMessage = json_decode(str_replace('Erro na API do Asaas: ', '', $errorMessage), true);
 
             $errorDetails = [];
