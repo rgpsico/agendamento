@@ -16,7 +16,7 @@
 
                     <x-select-modalidade label="Modalidade" :model="$model" :modalidades="$modalidades" />
 
-                    <x-text-input name="cnpj" size="30" label="Cnpj" :value="$model" />
+                    <x-text-input name="cnpj" size="30" label="CPF/CNPJ" :value="$model" />
 
                     <x-text-area name="descricao" label="Descrição" :model="$model" />
 

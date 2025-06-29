@@ -38,7 +38,7 @@
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <div class="info-group">
-                                        <label class="text-muted small">CNPJ</label>
+                                        <label class="text-muted small">CPF/CNPJ</label>
                                         <p class="mb-0 fw-bold">{{ $empresa->cnpj ?? 'Não informado' }}</p>
                                     </div>
                                 </div>

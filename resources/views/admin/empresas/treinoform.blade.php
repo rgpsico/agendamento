@@ -2,6 +2,26 @@
     <div class="page-wrapper">
         <div class="content container-fluid">
 
+            <!-- Modal de boas-vindas -->
+            <div class="modal fade" id="welcomeModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Bem-vindo!</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Esse é um cadastro simples para configurar seus serviços.</p>
+                            <p>Com ele iremos gerenciar seus alunos e otimizar os agendamentos.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Continuar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /Modal de boas-vindas -->
+
             <!-- Page Header -->
             <x-header.titulo pageTitle="{{ $pageTitle }}" />
             <!-- /Page Header -->
@@ -24,7 +44,7 @@
                         <x-text-input name="nome" size="30" label="Nome Completo" :value="$model->nome ?? ''" />
                         <x-text-input name="email" size="30" label="Email" :value="$model->user->email ?? ''" />
                         <x-select-modalidade label="Modalidade" :model="$model" :modalidades="$modalidades" />
-                        <x-text-input name="cnpj" size="30" label="Cnpj" :value="$model->cnpj ?? ''" />
+                        <x-text-input name="cnpj" size="30" label="CPF/CNPJ" :value="$model->cnpj ?? ''" />
                         <x-text-area name="descricao" label="Descrição" :model="$model" />
                         <x-text-input name="telefone" size="30" label="Telefone" :value="$model->telefone ?? ''" />
                         <x-text-input name="valor_aula_de" size="30" label="Preço Minimo aula" :value="$model->valor_aula_de ?? ''"
@@ -53,4 +73,10 @@
                 </div>
             </div>
             <!-- /Page Wrapper -->
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    var modal = new bootstrap.Modal(document.getElementById('welcomeModal'));
+                    modal.show();
+                });
+            </script>
             </x-layoutsadmin>

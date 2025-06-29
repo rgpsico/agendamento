@@ -142,7 +142,7 @@
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group mb-3">
-                                                <label for="cnpj" class="form-label">CNPJ</label>
+                                                <label for="cnpj" class="form-label">CPF/CNPJ</label>
                                                 <input type="text" class="form-control" id="cnpj"
                                                     name="cnpj" required>
                                             </div>
