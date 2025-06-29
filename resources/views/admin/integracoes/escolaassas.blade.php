@@ -328,6 +328,7 @@
                     postalCode: document.getElementById('postalCode').value
                 };
 
+                let shouldRedirect = false;
                 fetch('/subcontas', {
                         method: 'POST',
                         headers: {
@@ -339,7 +340,10 @@
                         credentials: 'same-origin', // Importante para Sanctum SPA
                         body: JSON.stringify(formData)
                     })
-                    .then(response => response.json())
+                    .then(response => {
+                        shouldRedirect = response.status === 200;
+                        return response.json();
+                    })
                     .then(data => {
                         const resultado = document.getElementById('resultado');
                         const status = document.getElementById('status');
@@ -370,15 +374,17 @@
                         document.getElementById('btnText').textContent = 'Integrar';
                         this.disabled = false;
 
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Integração confirada!',
-                            text: 'Você será redirecionado ao pagamento do boleto.',
-                            showConfirmButton: false,
-                            timer: 5000
-                        }).then(() => {
-                            window.location.href = "/empresa/pagamento/boleto";
-                        });
+                        if (shouldRedirect) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Integração confirada!',
+                                text: 'Você será redirecionado ao pagamento do boleto.',
+                                showConfirmButton: false,
+                                timer: 5000
+                            }).then(() => {
+                                window.location.href = "/empresa/pagamento/boleto";
+                            });
+                        }
 
                     });
             }
