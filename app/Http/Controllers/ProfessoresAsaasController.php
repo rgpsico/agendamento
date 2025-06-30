@@ -71,7 +71,7 @@ class ProfessoresAsaasController extends Controller
                 'name' => $validatedData['name'],
                 'email' => $validatedData['email'],
                 'cpfCnpj' => $validatedData['cpfCnpj'],
-                'companyType' => 'cpf',
+                'companyType' => 'cpf', // Como no seu exemplo
                 'phone' => $validatedData['phone'],
                 'mobilePhone' => $validatedData['mobilePhone'],
                 'birthDate' => $validatedData['birthDate'],
@@ -85,7 +85,6 @@ class ProfessoresAsaasController extends Controller
                 'notificationDisabled' => false,
                 'walletId' => env('ASAAS_WALLET_ID')
             ];
-
 
 
             // Fazer requisição para API do Asaas
@@ -146,7 +145,7 @@ class ProfessoresAsaasController extends Controller
             ], 201);
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
-            $error = "";
+
 
 
             return response()->json([
@@ -159,11 +158,9 @@ class ProfessoresAsaasController extends Controller
 
             // Tenta decodificar a mensagem de erroseja JSON
             $errorMessage = $e->getMessage();
-
             $decodedMessage = json_decode(str_replace('Erro na API do Asaas: ', '', $errorMessage), true);
 
             $errorDetails = [];
-            $error['code'] = [];
 
             if (isset($decodedMessage['errors'])) {
                 // Se vierem múltiplos erros da API do Asaas, formatamos
@@ -182,7 +179,7 @@ class ProfessoresAsaasController extends Controller
             return response()->json([
 
                 'success' => false,
-                'message' => 'Erro interno do servidor',
+                'message' => $errorDetails[$error['code']] ? $decodedMessage : 'Erro interno do servidor',
                 'errors' => $errorDetails[$error['code']] ?: (config('app.debug') ? $e->getMessage() : ['message' => 'Erro ao processar solicitação'])
             ], 422);
         }
