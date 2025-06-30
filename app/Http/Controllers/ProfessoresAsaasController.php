@@ -87,7 +87,7 @@ class ProfessoresAsaasController extends Controller
             ];
 
 
-            dd($this->baseUri);
+
             // Fazer requisição para API do Asaas
             $response = Http::withHeaders([
                 'access_token' => env('ASAAS_KEY'),
