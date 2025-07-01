@@ -527,7 +527,7 @@ class PagamentoController extends Controller
     public function getCustomer($customerId)
     {
         // Obtém a URL e a chave de API do arquivo de configuração
-        $apiUrl = env('ASAAS_SANDBOX_URL');
+        $apiUrl =  $this->baseUri;
         $apiKey = env('ASAAS_KEY');
 
 
@@ -576,7 +576,7 @@ class PagamentoController extends Controller
         // 3. Criar cliente no Asaas
         $clienteResponse = Http::withHeaders([
             'accept' => 'application/json',
-            'access_token' => env("ASAAS_API_KEY"),
+            'access_token' => env("ASAAS_KEY"),
         ])->post($this->baseUri . '/api/v3/customers', [
             'name' => $request->name,
             'email' => $request->email,
@@ -609,7 +609,7 @@ class PagamentoController extends Controller
         // 5. Criar pagamento com split
         $pagamentoResponse = Http::withHeaders([
             'accept' => 'application/json',
-            'access_token' => env('ASAAS_API_KEY'),
+            'access_token' => env('ASAAS_KEY'),
         ])->post($this->baseUri . '/api/v3/payments', [
             'customer' => $clienteId,
             'billingType' => 'CREDIT_CARD',

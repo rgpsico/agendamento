@@ -30,6 +30,7 @@ class ProfessoresAsaasController extends Controller
     public function createSubaccount(Request $request)
     {
         // Buscar o professor do usuário logado
+
         $professor = Auth::user()->professor;
 
         if (!$professor) {
@@ -86,12 +87,12 @@ class ProfessoresAsaasController extends Controller
                 'walletId' => env('ASAAS_WALLET_ID')
             ];
 
-
             // Fazer requisição para API do Asaas
             $response = Http::withHeaders([
                 'access_token' => env('ASAAS_KEY'),
                 'Content-Type' => 'application/json',
             ])->post($this->baseUri . '/api/v3/accounts', $subaccountData);
+
 
             // Verificar se a requisição foi bem-sucedida
             if (!$response->successful()) {
@@ -99,7 +100,7 @@ class ProfessoresAsaasController extends Controller
             }
 
             $asaasResponse = $response->json();
-
+            dd($response);
             // Verificar se a resposta contém os dados necessários
             if (!isset($asaasResponse['id'])) {
                 throw new \Exception('Resposta inválida da API do Asaas');
@@ -146,8 +147,6 @@ class ProfessoresAsaasController extends Controller
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
 
-
-
             return response()->json([
                 'success' => false,
                 'message' => 'Dados inválidos',
@@ -156,19 +155,20 @@ class ProfessoresAsaasController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            // Tenta decodificar a mensagem de erroseja JSON
             $errorMessage = $e->getMessage();
             $decodedMessage = json_decode(str_replace('Erro na API do Asaas: ', '', $errorMessage), true);
 
             $errorDetails = [];
 
             if (isset($decodedMessage['errors'])) {
-                // Se vierem múltiplos erros da API do Asaas, formatamos
                 foreach ($decodedMessage['errors'] as $error) {
                     $errorDetails[$error['code']] = $error['description'];
-                    $decodedMessage  =  $errorDetails[$error['code']];
                 }
             }
+
+            $finalErrorMessage = !empty($errorDetails)
+                ? implode('; ', $errorDetails)
+                : ($decodedMessage['message'] ?? 'Erro interno do servidor');
 
             Log::error('Erro ao criar subconta', [
                 'error' => $e->getMessage(),
@@ -177,13 +177,13 @@ class ProfessoresAsaasController extends Controller
             ]);
 
             return response()->json([
-
                 'success' => false,
-                'message' => $errorDetails[$error['code']] ? $decodedMessage : 'Erro interno do servidor',
-                'errors' => $errorDetails[$error['code']] ?: (config('app.debug') ? $e->getMessage() : ['message' => 'Erro ao processar solicitação'])
+                'message' => $finalErrorMessage,
+                'errors' => $errorDetails ?: (config('app.debug') ? $e->getMessage() : 'Erro ao processar solicitação')
             ], 422);
         }
     }
+
 
     public function getSubaccountStatus($id)
     {

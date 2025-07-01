@@ -5,13 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\Professor;
 use Illuminate\Http\Request;
 use App\Services\AsaasService;
+
 class AsaasWalletController extends Controller
 {
-    protected $asaasService;
+    protected $asaasService, $baseUri;
 
     public function __construct(AsaasService $asaasService)
     {
         $this->asaasService = $asaasService;
+        $this->baseUri = env('ASAAS_ENV') === 'production' ? env('ASAAS_URL') : env('ASAAS_SANDBOX_URL');
     }
 
     /**
@@ -24,8 +26,8 @@ class AsaasWalletController extends Controller
      */
     public function getProfessorWallet($professorId)
     {
-        $apiKey = env('ASAAS_SANDBOX_URL');
-         $mode = 'sandbox';
+        $apiKey = $this->baseUri;
+        $mode = 'sandbox';
         $professor = Professor::with('usuario')->find($professorId);
 
         if (!$professor || !$professor->usuario) {

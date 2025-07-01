@@ -3,6 +3,7 @@
 use App\Http\Controllers\AlunosController;
 use App\Http\Controllers\Api\AgendamentoControllerApi;
 use App\Http\Controllers\Api\AlunosControllerApi;
+use App\Http\Controllers\Api\AsaasController;
 use App\Http\Controllers\Api\AulasControllerApi;
 use App\Http\Controllers\Api\AuthControllerApi;
 use App\Http\Controllers\Api\DiaDaSemanaControllerApi;
@@ -115,6 +116,7 @@ Route::post('/gerar-pix', [PagamentoController::class, 'gerarPix'])->name('gerar
 Route::get('/verificar-pix/{id}', [PagamentoController::class, 'verificarStatusPix'])->name('verificar.pix');
 
 
+Route::post('/asaas/criarcliente', [AsaasController::class, 'createClient'])->name('asaas.createClient');
 
 
 

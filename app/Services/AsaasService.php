@@ -22,7 +22,7 @@ class AsaasService
             'accept' => 'application/json',
             'content-type' => 'application/json',
         ];
-        $this->url = env('APP_ENV') === 'production'
+        $this->url = env('ASAAS_ENV') === 'production'
             ? env('ASAAS_URL', 'https://api.asaas.com')
             : env('ASAAS_SANDBOX_URL', 'https://sandbox.asaas.com');
     }
@@ -32,7 +32,7 @@ class AsaasService
     {
         $response = Http::withHeaders([
             'accept' => 'application/json',
-            'access_token' => env("ASAAS_API_KEY"),
+            'access_token' => env("ASAAS_KEY"),
         ])->post($this->url . '/api/v3/customers', [
             'name' => $dados['name'],
             'email' => $dados['email'],
@@ -56,7 +56,7 @@ class AsaasService
     {
         $response = Http::withHeaders([
             'accept' => 'application/json',
-            'access_token' => env('ASAAS_API_KEY'),
+            'access_token' => env('ASAAS_KEY'),
         ])->post($this->url . '/api/v3/payments', [
             'customer' => $clienteId,
             'billingType' => 'CREDIT_CARD',

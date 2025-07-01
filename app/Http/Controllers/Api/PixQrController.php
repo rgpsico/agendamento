@@ -14,6 +14,7 @@ use App\Models\PagamentoGateway;
 use App\Models\AlunoProfessor;
 use App\Services\AsaasService;
 use App\Models\AsaasWebhookLog;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 
 
@@ -27,8 +28,8 @@ class PixQrController extends Controller
         $this->aluno_professor = $aluno_professor;
         $this->asaasService = $asaasService;
         $this->client = new Client();
-        $this->apiKey = env('ASAAS_API_KEY');
-        $this->baseUrl = env('ASAAS_ENV') === 'sandbox' ? env('ASAAS_SANDBOX_URL') : env('ASAAS_URL');
+        $this->apiKey = env('ASAAS_KEY');
+        $this->baseUrl = env('ASAAS_ENV') === 'sandbox' ? $this->baseUrl  : env('ASAAS_URL');
     }
 
 
@@ -218,10 +219,10 @@ class PixQrController extends Controller
             $client = new \GuzzleHttp\Client();
 
             // Create payment
-            $createResponse = $client->request('POST', env('ASAAS_SANDBOX_URL') . '/v3/payments', [
+            $createResponse = $client->request('POST', $this->baseUrl  . '/v3/payments', [
                 'headers' => [
                     'accept' => 'application/json',
-                    'access_token' => env('ASAAS_API_KEY'),
+                    'access_token' => env('ASAAS_KEY'),
                     'content-type' => 'application/json',
                 ],
                 'json' => $paymentData
@@ -238,10 +239,10 @@ class PixQrController extends Controller
             $paymentId = $paymentCreated['id'];
 
             // Step 2: Get QR Code
-            $qrResponse = $client->request('GET', env('ASAAS_SANDBOX_URL') . "/v3/payments/{$paymentId}/pixQrCode", [
+            $qrResponse = $client->request('GET', $this->baseUrl  . "/v3/payments/{$paymentId}/pixQrCode", [
                 'headers' => [
                     'accept' => 'application/json',
-                    'access_token' => env('ASAAS_API_KEY'),
+                    'access_token' => env('ASAAS_KEY'),
                 ],
             ]);
 
@@ -254,10 +255,10 @@ class PixQrController extends Controller
             if ($request->input('auto_pay', false)) {
                 sleep(2); // Simula tempo para processar
 
-                $payResponse = $client->request('POST', env('ASAAS_SANDBOX_URL') . "/v3/payments/{$paymentId}/receiveInCash", [
+                $payResponse = $client->request('POST', $this->baseUrl  . "/v3/payments/{$paymentId}/receiveInCash", [
                     'headers' => [
                         'accept' => 'application/json',
-                        'access_token' => env('ASAAS_API_KEY'),
+                        'access_token' => env('ASAAS_KEY'),
                         'content-type' => 'application/json',
                     ],
                     'json' => [
@@ -366,10 +367,10 @@ class PixQrController extends Controller
 
             // Make request to Asaas API using Guzzle
             $client = new \GuzzleHttp\Client();
-            $response = $client->request('POST', env('ASAAS_SANDBOX_URL') . '/v3/payments', [
+            $response = $client->request('POST', $this->baseUrl  . '/v3/payments', [
                 'headers' => [
                     'accept' => 'application/json',
-                    'access_token' => env('ASAAS_API_KEY'),
+                    'access_token' => env('ASAAS_KEY'),
                     'content-type' => 'application/json',
                 ],
                 'json' => $paymentData
@@ -699,10 +700,10 @@ class PixQrController extends Controller
                 $requestData['scheduleDate'] = $scheduleDate;
             }
 
-            $response = $client->request('POST', env('ASAAS_SANDBOX_URL') . "/v3/pix/qrCodes/pay", [
+            $response = $client->request('POST', $this->baseUrl  . "/v3/pix/qrCodes/pay", [
                 'headers' => [
                     'accept' => 'application/json',
-                    'access_token' => env('ASAAS_API_KEY'),
+                    'access_token' => env('ASAAS_KEY'),
                     'content-type' => 'application/json',
                 ],
                 'json' => $requestData,
@@ -780,10 +781,10 @@ class PixQrController extends Controller
         try {
             // Fazer uma chamada à API da Asaas para simular o pagamento (endpoint específico do sandbox)
             $client = new \GuzzleHttp\Client();
-            $response = $client->request('POST', env('ASAAS_SANDBOX_URL') . "/v3/payments/{$paymentId}/simulate", [
+            $response = $client->request('POST', $this->baseUrl  . "/v3/payments/{$paymentId}/simulate", [
                 'headers' => [
                     'accept' => 'application/json',
-                    'access_token' => env('ASAAS_API_KEY'),
+                    'access_token' => env('ASAAS_KEY'),
                 ],
             ]);
 
@@ -979,7 +980,7 @@ class PixQrController extends Controller
             'key' => 'nullable|string', // Opcional para todos os tipos
         ]);
 
-        $apiKey = env('ASAAS_API_KEY');
+        $apiKey = env('ASAAS_KEY');
 
         if (!$apiKey) {
             return response()->json([
@@ -1138,7 +1139,7 @@ class PixQrController extends Controller
 
         // Call Asaas API to create PIX key
         $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . env('ASAAS_API_KEY'),
+            'Authorization' => 'Bearer ' . env('ASAAS_KEY'),
             'Content-Type' => 'application/json',
         ])->post('https://api.asaas.com/v3/pix/addressKeys', $asaasData);
 
@@ -1172,7 +1173,7 @@ class PixQrController extends Controller
 
         // Chamada à API do Asaas para criar a chave PIX
         $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . env('ASAAS_API_KEY'),
+            'Authorization' => 'Bearer ' . env('ASAAS_KEY'),
             'Content-Type' => 'application/json',
         ])->post('https://api.asaas.com/v3/pix/addressKeys', [
             'walletId' => $validated['wallet_id'],
@@ -1224,10 +1225,10 @@ class PixQrController extends Controller
         try {
             // Make a request to the Asaas API status endpoint using Guzzle
             $client = new \GuzzleHttp\Client();
-            $response = $client->request('GET', env('ASAAS_SANDBOX_URL') . "/v3/payments/{$paymentId}/status", [
+            $response = $client->request('GET', $this->baseUrl  . "/v3/payments/{$paymentId}/status", [
                 'headers' => [
                     'accept' => 'application/json',
-                    'access_token' => env('ASAAS_API_KEY'),
+                    'access_token' => env('ASAAS_KEY'),
                 ],
             ]);
 
