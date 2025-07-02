@@ -30,10 +30,12 @@ class AsaasService
 
     public function criarClienteAsaas(array $dados)
     {
+
+
         $response = Http::withHeaders([
             'accept' => 'application/json',
             'access_token' => env("ASAAS_KEY"),
-        ])->post($this->url . '/api/v3/customers', [
+        ])->post($this->url . '/v3/customers', [
             'name' => $dados['name'],
             'email' => $dados['email'],
             'cpfCnpj' => $dados['cpfCnpj'],
@@ -44,8 +46,9 @@ class AsaasService
             'province' => $dados['province'],
         ]);
 
+
         if ($response->failed()) {
-            throw new \Exception('Erro ao criar cliente no Asaas: ' . $response->body());
+            throw new \Exception('Erro ao criar cliente no Asaas: ');
         }
 
         return $response->json();
