@@ -11,27 +11,34 @@
                 <input type="hidden" id="boleto-gerado-inicio" name="" value="">
                 <input type="hidden" id="boleto-gerado-fim" name="" value="">
                 <div class="card-body">
-                    <x-alert />
-                    <p><strong>Cliente Asaas:</strong> {{ Auth::user()->professor->asaas_customer_id }}</p>
-                    <div class="boleto-info">
+                    @if (!Auth::user()->professor || !Auth::user()->professor->asaas_customer_id)
+                        <div class="alert alert-warning">
+                            Para gerar o boleto é necessário criar seu cadastro no Asaas.
+                        </div>
+                        <a href="{{ route('integracao.assas.escola') }}" class="btn btn-primary mb-3">Criar ID Asaas</a>
+                    @else
+                        <x-alert />
+                        <p><strong>Cliente Asaas:</strong> {{ Auth::user()->professor->asaas_customer_id }}</p>
+                        <div class="boleto-info">
 
-                        <p><strong>Empresa:</strong> {{ Auth::user()->empresa->nome }}</p>
-                        <p><strong>Valor:</strong> R$ </p>
-                        <p><strong>Data de Vencimento:</strong>
-                        </p>
-                        <p><strong>Status:</strong> Pendente</p>
-                    </div>
-                    <div class="boleto-actions mt-4">
-                        @if (isset($boleto->link))
-                            <a href="{{ $boleto->link }}" class="btn btn-primary" target="_blank">
-                                <i class="fas fa-file-invoice-dollar"></i> Acessar Boleto
-                            </a>
-                        @else
-                            <p class="text-danger">Link do boleto não disponível. Entre em contato com o suporte.</p>
-                        @endif
-                        <a href="{{ route('cliente.dashboard') }}" class="btn btn-secondary ms-2">Voltar ao
-                            Dashboard</a>
-                    </div>
+                            <p><strong>Empresa:</strong> {{ Auth::user()->empresa->nome }}</p>
+                            <p><strong>Valor:</strong> R$ </p>
+                            <p><strong>Data de Vencimento:</strong>
+                            </p>
+                            <p><strong>Status:</strong> Pendente</p>
+                        </div>
+                        <div class="boleto-actions mt-4">
+                            @if (isset($boleto->link))
+                                <a href="{{ $boleto->link }}" class="btn btn-primary" target="_blank">
+                                    <i class="fas fa-file-invoice-dollar"></i> Acessar Boleto
+                                </a>
+                            @else
+                                <p class="text-danger">Link do boleto não disponível. Entre em contato com o suporte.</p>
+                            @endif
+                            <a href="{{ route('cliente.dashboard') }}" class="btn btn-secondary ms-2">Voltar ao
+                                Dashboard</a>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -42,7 +49,10 @@
     <!-- Script para re-verificar status após tentativa de pagamento -->
     <script>
         $(document).ready(function() {
-            gerarBoleto();
+            var customerId = "{{ Auth::user()->professor->asaas_customer_id }}";
+            if (customerId) {
+                gerarBoleto();
+            }
 
             function gerarBoleto() {
                 $.ajax({
