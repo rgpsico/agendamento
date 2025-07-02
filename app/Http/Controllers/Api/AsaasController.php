@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Professor;
 use Illuminate\Http\Request;
 use App\Http\Requests\CreateClientRequest;
+use App\Http\Requests\CreateSubaccountRequest;
 use App\Services\AsaasService;
 
 class AsaasController extends Controller
@@ -23,6 +24,15 @@ class AsaasController extends Controller
         $validated = $request->validated();
 
         $response = $this->asaasService->criarClienteAsaas($validated);
+
+        return response()->json($response);
+    }
+
+    public function createSubaccount(CreateSubaccountRequest $request)
+    {
+        $validated = $request->validated();
+
+        $response = $this->asaasService->criarSubcontaAsaas($validated);
 
         return response()->json($response);
     }

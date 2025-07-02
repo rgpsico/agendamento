@@ -55,6 +55,38 @@ class AsaasService
     }
 
 
+    public function criarSubcontaAsaas(array $dados)
+    {
+        $response = Http::withHeaders([
+            'accept' => 'application/json',
+            'access_token' => env('ASAAS_KEY'),
+        ])->post($this->url . '/v3/accounts', [
+            'name' => $dados['name'],
+            'email' => $dados['email'],
+            'cpfCnpj' => $dados['cpfCnpj'],
+            'companyType' => $dados['companyType'] ?? 'cpf',
+            'phone' => $dados['phone'],
+            'mobilePhone' => $dados['mobilePhone'],
+            'birthDate' => $dados['birthDate'],
+            'incomeValue' => $dados['incomeValue'],
+            'address' => $dados['address'],
+            'addressNumber' => $dados['addressNumber'],
+            'complement' => $dados['complement'] ?? '',
+            'province' => $dados['province'],
+            'postalCode' => $dados['postalCode'],
+            'personType' => $dados['personType'] ?? 'FISICA',
+            'notificationDisabled' => $dados['notificationDisabled'] ?? false,
+            'walletId' => env('ASAAS_WALLET_ID'),
+        ]);
+
+        if ($response->failed()) {
+            throw new \Exception('Erro ao criar subconta no Asaas: ' . $response->body());
+        }
+
+        return $response->json();
+    }
+
+
     public function criarPagamentoComCartao(array $dados, string $clienteId, string $walletId)
     {
         $response = Http::withHeaders([
