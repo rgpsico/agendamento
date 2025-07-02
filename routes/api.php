@@ -117,6 +117,7 @@ Route::get('/verificar-pix/{id}', [PagamentoController::class, 'verificarStatusP
 
 
 Route::post('/asaas/criarcliente', [AsaasController::class, 'createClient'])->name('asaas.createClient');
+Route::post('/asaas/criar-subconta', [AsaasController::class, 'createSubaccount'])->name('asaas.createSubaccount');
 
 
 
