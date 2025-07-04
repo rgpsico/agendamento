@@ -21,7 +21,8 @@ class BoletoController extends Controller
 
     public function __construct()
     {
-        $this->apiKey = env('ASAAS_KEY');
+
+        $this->apiKey = env('ASAAS_ENV') === 'production' ? env('ASAAS_KEY') : env("ASAAS_KEY_SANDBOX");
         $this->baseUri = env('ASAAS_ENV') === 'production' ? env('ASAAS_URL') : 'https://api-sandbox.asaas.com';
         $this->client = new Client(['base_uri' => $this->baseUri]);
     }
@@ -137,7 +138,7 @@ class BoletoController extends Controller
 
             $headers = [
                 'accept' => 'application/json',
-                'access_token' => env('ASAAS_KEY'),
+                'access_token' => $this->apiKey,
                 'content-type' => 'application/json',
             ];
 
@@ -170,17 +171,13 @@ class BoletoController extends Controller
     {
         $clientes = Empresa::with('user')->where('status', 'inativo')->get();
 
-        // foreach ($clientes as $cliente) {
-        //     echo $cliente->user->email . PHP_EOL;
-        // }
 
-        // URL correta
         $url = $this->baseUri . "/v3/payments";
 
 
         $headers = [
             'accept' => 'application/json',
-            'access_token' => env('ASAAS_KEY'),
+            'access_token' =>   $this->apiKey,
             'content-type' => 'application/json',
         ];
 
@@ -215,7 +212,7 @@ class BoletoController extends Controller
 
             $headers = [
                 'accept' => 'application/json',
-                'access_token' => env('ASAAS_KEY'),
+                'access_token' => $this->apiKey,
                 'content-type' => 'application/json',
             ];
 

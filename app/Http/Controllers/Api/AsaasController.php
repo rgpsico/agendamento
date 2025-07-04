@@ -63,16 +63,20 @@ class AsaasController extends Controller
         }
     }
 
-    public function criarClientePeloUsuario(Usuario $user): array
+    public function criarClientePeloUsuario($user): array
     {
 
         $empresa  = $user->empresa;
-        $endereco = $empresa ? $empresa->endereco : null;
+        $endereco = $empresa->endereco;
 
-        if (! $empresa || ! $endereco) {
-            throw new \Exception('Empresa ou endereço não configurados para este usuário.');
+        if (! $empresa) {
+            throw new \Exception('Empresa  não configurada para este usuário.');
         }
 
+
+        if (! $endereco) {
+            throw new \Exception('endereço não configurados para este usuário.');
+        }
         // Prepara dados para API do Asaas conforme documentação
         $dados = [
             'name'          => $empresa->nome,
