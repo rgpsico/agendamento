@@ -16,12 +16,14 @@ use Illuminate\Support\Facades\Auth;
 
 class ProfessoresAsaasController extends Controller
 {
-    protected $asaasService, $baseUri;
+    protected $asaasService, $baseUri, $apiKey, $waaletAsaas;
 
     public function __construct(AsaasService $asaasService)
     {
         $this->asaasService = $asaasService;
         $this->baseUri = env('ASAAS_ENV') === 'production' ? env('ASAAS_URL') : env('ASAAS_SANDBOX_URL');
+        $this->apiKey = env('ASAAS_ENV') === 'production' ? env('ASAAS_KEY') : env('ASAAS_KEY_SANDBOX');
+        $this->waaletAsaas = env('ASAAS_ENV') === 'production' ? env('ASAAS_WALLET_ID') : env('ASAAS_WALLET_ID_SANDBOX');
     }
 
 
@@ -84,12 +86,12 @@ class ProfessoresAsaasController extends Controller
                 'postalCode' => $validatedData['postalCode'],
                 'personType' => 'FISICA', // Assumindo pessoa física
                 'notificationDisabled' => false,
-                'walletId' => env('ASAAS_WALLET_ID')
+                'walletId' => $this->waaletAsaas
             ];
 
             // Fazer requisição para API do Asaas
             $response = Http::withHeaders([
-                'access_token' => env('ASAAS_KEY'),
+                'access_token' => $this->apiKey,
                 'Content-Type' => 'application/json',
             ])->post($this->baseUri . '/api/v3/accounts', $subaccountData);
 

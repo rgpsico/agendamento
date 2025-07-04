@@ -16,6 +16,7 @@ class AsaasService
     private $url;
     private $apiKey;
     private $client;
+    private $waaletAsaas;
 
     public function __construct()
     {
@@ -31,6 +32,8 @@ class AsaasService
         $this->apiKey = env('ASAAS_ENV') === 'production'
             ? env('ASAAS_KEY')
             : env('ASAAS_KEY_SANDBOX');
+
+        $this->waaletAsaas = env('ASAAS_ENV') === 'production' ? env('ASAAS_WALLET_ID') : env('ASAAS_WALLET_ID_SANDBOX');
     }
 
 
@@ -83,7 +86,7 @@ class AsaasService
             'postalCode' => $dados['postalCode'],
             'personType' => $dados['personType'] ?? 'FISICA',
             'notificationDisabled' => $dados['notificationDisabled'] ?? false,
-            'walletId' => env('ASAAS_WALLET_ID'),
+            'walletId' => $this->waaletAsaas,
         ]);
 
         if ($response->failed()) {
