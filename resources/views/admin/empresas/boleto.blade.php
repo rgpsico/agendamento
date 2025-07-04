@@ -4,47 +4,280 @@
             <!-- Page Header -->
             <x-header.titulo pageTitle="Pagamento de Boleto" />
             <!-- /Page Header -->
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="card-title">Detalhes do Boleto</h4>
-                </div>
-                <input type="hidden" id="boleto-gerado-inicio" name="" value="">
-                <input type="hidden" id="boleto-gerado-fim" name="" value="">
-                <div class="card-body">
-                    <x-alert />
-                    <p><strong>Cliente Asaas:</strong> {{ Auth::user()->professor->asaas_customer_id }}</p>
-                    <div class="boleto-info">
 
-                        <p><strong>Empresa:</strong> {{ Auth::user()->empresa->nome }}</p>
-                        <p><strong>Valor:</strong> R$ </p>
-                        <p><strong>Data de Vencimento:</strong>
-                        </p>
-                        <p><strong>Status:</strong> Pendente</p>
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h4 class="card-title mb-0">
+                                <i class="fas fa-file-invoice-dollar me-2"></i>
+                                Detalhes do Boleto
+                            </h4>
+                        </div>
+
+                        <input type="hidden" id="boleto-gerado-inicio" name="" value="">
+                        <input type="hidden" id="boleto-gerado-fim" name="" value="">
+
+                        <div class="card-body">
+                            <x-alert />
+
+                            @if (!Auth::user()->professor->asaas_customer_id)
+                                <!-- Seção para criar Customer ID -->
+                                <div class="alert alert-info border-0 shadow-sm mb-4">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-8">
+                                            <h5 class="alert-heading">
+                                                <i class="fas fa-info-circle me-2"></i>
+                                                Configuração Necessária
+                                            </h5>
+                                            <p class="mb-0">
+                                                Para gerar seu boleto, precisamos criar sua identificação no sistema de
+                                                pagamento.
+                                                Este processo é rápido e seguro.
+                                            </p>
+                                        </div>
+                                        <div class="col-md-4 text-end">
+                                            <button type="button" id="btn-criar-customer"
+                                                class="btn btn-success btn-lg">
+                                                <i class="fas fa-plus-circle me-2"></i>
+                                                Criar ID Asaas
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Loading spinner (inicialmente oculto) -->
+                                <div id="loading-customer" class="text-center py-4" style="display: none;">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Criando...</span>
+                                    </div>
+                                    <p class="mt-2 text-muted">Criando sua identificação no sistema...</p>
+                                </div>
+
+                                <!-- Seção do boleto (inicialmente oculta) -->
+                                <div id="boleto-section" style="display: none;">
+                                @else
+                                    <!-- Seção do boleto (visível quando já tem customer_id) -->
+                                    <div id="boleto-section">
+                            @endif
+
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <div class="info-card">
+                                        <label class="form-label text-muted">Empresa</label>
+                                        <p class="fw-bold">{{ Auth::user()->empresa->nome }}</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="info-card">
+                                        <label class="form-label text-muted">Cliente Asaas</label>
+                                        <p class="fw-bold" id="customer-id-display">
+                                            {{ Auth::user()->professor->asaas_customer_id ?? 'Será criado automaticamente' }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="boleto-info">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="info-card">
+                                            <label class="form-label text-muted">Valor</label>
+                                            <p class="fw-bold text-success fs-5">R$
+                                                {{ number_format(env('VALOR_SISTEMA', 0), 2, ',', '.') }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="info-card">
+                                            <label class="form-label text-muted">Data de Vencimento</label>
+                                            <p class="fw-bold">{{ date('d/m/Y') }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="info-card">
+                                            <label class="form-label text-muted">Status</label>
+                                            <p class="fw-bold">
+                                                <span class="badge bg-warning">Pendente</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Loading do boleto -->
+                            <div id="loading-boleto" class="text-center py-4">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Gerando boleto...</span>
+                                </div>
+                                <p class="mt-2 text-muted">Gerando seu boleto...</p>
+                            </div>
+
+                            <!-- Ações do boleto -->
+                            <div class="boleto-actions mt-4" style="display: none;">
+                                <div class="d-flex gap-2 justify-content-center">
+                                    <a href="#" id="btn-acessar-boleto" class="btn btn-primary btn-lg"
+                                        target="_blank">
+                                        <i class="fas fa-file-invoice-dollar me-2"></i>
+                                        Acessar Boleto
+                                    </a>
+                                    <a href="{{ route('cliente.dashboard') }}" class="btn btn-outline-secondary btn-lg">
+                                        <i class="fas fa-arrow-left me-2"></i>
+                                        Voltar ao Dashboard
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="boleto-actions mt-4">
-                        @if (isset($boleto->link))
-                            <a href="{{ $boleto->link }}" class="btn btn-primary" target="_blank">
-                                <i class="fas fa-file-invoice-dollar"></i> Acessar Boleto
-                            </a>
-                        @else
-                            <p class="text-danger">Link do boleto não disponível. Entre em contato com o suporte.</p>
-                        @endif
-                        <a href="{{ route('cliente.dashboard') }}" class="btn btn-secondary ms-2">Voltar ao
-                            Dashboard</a>
+                </div>
+
+                <!-- Card de instruções -->
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-lightbulb me-2 text-warning"></i>
+                            Instruções de Pagamento
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul class="list-unstyled">
+                                    <li class="mb-2">
+                                        <i class="fas fa-check text-success me-2"></i>
+                                        O boleto será gerado automaticamente
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="fas fa-check text-success me-2"></i>
+                                        Pagamento via banco ou casa lotérica
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul class="list-unstyled">
+                                    <li class="mb-2">
+                                        <i class="fas fa-check text-success me-2"></i>
+                                        Confirmação automática após pagamento
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="fas fa-check text-success me-2"></i>
+                                        Acesso imediato ao sistema
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    </div>
 
+    <style>
+        .info-card {
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .info-card label {
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-card p {
+            margin-bottom: 0;
+        }
+
+        .card {
+            border: none;
+            border-radius: 12px;
+        }
+
+        .card-header {
+            border-radius: 12px 12px 0 0 !important;
+        }
+
+        .btn-lg {
+            padding: 0.75rem 1.5rem;
+            font-size: 1.1rem;
+        }
+
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+
+        .alert {
+            border-radius: 12px;
+        }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
-    <!-- Script para re-verificar status após tentativa de pagamento -->
+
     <script>
         $(document).ready(function() {
-            gerarBoleto();
+            // Verifica se já tem customer_id
+            @if (Auth::user()->professor->asaas_customer_id)
+                gerarBoleto();
+            @endif
+
+            // Evento para criar customer ID
+            $('#btn-criar-customer').click(function() {
+                criarCustomerAsaas();
+            });
+
+            function criarCustomerAsaas() {
+                $('#btn-criar-customer').prop('disabled', true);
+                $('#loading-customer').show();
+
+                $.ajax({
+                    url: '/asaas/criarclienteautomatico',
+                    method: 'POST',
+                    data: {
+                        user_id: '{{ Auth::user()->id }}'
+
+                    },
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        $('#loading-customer').hide();
+                        $('#customer-id-display').text(response.customer_id);
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Sucesso!',
+                            text: 'ID Asaas criado com sucesso. Gerando seu boleto...',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+
+                        // Mostra seção do boleto e gera o boleto
+                        $('#boleto-section').show();
+                        gerarBoleto();
+                    },
+                    error: function(xhr) {
+                        $('#loading-customer').hide();
+                        $('#btn-criar-customer').prop('disabled', false);
+
+                        let errorMessage = 'Erro ao criar ID Asaas';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMessage = xhr.responseJSON.message;
+                        }
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Erro!',
+                            text: errorMessage
+                        });
+                    }
+                });
+            }
 
             function gerarBoleto() {
+                $('#loading-boleto').show();
+
                 $.ajax({
                     url: '/api/empresa/gerar-boleto',
                     method: 'POST',
@@ -53,40 +286,65 @@
                         "billingType": "BOLETO",
                         "value": {{ env('VALOR_SISTEMA') }},
                         "dueDate": "{{ date('Y-m-d') }}",
-                        "description": "Pagamento de teste"
+                        "description": "Pagamento do sistema"
                     },
                     headers: {
                         'Accept': 'application/json'
                     },
                     success: function(response) {
-                        console.log(response.data.id)
-                        $('#boleto-gerado-inicio').val(response.data.id)
+                        $('#loading-boleto').hide();
+                        $('#boleto-gerado-inicio').val(response.data.id);
 
                         if (response.status === 'success') {
+                            // Atualiza informações do boleto
                             $('.boleto-info').html(`
-                        <p><strong>Empresa:</strong> {{ Auth::user()->empresa->nome }}</p>
-                        <p><strong>Valor:</strong> R$ ${parseFloat(response.data.value).toFixed(2).replace('.', ',')}</p>
-                        <p><strong>Data de Vencimento:</strong> ${formatarData(response.data.dueDate)}</p>
-                        <p><strong>Status:</strong> Pendente</p>
-                `);
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="info-card">
+                                            <label class="form-label text-muted">Valor</label>
+                                            <p class="fw-bold text-success fs-5">R$ ${parseFloat(response.data.value).toFixed(2).replace('.', ',')}</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="info-card">
+                                            <label class="form-label text-muted">Data de Vencimento</label>
+                                            <p class="fw-bold">${formatarData(response.data.dueDate)}</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="info-card">
+                                            <label class="form-label text-muted">Status</label>
+                                            <p class="fw-bold">
+                                                <span class="badge bg-warning">Pendente</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            `);
 
-                            $('.boleto-actions').html(`
-                    <a href="${response.data.invoiceUrl}" class="btn btn-primary" target="_blank">
-                        <i class="fas fa-file-invoice-dollar"></i> Acessar Boleto
-                    </a>
-                    <a href="{{ route('cliente.dashboard') }}" class="btn btn-secondary ms-2">Voltar ao Dashboard</a>
-                `);
+                            // Mostra botão de acesso ao boleto
+                            $('#btn-acessar-boleto').attr('href', response.data.invoiceUrl);
+                            $('.boleto-actions').show();
                         } else {
-                            alert('Erro ao gerar boleto: ' + response.message);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Erro!',
+                                text: 'Erro ao gerar boleto: ' + response.message
+                            });
                         }
                     },
                     error: function(xhr) {
+                        $('#loading-boleto').hide();
                         console.error('Erro ao gerar boleto:', xhr.responseText);
-                        alert('Erro ao gerar boleto.');
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Erro!',
+                            text: 'Erro ao gerar boleto. Tente novamente.'
+                        });
                     }
                 });
             }
-
 
             function formatarData(data) {
                 const d = new Date(data);
@@ -94,47 +352,42 @@
             }
         });
 
-
-
+        // Socket.IO para receber confirmação de pagamento
         $(document).ready(function() {
-            // Initialize Socket.IO connection
             var socket = io('https://www.comunidadeppg.com.br:3000');
 
-            // Handle connection
             socket.on('connect', function() {
                 console.log('Conectado ao servidor Socket.IO.');
             });
 
-            // Handle 'enviarpedidoentregadores' event
             socket.on('enviarpedidoentregadores', function(recebendopagamento) {
-                console.log('pedido para entregador:', recebendopagamento.payment.id);
-
-                $("#boleto-gerado-fim").val(recebendopagamento.payment.id)
-                // Verificar se existe pixData e se os IDs coincidem
+                console.log('Pagamento recebido:', recebendopagamento.payment.id);
+                $("#boleto-gerado-fim").val(recebendopagamento.payment.id);
 
                 if (recebendopagamento.event == "PAYMENT_RECEIVED") {
                     if ($('#boleto-gerado-inicio').val() == recebendopagamento.payment.id) {
-                        console.log("PAGAMENTO ESTA OK PODE IR PRO DASHBOAD");
+                        console.log("PAGAMENTO CONFIRMADO!");
+
+                        // Atualiza status para pago
+                        $('.boleto-info .badge').removeClass('bg-warning').addClass('bg-success').text(
+                            'Pago');
 
                         Swal.fire({
                             icon: 'success',
-                            title: 'Pagamento confirmado!',
-                            text: 'Você será redirecionado para o dashboard e já pode começar a usar o sistema.',
+                            title: 'Pagamento Confirmado!',
+                            text: 'Seu pagamento foi confirmado! Você será redirecionado para o dashboard.',
                             showConfirmButton: false,
                             timer: 5000
                         }).then(() => {
                             window.location.href = "/cliente/empresa/dashboard";
                         });
                     }
-
                 }
             });
 
-            // Handle disconnection
             socket.on('disconnect', function() {
                 console.log('Desconectado do servidor Socket.IO.');
             });
         });
     </script>
-
 </x-admin.layout>

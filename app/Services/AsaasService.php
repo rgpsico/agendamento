@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Professor;
+use App\Models\Usuario;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -30,6 +31,7 @@ class AsaasService
 
     public function criarClienteAsaas(array $dados)
     {
+
 
 
         $response = Http::withHeaders([
@@ -329,6 +331,35 @@ class AsaasService
         }
     }
 
+    public function criarClientePeloUsuario(Usuario $user): array
+    {
+
+        // carrega relacionamento empresa + endereço
+        $empresa  = $user->empresa;
+        $endereco = $empresa->endereco;
+
+        if (! $empresa || ! $endereco) {
+            throw new \Exception('Empresa ou endereço não configurados para este usuário.');
+        }
+
+        // monta o array de dados conforme documentação do Asaas
+        $dados = [
+            'name'          => $empresa->nome,
+            'email'         => $user->email,
+            'cpfCnpj'       => $empresa->cnpj,
+            'phone'         => $empresa->telefone,
+            'postalCode'    => $endereco->cep,
+            'address'       => $endereco->logradouro,
+            'addressNumber' => $endereco->numero,
+            'province'      => $endereco->bairro,
+        ];
+
+        // chama o método genérico que já faz a requisição e trata erros
+        $resultado = $this->criarClienteAsaas($dados);
+
+        return $resultado;
+    }
+
     /**
      * Create a new Asaas subaccount for a professor.
      *
@@ -337,7 +368,7 @@ class AsaasService
      */
     public function createSubaccount($request)
     {
-        dd("aaa");
+
         DB::beginTransaction();
 
         try {

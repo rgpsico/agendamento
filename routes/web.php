@@ -16,6 +16,7 @@ use App\Http\Controllers\SiteController;
 use App\Http\Controllers\SiteServicoController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Admin\UserManagementController;
+use App\Http\Controllers\Api\AsaasController;
 use App\Http\Controllers\BoletoController;
 use App\Http\Controllers\ProfessoresAsaasController;
 use App\Http\Controllers\PagamentoController;
@@ -56,6 +57,9 @@ Route::get('/empresa/pagamento/boleto', [BoletoController::class, 'boleto'])->na
 
 
 Route::middleware('auth')->post('/subcontas', [ProfessoresAsaasController::class, 'createSubaccount'])->name('criar-subconta-professor');
+
+Route::middleware('auth')->post('/asaas/criarcliente', [AsaasController::class, 'createClient'])->name('asaas.createClient');
+Route::middleware('auth')->post('/asaas/criarclienteautomatico', [AsaasController::class, 'criarCustomerAutomatico'])->name('asaas.createClientAuto');
 
 
 Route::prefix('admin')->group(function () {
