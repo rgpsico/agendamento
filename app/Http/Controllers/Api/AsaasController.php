@@ -6,11 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Professor;
 use Illuminate\Http\Request;
 use App\Http\Requests\CreateClientRequest;
-<<<<<<< HEAD
 use App\Models\Usuario;
-=======
 use App\Http\Requests\CreateSubaccountRequest;
->>>>>>> 2fe6fd5f018eb89345b66e9a418a6b78977d12b6
 use App\Services\AsaasService;
 use Illuminate\Support\Facades\Http;
 
@@ -34,7 +31,7 @@ class AsaasController extends Controller
         return response()->json($response);
     }
 
-<<<<<<< HEAD
+
     public function criarCustomerAutomatico(Request $request)
     {
         $user_id = $request->user_id;
@@ -117,7 +114,8 @@ class AsaasController extends Controller
 
         // Retorna sempre array, nunca null
         return $response->json() ?? [];
-=======
+    }
+
     public function createSubaccount(CreateSubaccountRequest $request)
     {
         $validated = $request->validated();
@@ -125,6 +123,5 @@ class AsaasController extends Controller
         $response = $this->asaasService->criarSubcontaAsaas($validated);
 
         return response()->json($response);
->>>>>>> 2fe6fd5f018eb89345b66e9a418a6b78977d12b6
     }
 }
