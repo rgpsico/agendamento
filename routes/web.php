@@ -58,8 +58,6 @@ Route::get('/empresa/pagamento/boleto', [BoletoController::class, 'boleto'])->na
 
 Route::middleware('auth')->post('/subcontas', [ProfessoresAsaasController::class, 'createSubaccount'])->name('criar-subconta-professor');
 
-Route::middleware('auth')->post('/asaas/criarcliente', [AsaasController::class, 'createClient'])->name('asaas.createClient');
-Route::middleware('auth')->post('/asaas/criarclienteautomatico', [AsaasController::class, 'criarCustomerAutomatico'])->name('asaas.createClientAuto');
 
 
 Route::prefix('admin')->group(function () {

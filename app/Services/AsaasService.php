@@ -14,6 +14,7 @@ class AsaasService
 {
     private $headers;
     private $url;
+    private $apiKey;
     private $client;
 
     public function __construct()
@@ -26,6 +27,10 @@ class AsaasService
         $this->url = env('ASAAS_ENV') === 'production'
             ? env('ASAAS_URL', 'https://api.asaas.com')
             : env('ASAAS_SANDBOX_URL', 'https://sandbox.asaas.com');
+
+        $this->apiKey = env('ASAAS_ENV') === 'production'
+            ? env('ASAAS_KEY')
+            : env('ASAAS_KEY_SANDBOX');
     }
 
 
@@ -36,7 +41,7 @@ class AsaasService
 
         $response = Http::withHeaders([
             'accept' => 'application/json',
-            'access_token' => env("ASAAS_KEY"),
+            'access_token' => $this->apiKey,
         ])->post($this->url . '/v3/customers', [
             'name' => $dados['name'],
             'email' => $dados['email'],
@@ -61,7 +66,7 @@ class AsaasService
     {
         $response = Http::withHeaders([
             'accept' => 'application/json',
-            'access_token' => env('ASAAS_KEY'),
+            'access_token' => $this->apiKey,
         ])->post($this->url . '/v3/accounts', [
             'name' => $dados['name'],
             'email' => $dados['email'],
@@ -93,7 +98,7 @@ class AsaasService
     {
         $response = Http::withHeaders([
             'accept' => 'application/json',
-            'access_token' => env('ASAAS_KEY'),
+            'access_token' => $this->apiKey,
         ])->post($this->url . '/api/v3/payments', [
             'customer' => $clienteId,
             'billingType' => 'CREDIT_CARD',
