@@ -40,7 +40,7 @@ class AsaasService
     public function criarClienteAsaas(array $dados)
     {
 
-
+        dd($this->url);
 
         $response = Http::withHeaders([
             'accept' => 'application/json',

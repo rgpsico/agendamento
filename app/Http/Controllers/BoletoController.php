@@ -233,7 +233,7 @@ class BoletoController extends Controller
     public function checkCustomer($customerId)
     {
         try {
-            $response = $this->client->get("/api/v3/customers/{$customerId}", [
+            $response = $this->client->get("/v3/customers/{$customerId}", [
                 'headers' => [
                     'Content-Type' => 'application/json',
                     'access_token' => $this->apiKey,
@@ -341,7 +341,7 @@ class BoletoController extends Controller
                 }
             }
 
-            $response = $this->client->post('/api/v3/customers', [
+            $response = $this->client->post('/v3/customers', [
                 'headers' => [
                     'Content-Type' => 'application/json',
                     'access_token' => $this->apiKey,
