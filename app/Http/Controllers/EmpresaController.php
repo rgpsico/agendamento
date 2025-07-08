@@ -102,49 +102,95 @@ class EmpresaController extends Controller
         return view('admin.' . $this->view . '.' . $viewSuffix, $mergedData);
     }
 
-    public function store(ProfessorStoreRequest $request)
+    public function store(Request $request)
     {
-
         try {
-            // Os dados já foram validados pelo ProfessorStoreRequest
-            $data = $request->validated();
-
-            // Criar a empresa
-            $data['user_id'] = intval($request->user_id);
-
-            $empresa = Empresa::create($data);
-            $empresaId = $empresa->id;
-
-            Professor::where('usuario_id', $request->user_id)->update([
-                'empresa_id' => $empresaId
+            // Valide tudo (ajuste as regras conforme seu cenário)
+            $validated = $request->validate([
+                // Empresa
+                'nome' => 'required|max:255',
+                'email' => 'required|email|max:255',
+                'descricao' => 'required',
+                'telefone' => 'required|max:20',
+                'cnpj' => 'required|max:18',
+                'valor_aula_de' => 'required|min:0',
+                'valor_aula_ate' => 'required|min:0',
+                'modalidade_id' => 'required|exists:modalidade,id',
+                'user_id' => 'required|exists:usuarios,id',
+                'avatar' => 'nullable|image|max:2048',
+                'banner' => 'nullable|image|max:2048',
+                // Endereço
+                'cep' => 'required',
+                'endereco' => 'required',
+                //  'numero' => 'required',
+                // 'bairro' => 'required',
+                'cidade' => 'required',
+                'estado' => 'required',
+                'uf' => 'required',
+                'pais' => 'required',
             ]);
 
-            // Processar arquivos (se existirem)
+            // Salva a empresa
+            $empresa = Empresa::create([
+                'nome' => $validated['nome'],
+                'descricao' => $validated['descricao'],
+                'telefone' => $validated['telefone'],
+                'cnpj' => $validated['cnpj'],
+                'valor_aula_de' => $validated['valor_aula_de'],
+                'valor_aula_ate' => $validated['valor_aula_ate'],
+                'modalidade_id' => $validated['modalidade_id'],
+                'user_id' => $validated['user_id'],
+            ]);
+
+            // Atualiza o email do usuário, se quiser
+            if ($empresa->user) {
+                $empresa->user->update(['email' => $validated['email']]);
+            }
+
+            // Atualiza o professor para associar à empresa (se for necessário)
+            Professor::where('usuario_id', $validated['user_id'])->update([
+                'empresa_id' => $empresa->id
+            ]);
+
+            // Upload do avatar
             if ($request->hasFile('avatar')) {
                 $file = $request->file('avatar');
                 $filename = time() . '.' . $file->getClientOriginalExtension();
-                $path = public_path('/avatar');
-                $file->move($path, $filename);
-
-                // Atualizar a empresa com o avatar
+                $file->move(public_path('/avatar'), $filename);
                 $empresa->update(['avatar' => $filename]);
             }
 
+            // Upload do banner
             if ($request->hasFile('banner')) {
                 $file = $request->file('banner');
-                $filenameBanners = time() . '.' . $file->getClientOriginalExtension();
-                $path = public_path('/banner');
-                $file->move($path, $filenameBanners);
-
-                // Atualizar a empresa com o banner
-                $empresa->update(['banner' => $filenameBanners]);
+                $filenameBanner = time() . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('/banner'), $filenameBanner);
+                $empresa->update(['banners' => $filenameBanner]);
             }
 
-            return redirect()->route('integracao.assas.escola')->with('success', 'Empresa criada com sucesso!');
+
+            // Salva o endereço da empresa (na tabela relacionada)
+            EmpresaEndereco::updateOrCreate(
+                ['empresa_id' => $empresa->id],
+                [
+                    'cep' => $validated['cep'],
+                    'endereco' => $validated['endereco'],
+                    // 'numero' => $validated['numero'],
+                    // 'bairro' => $validated['bairro'],
+                    'cidade' => $validated['cidade'],
+                    'estado' => $validated['estado'],
+                    'uf' => $validated['uf'],
+                    'pais' => $validated['pais'],
+                ]
+            );
+
+            return redirect()->route('empresa.pagamento.boleto')->with('success', 'Empresa criada com sucesso!');
         } catch (\Exception $e) {
             return redirect()->back()->withErrors(['error' => 'Erro ao criar empresa: ' . $e->getMessage()])->withInput();
         }
     }
+
+
 
 
 
@@ -164,9 +210,18 @@ class EmpresaController extends Controller
             'descricao' => 'required',
             'telefone' => 'required|max:20',
             'cnpj' => 'required|max:18',
-            'valor_aula_de' => 'required|numeric|min:0',
-            'valor_aula_ate' => 'required|numeric|min:0',
+            'valor_aula_de' => 'required|min:0',
+            'valor_aula_ate' => 'required|min:0',
             'modalidade_id' => 'required|exists:modalidade,id',
+
+            'cep' => 'required',
+            'endereco' => 'required',
+            // 'numero' => 'required',
+            // 'bairro' => 'required',
+            'cidade' => 'required',
+            'estado' => 'required',
+            'uf' => 'required',
+            'pais' => 'required',
         ]);
 
         try {
@@ -237,6 +292,20 @@ class EmpresaController extends Controller
 
             // Atualizar a empresa
             $empresa->update($dataToUpdate);
+
+            EmpresaEndereco::updateOrCreate(
+                ['empresa_id' => $empresa->id],
+                [
+                    'cep' => $validatedData['cep'],
+                    'endereco' => $validatedData['endereco'],
+                    // 'numero' => $validatedData['numero'],
+                    // 'bairro' => $validatedData['bairro'],
+                    'cidade' => $validatedData['cidade'],
+                    'estado' => $validatedData['estado'],
+                    'uf' => $validatedData['uf'],
+                    'pais' => $validatedData['pais'],
+                ]
+            );
 
             // Resposta para requisição AJAX
             if ($request->ajax()) {
