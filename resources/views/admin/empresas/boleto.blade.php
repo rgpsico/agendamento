@@ -216,6 +216,9 @@
 
     <script>
         $(document).ready(function() {
+
+
+
             // Verifica se já tem customer_id
             @if (Auth::user()->professor->asaas_customer_id)
                 gerarBoleto();
@@ -243,24 +246,23 @@
                     },
                     success: function(response) {
                         $('#loading-customer').hide();
+                        $('#customer-id-display').text(response.customer_id);
 
-                        if (response.success && response.customer_id) {
-                            $('#customer-id-display').text(response.customer_id);
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Sucesso!',
+                            text: 'ID Asaas criado com sucesso. Gerando seu boleto...',
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => {
+                            window.location.reload();
+                        });
 
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Sucesso!',
-                                text: 'ID Asaas criado com sucesso. Gerando seu boleto...',
-                                timer: 2000,
-                                showConfirmButton: false
-                            });
+                        // Mostra seção do boleto e gera o boleto
+                        $('#boleto-section').show();
 
-                            // Mostra seção do boleto e gera o boleto
-                            $('#boleto-section').show();
-                            gerarBoleto();
-                        } else {
-                            throw new Error(response.message || 'Erro desconhecido');
-                        }
+                        //gerarBoleto();
+
                     },
                     error: function(xhr) {
                         $('#loading-customer').hide();
