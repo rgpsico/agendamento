@@ -116,9 +116,9 @@
                             </div>
                             <div class="row form-row social-login">
                                 <div class="col-12 text-center">
-                                    <a href="{{ route('prof.handle.google') }}" class="btn btn-google w-100">
+                                    {{-- <a href="{{ route('prof.handle.google') }}" class="btn btn-google w-100">
                                         <i class="fab fa-google me-1"></i> Registrar com Google
-                                    </a>
+                                    </a> --}}
                                 </div>
                             </div>
                         </form>
