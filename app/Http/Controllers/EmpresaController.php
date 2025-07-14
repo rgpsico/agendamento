@@ -184,6 +184,8 @@ class EmpresaController extends Controller
                 ]
             );
 
+            $criarServico = $this->criarServicoAutomatico($empresa->id, $validated['modalidade_id']);
+
             return redirect()->route('empresa.pagamento.boleto')->with('success', 'Empresa criada com sucesso!');
         } catch (\Exception $e) {
             return redirect()->back()->withErrors(['error' => 'Erro ao criar empresa: ' . $e->getMessage()])->withInput();
