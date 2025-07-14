@@ -73,46 +73,41 @@ class SocialLiteController extends Controller
     public function professorGoogleCallback(Request $request)
     {
 
-        try {
-            $googleUser = Socialite::driver('google')->user();
+        $googleUser = Socialite::driver('google')->user();
+        $user = Usuario::where('email', $googleUser->email)->first();
 
-            $user = Usuario::where('email', $googleUser->email)->first();
+        if (!$user) {
+            $user = Usuario::create([
+                'nome' => $googleUser->name ?? $googleUser->email,
+                'email' => $googleUser->email,
+                'google_id' => $googleUser->id,
+                'tipo_usuario' => 'Professor', // Agora setado como professor
+                'remember_token' => Str::random(60),
+                'password' => bcrypt(124)
+            ]);
 
-            if (!$user) {
-                $user = Usuario::create([
-                    'nome' => $googleUser->name ?? $googleUser->email,
-                    'email' => $googleUser->email,
-                    'google_id' => $googleUser->id,
-                    'tipo_usuario' => 'Professor', // Agora setado como professor
-                    'remember_token' => Str::random(60),
-                    'password' => bcrypt(124)
-                ]);
+            Professor::create([
+                'usuario_id' => $user->id
+                // Adicione mais campos padrão caso necessário
+            ]);
+        }
 
-                Professor::create([
-                    'usuario_id' => $user->id
-                    // Adicione mais campos padrão caso necessário
-                ]);
-            }
+        Auth::login($user, true);
 
-            Auth::login($user, true);
+        if (!Auth::check()) {
+            return redirect('/')->with('error', 'Login falhou após autenticação do Google.');
+        }
 
-            if (!Auth::check()) {
-                return redirect('/')->with('error', 'Login falhou após autenticação do Google.');
-            }
+        // Carrega relacionamento (professor)
+        $user->load('professor');
 
-            // Carrega relacionamento (professor)
-            $user->load('professor');
-
-            // Redireciona com base no tipo de usuário
-            if (strtolower($user->tipo_usuario) === 'professor') {
-                return redirect()->route('admin.dashboard', ['id' => $user->professor->id]);
-            } elseif (strtolower($user->tipo_usuario) === 'aluno') {
-                return redirect()->route('alunos.fotos', ['id' => $user->aluno->id]);
-            } else {
-                return redirect('/')->with('error', 'Tipo de usuário não reconhecido.');
-            }
-        } catch (\Exception $e) {
-            return redirect('/')->with('error', 'Erro ao tentar autenticar com o Google.');
+        // Redireciona com base no tipo de usuário
+        if (strtolower($user->tipo_usuario) === 'professor') {
+            return redirect()->route('admin.dashboard', ['id' => $user->professor->id]);
+        } elseif (strtolower($user->tipo_usuario) === 'aluno') {
+            return redirect()->route('alunos.fotos', ['id' => $user->aluno->id]);
+        } else {
+            return redirect('/')->with('error', 'Tipo de usuário não reconhecido.');
         }
     }
 }
