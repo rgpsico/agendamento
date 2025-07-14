@@ -72,8 +72,10 @@ class SocialLiteController extends Controller
 
     public function professorGoogleCallback(Request $request)
     {
+        dd($request->all());
         try {
             $googleUser = Socialite::driver('google')->user();
+
             $user = Usuario::where('email', $googleUser->email)->first();
 
             if (!$user) {
@@ -110,7 +112,6 @@ class SocialLiteController extends Controller
                 return redirect('/')->with('error', 'Tipo de usuário não reconhecido.');
             }
         } catch (\Exception $e) {
-            dd($e);
             return redirect('/')->with('error', 'Erro ao tentar autenticar com o Google.');
         }
     }
