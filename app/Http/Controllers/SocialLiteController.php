@@ -99,9 +99,6 @@ class SocialLiteController extends Controller
 
         } catch (\Exception $e) {
             dd($e);
-            // \Log::error('Erro com autenticação do Google: ' . $e->getMessage());
-
-            dd($e);
             return redirect('/')->with('error', 'Erro ao tentar autenticar com o Google.');
         }
     }
