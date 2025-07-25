@@ -183,20 +183,21 @@ class AsaasController extends Controller
 
         // 1. Obter dados do professor com walletId
 
-        $professor = Professor::where('id', $request->professor_id);
+        $professor = Professor::where('usuario_id', $request->professor_id)->first();
 
 
-        if (!$professor->asaas_wallet_id) {
-            return response()->json(['erro' => 'Professor sem carteira digital configurada.'], 400);
+        if (!$professor || !$professor->asaas_wallet_id) {
+            return response()->json([
+                'error' => 'Professor sem carteira digital configurada.'
+            ], 400);
         }
-
         // 2. Criar agendamento
 
         // 3. Criar cliente no Asaas
         $clienteResponse = Http::withHeaders([
             'accept' => 'application/json',
             'access_token' => env("ASAAS_KEY"),
-        ])->post($this->baseUri . '/api/v3/customers', [
+        ])->post($this->baseUri . '/customers', [
             'name' => $request->name,
             'email' => $request->email,
             'cpfCnpj' => $request->cpfCnpj,
