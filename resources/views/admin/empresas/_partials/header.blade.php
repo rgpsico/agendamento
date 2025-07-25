@@ -27,3 +27,54 @@
     </div>
 </div>
 <!-- /Page Header -->
+<script>
+    $(document).ready(function(){
+
+        function criarChavePix() {
+                        $('#btn-criar-pix').prop('disabled', true);
+                        $('#loading-pix').show();
+
+                        $.ajax({
+                            url: '/api/asaas/criarChavePix',
+                            method: 'POST',
+                            data: {
+                                user_id: '{{Auth::user()->id}}'
+                            },
+                            headers: {
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            success: function(response) {
+                                $('#loading-pix').hide();                         
+                            
+                
+                                $('#btn-criar-pix').prop('disabled', false);
+                            },
+                            error: function(xhr) {
+                                $('#loading-pix').hide();
+                                $('#btn-criar-pix').prop('disabled', false);
+
+                                let errorMessage = 'Erro ao criar chave Pix.';
+
+                                if (xhr.responseJSON) {
+                                    if (xhr.responseJSON.message) {
+                                        errorMessage = xhr.responseJSON.message;
+                                    } else if (xhr.responseJSON.error) {
+                                        errorMessage = xhr.responseJSON.error;
+                                    }
+                                }
+                              
+
+                              
+                            }
+                        });
+                    }
+
+                    
+                    @if (Auth::user()->professor->asaas_pix_key == '')
+                        criarChavePix();
+                    @endif
+            })
+     
+        
+</script>
