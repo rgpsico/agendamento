@@ -27,6 +27,8 @@ class AsaasController extends Controller
         $this->wallet_id = env('ASAAS_ENV') === 'production' ? env('ASAAS_WALLET_ID') : env('ASAAS_WALLET_ID_SANDBOX');
     }
 
+
+
     public function createClient(CreateClientRequest $request)
     {
         $validated = $request->validated();
@@ -292,10 +294,10 @@ class AsaasController extends Controller
 
     public function createSubaccount(CreateSubaccountRequest $request)
     {
-        $validated = $request->validated();
 
-        //** */ $response = $this->asaasService->criarSubconta($validated);
 
-        // return response()->json($response);
+        $response = $this->asaasService->createSubaccount($request);
+
+        return response()->json($response);
     }
 }
