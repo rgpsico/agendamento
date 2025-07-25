@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\Professor;
-use App\Models\Usuario;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -14,9 +13,7 @@ class AsaasService
 {
     private $headers;
     private $url;
-    private $apiKey;
     private $client;
-    private $waaletAsaas;
 
     public function __construct()
     {
@@ -25,27 +22,18 @@ class AsaasService
             'accept' => 'application/json',
             'content-type' => 'application/json',
         ];
-        $this->url = env('ASAAS_ENV') === 'production'
+        $this->url = env('APP_ENV') === 'production'
             ? env('ASAAS_URL', 'https://api.asaas.com')
             : env('ASAAS_SANDBOX_URL', 'https://sandbox.asaas.com');
-
-        $this->apiKey = env('ASAAS_ENV') === 'production'
-            ? env('ASAAS_KEY')
-            : env('ASAAS_KEY_SANDBOX');
-
-        $this->waaletAsaas = env('ASAAS_ENV') === 'production' ? env('ASAAS_WALLET_ID') : env('ASAAS_WALLET_ID_SANDBOX');
     }
 
 
     public function criarClienteAsaas(array $dados)
     {
-
-     
-
         $response = Http::withHeaders([
             'accept' => 'application/json',
-            'access_token' => $this->apiKey,
-        ])->post($this->url . '/v3/customers', [
+            'access_token' => env("ASAAS_API_KEY"),
+        ])->post('https://sandbox.asaas.com/api/v3/customers', [
             'name' => $dados['name'],
             'email' => $dados['email'],
             'cpfCnpj' => $dados['cpfCnpj'],
@@ -56,41 +44,8 @@ class AsaasService
             'province' => $dados['province'],
         ]);
 
-
         if ($response->failed()) {
-            throw new \Exception('Erro ao criar cliente no Asaas: ');
-        }
-
-        return $response->json();
-    }
-
-
-    public function criarSubcontaAsaas(array $dados)
-    {
-        $response = Http::withHeaders([
-            'accept' => 'application/json',
-            'access_token' => $this->apiKey,
-        ])->post($this->url . '/v3/accounts', [
-            'name' => $dados['name'],
-            'email' => $dados['email'],
-            'cpfCnpj' => $dados['cpfCnpj'],
-            'companyType' => $dados['companyType'] ?? 'cpf',
-            'phone' => $dados['phone'],
-            'mobilePhone' => $dados['mobilePhone'],
-            'birthDate' => $dados['birthDate'],
-            'incomeValue' => $dados['incomeValue'],
-            'address' => $dados['address'],
-            'addressNumber' => $dados['addressNumber'],
-            'complement' => $dados['complement'] ?? '',
-            'province' => $dados['province'],
-            'postalCode' => $dados['postalCode'],
-            'personType' => $dados['personType'] ?? 'FISICA',
-            'notificationDisabled' => $dados['notificationDisabled'] ?? false,
-            'walletId' => $this->waaletAsaas,
-        ]);
-
-        if ($response->failed()) {
-            throw new \Exception('Erro ao criar subconta no Asaas: ' . $response->body());
+            throw new \Exception('Erro ao criar cliente no Asaas: ' . $response->body());
         }
 
         return $response->json();
@@ -101,8 +56,8 @@ class AsaasService
     {
         $response = Http::withHeaders([
             'accept' => 'application/json',
-            'access_token' => $this->apiKey,
-        ])->post($this->url . '/api/v3/payments', [
+            'access_token' => env('ASAAS_API_KEY'),
+        ])->post('https://sandbox.asaas.com/api/v3/payments', [
             'customer' => $clienteId,
             'billingType' => 'CREDIT_CARD',
             'value' => $dados['value'],
@@ -369,35 +324,6 @@ class AsaasService
             Log::error('Error listing customers: ' . $e->getMessage());
             throw new \Exception('Error listing customers: ' . $e->getMessage());
         }
-    }
-
-    public function criarClientePeloUsuario(Usuario $user): array
-    {
-
-        // carrega relacionamento empresa + endereço
-        $empresa  = $user->empresa;
-        $endereco = $empresa->endereco;
-
-        if (! $empresa || ! $endereco) {
-            throw new \Exception('Empresa ou endereço não configurados para este usuário.');
-        }
-
-        // monta o array de dados conforme documentação do Asaas
-        $dados = [
-            'name'          => $empresa->nome,
-            'email'         => $user->email,
-            'cpfCnpj'       => $empresa->cnpj,
-            'phone'         => $empresa->telefone,
-            'postalCode'    => $endereco->cep,
-            'address'       => $endereco->logradouro,
-            'addressNumber' => $endereco->numero,
-            'province'      => $endereco->bairro,
-        ];
-
-        // chama o método genérico que já faz a requisição e trata erros
-        $resultado = $this->criarClienteAsaas($dados);
-
-        return $resultado;
     }
 
     /**

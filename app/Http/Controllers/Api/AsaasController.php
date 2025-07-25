@@ -13,13 +13,14 @@ use Illuminate\Support\Facades\Http;
 
 class AsaasController extends Controller
 {
-    protected $asaasService, $baseUri, $token;
+    protected $asaasService, $baseUri, $token, $wallet_id;
 
     public function __construct(AsaasService $asaasService)
     {
         $this->asaasService = $asaasService;
         $this->baseUri = env('ASAAS_ENV') == 'production' ? env('ASAAS_URL') : env('ASAAS_SANDBOX_URL');
         $this->token = env('ASAAS_ENV') == 'production' ? env('ASAAS_KEY') : env('ASAAS_KEY_SANDBOX');
+        $this->wallet_id = env('ASAAS_ENV') === 'production' ? env('ASAAS_WALLET_ID') : env('ASAAS_WALLET_ID_SANDBOX');
     }
 
     public function createClient(CreateClientRequest $request)
@@ -69,12 +70,12 @@ class AsaasController extends Controller
         $empresa  = $user->empresa;
         $endereco = $empresa->endereco;
 
-        if (! $empresa) {
+        if (!$empresa) {
             throw new \Exception('Empresa  não configurada para este usuário.');
         }
 
 
-        if (! $endereco) {
+        if (!$endereco) {
             throw new \Exception('endereço não configurados para este usuário.');
         }
         // Prepara dados para API do Asaas conforme documentação
@@ -99,7 +100,6 @@ class AsaasController extends Controller
     public function criarClienteAsaas(array $dados): array
     {
 
-
         $response = Http::withHeaders([
             'Content-Type'  => 'application/json',
             'access_token'  => $this->token,
@@ -120,12 +120,62 @@ class AsaasController extends Controller
         return $response->json() ?? [];
     }
 
+
+    public function criarChavePix(Request $request)
+    {
+        $user_id = $request->user_id;
+        // Buscar o professor baseado no usuario_id
+        $professor = Professor::where('usuario_id', $user_id)->first();
+
+        if (!$professor) {
+            return response()->json([
+                'message' => 'Professor não encontrado para o usuário informado.',
+            ], 404);
+            throw new \Exception('Professor não encontrado para o usuário informado.');
+        }
+
+        if (!empty($professor->asaas_pix_key)) {
+            return response()->json([
+                'message' => 'O professor já possui uma chave Pix cadastrada.',
+                'pixKey' => $professor->asaas_pix_key
+            ], 200);
+        }
+
+        // Criar a chave Pix no Asaas
+        $response = Http::withHeaders([
+            'Content-Type'  => 'application/json',
+            'access_token'  => $this->token,
+        ])->post($this->baseUri . '/pix/addressKeys', [
+            'type' => 'EVP',
+            'walletId' => $professor->asaas_wallet_id
+        ]);
+
+        if ($response->failed()) {
+            $msg = $response->json('errors.0.description')
+                ?? $response->json('message')
+                ?? $response->body()
+                ?? 'Erro desconhecido ao gerar chave Pix.';
+            throw new \Exception('Erro ao criar chave Pix no Asaas: ' . $msg);
+        }
+
+        // Armazenar a chave Pix no banco
+        $pixKey = $response->json('key');
+        $professor->asaas_pix_key = $pixKey;
+        $professor->save();
+
+        return response()->json([
+            'message' => 'Chave criada com sucesso',
+            'pixKey' => $pixKey,
+        ]);
+    }
+
+
     public function createSubaccount(CreateSubaccountRequest $request)
     {
         $validated = $request->validated();
 
-        $response = $this->asaasService->criarSubcontaAsaas($validated);
+        //** */ $response = $this->asaasService->criarSubconta($validated);
 
-        return response()->json($response);
+        // return response()->json($response);
     }
 }

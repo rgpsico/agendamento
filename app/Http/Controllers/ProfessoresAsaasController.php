@@ -93,7 +93,7 @@ class ProfessoresAsaasController extends Controller
             $response = Http::withHeaders([
                 'access_token' => $this->apiKey,
                 'Content-Type' => 'application/json',
-            ])->post($this->baseUri . '/api/v3/accounts', $subaccountData);
+            ])->post($this->baseUri . '/accounts', $subaccountData);
 
 
             // Verificar se a requisição foi bem-sucedida
@@ -102,7 +102,7 @@ class ProfessoresAsaasController extends Controller
             }
 
             $asaasResponse = $response->json();
-            dd($response);
+
             // Verificar se a resposta contém os dados necessários
             if (!isset($asaasResponse['id'])) {
                 throw new \Exception('Resposta inválida da API do Asaas');
