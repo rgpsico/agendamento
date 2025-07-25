@@ -26,6 +26,7 @@
         </div>
     </div>
 </div>
+
 <!-- /Page Header -->
 <script>
     $(document).ready(function(){
@@ -38,7 +39,8 @@
                             url: '/api/asaas/criarChavePix',
                             method: 'POST',
                             data: {
-                                user_id: '{{Auth::user()->id}}'
+                                user_id: '{{Auth::user()->id}}',
+                                empresa_id:'{{Auth::user()->empresa->id}}'
                             },
                             headers: {
                                 'Accept': 'application/json',

@@ -125,6 +125,7 @@ class AsaasController extends Controller
     public function criarChavePix(Request $request)
     {
         $user_id = $request->user_id;
+        $empresa_id = $request->empresa_id;
         // Buscar o professor baseado no usuario_id
         $professor = Professor::where('usuario_id', $user_id)->first();
 
@@ -162,6 +163,7 @@ class AsaasController extends Controller
         // Armazenar a chave Pix no banco
         $pixKey = $response->json('key');
         $professor->asaas_pix_key = $pixKey;
+        $professor->empresa_id = $empresa_id;
         $professor->save();
 
         return response()->json([

@@ -309,7 +309,8 @@
                     url: '/api/asaas/criarChavePix',
                     method: 'POST',
                     data: {
-                        user_id: $('#user_id').val()
+                        user_id: '{{Auth::user()->id}}',
+                        empresa_id:'{{Auth::user()->empresa->id}}'
                     },
                     headers: {
                         'Accept': 'application/json',
