@@ -118,6 +118,8 @@ Route::get('/verificar-pix/{id}', [PagamentoController::class, 'verificarStatusP
 Route::post('/asaas/criarcliente', [AsaasController::class, 'createClient'])->name('asaas.createClient');
 Route::post('/asaas/criarclienteautomatico', [AsaasController::class, 'criarCustomerAutomatico'])->name('asaas.createClientAuto');
 Route::post('/asaas/criarChavePix', [AsaasController::class, 'criarChavePix'])->name('asaas.criarChavePix');
+Route::post('/asaas/pagamentocc', [AsaasController::class, 'pagarComCartao'])->name('asaas.pagarComCartao');
+
 
 
 
