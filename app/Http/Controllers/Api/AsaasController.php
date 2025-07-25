@@ -45,6 +45,7 @@ class AsaasController extends Controller
         }
 
         try {
+
             // Cria cliente no Asaas
             $res = $this->criarClientePeloUsuario($user);
 
@@ -103,7 +104,7 @@ class AsaasController extends Controller
         $response = Http::withHeaders([
             'Content-Type'  => 'application/json',
             'access_token'  => $this->token,
-        ])->post($this->baseUri . '/v3/customers', $dados);
+        ])->post($this->baseUri . '/customers', $dados);
 
 
 

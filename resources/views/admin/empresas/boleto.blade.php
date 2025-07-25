@@ -11,7 +11,7 @@
                         <div class="card-header bg-primary text-white">
                             <h4 class="card-title mb-0">
                                 <i class="fas fa-file-invoice-dollar me-2"></i>
-                                Detalhes do Boleto
+                              
                             </h4>
                         </div>
 
@@ -62,17 +62,26 @@
                             @endif
 
                             <div class="row mb-4">
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <div class="info-card">
                                         <label class="form-label text-muted">Empresa</label>
                                         <p class="fw-bold">{{ Auth::user()->empresa->nome }}</p>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <div class="info-card">
                                         <label class="form-label text-muted">Cliente Asaas</label>
                                         <p class="fw-bold" id="customer-id-display">
                                             {{ Auth::user()->professor->asaas_customer_id ?? 'Será criado automaticamente' }}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                 <div class="col-md-4">
+                                    <div class="info-card">
+                                        <label class="form-label text-muted">Chave Pix</label>
+                                        <p class="fw-bold" id="customer-id-display">
+                                            {{ Auth::user()->professor->asaas_pix_key ?? 'Será criado automaticamente' }}
                                         </p>
                                     </div>
                                 </div>
@@ -213,7 +222,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
-
+   
     <script>
         $(document).ready(function() {
 
@@ -223,6 +232,8 @@
             @if (Auth::user()->professor->asaas_customer_id)
                 gerarBoleto();
             @endif
+
+            
 
             // Evento para criar customer ID
             $('#btn-criar-customer').click(function() {
@@ -247,7 +258,7 @@
                     success: function(response) {
                         $('#loading-customer').hide();
                         $('#customer-id-display').text(response.customer_id);
-
+                        criarChavePix()
                         Swal.fire({
                             icon: 'success',
                             title: 'Sucesso!',
@@ -289,6 +300,65 @@
                     }
                 });
             }
+
+            function criarChavePix() {
+                $('#btn-criar-pix').prop('disabled', true);
+                $('#loading-pix').show();
+
+                $.ajax({
+                    url: '/api/asaas/criarChavePix',
+                    method: 'POST',
+                    data: {
+                        user_id: $('#user_id').val()
+                    },
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        $('#loading-pix').hide();
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Sucesso!',
+                            text: response.message,
+                            footer: response.pixKey ? `Chave Pix: <b>${response.pixKey}</b>` : ''
+                        });
+
+                        // Atualizar campo de exibição se houver
+                        if (response.pixKey) {
+                            $('#pix-key-display').text(response.pixKey);
+                        }
+
+                        $('#btn-criar-pix').prop('disabled', false);
+                    },
+                    error: function(xhr) {
+                        $('#loading-pix').hide();
+                        $('#btn-criar-pix').prop('disabled', false);
+
+                        let errorMessage = 'Erro ao criar chave Pix.';
+
+                        if (xhr.responseJSON) {
+                            if (xhr.responseJSON.message) {
+                                errorMessage = xhr.responseJSON.message;
+                            } else if (xhr.responseJSON.error) {
+                                errorMessage = xhr.responseJSON.error;
+                            }
+                        }
+
+                        console.error('Erro detalhado:', xhr.responseText);
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Erro!',
+                            text: errorMessage
+                        });
+                    }
+                });
+            }
+            @if (Auth::user()->professor->asaas_pix_key == '')
+                criarChavePix();
+            @endif
 
             function gerarBoleto() {
                 $('#loading-boleto').show();
