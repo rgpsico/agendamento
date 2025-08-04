@@ -23,7 +23,9 @@ class SocialLiteController extends Controller
     public function alunoGoogleCallback(Request $request)
     {
         try {
-            $googleUser = Socialite::driver('google')->user();
+            // Recupera dados do Google + tokens
+            $googleUser = Socialite::driver('google')->stateless()->user();
+
             $user = Usuario::where('email', $googleUser->email)->first();
 
             if (!$user) {
@@ -31,7 +33,7 @@ class SocialLiteController extends Controller
                     'nome' => $googleUser->name ?? $googleUser->email,
                     'email' => $googleUser->email,
                     'google_id' => $googleUser->id,
-                    'tipo_usuario' => 'Aluno', // Default novo usuário como aluno
+                    'tipo_usuario' => 'Aluno',
                     'remember_token' => Str::random(60),
                     'password' => bcrypt(124)
                 ]);
@@ -41,16 +43,22 @@ class SocialLiteController extends Controller
                 ]);
             }
 
+            // Aqui está o segredo: tokens do Google
+            $accessToken = $googleUser->token;
+            $refreshToken = $googleUser->refreshToken ?? null;
+            $expiresIn = $googleUser->expiresIn;
+
+            // 💾 Salve esses tokens na sua tabela (ex: google_tokens, ou dentro da tabela `usuarios`)
+            $user->google_access_token = $accessToken;
+            $user->google_refresh_token = $refreshToken;
+            $user->google_token_expire = now()->addSeconds($expiresIn);
+            $user->save();
+
+            // Login no sistema
             Auth::login($user, true);
 
-            if (!Auth::check()) {
-                return redirect('/')->with('error', 'Login falhou após autenticação do Google.');
-            }
-
-            // Carrega relacionamento (se for aluno)
-            $user->load('aluno');
-
             // Redireciona com base no tipo de usuário
+            $user->load('aluno');
             if (strtolower($user->tipo_usuario) === 'professor') {
                 return redirect()->route('admin.dashboard', ['id' => $user->id]);
             } elseif (strtolower($user->tipo_usuario) === 'aluno') {
@@ -63,6 +71,7 @@ class SocialLiteController extends Controller
             return redirect('/')->with('error', 'Erro ao tentar autenticar com o Google.');
         }
     }
+
 
 
     public function professorRedirectToGoogle()
