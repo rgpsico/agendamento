@@ -4,8 +4,11 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateGoogleAdsTokensTable extends Migration
+return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up()
     {
         Schema::create('google_ads_tokens', function (Blueprint $table) {
@@ -22,7 +25,7 @@ class CreateGoogleAdsTokensTable extends Migration
             $table->timestamps();
 
             // FK e índices
-            $table->foreign('empresa_id')->references('id')->on('empresas')->onDelete('cascade');
+            $table->foreign('empresa_id')->references('id')->on('empresa')->onDelete('cascade');
             $table->index('empresa_id');
         });
     }
@@ -31,4 +34,4 @@ class CreateGoogleAdsTokensTable extends Migration
     {
         Schema::dropIfExists('google_ads_tokens');
     }
-}
+};
