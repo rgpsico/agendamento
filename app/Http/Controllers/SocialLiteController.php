@@ -75,7 +75,7 @@ class SocialLiteController extends Controller
             return redirect('/')->with('error', 'Tipo de usuário não reconhecido.');
         } catch (\Exception $e) {
             \Log::error('Google Auth Error: ' . $e->getMessage());
-            dd("erro");
+            dd($e);
             return redirect('/')->with('error', 'Erro ao tentar autenticar com o Google: ' . $e->getMessage());
         }
     }
