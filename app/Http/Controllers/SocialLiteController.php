@@ -22,11 +22,11 @@ class SocialLiteController extends Controller
 
     public function alunoGoogleCallback(Request $request)
     {
-        dd("aaaa");
+        $googleUser = Socialite::driver('google')->stateless()->user();
+        dd($googleUser->token); // Inspect the access token
         try {
             // Recupera dados do Google + tokens
-            $googleUser = Socialite::driver('google')->stateless()->user();
-            dd($googleUser->token); // Inspect the access token
+
 
             $user = Usuario::where('email', $googleUser->email)->first();
 
