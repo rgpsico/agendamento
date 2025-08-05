@@ -31,6 +31,8 @@ class SocialLiteController extends Controller
                 ->redirectUrl(config('services.google.redirect'))
                 ->user();
 
+
+            dd($googleUser);
             // Log para depuração
             \Log::info('Google User Data: ' . json_encode($googleUser));
 
