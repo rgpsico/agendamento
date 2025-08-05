@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Alunos;
+use App\Models\GoogleAdsToken;
 use App\Models\Professor;
 use App\Models\Usuario;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
@@ -45,7 +47,18 @@ class SocialLiteController extends Controller
 
         $data = $response->json();
 
-        dd($data);
+        $expiresAt = Carbon::now()->addSeconds($data['expires_in']);
+        $empresaId = 17;
+        // Atualiza ou cria o registro do token
+        GoogleAdsToken::updateOrCreate(
+            ['empresa_id' => $empresaId], // <- substitua $empresaId conforme o contexto
+            [
+                'google_account_id'        => null, // ou preencha se tiver
+                'access_token'             => $data['access_token'],
+                'refresh_token'            => $data['refresh_token'] ?? null,
+                'access_token_expires_at'  => $expiresAt,
+            ]
+        );
 
         try {
 
