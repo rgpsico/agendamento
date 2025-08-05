@@ -23,30 +23,17 @@ class SocialLiteController extends Controller
     public function alunoGoogleCallback(Request $request)
     {
         try {
-            // Obtém os dados do usuário autenticado via Google
-            $googleUser = Socialite::driver('google')->stateless()->user();
-
-            // Debug opcional para verificar os dados recebidos
-            dd([
-                'id' => $googleUser->getId(),
-                'name' => $googleUser->getName(),
-                'email' => $googleUser->getEmail(),
-                'token' => $googleUser->token,
-                'refreshToken' => $googleUser->refreshToken,
-                'expiresIn' => $googleUser->expiresIn,
-            ]);
-
-            // Busca usuário pelo e-mail
-            $user = Usuario::where('email', $googleUser->getEmail())->first();
+            $googleUser = Socialite::driver('google')->user();
+            $user = Usuario::where('email', $googleUser->email)->first();
 
             if (!$user) {
                 $user = Usuario::create([
-                    'nome' => $googleUser->getName() ?? $googleUser->getEmail(),
-                    'email' => $googleUser->getEmail(),
-                    'google_id' => $googleUser->getId(),
-                    'tipo_usuario' => 'Aluno',
+                    'nome' => $googleUser->name ?? $googleUser->email,
+                    'email' => $googleUser->email,
+                    'google_id' => $googleUser->id,
+                    'tipo_usuario' => 'Aluno', // Default novo usuário como aluno
                     'remember_token' => Str::random(60),
-                    'password' => bcrypt(124) // Ideal seria gerar senha aleatória e enviar para e-mail depois
+                    'password' => bcrypt(124)
                 ]);
 
                 Alunos::create([
@@ -54,31 +41,28 @@ class SocialLiteController extends Controller
                 ]);
             }
 
-            // Salva os tokens (acesso, refresh e expiração)
-            $user->google_access_token = $googleUser->token;
-            $user->google_refresh_token = $googleUser->refreshToken ?? null;
-            $user->google_token_expire = now()->addSeconds($googleUser->expiresIn);
-            $user->save();
-
-            // Autentica o usuário
             Auth::login($user, true);
 
-            // Redirecionamento baseado no tipo de usuário
+            if (!Auth::check()) {
+                return redirect('/')->with('error', 'Login falhou após autenticação do Google.');
+            }
+
+            // Carrega relacionamento (se for aluno)
             $user->load('aluno');
 
-            return match (strtolower($user->tipo_usuario)) {
-                'professor' => redirect()->route('admin.dashboard', ['id' => $user->id]),
-                'aluno'     => redirect()->route('alunos.fotos', ['id' => $user->aluno->id]),
-                default     => redirect('/')->with('error', 'Tipo de usuário não reconhecido.')
-            };
+            // Redireciona com base no tipo de usuário
+            if (strtolower($user->tipo_usuario) === 'professor') {
+                return redirect()->route('admin.dashboard', ['id' => $user->id]);
+            } elseif (strtolower($user->tipo_usuario) === 'aluno') {
+                return redirect()->route('alunos.fotos', ['id' => $user->aluno->id]);
+            } else {
+                return redirect('/')->with('error', 'Tipo de usuário não reconhecido.');
+            }
         } catch (\Exception $e) {
-            // Exibe erro para debugging
-            dd($e->getMessage(), $e);
+            dd($e);
             return redirect('/')->with('error', 'Erro ao tentar autenticar com o Google.');
         }
     }
-
-
 
 
     public function professorRedirectToGoogle()
