@@ -22,12 +22,18 @@ class SocialLiteController extends Controller
 
     public function alunoGoogleCallback(Request $request)
     {
-
         try {
-            // Retrieve Google user data
-            $googleUser = Socialite::driver('google')->scopes(['openid', 'email', 'profile'])->stateless()->user();
+            // Recupera dados do Google
+            $googleUser = Socialite::driver('google')
+                ->scopes(['openid', 'email', 'profile'])
+                ->stateless()
+                ->redirectUrl(config('services.google.redirect'))
+                ->user();
 
-            // Find or create user
+            // Log para depuração
+            \Log::info('Google User Data: ' . json_encode($googleUser));
+
+            // Busca ou cria usuário
             $user = Usuario::where('email', $googleUser->email)->first();
 
             if (!$user) {
@@ -37,7 +43,7 @@ class SocialLiteController extends Controller
                     'google_id' => $googleUser->id,
                     'tipo_usuario' => 'Aluno',
                     'remember_token' => Str::random(60),
-                    'password' => bcrypt(Str::random(16)), // Use a random password instead of hardcoded
+                    'password' => bcrypt(Str::random(16)),
                 ]);
 
                 Alunos::create([
@@ -45,37 +51,35 @@ class SocialLiteController extends Controller
                 ]);
             }
 
-            dd($googleUser->token);
-            // Save Google tokens
-            // $user->google_access_token = $googleUser->token;
-            // $user->google_refresh_token = $googleUser->refreshToken ?? null;
-            // $user->google_token_expire = now()->addSeconds($googleUser->expiresIn);
-            // $user->save();
+            // Salva os tokens do Google
+            $user->google_access_token = $googleUser->token;
+            $user->google_refresh_token = $googleUser->refreshToken ?? null;
+            $user->google_token_expire = now()->addSeconds($googleUser->expiresIn);
+            $user->save();
 
-            // Test userinfo endpoint
+            // Testa o endpoint userinfo
             $client = new \GuzzleHttp\Client();
             $response = $client->get('https://www.googleapis.com/oauth2/v3/userinfo', [
                 'headers' => [
-                    'Authorization' => 'Bearer ' . $user->google_access_token,
+                    'Authorization' => 'Bearer ' . $googleUser->token,
                 ],
             ]);
             \Log::info('Userinfo response: ' . $response->getBody());
 
-            // Log in the user
+            // Faz login no usuário
             Auth::login($user, true);
 
-            // Redirect based on user type
+            // Redireciona com base no tipo de usuário
             $user->load('aluno');
             if (strtolower($user->tipo_usuario) === 'professor') {
                 return redirect()->route('admin.dashboard', ['id' => $user->id]);
             } elseif (strtolower($user->tipo_usuario) === 'aluno') {
                 return redirect()->route('alunos.fotos', ['id' => $user->aluno->id]);
             }
-            dd("erro");
+
             return redirect('/')->with('error', 'Tipo de usuário não reconhecido.');
         } catch (\Exception $e) {
             \Log::error('Google Auth Error: ' . $e->getMessage());
-            dd($e);
             return redirect('/')->with('error', 'Erro ao tentar autenticar com o Google: ' . $e->getMessage());
         }
     }
