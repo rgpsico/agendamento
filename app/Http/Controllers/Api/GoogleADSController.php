@@ -23,13 +23,13 @@ class GoogleADSController extends Controller
     public function getAuthUrl()
     {
         $scopes = urlencode('https://www.googleapis.com/auth/adwords');
-        $authUrl = "https://accounts.google.com/o/oauth2/v2/auth?" . http_build_query([
-            'client_id'     => $this->clientId,
-            'redirect_uri'  => $this->redirectUri,
+        $authUrl = http_build_query([
+            'client_id' => env('GOOGLE_CLIENT_ID'),
+            'redirect_uri' => env('GOOGLE_REDIRECT_URL'),
             'response_type' => 'code',
-            'scope'         => $scopes,
-            'access_type'   => 'offline',
-            'prompt'        => 'consent'
+            'scope' => 'https://www.googleapis.com/auth/adwords',
+            'access_type' => 'offline',
+            'prompt' => 'consent'
         ]);
 
         return response()->json(['auth_url' => $authUrl]);
