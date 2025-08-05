@@ -22,7 +22,7 @@ class SocialLiteController extends Controller
 
     public function alunoGoogleCallback(Request $request)
     {
-        dd(config('services.google.redirect'));
+
         try {
             // Recupera dados do Google
             $googleUser = Socialite::driver('google')
