@@ -7,22 +7,45 @@ use App\Models\Professor;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Str;
 
 class SocialLiteController extends Controller
 {
 
+    protected $clientId;
+    protected $clientSecret;
+    protected $redirectUri;
+
+    public function __construct()
+    {
+        $this->clientId = env('GOOGLE_CLIENT_ID');
+        $this->clientSecret = env('GOOGLE_CLIENT_SECRET');
+        $this->redirectUri = env('GOOGLE_REDIRECT_URL');
+    }
 
     public function alunoRedirectToGoogle()
     {
-
         return $user =  Socialite::driver('google')->redirect();
     }
 
     public function alunoGoogleCallback(Request $request)
     {
         try {
+
+            $code = $request->get('code');
+
+            $response = Http::asForm()->post('https://oauth2.googleapis.com/token', [
+                'code'          => $code,
+                'client_id'     => $this->clientId,
+                'client_secret' => $this->clientSecret,
+                'redirect_uri'  => $this->redirectUri,
+                'grant_type'    => 'authorization_code',
+            ]);
+
+            dd($response);
+
             $googleUser = Socialite::driver('google')->user();
             $user = Usuario::where('email', $googleUser->email)->first();
 
