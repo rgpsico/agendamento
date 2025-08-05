@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
+use Google\Ads\GoogleAds\V16\Services\CreateCustomerClientRequest;
+use Google\Ads\GoogleAds\V16\Resources\Customer;
+
 class GoogleADSController extends Controller
 {
     protected $clientId;
@@ -22,18 +25,22 @@ class GoogleADSController extends Controller
 
     public function getAuthUrl()
     {
-        $scopes = urlencode('https://www.googleapis.com/auth/adwords');
-        $authUrl = http_build_query([
+        $baseUrl = 'https://accounts.google.com/o/oauth2/v2/auth';
+
+        $params = [
             'client_id' => env('GOOGLE_CLIENT_ID'),
             'redirect_uri' => env('GOOGLE_REDIRECT_URL'),
             'response_type' => 'code',
             'scope' => 'https://www.googleapis.com/auth/adwords',
             'access_type' => 'offline',
             'prompt' => 'consent'
-        ]);
+        ];
+
+        $authUrl = $baseUrl . '?' . http_build_query($params);
 
         return response()->json(['auth_url' => $authUrl]);
     }
+
 
     public function handleCallback(Request $request)
     {
@@ -66,5 +73,25 @@ class GoogleADSController extends Controller
         // Com PHP é recomendado usar o SDK oficial: https://github.com/googleads/google-ads-php
 
         return response()->json(['message' => 'Requisição de criação de campanha recebida.']);
+    }
+
+
+    public function createCustomerClient(Request $request)
+    {
+        $customer = new Customer([
+            'descriptive_name' => 'Nome do cliente',
+            'currency_code' => 'BRL',
+            'time_zone' => 'America/Sao_Paulo',
+        ]);
+
+        $createCustomerClientRequest = new CreateCustomerClientRequest([
+            'customer_id' => $mccId, // ID da conta MCC (conta master)
+            'customer_client' => $customer,
+        ]);
+
+        $response = $googleAdsClient->getCustomerServiceClient()
+            ->createCustomerClient($createCustomerClientRequest);
+
+        $newCustomerId = $response->getResourceName();
     }
 }

@@ -206,4 +206,5 @@ Route::prefix('google-ads')->group(function () {
     Route::get('auth-url', [GoogleADSController::class, 'getAuthUrl']);
     Route::get('callback', [GoogleADSController::class, 'handleCallback']);
     Route::post('create-campaign', [GoogleADSController::class, 'createCampaign']);
+    Route::post('create-cliente', [GoogleADSController::class, 'createCustomerClient']);
 });
