@@ -43,7 +43,9 @@ class SocialLiteController extends Controller
             'grant_type'    => 'authorization_code',
         ]);
 
-        dd($response);
+        $data = $response->json();
+
+        dd($data);
 
         try {
 
