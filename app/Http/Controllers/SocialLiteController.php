@@ -27,7 +27,7 @@ class SocialLiteController extends Controller
             ->stateless()
             ->redirectUrl(config('services.google.redirect'))
             ->user();
-
+        dd($googleUser);
         Log::info('Google User Data: ' . json_encode($googleUser));
         return $googleUser;
     }
