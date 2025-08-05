@@ -14,6 +14,7 @@ class SocialLiteController extends Controller
 {
     public function alunoRedirectToGoogle()
     {
+        // O Socialite vai gerar o 'state' aqui
         return Socialite::driver('google')
             ->scopes(['openid', 'email', 'profile'])
             ->redirectUrl(config('services.google.redirect'))
@@ -90,7 +91,7 @@ class SocialLiteController extends Controller
 
     public function alunoGoogleCallback(Request $request)
     {
-
+        dd($request->input('state'), session()->get('state'));
         // Etapa 1: Obtém os dados do Google
         $googleUser = $this->getGoogleUserData($request);
         dd($googleUser);
