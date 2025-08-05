@@ -22,7 +22,7 @@ class SocialLiteController extends Controller
 
     public function alunoGoogleCallback(Request $request)
     {
-        dd('aaa');
+
         try {
             // Retrieve Google user data
             $googleUser = Socialite::driver('google')->scopes(['openid', 'email', 'profile'])->stateless()->user();
@@ -45,11 +45,12 @@ class SocialLiteController extends Controller
                 ]);
             }
 
+            dd($googleUser->token);
             // Save Google tokens
-            $user->google_access_token = $googleUser->token;
-            $user->google_refresh_token = $googleUser->refreshToken ?? null;
-            $user->google_token_expire = now()->addSeconds($googleUser->expiresIn);
-            $user->save();
+            // $user->google_access_token = $googleUser->token;
+            // $user->google_refresh_token = $googleUser->refreshToken ?? null;
+            // $user->google_token_expire = now()->addSeconds($googleUser->expiresIn);
+            // $user->save();
 
             // Test userinfo endpoint
             $client = new \GuzzleHttp\Client();
