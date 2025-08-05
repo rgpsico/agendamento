@@ -22,10 +22,11 @@ class SocialLiteController extends Controller
 
     public function alunoGoogleCallback(Request $request)
     {
+        dd('aaa');
         try {
             // Retrieve Google user data
             $googleUser = Socialite::driver('google')->scopes(['openid', 'email', 'profile'])->stateless()->user();
-            dd($googleUser);
+
             // Find or create user
             $user = Usuario::where('email', $googleUser->email)->first();
 
