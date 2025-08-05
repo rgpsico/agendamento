@@ -16,7 +16,7 @@ class SocialLiteController extends Controller
     {
         // O Socialite vai gerar o 'state' aqui
         return Socialite::driver('google')
-            ->scopes(['openid', 'email', 'profile'])
+            ->scopes(['openid'])
             ->redirectUrl(config('services.google.redirect'))
             ->redirect();
     }
