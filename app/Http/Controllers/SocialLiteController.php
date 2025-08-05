@@ -32,19 +32,22 @@ class SocialLiteController extends Controller
 
     public function alunoGoogleCallback(Request $request)
     {
+
+        $code = $request->get('code');
+
+        $response = Http::asForm()->post('https://oauth2.googleapis.com/token', [
+            'code'          => $code,
+            'client_id'     => $this->clientId,
+            'client_secret' => $this->clientSecret,
+            'redirect_uri'  => $this->redirectUri,
+            'grant_type'    => 'authorization_code',
+        ]);
+
+        dd($response);
+
         try {
 
-            $code = $request->get('code');
 
-            $response = Http::asForm()->post('https://oauth2.googleapis.com/token', [
-                'code'          => $code,
-                'client_id'     => $this->clientId,
-                'client_secret' => $this->clientSecret,
-                'redirect_uri'  => $this->redirectUri,
-                'grant_type'    => 'authorization_code',
-            ]);
-
-            dd($response);
 
             $googleUser = Socialite::driver('google')->user();
             $user = Usuario::where('email', $googleUser->email)->first();
