@@ -22,12 +22,11 @@ class SocialLiteController extends Controller
 
     protected function getGoogleUserData(Request $request)
     {
-        $googleUser = Socialite::driver('google')
-            ->scopes(['openid', 'email', 'profile'])
-            ->stateless()
-            ->redirectUrl(config('services.google.redirect'))
-            ->user();
-        dd($googleUser);
+        $googleUser = Socialite::driver('google')->stateless()->user();
+
+        $accessToken = $googleUser->token; // 🎯 ESTE É O TOKEN
+        $refreshToken = $googleUser->refreshToken;
+        dd($accessToken);
         Log::info('Google User Data: ' . json_encode($googleUser));
         return $googleUser;
     }
