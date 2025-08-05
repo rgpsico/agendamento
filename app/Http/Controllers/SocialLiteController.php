@@ -26,7 +26,7 @@ class SocialLiteController extends Controller
 
         $accessToken = $googleUser->token; // 🎯 ESTE É O TOKEN
         $refreshToken = $googleUser->refreshToken;
-        dd($accessToken);
+
         Log::info('Google User Data: ' . json_encode($googleUser));
         return $googleUser;
     }
@@ -90,23 +90,22 @@ class SocialLiteController extends Controller
 
     public function alunoGoogleCallback(Request $request)
     {
-        try {
-            // Etapa 1: Obtém os dados do Google
-            $googleUser = $this->getGoogleUserData($request);
 
-            // Etapa 2: Salva os dados do usuário
-            $user = $this->saveUserData($googleUser);
+        // Etapa 1: Obtém os dados do Google
+        $googleUser = $this->getGoogleUserData($request);
+        dd($googleUser);
+        // Etapa 2: Salva os dados do usuário
+        $user = $this->saveUserData($googleUser);
 
-            // Etapa 3: Testa o endpoint userinfo (opcional, para depuração)
-            $this->testUserInfoEndpoint($googleUser);
+        // Etapa 3: Testa o endpoint userinfo (opcional, para depuração)
+        $this->testUserInfoEndpoint($googleUser);
 
-            // Etapa 4: Faz login e redireciona
-            return $this->loginAndRedirect($user);
-        } catch (\Exception $e) {
-            dd($e->getMessage());
-            Log::error('Google Auth Error: ' . $e->getMessage());
-            return redirect('/')->with('error', 'Erro ao tentar autenticar com o Google: ' . $e->getMessage());
-        }
+        // Etapa 4: Faz login e redireciona
+        return $this->loginAndRedirect($user);
+
+
+        Log::error('Google Auth Error: ' . $e->getMessage());
+        return redirect('/')->with('error', 'Erro ao tentar autenticar com o Google: ' . $e->getMessage());
     }
 
     // Métodos para professores (mantidos como estavam)
