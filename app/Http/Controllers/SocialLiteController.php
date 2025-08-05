@@ -104,6 +104,7 @@ class SocialLiteController extends Controller
             // Etapa 4: Faz login e redireciona
             return $this->loginAndRedirect($user);
         } catch (\Exception $e) {
+            dd($e->getMessage());
             Log::error('Google Auth Error: ' . $e->getMessage());
             return redirect('/')->with('error', 'Erro ao tentar autenticar com o Google: ' . $e->getMessage());
         }
