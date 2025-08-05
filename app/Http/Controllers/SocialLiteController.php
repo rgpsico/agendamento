@@ -94,7 +94,7 @@ class SocialLiteController extends Controller
         dd($request->input('state'), session()->get('state'));
         // Etapa 1: Obtém os dados do Google
         $googleUser = $this->getGoogleUserData($request);
-        dd($googleUser);
+
         // Etapa 2: Salva os dados do usuário
         $user = $this->saveUserData($googleUser);
 
