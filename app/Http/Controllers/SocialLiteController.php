@@ -22,22 +22,31 @@ class SocialLiteController extends Controller
 
     public function alunoGoogleCallback(Request $request)
     {
-        $googleUser = Socialite::driver('google')->stateless()->user();
-        dd($googleUser->token); // Inspect the access token
         try {
-            // Recupera dados do Google + tokens
+            // Obtém os dados do usuário autenticado via Google
+            $googleUser = Socialite::driver('google')->stateless()->user();
 
+            // Debug opcional para verificar os dados recebidos
+            dd([
+                'id' => $googleUser->getId(),
+                'name' => $googleUser->getName(),
+                'email' => $googleUser->getEmail(),
+                'token' => $googleUser->token,
+                'refreshToken' => $googleUser->refreshToken,
+                'expiresIn' => $googleUser->expiresIn,
+            ]);
 
-            $user = Usuario::where('email', $googleUser->email)->first();
+            // Busca usuário pelo e-mail
+            $user = Usuario::where('email', $googleUser->getEmail())->first();
 
             if (!$user) {
                 $user = Usuario::create([
-                    'nome' => $googleUser->name ?? $googleUser->email,
-                    'email' => $googleUser->email,
-                    'google_id' => $googleUser->id,
+                    'nome' => $googleUser->getName() ?? $googleUser->getEmail(),
+                    'email' => $googleUser->getEmail(),
+                    'google_id' => $googleUser->getId(),
                     'tipo_usuario' => 'Aluno',
                     'remember_token' => Str::random(60),
-                    'password' => bcrypt(124)
+                    'password' => bcrypt(124) // Ideal seria gerar senha aleatória e enviar para e-mail depois
                 ]);
 
                 Alunos::create([
@@ -45,34 +54,30 @@ class SocialLiteController extends Controller
                 ]);
             }
 
-            // Aqui está o segredo: tokens do Google
-            $accessToken = $googleUser->token;
-            $refreshToken = $googleUser->refreshToken ?? null;
-            $expiresIn = $googleUser->expiresIn;
-
-            // 💾 Salve esses tokens na sua tabela (ex: google_tokens, ou dentro da tabela `usuarios`)
-            $user->google_access_token = $accessToken;
-            $user->google_refresh_token = $refreshToken;
-            $user->google_token_expire = now()->addSeconds($expiresIn);
+            // Salva os tokens (acesso, refresh e expiração)
+            $user->google_access_token = $googleUser->token;
+            $user->google_refresh_token = $googleUser->refreshToken ?? null;
+            $user->google_token_expire = now()->addSeconds($googleUser->expiresIn);
             $user->save();
 
-            // Login no sistema
+            // Autentica o usuário
             Auth::login($user, true);
 
-            // Redireciona com base no tipo de usuário
+            // Redirecionamento baseado no tipo de usuário
             $user->load('aluno');
-            if (strtolower($user->tipo_usuario) === 'professor') {
-                return redirect()->route('admin.dashboard', ['id' => $user->id]);
-            } elseif (strtolower($user->tipo_usuario) === 'aluno') {
-                return redirect()->route('alunos.fotos', ['id' => $user->aluno->id]);
-            } else {
-                return redirect('/')->with('error', 'Tipo de usuário não reconhecido.');
-            }
+
+            return match (strtolower($user->tipo_usuario)) {
+                'professor' => redirect()->route('admin.dashboard', ['id' => $user->id]),
+                'aluno'     => redirect()->route('alunos.fotos', ['id' => $user->aluno->id]),
+                default     => redirect('/')->with('error', 'Tipo de usuário não reconhecido.')
+            };
         } catch (\Exception $e) {
-            dd($e);
+            // Exibe erro para debugging
+            dd($e->getMessage(), $e);
             return redirect('/')->with('error', 'Erro ao tentar autenticar com o Google.');
         }
     }
+
 
 
 
