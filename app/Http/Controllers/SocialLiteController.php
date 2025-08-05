@@ -25,7 +25,7 @@ class SocialLiteController extends Controller
         try {
             // Retrieve Google user data
             $googleUser = Socialite::driver('google')->scopes(['openid', 'email', 'profile'])->stateless()->user();
-
+            dd($googleUser);
             // Find or create user
             $user = Usuario::where('email', $googleUser->email)->first();
 
