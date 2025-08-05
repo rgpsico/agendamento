@@ -71,7 +71,7 @@ class SocialLiteController extends Controller
             } elseif (strtolower($user->tipo_usuario) === 'aluno') {
                 return redirect()->route('alunos.fotos', ['id' => $user->aluno->id]);
             }
-
+            dd("erro");
             return redirect('/')->with('error', 'Tipo de usuário não reconhecido.');
         } catch (\Exception $e) {
             \Log::error('Google Auth Error: ' . $e->getMessage());
