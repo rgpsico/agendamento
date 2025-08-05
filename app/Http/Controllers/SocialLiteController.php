@@ -22,6 +22,7 @@ class SocialLiteController extends Controller
 
     public function alunoGoogleCallback(Request $request)
     {
+        dd("aaaa");
         try {
             // Recupera dados do Google + tokens
             $googleUser = Socialite::driver('google')->stateless()->user();
