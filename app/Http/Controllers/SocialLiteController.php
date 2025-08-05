@@ -22,7 +22,7 @@ class SocialLiteController extends Controller
 
     protected function getGoogleUserData(Request $request)
     {
-        $googleUser = Socialite::driver('google')->stateless()->user();
+        $googleUser = Socialite::driver('google')->user();
 
         $accessToken = $googleUser->token; // 🎯 ESTE É O TOKEN
         $refreshToken = $googleUser->refreshToken;
