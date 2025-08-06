@@ -38,7 +38,7 @@ class EmpresaSite extends Model
     // {
     //     // Tentar encontrar o registro
     //     $result = $this->where($field ?? $this->getRouteKeyName(), $value)->first();
-        
+
     //     // Se não encontrar, retornar null ao invés de dar erro 404
     //     return $result;
     // }
@@ -62,5 +62,20 @@ class EmpresaSite extends Model
     public function contatos()
     {
         return $this->hasMany(SiteContato::class, 'site_id');
+    }
+
+    public function visualizacoes()
+    {
+        return $this->hasMany(SiteVisualizacao::class, 'empresa_site_id');
+    }
+
+    public function cliquesWhatsapp()
+    {
+        return $this->hasMany(SiteCliqueWhatsapp::class, 'empresa_site_id');
+    }
+
+    public function visitantes()
+    {
+        return $this->hasMany(SiteVisitante::class, 'empresa_site_id');
     }
 }

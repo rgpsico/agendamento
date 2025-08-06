@@ -38,7 +38,7 @@
                                 <span class="menu-arrow"></span>
                             </a>
                             <ul>
-                                <li><a href="">Lista</a></li>
+                                <li><a href="{{ route('admin.site.lista') }}">Lista</a></li>
 
                                 <li><a href="{{ route('admin.site.configuracoes') }}">Configurações do Site</a></li>
                                 <li><a href="{{ route('admin.site.servicos.index') }}">Serviços</a></li>

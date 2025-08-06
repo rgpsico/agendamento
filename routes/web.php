@@ -80,6 +80,11 @@ Route::prefix('admin/site/ssl')->middleware(['auth'])->name('admin.site.dominios
 Route::post('/admin/site/dominios/update', [SiteController::class, 'atualizarDominio'])->name('admin.site.dominios.update');
 
 Route::prefix('admin/site')->middleware(['auth'])->group(function () {
+    Route::get('lista', [SiteController::class, 'lista'])->name('admin.site.lista');
+    Route::get('create', [SiteController::class, 'create'])->name('admin.site.create');
+    Route::post('criar', [SiteController::class, 'store'])->name('admin.site.store');
+    Route::get('edit/{idsite}', [SiteController::class, 'editSite'])->name('admin.site.edit');
+
     Route::get('configuracoes', [SiteController::class, 'edit'])->name('admin.site.configuracoes');
     Route::resource('servicos', SiteController::class)->names('admin.site.servicos');
     Route::resource('depoimentos', SiteController::class)->names('admin.site.depoimentos');

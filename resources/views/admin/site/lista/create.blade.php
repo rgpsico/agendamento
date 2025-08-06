@@ -24,7 +24,7 @@
                             <x-alert/>
 
                            
-                                <form action="{{ route('admin.site.configuracoes.store') }}" method="POST" enctype="multipart/form-data">
+                                <form action="{{ route('admin.site.store') }}" method="POST" enctype="multipart/form-data">
                       
                                 @csrf
 
@@ -85,6 +85,19 @@
                                         <label for="sobre_descricao">Descrição</label>
                                         <textarea name="sobre_descricao" class="form-control" style="min-height: 300px;">{{ old('sobre_descricao', $site->sobre_descricao ?? '') }}</textarea>
                                     </div>
+
+                                      <div class="form-group">
+                                        <label for="whatsapp">Número do WhatsApp</label>
+                                        <input type="tel" name="whatsapp" value="{{ old('whatsapp', $site->whatsapp ?? '') }}" class="form-control" placeholder="+55 21 99999-9999">
+                                    </div>
+
+                                    <!-- NOVO: Autoatendimento com IA -->
+                                    <div class="form-group form-check mt-4 my-5">
+                                        <input type="checkbox" name="autoatendimento_ia" id="autoatendimento_ia" class="form-check-input" 
+                                        {{ old('autoatendimento_ia', $site->autoatendimento_ia ?? false) ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="autoatendimento_ia">Ativar Autoatendimento com IA</label>
+                                    </div>
+
 
                                     <div class="form-group">
                                         <label for="sobre_imagem">Imagem</label>

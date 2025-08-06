@@ -15,6 +15,39 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 
 class SiteController extends Controller
 {
+
+    public function lista()
+    {
+        $empresaId = Auth::user()->empresa->id;
+
+        $sites = EmpresaSite::where('empresa_id', $empresaId)
+            ->withCount(['visualizacoes', 'cliquesWhatsapp', 'visitantes'])
+            ->latest()
+            ->paginate(10);
+
+        return view('admin.site.lista.index', compact('sites'));
+    }
+
+
+    public function create()
+    {
+        return view('admin.site.lista.create');
+    }
+
+    public function editSite($idsite)
+    {
+        $site = EmpresaSite::findOrFail($idsite);
+
+        if ($site->empresa_id !== Auth::user()->empresa->id) {
+            abort(403, 'Acesso não autorizado.');
+        }
+
+        return view('admin.site.lista.edit', compact('site'));
+    }
+
+
+
+
     /**
      * Exibe o site público com base no slug
      */
@@ -83,6 +116,63 @@ class SiteController extends Controller
     }
 
 
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'titulo' => 'required|string|max:255',
+            'descricao' => 'nullable|string',
+            'cores' => 'required|array',
+            'cores.primaria' => 'required|string',
+            'cores.secundaria' => 'required|string',
+            'sobre_titulo' => 'nullable|string|max:255',
+            'sobre_descricao' => 'nullable|string',
+            'sobre_itens' => 'nullable|array',
+            'sobre_itens.*.icone' => 'nullable|string|max:255',
+            'sobre_itens.*.titulo' => 'nullable|string|max:255',
+            'sobre_itens.*.descricao' => 'nullable|string',
+            'dominio_personalizado' => 'nullable|string|max:255'
+        ]);
+
+        $data = [
+            'empresa_id' => Auth::user()->empresa->id,
+            'titulo' => $request->titulo,
+            'slug' => Str::slug($request->titulo),
+            'descricao' => $request->descricao,
+            'cores' => [
+                'primaria' => $request->input('cores.primaria', '#0ea5e9'),
+                'secundaria' => $request->input('cores.secundaria', '#38b2ac'),
+            ],
+            'sobre_titulo' => $request->sobre_titulo,
+            'sobre_descricao' => $request->sobre_descricao,
+            'sobre_itens' => $request->input('sobre_itens', []),
+            'dominio_personalizado' => $request->input('dominio_personalizado'),
+        ];
+
+        // Upload do logo
+        if ($request->hasFile('logo')) {
+            $data['logo'] = $request->file('logo')->store('sites/logos', 'public');
+        }
+
+        // Upload da capa
+        if ($request->hasFile('capa')) {
+            $data['capa'] = $request->file('capa')->store('sites/capas', 'public');
+        }
+
+        // Upload imagem da seção sobre nós
+        if ($request->hasFile('sobre_imagem')) {
+            $data['sobre_imagem'] = $request->file('sobre_imagem')->store('sites/sobre', 'public');
+        }
+
+        $site = EmpresaSite::create($data);
+
+        // Se quiser, pode criar o virtual host aqui futuramente
+        // $this->criarVirtualHost($site->dominio_personalizado);
+
+        return redirect()
+            ->route('admin.site.lista')
+            ->with('success', 'Site criado com sucesso!');
+    }
 
 
 
