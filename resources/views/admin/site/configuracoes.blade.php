@@ -23,9 +23,12 @@
                         <div class="card-body">
                             <x-alert/>
 
-                           
-                                <form action="{{ route('admin.site.configuracoes.store') }}" method="POST" enctype="multipart/form-data">
-                      
+                            @if(isset($site))
+                                <form action="{{ route('admin.site.configuracoes.update', $site->id) }}" method="POST" enctype="multipart/form-data">
+                                @method('PUT')
+                            @else
+                            <form action="{{ route('admin.site.configuracoes.store') }}" method="POST" enctype="multipart/form-data">
+                            @endif
                                 @csrf
 
                                 <!-- Seção 1: Informações gerais -->
