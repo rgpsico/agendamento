@@ -115,6 +115,19 @@ class SiteController extends Controller
         return view('admin.site.configuracoes', compact('site'));
     }
 
+    private function createUniqueSlug($titulo)
+    {
+        $slugBase = Str::slug($titulo);
+        $slug = $slugBase;
+        $count = 1;
+
+        while (EmpresaSite::where('slug', $slug)->exists()) {
+            $slug = $slugBase . '-' . $count;
+            $count++;
+        }
+
+        return $slug;
+    }
 
 
     public function store(Request $request)
@@ -131,13 +144,14 @@ class SiteController extends Controller
             'sobre_itens.*.icone' => 'nullable|string|max:255',
             'sobre_itens.*.titulo' => 'nullable|string|max:255',
             'sobre_itens.*.descricao' => 'nullable|string',
-            'dominio_personalizado' => 'nullable|string|max:255'
+            'dominio_personalizado' => 'nullable|string|max:255',
+            'whatsapp' => 'nullable|string|max:20',
         ]);
 
         $data = [
             'empresa_id' => Auth::user()->empresa->id,
             'titulo' => $request->titulo,
-            'slug' => Str::slug($request->titulo),
+
             'descricao' => $request->descricao,
             'cores' => [
                 'primaria' => $request->input('cores.primaria', '#0ea5e9'),
@@ -147,7 +161,10 @@ class SiteController extends Controller
             'sobre_descricao' => $request->sobre_descricao,
             'sobre_itens' => $request->input('sobre_itens', []),
             'dominio_personalizado' => $request->input('dominio_personalizado'),
+            'whatsapp' => $request->whatsapp,
         ];
+
+        $data['slug'] = $this->createUniqueSlug($request->titulo);
 
         // Upload do logo
         if ($request->hasFile('logo')) {
@@ -193,7 +210,8 @@ class SiteController extends Controller
             'sobre_itens.*.icone' => 'nullable|string|max:255',
             'sobre_itens.*.titulo' => 'nullable|string|max:255',
             'sobre_itens.*.descricao' => 'nullable|string',
-            'dominio_personalizado' => 'nullable|string|max:255'
+            'dominio_personalizado' => 'nullable|string|max:255',
+            'whatsapp' => 'nullable|string|max:20',
         ]);
 
         $data = [
@@ -206,9 +224,10 @@ class SiteController extends Controller
             'sobre_titulo' => $request->sobre_titulo,
             'sobre_descricao' => $request->sobre_descricao,
             'sobre_itens' => $request->input('sobre_itens', []),
+            'whatsapp' => $request->whatsapp,
         ];
 
-        $data['slug'] = Str::slug($request->titulo);
+        $data['slug'] = $this->createUniqueSlug($request->titulo);
 
         // Upload do logo
         if ($request->hasFile('logo')) {

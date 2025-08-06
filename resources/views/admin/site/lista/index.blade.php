@@ -13,11 +13,13 @@
                 </div>
             </div>
 
-            <div class="text-right mb-3">
-                <a href="{{ route('admin.site.create') }}" class="btn btn-primary">
-                    <i class="fas fa-plus"></i> Novo Site
-                </a>
-            </div>
+                 @if($sites->count() < 3)
+                    <div class="text-right mb-3">
+                        <a href="{{ route('admin.site.create') }}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Novo Site
+                        </a>
+                    </div>
+                @endif
 
             <x-alert/>
 

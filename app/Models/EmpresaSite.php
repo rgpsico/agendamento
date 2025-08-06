@@ -25,6 +25,7 @@ class EmpresaSite extends Model
         'sobre_descricao',
         'sobre_imagem',
         'sobre_itens',
+        'whatsapp',
     ];
 
     protected $casts = [
