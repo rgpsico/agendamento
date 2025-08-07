@@ -65,6 +65,13 @@ class EmpresaSite extends Model
         return $this->hasMany(SiteContato::class, 'site_id');
     }
 
+    public function endereco()
+    {
+        return $this->belongsTo(EmpresaEndereco::class, 'empresa_id', 'empresa_id');
+    }
+
+
+
     public function visualizacoes()
     {
         return $this->hasMany(SiteVisualizacao::class, 'empresa_site_id');

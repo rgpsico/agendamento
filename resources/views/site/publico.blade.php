@@ -226,7 +226,7 @@
     </div>
 
     <!-- WhatsApp Button -->
-    <a href="https://wa.me/{{ $site->telefone ?? '5511999999999' }}?text=Olá,%20gostaria%20de%20mais%20informações%20sobre%20seus%20serviços" class="diagonal-whatsapp floating">
+    <a href="https://wa.me/{{ $site->whatsapp  ?? '5511999999999' }}?text=Olá,%20gostaria%20de%20mais%20informações%20sobre%20seus%20serviços" class="diagonal-whatsapp floating">
         <i class="fab fa-whatsapp"></i>
     </a>
 
@@ -279,7 +279,7 @@
             <div class="grid md:grid-cols-2 gap-12 items-center">
                 <div class="hero-content">
                     <h1 class="text-5xl md:text-7xl font-bold leading-tight mb-6 text-glow">
-                        Domine as <span class="typing-text"></span>
+                        <span class="typing-text"></span>
                     </h1>
                     <p class="text-xl md:text-2xl mb-8 opacity-90 hero-subtitle">
                         {{ $site->descricao ?? 'Aprenda a surfar com os melhores instrutores e viva a experiência única do oceano' }}
@@ -316,7 +316,7 @@
     </section>
 
     <!-- Stats Section -->
-    <section class="py-20 bg-white relative">
+    <section class="py-0 bg-white relative">
         <div class="container mx-auto px-6">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-8 stats-container">
                 @foreach($site->estatisticas ?? [
@@ -480,47 +480,48 @@
 </section>
 
     <!-- About Section -->
-    <section id="about" class="py-20 bg-white parallax-bg" style="background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('{{ $site->sobre_imagem ? asset('storage/' . $site->sobre_imagem) : 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80' }}');">
-        <div class="container mx-auto px-6">
-            <div class="grid md:grid-cols-2 gap-12 items-center">
-                <div class="about-content">
-                    <h2 class="text-4xl md:text-5xl font-bold text-white mb-6">{{ $site->sobre_titulo ?? 'Por que escolher a OceanWave?' }}</h2>
-                    <p class="text-gray-200 text-lg mb-8">{{ $site->sobre_descricao ?? 'Com mais de 15 anos de experiência, somos a escola de surf líder na região.' }}</p>
-                    
-                    <div class="space-y-6 about-features">
-                        @foreach($site->sobre_itens ?? [
-                            ['icone' => 'fa-award', 'titulo' => 'Instrutores Certificados', 'descricao' => 'Todos nossos instrutores possuem certificação internacional e anos de experiência.'],
-                            ['icone' => 'fa-leaf', 'titulo' => 'Sustentabilidade', 'descricao' => 'Comprometidos com a preservação do meio ambiente e oceanos limpos.'],
-                            ['icone' => 'fa-heart', 'titulo' => 'Comunidade', 'descricao' => 'Mais que uma escola, somos uma família de amantes do surf.']
-                        ] as $item)
-                            <div class="flex items-start glass-card p-4 rounded-lg">
-                                <div class="bg-blue-500 p-3 rounded-full mr-4 flex-shrink-0">
-                                    <i class="fas {{ $item['icone'] }} text-white text-xl"></i>
-                                </div>
-                                <div>
-                                    <h3 class="text-xl font-semibold text-white mb-2">{{ $item['titulo'] }}</h3>
-                                    <p class="text-gray-200">{{ $item['descricao'] }}</p>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
+    <!-- About Section -->
+<section id="about" class="py-20 bg-white parallax-bg" style="background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('{{ $site->sobre_imagem ? asset('storage/' . $site->sobre_imagem) : 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80' }}');">
+    <div class="container mx-auto px-6">
+        <div class="grid md:grid-cols-2 gap-12 items-center">
+            <div class="about-content">
+                <h2 class="text-4xl md:text-5xl font-bold text-white mb-6 about-title">{{ $site->sobre_titulo ?? 'Por que escolher a OceanWave?' }}</h2>
+                <p class="text-gray-200 text-lg mb-8 about-description">{{ $site->sobre_descricao ?? 'Com mais de 15 anos de experiência, somos a escola de surf líder na região.' }}</p>
                 
-                <div class="about-image">
-                    <div class="grid grid-cols-2 gap-4">
-                        @foreach($site->sobre_imagens ?? [
-                            'https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
-                            'https://images.unsplash.com/photo-1502680390469-be75c86b636f?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
-                            'https://images.unsplash.com/photo-1530549387789-4c1017266635?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
-                            'https://images.unsplash.com/photo-1537519646099-335112b4e681?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'
-                        ] as $imagem)
-                            <img src="{{ $imagem }}" alt="Imagem sobre" class="rounded-lg shadow-lg">
-                        @endforeach
-                    </div>
+                <div class="space-y-6 about-features">
+                    @foreach($site->sobre_itens ?? [
+                        ['icone' => 'fa-award', 'titulo' => 'Instrutores Certificados', 'descricao' => 'Todos nossos instrutores possuem certificação internacional e anos de experiência.'],
+                        ['icone' => 'fa-leaf', 'titulo' => 'Sustentabilidade', 'descricao' => 'Comprometidos com a preservação do meio ambiente e oceanos limpos.'],
+                        ['icone' => 'fa-heart', 'titulo' => 'Comunidade', 'descricao' => 'Mais que uma escola, somos uma família de amantes do surf.']
+                    ] as $item)
+                        <div class="flex items-start glass-card p-4 rounded-lg about-feature">
+                            <div class="bg-blue-500 p-3 rounded-full mr-4 flex-shrink-0">
+                                <i class="fas {{ $item['icone'] }} text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold text-white mb-2">{{ $item['titulo'] }}</h3>
+                                <p class="text-gray-200">{{ $item['descricao'] }}</p>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+            
+            <div class="about-image">
+                <div class="grid grid-cols-2 gap-4">
+                    @foreach($site->sobre_imagens ?? [
+                        'https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+                        'https://images.unsplash.com/photo-1502680390469-be75c86b636f?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+                        'https://images.unsplash.com/photo-1530549387789-4c1017266635?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+                        'https://images.unsplash.com/photo-1537519646099-335112b4e681?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'
+                    ] as $index => $imagem)
+                        <img src="{{ $imagem }}" alt="Imagem sobre" class="rounded-lg shadow-lg about-image-item" data-index="{{ $index }}">
+                    @endforeach
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
     <!-- Testimonials Section -->
  <section id="testimonials" class="py-20 bg-gray-50">
@@ -618,7 +619,7 @@
         </div>
     </div>
 </section>
-
+       
     <!-- CTA Section -->
     <section class="py-20 hero-gradient text-white relative overflow-hidden">
         <div class="absolute inset-0 bg-black bg-opacity-20"></div>
@@ -629,7 +630,7 @@
             <div class="flex flex-col sm:flex-row justify-center gap-4 cta-buttons">
                 <button class="bg-white text-gray-800 hover:bg-gray-100 px-8 py-4 rounded-full font-semibold text-lg hover:scale-105 transition-all duration-300">
                     <i class="fas fa-phone mr-2"></i>
-                    {{ $site->whatsapp  ?? '(11) 99999-9999' }}
+                    {{ $site->whatsapp  ?? '(11) 99999-888' }}
                 </button>
                 <button class="border-2 border-white text-white hover:bg-white hover:text-gray-800 px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300">
                     <i class="fab fa-whatsapp mr-2"></i>
@@ -650,6 +651,7 @@
                 </p>
             </div>
 
+         
             <div class="max-w-6xl mx-auto">
                 <div class="grid md:grid-cols-2 gap-12">
                     <!-- Contact Info -->
@@ -664,7 +666,7 @@
                                     </div>
                                     <div>
                                         <h4 class="font-semibold text-gray-800">Endereço</h4>
-                                        <p class="text-gray-600">{{ $site->endereco ?? 'Av. Beira Mar, 1234<br>Praia do Sol - SP, 11000-000' }}</p>
+                                        <p class="text-gray-600">{{ $site->endereco->endereco ?? 'Av. Beira Mar, 1234<br>Praia do Sol - SP, 11000-000' }}</p>
                                     </div>
                                 </div>
                                 
@@ -684,7 +686,7 @@
                                     </div>
                                     <div>
                                         <h4 class="font-semibold text-gray-800">Email</h4>
-                                        <p class="text-gray-600">{{ $site->email ?? 'contato@oceanwave.com.br' }}</p>
+                                        <p class="text-gray-600">{{ $site->empresa->user->email ?? 'contato@oceanwave.com.br' }}</p>
                                     </div>
                                 </div>
                                 
@@ -1077,6 +1079,56 @@
                     ease: "power2.out"
                 });
             });
+        });
+
+        // Enhanced About section animations
+        gsap.timeline({
+            scrollTrigger: {
+                trigger: '#about',
+                start: 'top 80%',
+                end: 'bottom top',
+                toggleActions: 'play none none none'
+            }
+        })
+        .from('.about-title', {
+            opacity: 0,
+            y: 100,
+            duration: 1,
+            ease: 'power3.out'
+        })
+        .from('.about-description', {
+            opacity: 0,
+            y: 50,
+            duration: 0.8,
+            ease: 'power2.out'
+        }, '-=0.5')
+        .from('.about-feature', {
+            opacity: 0,
+            x: -100,
+            rotation: -10,
+            duration: 0.8,
+            stagger: 0.2,
+            ease: 'back.out(1.7)'
+        }, '-=0.3')
+        .from('.about-image-item', {
+            opacity: 0,
+            scale: 0.8,
+            duration: 0.6,
+            stagger: 0.2,
+            ease: 'elastic.out(1, 0.5)'
+        }, '-=0.5');
+
+        // Enhanced parallax effect with zoom
+        gsap.to('#about', {
+            backgroundPosition: '50% 100%',
+            scale: 1.1, // Adiciona um leve efeito de zoom
+            ease: 'none',
+            scrollTrigger: {
+                trigger: '#about',
+                start: 'top bottom',
+                end: 'bottom top',
+                scrub: true
+            }
         });
 
         // Form submission animation

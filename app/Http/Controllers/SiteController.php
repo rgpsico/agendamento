@@ -53,8 +53,9 @@ class SiteController extends Controller
      */
     public function mostrar($slug)
     {
+
         $site = EmpresaSite::where('slug', $slug)
-            ->with(['servicos', 'depoimentos', 'contatos'])
+            ->with(['servicos', 'depoimentos', 'contatos', 'endereco', 'empresa', 'empresa.modalidade'])
             ->firstOrFail();
 
 
