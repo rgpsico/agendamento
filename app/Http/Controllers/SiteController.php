@@ -228,7 +228,7 @@ class SiteController extends Controller
             'whatsapp' => $request->whatsapp,
         ];
 
-        $data['slug'] = $this->createUniqueSlug($request->titulo);
+        // $data['slug'] = $this->createUniqueSlug($request->titulo);
 
         // Upload do logo
         if ($request->hasFile('logo')) {
