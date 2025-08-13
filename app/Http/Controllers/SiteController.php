@@ -236,6 +236,8 @@ class SiteController extends Controller
         if (!empty($request->dominio_personalizado) && $request->gerar_vhost) {
             $data['dominio_personalizado'] = $request->dominio_personalizado;
 
+            $site->vhost_criado = true;
+
             $this->criarVirtualHost($request->dominio_personalizado);
         }
 
