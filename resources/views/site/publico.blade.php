@@ -16,50 +16,16 @@
     @include('site._partials.menu')
 
     <!-- Hero Section -->
-    <section id="home" class="hero-gradient text-white min-h-screen flex items-center relative">
-        <div class="wave-animation"></div>
-        <div class="container mx-auto px-6 relative z-10">
-            <div class="grid md:grid-cols-2 gap-12 items-center">
-                <div class="hero-content">
-                    <h1 class="text-5xl md:text-7xl font-bold leading-tight mb-6 text-glow">
-                        <span class="typing-text"></span>
-                    </h1>
-                    <p class="text-xl md:text-2xl mb-8 opacity-90 hero-subtitle">
-                        {{ $site->descricao ?? 'Aprenda a surfar com os melhores instrutores e viva a experiência única do oceano' }}
-                    </p>
-                    <div class="flex flex-col sm:flex-row gap-4 hero-buttons">
-                        <button class="btn-primary text-white px-8 py-4 rounded-full font-semibold text-lg hover:scale-105 transition-all duration-300">
-                            <i class="fas fa-water mr-2"></i>
-                            Começar Agora
-                        </button>
-                        <button class="border-2 border-white text-white hover:bg-white hover:text-gray-800 px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300">
-                            <i class="fas fa-play mr-2"></i>
-                            Ver Vídeo
-                        </button>
-                    </div>
-                </div>
-                <div class="hero-image">
-                    <div class="floating">
-                        @if($site->capa)
-                            <img src="{{ asset('storage/' . $site->capa) }}" alt="Surfista" class="rounded-2xl shadow-2xl w-full">
-                        @else
-                            <img src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Surfista" class="rounded-2xl shadow-2xl w-full">
-                        @endif
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Scroll Indicator -->
-        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 scroll-indicator">
-            <div class="w-6 h-10 border-2 border-white rounded-full flex justify-center">
-                <div class="w-1 h-3 bg-white rounded-full mt-2 animate-bounce"></div>
-            </div>
-        </div>
-    </section>
+    <x-hero-section 
+        :title="$site->titulo ?? 'Aprenda a surfar com os melhores instrutores'"
+        :subtitle="$site->descricao ?? 'Viva a experiência única do oceano'"
+        :image="$site->capa ? asset('storage/' . $site->capa) : null"
+        :primary-button="['text' => 'Começar Agora', 'link' => '/inscricao', 'icon' => 'fas fa-water']"
+        :secondary-button="['text' => 'Ver Vídeo', 'link' => '/video', 'icon' => 'fas fa-play']"
+    />
 
     <!-- Stats Section -->
-    <section class="py-0 bg-white relative">
+    {{-- <section class="py-0 bg-white relative">
         <div class="container mx-auto px-6">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-8 stats-container">
                 @foreach($site->estatisticas ?? [
@@ -75,152 +41,10 @@
                 @endforeach
             </div>
         </div>
-    </section>
+    </section> --}}
 
     <!-- Services Section -->
-    <section id="services" class="py-20 bg-gray-50">
-    <div class="container mx-auto px-6">
-        <div class="text-center mb-16 section-header">
-            <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">{{ $site->servicos_titulo ?? 'Nossos Serviços' }}</h2>
-            <div class="section-divider max-w-md mx-auto"></div>
-            <p class="text-gray-600 text-xl max-w-2xl mx-auto">
-                {{ $site->servicos_descricao ?? 'Oferecemos uma experiência completa para todos os níveis, do iniciante ao avançado' }}
-            </p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 services-grid">
-            @if($site->servicos->isEmpty())
-                @php
-                    $fakeServices = [
-                        [
-                            'titulo' => 'Aula Individual',
-                            'descricao' => 'Atenção personalizada com um instrutor dedicado exclusivamente para você.',
-                            'preco' => 150.00,
-                            'icone' => 'fa-user',
-                            'features' => [
-                                'Equipamento incluído',
-                                '2 horas de aula',
-                                'Teoria e prática',
-                                'Certificado'
-                            ],
-                            'destaque' => false,
-                            'imagem' => 'https://picsum.photos/500/300?random=1'
-                        ],
-                        [
-                            'titulo' => 'Aula em Grupo',
-                            'descricao' => 'Aprenda em um ambiente social com outros iniciantes.',
-                            'preco' => 80.00,
-                            'icone' => 'fa-users',
-                            'features' => [
-                                'Equipamento incluído',
-                                '2 horas de aula',
-                                'Máximo 6 pessoas',
-                                'Ambiente social'
-                            ],
-                            'destaque' => false,
-                            'imagem' => 'https://picsum.photos/500/300?random=2'
-                        ],
-                        [
-                            'titulo' => 'Curso Completo',
-                            'descricao' => 'Programa intensivo para levar você do iniciante ao intermediário.',
-                            'preco' => 500.00,
-                            'icone' => 'fa-trophy',
-                            'features' => [
-                                '8 aulas de 2 horas',
-                                'Equipamento incluído',
-                                'Material didático',
-                                'Certificado oficial'
-                            ],
-                            'destaque' => true,
-                            'imagem' => 'https://picsum.photos/500/300?random=3'
-                        ]
-                    ];
-                @endphp
-                @foreach($fakeServices as $servico)
-                    <div class="card-hover bg-white rounded-2xl overflow-hidden shadow-lg  relative">
-                        @if($servico['destaque'])
-                            <div class="absolute top-4 left-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-sm font-semibold z-10">
-                                Mais Popular
-                            </div>
-                        @endif
-                        <div class="h-48 relative overflow-hidden">
-                            <img src="{{ $servico['imagem'] }}" alt="{{ $servico['titulo'] }}" class="w-full h-full object-cover">
-                            <div class="absolute inset-0 bg-black bg-opacity-20"></div>
-                            <div class="absolute top-4 right-4 bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg rounded-full p-3">
-                                <i class="fas {{ $servico['icone'] }} text-white text-xl"></i>
-                            </div>
-                        </div>
-                        <div class="p-6">
-                            <h3 class="text-2xl font-bold text-gray-800 mb-3">{{ $servico['titulo'] }}</h3>
-                            <p class="text-gray-600 mb-4">{{ $servico['descricao'] }}</p>
-                            
-                            @if(!empty($servico['features']) && is_array($servico['features']))
-                                <ul class="mb-6 text-gray-600 space-y-2">
-                                    @foreach($servico['features'] as $feature)
-                                        <li class="flex items-center">
-                                            <i class="fas fa-check text-green-500 mr-3"></i>
-                                            {{ $feature }}
-                                        </li>
-                                    @endforeach
-                                </ul>
-                            @endif
-                            
-                            <div class="flex justify-between items-center">
-                                {{-- <span class="text-3xl font-bold service-icon">R$ {{ number_format($servico['preco'], 2, ',', '.') }}</span> --}}
-                                <button class="btn-primary text-white px-6 py-3 rounded-full font-semibold transition-all duration-300 hover:scale-105">
-                                    Reservar
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
-            @else
-                @foreach($site->servicos as $servico)
-                    <div class="card-hover bg-white rounded-2xl overflow-hidden shadow-lg stagger-item relative">
-                        @if($servico->destaque)
-                            <div class="absolute top-4 left-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-sm font-semibold z-10">
-                                Mais Popular
-                            </div>
-                        @endif
-                        <div class="h-48 relative overflow-hidden">
-                            @if($servico->imagem)
-                                <img src="{{ asset('storage/' . $servico->imagem) }}" alt="{{ $servico->titulo }}" class="w-full h-full object-cover">
-                            @else
-                                <img src="https://images.unsplash.com/photo-1502680390469-be75c86b636f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="{{ $servico->titulo }}" class="w-full h-full object-cover">
-                            @endif
-                            <div class="absolute inset-0 bg-black bg-opacity-20"></div>
-                            <div class="absolute top-4 right-4 bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg rounded-full p-3">
-                                <i class="fas {{ $servico->icone ?? 'fa-water' }} text-white text-xl"></i>
-                            </div>
-                        </div>
-                        <div class="p-6">
-                            <h3 class="text-2xl font-bold text-gray-800 mb-3">{{ $servico->titulo }}</h3>
-                            <p class="text-gray-600 mb-4">{{ $servico->descricao }}</p>
-                            
-                            @if(!empty($servico->features) && is_array($servico->features))
-                                <ul class="mb-6 text-gray-600 space-y-2">
-                                    @foreach($servico->features as $feature)
-                                        <li class="flex items-center">
-                                            <i class="fas fa-check text-green-500 mr-3"></i>
-                                            {{ $feature }}
-                                        </li>
-                                    @endforeach
-                                </ul>
-                            @endif
-                            
-                            <div class="flex justify-between items-center">
-                                <span class="text-3xl font-bold service-icon">R$ {{ number_format($servico->preco, 2, ',', '.') }}</span>
-                                <button class="btn-primary text-white px-6 py-3 rounded-full font-semibold transition-all duration-300 hover:scale-105">
-                                    Reservar
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
-            @endif
-        </div>
-    </div>
-</section>
+   <x-services-section :site="$site" modalidade="surf" />
 
     <!-- About Section -->
     <!-- About Section -->
@@ -278,7 +102,7 @@
         </div>
     
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 testimonials-grid">
-        @if(!isset($site->depoimentos) || $site->depoimentos->isEmpty())
+            @if(!isset($site->depoimentos) || $site->depoimentos->isEmpty())
                 @php
                                     $fakeTestimonials = [
                         [
@@ -309,7 +133,7 @@
                     <div class="testimonial-card p-6 rounded-2xl shadow-lg stagger-item-depoimento">
                         <div class="flex items-center mb-4">
                             <img src="{{ $depoimento['foto'] }}" alt="{{ $depoimento['nome'] }}" class="w-12 h-12 rounded-full mr-4">
-                            <div>ssss
+                            <div>
                                 <h4 class="font-semibold text-gray-800">{{ $depoimento['nome'] }}</h4>
                                 <div class="flex text-yellow-400">
                                     @for($i = 1; $i <= 5; $i++)
