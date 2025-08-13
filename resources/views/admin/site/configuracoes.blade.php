@@ -8,7 +8,7 @@
                         <h3 class="page-title">Gerenciar Site</h3>
                         <ul class="breadcrumb">
                             <li class="breadcrumb-item"><a href="">Admin</a></li>
-                            <li class="breadcrumb-item active">Configurações do Site</li>
+                            <li class="breadcrumb-item active">Configurações do Sitesss</li>
                         </ul>
                     </div>
                 </div>

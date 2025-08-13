@@ -77,7 +77,11 @@ Route::prefix('admin/site/ssl')->middleware(['auth'])->name('admin.site.dominios
     Route::post('/', [SiteController::class, 'atualizarDominio'])->name('update');
 });
 // routes/web.php
-Route::post('/admin/site/dominios/update', [SiteController::class, 'atualizarDominio'])->name('admin.site.dominios.update');
+Route::post('/admin/site/{site}/dominio', [SiteController::class, 'atualizarDominio'])
+    ->name('admin.site.dominios.update');
+
+Route::put('/admin/site/{site}/configuracoes', [SiteController::class, 'atualizarConfiguracoes'])
+    ->name('admin.site.configuracoes.update');
 
 Route::prefix('admin/site')->middleware(['auth'])->group(function () {
     Route::get('lista', [SiteController::class, 'lista'])->name('admin.site.lista');

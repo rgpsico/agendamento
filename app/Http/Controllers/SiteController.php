@@ -83,6 +83,9 @@ class SiteController extends Controller
 
 
 
+
+
+
     /**
      * Página de edição das configurações do site (painel admin)
      */
@@ -230,7 +233,15 @@ class SiteController extends Controller
 
         // $data['slug'] = $this->createUniqueSlug($request->titulo);
 
+        if (!empty($request->dominio_personalizado) && $request->gerar_vhost) {
+            $data['dominio_personalizado'] = $request->dominio_personalizado;
+
+            $this->criarVirtualHost($request->dominio_personalizado);
+        }
+
         // Upload do logo
+
+
         if ($request->hasFile('logo')) {
             if (!empty($site->logo) && Storage::disk('public')->exists($site->logo)) {
                 Storage::disk('public')->delete($site->logo);
@@ -268,24 +279,74 @@ class SiteController extends Controller
         return redirect()->back()->with('success', 'Configurações do site atualizadas com sucesso!');
     }
 
-    public function atualizarDominio(Request $request)
+    protected function criarOuAtualizarVirtualHost($dominio)
+    {
+        // Validar domínio
+        if (!filter_var('http://' . $dominio, FILTER_VALIDATE_URL)) {
+            throw new \Exception('Domínio inválido.');
+        }
+
+        $scriptPath = '/usr/local/bin/criar-vhost.sh';
+
+        $process = new Process(["sudo", $scriptPath, $dominio]);
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            throw new ProcessFailedException($process);
+        }
+
+        return true;
+    }
+
+
+
+    public function atualizarConfiguracoes(Request $request, EmpresaSite $site)
+    {
+        // Validação
+
+        dd($request->all());
+
+        $data = $request->validate([
+            'titulo' => 'required|string|max:255',
+            'descricao' => 'nullable|string',
+            'dominio_personalizado' => 'nullable|string|max:255',
+            'gerar_vhost' => 'nullable|boolean',
+            'whatsapp' => 'nullable|string',
+            'cores' => 'nullable|array',
+            'sobre_titulo' => 'nullable|string|max:255',
+            'sobre_descricao' => 'nullable|string',
+            'sobre_itens' => 'nullable|array',
+            'autoatendimento_ia' => 'nullable|boolean',
+        ]);
+
+
+        $site->update($data);
+
+        // Se marcou gerar VHost e domínio válido
+        if (!empty($site->dominio_personalizado) && $site->gerar_vhost) {
+            try {
+                $this->criarOuAtualizarVirtualHost($site->dominio_personalizado);
+            } catch (\Exception $e) {
+                return redirect()->back()->withErrors(['erro' => 'Erro ao criar Virtual Host: ' . $e->getMessage()]);
+            }
+        }
+
+        return redirect()->back()->with('success', 'Configurações atualizadas com sucessoaaa!');
+    }
+
+    public function atualizarDominio(Request $request, EmpresaSite $site)
     {
         $request->validate([
             'dominio_personalizado' => 'required|string|max:255',
         ]);
 
         $dominio = strtolower(trim($request->dominio_personalizado));
-        $empresa = Auth::user()->empresa;
 
-        $site = EmpresaSite::firstOrCreate(
-            ['empresa_id' => $empresa->id],
-            ['slug' => Str::slug($empresa->nome_fantasia)]
-        );
-
+        // Atualiza domínio do site específico
         $site->dominio_personalizado = $dominio;
         $site->save();
 
-        // Chamar criação do Virtual Host
+        // Criar Virtual Host para este site
         try {
             $this->criarVirtualHost($dominio);
         } catch (\Exception $e) {
@@ -294,6 +355,7 @@ class SiteController extends Controller
 
         return redirect()->back()->with('success', 'Domínio atualizado e virtual host configurado!');
     }
+
 
     protected function criarVirtualHost($dominio)
     {

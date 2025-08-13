@@ -24,9 +24,8 @@
                             <x-alert/>
 
                            
-                             <form action="{{ route('admin.site.configuracoes.update', $site->id) }}" method="POST" enctype="multipart/form-data">
-                                @method('PUT')
-                      
+                           <form action="{{ route('admin.site.configuracoes.update', $site->id) }}" method="POST" enctype="multipart/form-data">
+                                @method('PUT')                      
                                 @csrf
 
                                 <!-- Seção 1: Informações gerais -->
@@ -128,6 +127,38 @@
                                         <button type="button" class="btn btn-secondary mt-2" onclick="adicionarItem()">+ Adicionar Item</button>
                                     </div>
                                 </div>
+
+
+                                <!-- Seção Domínio e Virtual Host -->
+                               <div class="form-section mb-4">
+                                <h5 class="mb-3">Domínio Personalizado e Virtual Host</h5>
+
+                                <div class="form-group">
+                                    <label for="dominio_personalizado">Domínio Personalizado (ex: meusite.com.br)</label>
+                                    <input type="text" name="dominio_personalizado" value="{{ old('dominio_personalizado', $site->dominio_personalizado ?? '') }}" class="form-control" placeholder="dominio.com.br">
+                                </div>
+
+                                <div class="form-group form-check mt-3">
+                                    <input type="checkbox" name="gerar_vhost" id="gerar_vhost" class="form-check-input"
+                                    {{ old('gerar_vhost', $site->gerar_vhost ?? false) ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="gerar_vhost">Gerar Virtual Host para este site</label>
+                                </div>
+
+                                @if(!empty($site->dominio_personalizado))
+                                    <div class="mt-2">
+                                        <small>Domínio atual: <strong>{{ $site->dominio_personalizado }}</strong></small>
+                                    </div>
+                                @endif
+
+                                {{-- Mensagem caso o VHost já esteja criado --}}
+                                @if(!empty($site->dominio_personalizado) && $site->vhost_criado)
+                                    <div class="alert alert-success mt-3">
+                                        ✅ Virtual Host já configurado para este domínio.
+                                    </div>
+                                @endif
+                            </div>
+
+
 
                                 <div class="card-footer d-flex justify-content-end">
                                     <button class="btn btn-success">
