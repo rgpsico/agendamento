@@ -199,13 +199,16 @@
                     <i class="fas fa-phone mr-2"></i>
                     {{ $site->whatsapp  ?? '(11) 99999-888' }}
                 </button>
-                <button class="border-2 border-white text-white hover:bg-white hover:text-gray-800 px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300">
+                <button  class="border-2 border-white text-white hover:bg-white hover:text-gray-800 px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300">
                     <i class="fab fa-whatsapp mr-2"></i>
                     WhatsApp
                 </button>
             </div>
         </div>
     </section>
+
+
+
 
     <!-- Contact Section -->
     <section id="contact" class="py-20 bg-white">
@@ -315,6 +318,16 @@
         </div>
     </section>
 
+
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{{ asset('js/site-metrics.js') }}"></script>
+<script>
+    window.SITE_ID = {{ $site->id ?? 1 }};
+    window.WHATSAPP = '{{ preg_replace("/[^0-9]/", "", $site->whatsapp ?? "1199999888") }}';
+</script>
+
+
+</script>
    @include('site._partials.footer')
 
     <!-- WhatsApp Floating Button -->

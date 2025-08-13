@@ -26,6 +26,9 @@ use App\Http\Controllers\Api\PixQrController;
 use App\Http\Controllers\Api\WebhookController;
 use App\Http\Controllers\BoletoController;
 use App\Http\Controllers\OpenAIController;
+use App\Http\Controllers\SiteCliqueWhatsappController;
+use App\Http\Controllers\SiteVisualizacaoController;
+
 use Illuminate\Http\Request;
 use Twilio\Rest\Client;
 use Illuminate\Support\Facades\Route;
@@ -201,6 +204,7 @@ Route::post('/test-twilio', function () {
 
 
 use App\Http\Controllers\Api\GoogleADSController;
+use App\Http\Controllers\SiteVisitanteController;
 
 Route::prefix('google-ads')->group(function () {
     Route::get('auth-url', [GoogleADSController::class, 'getAuthUrl']);
@@ -208,3 +212,14 @@ Route::prefix('google-ads')->group(function () {
     Route::post('create-campaign', [GoogleADSController::class, 'createCampaign']);
     Route::post('create-cliente', [GoogleADSController::class, 'createCustomerClient']);
 });
+
+
+
+Route::post('/clique-whatsapp', [SiteCliqueWhatsappController::class, 'store']);
+
+
+
+Route::post('/visualizacao', [SiteVisualizacaoController::class, 'store']);
+
+
+Route::post('/visitante', [SiteVisitanteController::class, 'store']);
