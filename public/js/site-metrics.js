@@ -59,4 +59,6 @@ $(document).ready(function() {
     registrarVisualizacao(empresaSiteId);
     registrarCliquesWhatsapp('.fa-whatsapp', empresaSiteId, whatsappNumero);
 
+    
+
 });
