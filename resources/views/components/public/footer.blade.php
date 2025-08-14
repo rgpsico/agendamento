@@ -357,7 +357,8 @@
                     <div class="footer-widget footer-about">
                         <div class="footer-logo">
                             <a href="/">
-                                <img src="{{ asset('admin/img/logorjpasseioedi.png') }}" alt="Logo RJ Passeios">
+                              <img src="https://rjpasseios.com.br/wp-content/uploads/2024/12/cropped-logo-1.png"
+                                class="img-fluid" alt="Logo">
                             </a>
                         </div>
                         <div class="footer-about-content" style="color:#fff;">
