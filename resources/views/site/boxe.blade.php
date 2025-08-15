@@ -407,7 +407,7 @@
                         <div class="carousel-wrapper" id="carousel">
                             @foreach ($site->servicos as $index => $servico)
                                 <div class="carousel-slide {{ $index == 0 ? 'active' : '' }}">
-                                    <img src="{{ $servico->imagem ?? 'https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80' }}" 
+                                    <img src="{{ $site->capa  ?? 'https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80' }}" 
                                          alt="{{ $servico->titulo ?? 'Imagem de Serviço' }}" class="rounded-2xl shadow-2xl w-full h-96 object-cover">
                                 </div>
                             @endforeach
