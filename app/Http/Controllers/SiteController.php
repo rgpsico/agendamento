@@ -83,12 +83,6 @@ class SiteController extends Controller
 
 
 
-
-
-
-    /**
-     * Página de edição das configurações do site (painel admin)
-     */
     public function edit()
     {
         $empresa = Auth::user()->empresa;
