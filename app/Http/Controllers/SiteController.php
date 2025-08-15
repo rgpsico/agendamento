@@ -59,7 +59,7 @@ class SiteController extends Controller
             ->firstOrFail();
 
 
-        return view('site.publico', compact('site'));
+        return view('site.boxe', compact('site'));
     }
 
     public function mostrarDominio(Request $request)

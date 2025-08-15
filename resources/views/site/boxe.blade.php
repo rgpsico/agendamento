@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fight Club Academy - Transforme-se Através do Boxe</title>
+    <title>{{ $site->titulo ?? 'Fight Club Academy' }} - Transforme-se Através do Boxe</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
             margin: 0;
@@ -15,10 +16,40 @@
         }
 
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Inter', 'Arial', sans-serif;
             background: #0a0a0a;
             color: #fff;
             overflow-x: hidden;
+        }
+
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, {{ $site->cores['primary'] ?? '#ff6b35' }}, {{ $site->cores['secondary'] ?? '#f7931e' }});
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .wave-loader {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         /* Header */
@@ -37,15 +68,15 @@
             max-width: 1200px;
             margin: 0 auto;
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
             padding: 0 2rem;
         }
 
         .logo {
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: bold;
-            background: linear-gradient(45deg, #ff6b35, #f7931e);
+            background: linear-gradient(45deg, {{ $site->cores['primary'] ?? '#ff6b35' }}, {{ $site->cores['secondary'] ?? '#f7931e' }});
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -53,47 +84,50 @@
             letter-spacing: 2px;
         }
 
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-menu a:hover {
+            color: {{ $site->cores['primary'] ?? '#ff6b35' }};
+        }
+
         /* Hero Section */
         .hero-gradient {
-            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 50%, #ff4500 100%);
-            position: relative;
+            background: linear-gradient(135deg, {{ $site->cores['primary'] ?? '#ff6b35' }} 0%, {{ $site->cores['secondary'] ?? '#f7931e' }} 50%, {{ $site->cores['accent'] ?? '#ff4500' }} 100%);
         }
 
         .hero {
-            height: 100vh;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
             position: relative;
             overflow: hidden;
         }
 
-        .hero::before {
-            content: '';
+        .wave-animation {
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
             bottom: 0;
-            background: radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.3) 100%);
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25" fill="%23ffffff"></path><path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" opacity=".5" fill="%23ffffff"></path><path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" fill="%23ffffff"></path></svg>') repeat-x;
+            animation: wave 20s ease-in-out infinite;
             z-index: 1;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .hero-content h1 {
-            font-size: clamp(3rem, 8vw, 6rem);
-            font-weight: bold;
-            margin-bottom: 1.5rem;
-            line-height: 1.1;
-            text-transform: uppercase;
-        }
-
-        .hero-content p {
-            font-size: 1.3rem;
-            margin-bottom: 2.5rem;
-            opacity: 0.9;
-            line-height: 1.6;
+        @keyframes wave {
+            0%, 100% { transform: translateX(0px); }
+            50% { transform: translateX(-50px); }
         }
 
         .text-glow {
@@ -111,34 +145,7 @@
             border-color: rgba(255, 255, 255, 0.4);
         }
 
-        /* Wave Animation */
-        .wave-animation {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 100px;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25" fill="%23ffffff"></path><path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" opacity=".5" fill="%23ffffff"></path><path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" fill="%23ffffff"></path></svg>') repeat-x;
-            animation: wave 20s ease-in-out infinite;
-            z-index: 1;
-        }
-
-        @keyframes wave {
-            0%, 100% { transform: translateX(0px); }
-            50% { transform: translateX(-50px); }
-        }
-
-        /* Floating Animation */
-        .floating {
-            animation: floating 6s ease-in-out infinite;
-        }
-
-        @keyframes floating {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-        }
-
-        /* Carousel Styles */
+        /* Carousel */
         .carousel-container {
             position: relative;
             width: 100%;
@@ -170,10 +177,6 @@
             transform: translateX(0);
         }
 
-        .carousel-slide.prev {
-            transform: translateX(-100%);
-        }
-
         .carousel-slide img {
             width: 100%;
             height: 100%;
@@ -182,7 +185,6 @@
             box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
         }
 
-        /* Carousel Navigation */
         .carousel-nav {
             display: flex;
             justify-content: center;
@@ -205,205 +207,58 @@
             transform: scale(1.2);
         }
 
-        .carousel-dot:hover {
-            background: rgba(255, 255, 255, 0.8);
+        .floating {
+            animation: floating 6s ease-in-out infinite;
         }
 
-        /* Scroll Indicator */
-        .scroll-indicator {
-            z-index: 10;
+        @keyframes floating {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
         }
 
-        /* Typing Animation */
-        .typing-text {
-            border-right: 3px solid white;
-            animation: blink 1s infinite;
-        }
-
-        @keyframes blink {
-            0%, 50% { border-color: white; }
-            51%, 100% { border-color: transparent; }
-        }
-
-        .cta-button {
-            background: linear-gradient(45deg, #ff6b35, #f7931e);
-            color: white;
-            padding: 1.2rem 3rem;
-            font-size: 1.2rem;
-            font-weight: bold;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+        /* Services Section */
+        .card-hover {
             transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-            position: relative;
-            overflow: hidden;
         }
 
-        .cta-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(255, 107, 53, 0.4);
-        }
-
-        .cta-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s;
-        }
-
-        .cta-button:hover::before {
-            left: 100%;
-        }
-
-        /* Features Section */
-        .features {
-            padding: 6rem 2rem;
-            background: #111;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .section-title {
-            text-align: center;
-            font-size: 3rem;
-            margin-bottom: 3rem;
-            background: linear-gradient(45deg, #ff6b35, #f7931e);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-transform: uppercase;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-top: 4rem;
-        }
-
-        .feature-card {
-            background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
-            padding: 2.5rem;
-            border-radius: 20px;
-            text-align: center;
-            border: 1px solid #333;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .feature-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(45deg, #ff6b35, #f7931e);
-            transform: scaleX(0);
-            transition: transform 0.3s ease;
-        }
-
-        .feature-card:hover::before {
-            transform: scaleX(1);
-        }
-
-        .feature-card:hover {
+        .card-hover:hover {
             transform: translateY(-10px);
             box-shadow: 0 20px 40px rgba(255, 107, 53, 0.2);
         }
 
-        .feature-icon {
-            font-size: 3rem;
-            color: #ff6b35;
-            margin-bottom: 1.5rem;
-        }
-
-        .feature-card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            color: #f7931e;
-        }
-
-        /* Stats Section */
-        .stats {
-            padding: 6rem 2rem;
-            background: linear-gradient(135deg, #ff6b35, #f7931e);
-            text-align: center;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 3rem;
-            margin-top: 3rem;
-        }
-
-        .stat-item {
-            color: white;
-        }
-
-        .stat-number {
-            font-size: 3.5rem;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-            display: block;
-        }
-
-        .stat-label {
-            font-size: 1.2rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        /* CTA Section */
-        .cta-section {
-            padding: 8rem 2rem;
-            background: #0a0a0a;
-            text-align: center;
-        }
-
-        .cta-section h2 {
-            font-size: 3.5rem;
-            margin-bottom: 1.5rem;
-            background: linear-gradient(45deg, #ff6b35, #f7931e);
+        .service-icon {
+            background: linear-gradient(45deg, {{ $site->cores['primary'] ?? '#ff6b35' }}, {{ $site->cores['secondary'] ?? '#f7931e' }});
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
 
-        .cta-section p {
-            font-size: 1.3rem;
-            margin-bottom: 3rem;
-            opacity: 0.9;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
+        /* About Section */
+        .parallax-bg {
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
         }
 
-        /* WhatsApp Floating Button */
-        .whatsapp-float {
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* WhatsApp Button */
+        .diagonal-whatsapp {
             position: fixed;
             width: 60px;
             height: 60px;
-            bottom: 40px;
-            right: 40px;
+            bottom: 30px;
+            right: 30px;
             background: #25d366;
             color: white;
             border-radius: 50px;
             text-align: center;
-            font-size: 30px;
+            font-size: 28px;
             box-shadow: 2px 2px 15px rgba(37, 211, 102, 0.4);
             z-index: 1000;
             display: flex;
@@ -414,7 +269,7 @@
             animation: pulse 2s infinite;
         }
 
-        .whatsapp-float:hover {
+        .diagonal-whatsapp:hover {
             transform: scale(1.1);
             box-shadow: 2px 2px 25px rgba(37, 211, 102, 0.6);
         }
@@ -431,124 +286,115 @@
             }
         }
 
+        /* Section Divider */
+        .section-divider {
+            height: 4px;
+            background: linear-gradient(45deg, {{ $site->cores['primary'] ?? '#ff6b35' }}, {{ $site->cores['secondary'] ?? '#f7931e' }});
+            border-radius: 2px;
+            margin: 1rem auto;
+        }
+
+        /* Testimonial Cards */
+        .testimonial-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Stars */
+        .stars {
+            color: #fbbf24;
+        }
+
+        /* Scroll Indicator */
+        .scroll-indicator {
+            z-index: 10;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
-            .hero-content h1 {
-                font-size: 2.5rem;
+            .nav-menu {
+                display: none;
             }
             
-            .section-title {
-                font-size: 2rem;
-            }
-            
-            .whatsapp-float {
-                width: 50px;
-                height: 50px;
-                font-size: 24px;
-                bottom: 20px;
-                right: 20px;
-            }
-
             .carousel-wrapper {
                 height: 300px;
             }
 
-            .hero-content p {
-                font-size: 1.1rem;
+            .hero-content h1 {
+                font-size: 2.5rem !important;
             }
 
             .hero-buttons {
                 flex-direction: column;
                 gap: 1rem;
             }
-
-            .btn-primary, .hero-buttons a {
-                padding: 1rem 2rem;
-                font-size: 1rem;
-                text-align: center;
-            }
         }
 
         @media (max-width: 640px) {
-            .hero {
-                padding: 2rem 0;
-            }
-
-            .container {
-                padding: 0 1rem;
-            }
-
             .grid {
-                grid-template-columns: 1fr;
-                gap: 2rem;
-            }
-
-            .hero-image {
-                order: -1;
+                grid-template-columns: 1fr !important;
             }
 
             .carousel-wrapper {
                 height: 250px;
             }
         }
-
-        /* Particles Animation */
-        .particles {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            z-index: 1;
-        }
-
-        .particle {
-            position: absolute;
-            background: #ff6b35;
-            border-radius: 50%;
-            opacity: 0.5;
-            animation: float 6s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0px) rotate(0deg);
-            }
-            50% {
-                transform: translateY(-20px) rotate(180deg);
-            }
-        }
     </style>
 </head>
-<body>
-    <!-- Header -->
+<body class="font-sans bg-gray-50 overflow-x-hidden">
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loading">
+        <div class="wave-loader"></div>
+        <p class="text-white text-xl mt-4 loading-text">Preparando o treino...</p>
+    </div>
+
+    <!-- WhatsApp Button -->
+    <a href="https://wa.me/{{ $site->whatsapp ?? '5511999999999' }}?text=Olá,%20gostaria%20de%20mais%20informações%20sobre%20os%20treinos%20de%20boxe!" class="diagonal-whatsapp floating">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <!-- Navigation -->
     <header id="header">
         <div class="nav-container">
-            <div class="logo">Fight Club Academy</div>
+            <div class="logo">{{ $site->titulo ?? 'Fight Club Academy' }}</div>
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="#home">Início</a></li>
+                    <li><a href="#services">Serviços</a></li>
+                    <li><a href="#about">Sobre</a></li>
+                    <li><a href="#testimonials">Depoimentos</a></li>
+                    <li><a href="#contact">Contato</a></li>
+                </ul>
+            </nav>
         </div>
     </header>
 
     <!-- Hero Section -->
-    <section id="home" class="hero hero-gradient text-white min-h-screen flex items-center relative overflow-hidden">
+    <section id="home" class="hero-gradient text-white min-h-screen flex items-center relative">
         <div class="wave-animation"></div>
-        <div class="particles" id="particles"></div>
-        
         <div class="container mx-auto px-6 relative z-10">
             <div class="grid md:grid-cols-2 gap-12 items-center">
                 <div class="hero-content">
                     <h1 class="text-5xl md:text-7xl font-bold leading-tight mb-6 text-glow">
-                        <span class="typing-text" id="hero-title">Desperte o Lutador que Existe em Você</span>
+                        <span class="typing-text" id="hero-title">{{ $site->descricao ?? 'Desperte o Lutador que Existe em Você' }}</span>
                     </h1>
                     <p class="text-xl md:text-2xl mb-8 opacity-90 hero-subtitle" id="hero-text">
-                        Transforme sua vida através do boxe. Treine com os melhores, desenvolva disciplina, força e confiança. Sua jornada de transformação começa agora!
+                        {{ $site->sobre_descricao ?? 'Transforme sua vida através do boxe. Treine com os melhores, desenvolva disciplina, força e confiança. Sua jornada de transformação começa agora!' }}
                     </p>
                     <div class="flex flex-col sm:flex-row gap-4 hero-buttons">
-                        <a href="#cta" class="btn-primary text-white px-8 py-4 rounded-full font-semibold text-lg hover:scale-105 transition-all duration-300" id="hero-cta">
+                        <a href="#services" class="btn-primary text-white px-8 py-4 rounded-full font-semibold text-lg hover:scale-105 transition-all duration-300">
                             <i class="fas fa-fist-raised mr-2"></i>
                             Comece Sua Transformação
                         </a>
-                        <a href="#features" class="border-2 border-white text-white hover:bg-white hover:text-gray-800 px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300">
+                        <a href="#about" class="border-2 border-white text-white hover:bg-white hover:text-gray-800 px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300">
                             <i class="fas fa-play mr-2"></i>
                             Ver Mais
                         </a>
@@ -559,30 +405,19 @@
                 <div class="hero-image relative">
                     <div class="floating carousel-container">
                         <div class="carousel-wrapper" id="carousel">
-                            <div class="carousel-slide active">
-                                <img src="https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
-                                     alt="Boxeador Treinando" class="rounded-2xl shadow-2xl w-full h-96 object-cover">
-                            </div>
-                            <div class="carousel-slide">
-                                <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
-                                     alt="Academia de Boxe" class="rounded-2xl shadow-2xl w-full h-96 object-cover">
-                            </div>
-                            <div class="carousel-slide">
-                                <img src="https://images.unsplash.com/photo-1517438984742-1262db08379e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
-                                     alt="Treino Intenso" class="rounded-2xl shadow-2xl w-full h-96 object-cover">
-                            </div>
-                            <div class="carousel-slide">
-                                <img src="https://images.unsplash.com/photo-1544551763-77ef2d0cfc6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
-                                     alt="Boxeador Profissional" class="rounded-2xl shadow-2xl w-full h-96 object-cover">
-                            </div>
+                            @foreach ($site->servicos as $index => $servico)
+                                <div class="carousel-slide {{ $index == 0 ? 'active' : '' }}">
+                                    <img src="{{ $servico->imagem ?? 'https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80' }}" 
+                                         alt="{{ $servico->titulo ?? 'Imagem de Serviço' }}" class="rounded-2xl shadow-2xl w-full h-96 object-cover">
+                                </div>
+                            @endforeach
                         </div>
                         
                         <!-- Carousel Navigation -->
                         <div class="carousel-nav">
-                            <button class="carousel-dot active" onclick="goToSlide(0)"></button>
-                            <button class="carousel-dot" onclick="goToSlide(1)"></button>
-                            <button class="carousel-dot" onclick="goToSlide(2)"></button>
-                            <button class="carousel-dot" onclick="goToSlide(3)"></button>
+                            @foreach ($site->servicos as $index => $servico)
+                                <button class="carousel-dot {{ $index == 0 ? 'active' : '' }}" onclick="goToSlide({{ $index }})"></button>
+                            @endforeach
                         </div>
                     </div>
                 </div>
@@ -597,146 +432,351 @@
         </div>
     </section>
 
-    <!-- Features Section -->
-    <section class="features" id="features">
-        <div class="container">
-            <h2 class="section-title">Por Que Escolher o Boxe?</h2>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <i class="fas fa-fist-raised feature-icon"></i>
-                    <h3>Força e Resistência</h3>
-                    <p>Desenvolva força explosiva e resistência cardiovascular através de treinos intensivos e progressivos.</p>
+    <!-- Services Section -->
+    <section id="services" class="py-20 bg-gray-50">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16 section-header">
+                <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
+                    Nossos Serviços de Boxe
+                </h2>
+                <div class="section-divider max-w-md mx-auto"></div>
+                <p class="text-gray-600 text-xl max-w-2xl mx-auto">
+                    {{ $site->sobre_descricao ?? 'Oferecemos uma experiência completa para todos os níveis - do iniciante ao profissional.' }}
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 services-grid">
+                @foreach ($site->servicos as $servico)
+                    <div class="card-hover bg-white rounded-2xl overflow-hidden shadow-lg relative">
+                        @if ($servico->destaque)
+                            <div class="absolute top-4 left-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-sm font-semibold z-10">
+                                Mais Popular
+                            </div>
+                        @endif
+                        <div class="h-48 relative overflow-hidden">
+                            <img src="{{ $servico->imagem ?? 'https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80' }}" alt="{{ $servico->titulo }}" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-black bg-opacity-20"></div>
+                            <div class="absolute top-4 right-4 bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg rounded-full p-3">
+                                <i class="fas {{ $servico->icone ?? 'fa-user' }} text-white text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-3">{{ $servico->titulo }}</h3>
+                            <p class="text-gray-600 mb-4">{{ $servico->descricao }}</p>
+                            <ul class="mb-6 text-gray-600 space-y-2">
+                                @foreach ($servico->itens ?? ['Item 1', 'Item 2', 'Item 3'] as $item)
+                                    <li class="flex items-center">
+                                        <i class="fas fa-check text-green-500 mr-3"></i>
+                                        {{ $item }}
+                                    </li>
+                                @endforeach
+                            </ul>
+                            <div class="flex justify-between items-center">
+                                <span class="text-3xl font-bold service-icon">{{ $servico->preco ? 'R$ ' . number_format($servico->preco, 2, ',', '.') : 'Consultar' }}</span>
+                                <button class="btn-primary text-white px-6 py-3 rounded-full font-semibold transition-all duration-300 hover:scale-105" onclick="openWhatsApp('{{ $servico->titulo }}')">
+                                    Reservar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 bg-white parallax-bg" style="background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('{{ $site->sobre_imagem ?? 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80' }}');">
+        <div class="container mx-auto px-6">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="about-content">
+                    <h2 class="text-4xl md:text-5xl font-bold text-white mb-6 about-title">{{ $site->sobre_titulo ?? 'Por que escolher a Fight Club Academy?' }}</h2>
+                    <p class="text-gray-200 text-lg mb-8 about-description">{{ $site->sobre_descricao ?? 'Com mais de 10 anos de experiência, somos a academia de boxe líder na região, formando campeões e transformando vidas.' }}</p>
+                    
+                    <div class="space-y-6 about-features">
+                        @foreach ($site->sobre_itens ?? [] as $item)
+                            <div class="flex items-start glass-card p-4 rounded-lg about-feature">
+                                <div class="bg-orange-500 p-3 rounded-full mr-4 flex-shrink-0">
+                                    <i class="fas {{ $item['icone'] ?? 'fa-medal' }} text-white text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-semibold text-white mb-2">{{ $item['titulo'] ?? 'Característica' }}</h3>
+                                    <p class="text-gray-200">{{ $item['descricao'] ?? 'Descrição da característica.' }}</p>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
-                <div class="feature-card">
-                    <i class="fas fa-brain feature-icon"></i>
-                    <h3>Disciplina Mental</h3>
-                    <p>Fortaleça sua mente, desenvolva foco e aprenda a superar desafios dentro e fora do ringue.</p>
-                </div>
-                <div class="feature-card">
-                    <i class="fas fa-shield-alt feature-icon"></i>
-                    <h3>Autodefesa</h3>
-                    <p>Aprenda técnicas eficazes de autodefesa e ganhe confiança para enfrentar qualquer situação.</p>
-                </div>
-                <div class="feature-card">
-                    <i class="fas fa-fire feature-icon"></i>
-                    <h3>Queima de Calorias</h3>
-                    <p>Elimine até 800 calorias por treino e conquiste o corpo dos seus sonhos de forma divertida.</p>
-                </div>
-                <div class="feature-card">
-                    <i class="fas fa-users feature-icon"></i>
-                    <h3>Comunidade</h3>
-                    <p>Faça parte de uma família de lutadores que se apoiam mutuamente na jornada de crescimento.</p>
-                </div>
-                <div class="feature-card">
-                    <i class="fas fa-trophy feature-icon"></i>
-                    <h3>Conquiste Objetivos</h3>
-                    <p>Supere seus limites e alcance metas que você nunca imaginou ser possível atingir.</p>
+                
+                <div class="about-image">
+                    <div class="grid grid-cols-2 gap-4">
+                        @foreach ($site->servicos->take(4) as $index => $servico)
+                            <img src="{{ $servico->imagem ?? 'https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }}" alt="{{ $servico->titulo }}" class="rounded-lg shadow-lg about-image-item {{ $index % 2 == 1 ? 'mt-8' : ($index == 2 ? 'mt-16' : '') }}">
+                        @endforeach
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Stats Section -->
-    <section class="stats">
-        <div class="container">
-            <h2 class="section-title" style="color: white;">Resultados Comprovados</h2>
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <span class="stat-number" id="stat1">500</span>
-                    <span class="stat-label">Alunos Transformados</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number" id="stat2">95</span>
-                    <span class="stat-label">% de Satisfação</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number" id="stat3">5</span>
-                    <span class="stat-label">Anos de Experiência</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number" id="stat4">50</span>
-                    <span class="stat-label">Campeões Formados</span>
-                </div>
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="py-20 bg-gray-50">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16 section-header">
+                <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">O Que Dizem Nossos Alunos</h2>
+                <div class="section-divider max-w-md mx-auto"></div>
+                <p class="text-gray-600 text-xl max-w-2xl mx-auto">
+                    Histórias reais de transformação e conquistas
+                </p>
+            </div>
+        
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-1 testimonials-grid">
+                @foreach ($site->depoimentos as $depoimento)
+                    <div class="testimonial-card">
+                        <div class="flex items-center mb-4">
+                            <img src="{{ $depoimento->imagem ?? 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80' }}" alt="{{ $depoimento->nome }}" class="w-12 h-12 rounded-full mr-4 object-cover">
+                            <div>
+                                <h4 class="font-semibold text-gray-800">{{ $depoimento->nome }}</h4>
+                                <p class="text-sm text-gray-600">{{ $depoimento->servico ?? 'Serviço' }} - {{ $depoimento->ano ?? now()->year }}</p>
+                            </div>
+                        </div>
+                        <div class="stars mb-4">
+                            @for ($i = 0; $i < ($depoimento->avaliacao ?? 5); $i++)
+                                <i class="fas fa-star"></i>
+                            @endfor
+                        </div>
+                        <p class="text-gray-700 mb-4">"{{ $depoimento->texto ?? 'Depoimento inspirador de um aluno.' }}"</p>
+                    </div>
+                @endforeach
             </div>
         </div>
     </section>
 
     <!-- CTA Section -->
-    <section class="cta-section" id="cta">
-        <div class="container">
-            <h2>Pronto Para Começar?</h2>
-            <p>Não deixe para amanhã a transformação que você pode começar hoje. Junte-se aos nossos alunos e descubra o poder do boxe!</p>
-            <a href="#" class="cta-button" onclick="openWhatsApp()">Quero Começar Agora</a>
+    <section class="py-20 hero-gradient text-white relative overflow-hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-20"></div>
+        <div class="container mx-auto px-6 relative z-10 text-center">
+            <h2 class="text-4xl md:text-6xl font-bold mb-6 text-glow cta-title">Pronto para Sua Primeira Luta?</h2>
+            <p class="text-xl md:text-2xl mb-8 opacity-90 cta-subtitle">{{ $site->sobre_descricao ?? 'Junte-se a centenas de alunos que já transformaram suas vidas através do boxe' }}</p>
+            
+            <div class="flex flex-col sm:flex-row justify-center gap-4 cta-buttons">
+                <button onclick="openWhatsApp('Informações gerais')" class="bg-white text-gray-800 hover:bg-gray-100 px-8 py-4 rounded-full font-semibold text-lg hover:scale-105 transition-all duration-300">
+                    <i class="fas fa-phone mr-2"></i>
+                    {{ $site->whatsapp ?? '(11) 99999-9999' }}
+                </button>
+                <button onclick="openWhatsApp('Quero treinar boxe')" class="border-2 border-white text-white hover:bg-white hover:text-gray-800 px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300">
+                    <i class="fab fa-whatsapp mr-2"></i>
+                    WhatsApp
+                </button>
+            </div>
         </div>
     </section>
 
-    <!-- WhatsApp Floating Button -->
-    <a href="#" class="whatsapp-float" onclick="openWhatsApp()" title="Entre em contato pelo WhatsApp">
-        <i class="fab fa-whatsapp"></i>
-    </a>
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16 section-header">
+                <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">Fale Conosco</h2>
+                <div class="section-divider max-w-md mx-auto"></div>
+                <p class="text-gray-600 text-xl max-w-2xl mx-auto">
+                    Estamos aqui para tirar suas dúvidas e ajudar você a começar sua jornada no boxe
+                </p>
+            </div>
+
+            <div class="max-w-6xl mx-auto">
+                <div class="grid md:grid-cols-2 gap-12">
+                    <!-- Contact Info -->
+                    <div class="contact-info">
+                        <div class="glass-card p-8 rounded-2xl bg-gradient-to-br from-orange-50 to-red-50">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-6">Informações de Contato</h3>
+                            <div class="space-y-6">
+                                <!-- Address -->
+                                <div class="flex items-start">
+                                    <div class="bg-orange-500 p-3 rounded-full mr-4 flex-shrink-0">
+                                        <i class="fas fa-map-marker-alt text-white text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-800 mb-1">Endereço</h4>
+                                        <p class="text-gray-600">
+                                            {{ $site->endereco->rua ?? 'Rua dos Lutadores, 1234' }}<br>
+                                            {{ $site->endereco->bairro ?? 'Centro' }} - {{ $site->endereco->cidade ?? 'São Paulo' }}, {{ $site->endereco->estado ?? 'SP' }}<br>
+                                            {{ $site->endereco->cep ?? '01000-000' }}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <!-- Phone -->
+                                <div class="flex items-start">
+                                    <div class="bg-orange-500 p-3 rounded-full mr-4 flex-shrink-0">
+                                        <i class="fas fa-phone text-white text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-800 mb-1">Telefone</h4>
+                                        <p class="text-gray-600">{{ $site->whatsapp ?? '(11) 99999-9999' }}</p>
+                                    </div>
+                                </div>
+
+                                <!-- Email -->
+                                <div class="flex items-start">
+                                    <div class="bg-orange-500 p-3 rounded-full mr-4 flex-shrink-0">
+                                        <i class="fas fa-envelope text-white text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-800 mb-1">Email</h4>
+                                        <p class="text-gray-600">{{ $site->empresa->email ?? 'contato@fightclub.com.br' }}</p>
+                                    </div>
+                                </div>
+
+                                <!-- Schedule -->
+                                <div class="flex items-start">
+                                    <div class="bg-orange-500 p-3 rounded-full mr-4 flex-shrink-0">
+                                        <i class="fas fa-clock text-white text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-800 mb-1">Horário</h4>
+                                        <p class="text-gray-600">
+                                            {{ $site->horario ?? 'Seg - Sex: 6h às 22h<br>Sáb: 7h às 18h<br>Dom: 8h às 16h' }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Form -->
+                    <div class="contact-form">
+                        <form class="space-y-6" id="contactForm">
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-2">Nome</label>
+                                    <input type="text" name="nome" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all duration-300" required>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-2">Telefone</label>
+                                    <input type="tel" name="telefone" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all duration-300" required>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2">Email</label>
+                                <input type="email" name="email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all duration-300" required>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2">Serviço de Interesse</label>
+                                <select name="servico" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all duration-300">
+                                    @foreach ($site->servicos as $servico)
+                                        <option>{{ $servico->titulo }}</option>
+                                    @endforeach
+                                    <option>Informações Gerais</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2">Mensagem</label>
+                                <textarea name="mensagem" rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all duration-300" placeholder="Conte-nos mais sobre seu interesse no boxe..." required></textarea>
+                            </div>
+                            
+                            <button type="submit" class="w-full btn-primary text-white font-semibold py-4 rounded-lg hover:scale-105 transition-all duration-300">
+                                <i class="fas fa-paper-plane mr-2"></i>
+                                Enviar Mensagem
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="container mx-auto px-6">
+            <div class="grid md:grid-cols-4 gap-8">
+                <!-- Company Info -->
+                <div class="md:col-span-2">
+                    <div class="logo text-2xl font-bold mb-4">{{ $site->titulo ?? 'Fight Club Academy' }}</div>
+                    <p class="text-gray-400 mb-4">{{ $site->descricao ?? 'Transformando vidas através do boxe há mais de 10 anos. Nossa missão é desenvolver não apenas lutadores, mas pessoas mais disciplinadas e confiantes.' }}</p>
+                    <div class="flex space-x-4">
+                        <a href="{{ $site->facebook ?? '#' }}" class="text-gray-400 hover:text-orange-500 transition-colors">
+                            <i class="fab fa-facebook text-2xl"></i>
+                        </a>
+                        <a href="{{ $site->instagram ?? '#' }}" class="text-gray-400 hover:text-orange-500 transition-colors">
+                            <i class="fab fa-instagram text-2xl"></i>
+                        </a>
+                        <a href="{{ $site->youtube ?? '#' }}" class="text-gray-400 hover:text-orange-500 transition-colors">
+                            <i class="fab fa-youtube text-2xl"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Links Rápidos</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#home" class="text-gray-400 hover:text-orange-500 transition-colors">Início</a></li>
+                        <li><a href="#services" class="text-gray-400 hover:text-orange-500 transition-colors">Serviços</a></li>
+                        <li><a href="#about" class="text-gray-400 hover:text-orange-500 transition-colors">Sobre</a></li>
+                        <li><a href="#testimonials" class="text-gray-400 hover:text-orange-500 transition-colors">Depoimentos</a></li>
+                        <li><a href="#contact" class="text-gray-400 hover:text-orange-500 transition-colors">Contato</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact Info -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Contato</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><i class="fas fa-map-marker-alt mr-2"></i>{{ $site->endereco->rua ?? 'Rua dos Lutadores, 1234' }}</li>
+                        <li><i class="fas fa-phone mr-2"></i>{{ $site->whatsapp ?? '(11) 99999-9999' }}</li>
+                        <li><i class="fas fa-envelope mr-2"></i>{{ $site->empresa->email ?? 'contato@fightclub.com.br' }}</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center">
+                <p class="text-gray-400">&copy; {{ now()->year }} {{ $site->titulo ?? 'Fight Club Academy' }}. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
 
     <script>
-        // Variáveis do carrossel
+        // Loading Screen
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                document.getElementById('loading').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('loading').style.display = 'none';
+                }, 500);
+            }, 2000);
+        });
+
+        // Carousel functionality
         let currentSlide = 0;
         const slides = document.querySelectorAll('.carousel-slide');
         const dots = document.querySelectorAll('.carousel-dot');
         const totalSlides = slides.length;
 
-        // Função para ir para um slide específico
         function goToSlide(slideIndex) {
-            // Remove classes ativas
             slides[currentSlide].classList.remove('active');
             dots[currentSlide].classList.remove('active');
             
-            // Atualiza o slide atual
             currentSlide = slideIndex;
             
-            // Adiciona classes ativas
             slides[currentSlide].classList.add('active');
             dots[currentSlide].classList.add('active');
         }
 
-        // Função para próximo slide
         function nextSlide() {
             const nextIndex = (currentSlide + 1) % totalSlides;
             goToSlide(nextIndex);
         }
 
-        // Auto-play do carrossel
         function startCarousel() {
-            setInterval(nextSlide, 4000); // Muda a cada 4 segundos
+            setInterval(nextSlide, 4000);
         }
 
-        // Inicializar carrossel após carregamento
-        document.addEventListener('DOMContentLoaded', function() {
-            startCarousel();
-        });
-
-        // Animação de digitação
-        function typeWriter(element, text, speed = 100) {
-            element.innerHTML = '';
-            element.style.borderRight = '3px solid white';
-            
-            let i = 0;
-            function type() {
-                if (i < text.length) {
-                    element.innerHTML += text.charAt(i);
-                    i++;
-                    setTimeout(type, speed);
-                } else {
-                    // Remove cursor após terminar
-                    setTimeout(() => {
-                        element.style.borderRight = 'none';
-                    }, 1000);
-                }
-            }
-            type();
-        }
-
-        // Registrar ScrollTrigger
+        // GSAP Animations
         gsap.registerPlugin(ScrollTrigger);
 
-        // Animações de entrada da hero section
+        // Hero animations
         gsap.timeline()
             .from(".hero-content", {
                 duration: 1,
@@ -757,148 +797,136 @@
                 ease: "power2.out"
             }, "-=0.3");
 
-        // Inicializar animação de digitação
-        window.addEventListener('load', function() {
-            const titleElement = document.getElementById('hero-title');
-            const originalText = titleElement.textContent;
-            typeWriter(titleElement, originalText, 80);
-        });
-
-        // Animação das partículas
-        function createParticles() {
-            const particlesContainer = document.getElementById('particles');
-            const particleCount = 20;
-
-            for (let i = 0; i < particleCount; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                
-                const size = Math.random() * 4 + 2;
-                particle.style.width = size + 'px';
-                particle.style.height = size + 'px';
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.top = Math.random() * 100 + '%';
-                particle.style.animationDelay = Math.random() * 6 + 's';
-                particle.style.animationDuration = (Math.random() * 4 + 4) + 's';
-                
-                particlesContainer.appendChild(particle);
-            }
-        }
-
-        createParticles();
-
-        // Animação dos cards de features
-        gsap.from(".feature-card", {
+        // Services animation
+        gsap.from(".card-hover", {
             duration: 0.8,
             y: 100,
             opacity: 0,
             stagger: 0.2,
             ease: "power2.out",
             scrollTrigger: {
-                trigger: ".features-grid",
+                trigger: "#services",
                 start: "top 80%"
             }
         });
 
-        // Animação dos números das estatísticas
-        function animateStats() {
-            const stats = [
-                { id: "stat1", target: 500 },
-                { id: "stat2", target: 95 },
-                { id: "stat3", target: 5 },
-                { id: "stat4", target: 50 }
-            ];
+        // About animation
+        gsap.from(".about-feature", {
+            duration: 0.8,
+            x: -50,
+            opacity: 0,
+            stagger: 0.2,
+            scrollTrigger: {
+                trigger: "#about",
+                start: "top 80%"
+            }
+        });
 
-            stats.forEach(stat => {
-                gsap.to(`#${stat.id}`, {
-                    duration: 2,
-                    innerText: stat.target,
-                    ease: "power2.out",
-                    snap: { innerText: 1 },
-                    scrollTrigger: {
-                        trigger: ".stats",
-                        start: "top 80%"
-                    }
-                });
-            });
-        }
+        gsap.from(".about-image-item", {
+            duration: 0.8,
+            scale: 0.8,
+            opacity: 0,
+            stagger: 0.1,
+            scrollTrigger: {
+                trigger: "#about",
+                start: "top 80%"
+            }
+        });
 
-        animateStats();
-
-        // Animação da seção CTA
-        gsap.from(".cta-section h2", {
-            duration: 1,
+        // Testimonials animation
+        gsap.from(".testimonial-card", {
+            duration: 0.8,
             y: 50,
             opacity: 0,
+            stagger: 0.2,
             scrollTrigger: {
-                trigger: ".cta-section",
+                trigger: "#testimonials",
                 start: "top 80%"
             }
         });
 
-        gsap.from(".cta-section p", {
-            duration: 1,
-            y: 30,
-            opacity: 0,
-            delay: 0.2,
-            scrollTrigger: {
-                trigger: ".cta-section",
-                start: "top 80%"
+        // WhatsApp functionality
+        function openWhatsApp(service = '') {
+            const phoneNumber = "{{ $site->whatsapp ?? '5511999999999' }}";
+            let message = "Olá! Gostaria de mais informações sobre os treinos de boxe!";
+            
+            if (service) {
+                message = `Olá! Gostaria de mais informações sobre: ${service}`;
             }
-        });
-
-        gsap.from(".cta-section .cta-button", {
-            duration: 0.8,
-            scale: 0,
-            opacity: 0,
-            delay: 0.5,
-            ease: "back.out(1.7)",
-            scrollTrigger: {
-                trigger: ".cta-section",
-                start: "top 80%"
-            }
-        });
-
-        // Header transparente no scroll
-        gsap.to("#header", {
-            backgroundColor: "rgba(0,0,0,0.95)",
-            backdropFilter: "blur(10px)",
-            scrollTrigger: {
-                trigger: "body",
-                start: "100px top",
-                toggleActions: "play none none reverse"
-            }
-        });
-
-        // Função para abrir WhatsApp
-        function openWhatsApp() {
-            const phoneNumber = "5511999999999"; // Substitua pelo seu número
-            const message = encodeURIComponent("Olá! Gostaria de saber mais sobre os treinos de boxe!");
-            window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
+            
+            const encodedMessage = encodeURIComponent(message);
+            window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
         }
 
-        // Animação smooth scroll para links internos
+        // Contact form
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const nome = formData.get('nome');
+            const telefone = formData.get('telefone');
+            const email = formData.get('email');
+            const servico = formData.get('servico');
+            const mensagem = formData.get('mensagem');
+            
+            const message = `Olá! Meu nome é ${nome}.
+            
+Telefone: ${telefone}
+Email: ${email}
+Serviço: ${servico}
+
+Mensagem: ${mensagem}`;
+
+            const encodedMessage = encodeURIComponent(message);
+            window.open(`https://wa.me/{{ $site->whatsapp ?? '5511999999999' }}?text=${encodedMessage}`, '_blank');
+        });
+
+        // Smooth scrolling
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
                 const target = document.querySelector(this.getAttribute('href'));
                 if (target) {
-                    gsap.to(window, {
-                        duration: 1,
-                        scrollTo: target,
-                        ease: "power2.inOut"
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
                     });
                 }
             });
         });
 
-        // Animação do botão WhatsApp flutuante
-        gsap.from(".whatsapp-float", {
-            duration: 1,
-            scale: 0,
-            opacity: 0,
-            delay: 2,
-            ease: "back.out(1.7)"
+        // Initialize carousel
+        document.addEventListener('DOMContentLoaded', function() {
+            startCarousel();
+        });
+
+        // Typing animation
+        function typeWriter(element, text, speed = 100) {
+            element.innerHTML = '';
+            element.style.borderRight = '3px solid white';
+            
+            let i = 0;
+            function type() {
+                if (i < text.length) {
+                    element.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                } else {
+                    setTimeout(() => {
+                        element.style.borderRight = 'none';
+                    }, 1000);
+                }
+            }
+            type();
+        }
+
+        // Initialize typing animation
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                const titleElement = document.getElementById('hero-title');
+                const originalText = titleElement.textContent;
+                typeWriter(titleElement, originalText, 80);
+            }, 2500);
         });
     </script>
 </body>
