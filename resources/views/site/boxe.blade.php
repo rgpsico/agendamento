@@ -445,8 +445,10 @@
                 </p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 services-grid">
-                @foreach ($site->servicos as $servico)
+          
+           
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 ">
+                @foreach ($servicos as $servico)
                     <div class="card-hover bg-white rounded-2xl overflow-hidden shadow-lg relative">
                         @if ($servico->destaque)
                             <div class="absolute top-4 left-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-sm font-semibold z-10">
@@ -463,14 +465,14 @@
                         <div class="p-6">
                             <h3 class="text-2xl font-bold text-gray-800 mb-3">{{ $servico->titulo }}</h3>
                             <p class="text-gray-600 mb-4">{{ $servico->descricao }}</p>
-                            <ul class="mb-6 text-gray-600 space-y-2">
+                            {{-- <ul class="mb-6 text-gray-600 space-y-2">
                                 @foreach ($servico->itens ?? ['Item 1', 'Item 2', 'Item 3'] as $item)
                                     <li class="flex items-center">
                                         <i class="fas fa-check text-green-500 mr-3"></i>
                                         {{ $item }}
                                     </li>
                                 @endforeach
-                            </ul>
+                            </ul> --}}
                             <div class="flex justify-between items-center">
                                 <span class="text-3xl font-bold service-icon">{{ $servico->preco ? 'R$ ' . number_format($servico->preco, 2, ',', '.') : 'Consultar' }}</span>
                                 <button class="btn-primary text-white px-6 py-3 rounded-full font-semibold transition-all duration-300 hover:scale-105" onclick="openWhatsApp('{{ $servico->titulo }}')">
