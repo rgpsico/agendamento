@@ -192,6 +192,18 @@
                             </ul>
                         </li>
 
+                        <li class="submenu">
+                            <a href="#">
+                                <i class="fas fa-cogs" style="font-size: 18px;"></i>
+                                <span>Usúarios</span>
+                                <span class="menu-arrow"></span>
+                            </a>
+                            <ul>
+                                <li><a href="{{ route('admin.usuarios.index') }}">Usuários</a></li>           
+                                <li><a href="{{ route('configuracoes.permissoes') }}">Permissões</a></li>                            
+                            </ul>
+                        </li>
+                        
                         <!-- Configurações -->
                         <li class="submenu">
                             <a href="#">
@@ -207,6 +219,10 @@
                                 <li><a href="{{ route('configuracoes.index') }}">Sistema</a></li>
                             </ul>
                         </li>
+
+
+
+                        
                     @endif
                 </ul>
             </div>

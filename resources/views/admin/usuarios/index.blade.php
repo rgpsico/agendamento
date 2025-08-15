@@ -61,37 +61,50 @@
         </div>
     </div>
 
-    <script src="{{ asset('request.js') }}"></script>
-    <script>
-        $(document).ready(function() {
-            $('.datatable').DataTable();
+  
+<!-- jQuery (primeiro) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-            $(document).on("click", ".bt_excluir", function() {
-                var id = $(this).data('id');
-                $('.confirmar_exclusao').data('id', id);
-                $(".delete_modal").modal('show');
-            });
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
 
-            $(document).on("click", ".confirmar_exclusao", function() {
-                var id = $(this).data('id');
-                var token = $('meta[name="csrf-token"]').attr('content');
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
 
-                $.ajax({
-                    url: '{{ route("admin.usuarios.destroy", ":id") }}'.replace(':id', id),
-                    type: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': token,
-                    },
-                    success: function(result) {
-                        alert('Usuário excluído com sucesso');
-                        $('.modal').modal('hide');
-                        $(".linha_" + id).fadeOut();
-                    },
-                    error: function(request, msg, error) {
-                        console.log(error);
-                    }
-                });
-            });
+<!-- request.js (se precisar) -->
+<script src="{{ asset('request.js') }}"></script>
+
+<script>
+$(document).ready(function() {
+  
+
+    $(document).on("click", ".bt_excluir", function() {
+        var id = $(this).data('id');
+        $('.confirmar_exclusao').data('id', id);
+        $(".delete_modal").modal('show');
+    });
+
+    $(document).on("click", ".confirmar_exclusao", function() {
+        var id = $(this).data('id');
+        var token = $('meta[name="csrf-token"]').attr('content');
+
+        $.ajax({
+            url: '{{ route("admin.usuarios.destroy", ":id") }}'.replace(':id', id),
+            type: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': token,
+            },
+            success: function(result) {
+                alert('Usuário excluído com sucesso');
+                $('.modal').modal('hide');
+                $(".linha_" + id).fadeOut();
+            },
+            error: function(request, msg, error) {
+                console.log(error);
+            }
         });
-    </script>
+    });
+});
+</script>
+
 </x-admin.layout>
