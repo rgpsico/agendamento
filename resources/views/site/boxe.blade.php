@@ -218,7 +218,7 @@
 
         /* Services Section */
         .card-hover {
-            transition: all 0.3s ease;
+            transition: all 0.1s ease;
         }
 
         .card-hover:hover {
