@@ -17,4 +17,9 @@ class Servicos extends Model
     {
         return $this->belongsTo(Servicos::class, 'empresa_id', 'id');
     }
+
+    public function empresa()
+    {
+        return $this->belongsTo(Empresa::class, 'empresa_id', 'id');
+    }
 }

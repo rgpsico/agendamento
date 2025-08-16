@@ -218,7 +218,7 @@
 
         /* Services Section */
         .card-hover {
-            transition: all 0.1s ease;
+            transition: all 0.3s ease;
         }
 
         .card-hover:hover {
@@ -407,7 +407,7 @@
                         <div class="carousel-wrapper" id="carousel">
                             @foreach ($site->servicos as $index => $servico)
                                 <div class="carousel-slide {{ $index == 0 ? 'active' : '' }}">
-                                    <img src="{{ $site->capa  ?? 'https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80' }}" 
+                                    <img src="{{ $servico->imagem ?? 'https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80' }}" 
                                          alt="{{ $servico->titulo ?? 'Imagem de Serviço' }}" class="rounded-2xl shadow-2xl w-full h-96 object-cover">
                                 </div>
                             @endforeach
@@ -445,10 +445,9 @@
                 </p>
             </div>
 
-          
            
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 ">
-                @foreach ($servicos as $servico)
+                @foreach ($site->servicos as $servico)
                     <div class="card-hover bg-white rounded-2xl overflow-hidden shadow-lg relative">
                         @if ($servico->destaque)
                             <div class="absolute top-4 left-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-sm font-semibold z-10">
@@ -456,7 +455,7 @@
                             </div>
                         @endif
                         <div class="h-48 relative overflow-hidden">
-                            <img src="{{ $servico->imagem ?? 'https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80' }}" alt="{{ $servico->titulo }}" class="w-full h-full object-cover">
+                            <img src="{{ asset('servico/' . $servico->imagem ?? '') }}" alt="{{ $servico->titulo }}" class="w-full h-full object-cover">
                             <div class="absolute inset-0 bg-black bg-opacity-20"></div>
                             <div class="absolute top-4 right-4 bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg rounded-full p-3">
                                 <i class="fas {{ $servico->icone ?? 'fa-user' }} text-white text-xl"></i>
@@ -509,13 +508,18 @@
                     </div>
                 </div>
                 
-                <div class="about-image">
-                    <div class="grid grid-cols-2 gap-4">
-                        @foreach ($site->servicos->take(4) as $index => $servico)
-                            <img src="{{ $servico->imagem ?? 'https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }}" alt="{{ $servico->titulo }}" class="rounded-lg shadow-lg about-image-item {{ $index % 2 == 1 ? 'mt-8' : ($index == 2 ? 'mt-16' : '') }}">
-                        @endforeach
-                    </div>
+            <div class="about-image">
+                <div class="grid grid-cols-2 gap-4">
+                    @foreach ($site->siteServicos as $index => $siteServico)
+                        <img 
+                            src="{{ asset('storage/sites/servicos/' . $siteServico->imagem) }}" 
+                            alt="{{ $siteServico->titulo }}" 
+                            class="rounded-lg shadow-lg about-image-item 
+                                {{ $index % 2 == 1 ? 'mt-8' : ($index == 2 ? 'mt-16' : '') }}">
+                    @endforeach
                 </div>
+            </div>
+
             </div>
         </div>
     </section>

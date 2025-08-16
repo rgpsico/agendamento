@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\EmpresaSite;
-use App\Models\Servicos;
 use App\Models\SiteContato;
 use App\Models\SiteDepoimento;
 use App\Models\SiteServico;
@@ -54,20 +53,13 @@ class SiteController extends Controller
      */
     public function mostrar($slug)
     {
-
         $site = EmpresaSite::where('slug', $slug)
-            ->with(['depoimentos', 'contatos', 'endereco', 'empresa', 'empresa.modalidade'])
+            ->with(['servicos', 'siteServicos', 'depoimentos', 'contatos', 'endereco', 'empresa', 'empresa.modalidade'])
             ->firstOrFail();
 
-        $empresaId = $site->empresa->id;
-
-        $servicos = Servicos::where('empresa_id', $empresaId)->get();
-
-
-
-
-        return view('site.boxe', compact('site', 'servicos'));
+        return view('site.boxe', compact('site'));
     }
+
 
     public function mostrarDominio(Request $request)
     {

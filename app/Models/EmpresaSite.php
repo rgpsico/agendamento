@@ -53,7 +53,12 @@ class EmpresaSite extends Model
 
     public function servicos()
     {
-        return $this->hasMany(SiteServico::class, 'site_id');
+        return $this->hasMany(Servicos::class, 'empresa_id', 'empresa_id');
+    }
+
+    public function siteServicos()
+    {
+        return $this->hasMany(SiteServico::class, 'site_id', 'id');
     }
 
     public function depoimentos()
