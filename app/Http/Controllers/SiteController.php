@@ -57,7 +57,7 @@ class SiteController extends Controller
             ->with(['servicos', 'siteServicos', 'depoimentos', 'contatos', 'endereco', 'empresa', 'empresa.modalidade'])
             ->firstOrFail();
 
-        return view('site.boxe', compact('site'));
+        return view('site.publico', compact('site'));
     }
 
 
