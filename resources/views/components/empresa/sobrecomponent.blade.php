@@ -154,19 +154,9 @@
                                     </div>
                                     @if (isset($empresa->endereco->latitude) && isset($empresa->endereco->longitude))
                                         <div class="mt-3">
-                                            <div id="map" style="height: 200px; width: 100%;" class="rounded">
-                                            </div>
+                                            <div id="map" style="height: 200px; width: 100%;" class="rounded"></div>
                                         </div>
-
-
-                                        <!-- Mapa baseado no CEP -->
-                                        @if (!empty($empresa->endereco->cep))
-                                            <div class="mt-3">
-                                                <div id="map" style="height: 200px; width: 100%;"
-                                                    class="rounded"></div>
-                                            </div>
-
-                                        @endif
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -177,6 +167,57 @@
     </div>
     <!-- /Personal Details -->
 </div>
+
+<style>
+    .info-group {
+        padding: 10px;
+        border-radius: 5px;
+    }
+
+    .info-group label {
+        margin-bottom: 2px;
+        display: block;
+    }
+
+    .card {
+        border-radius: 10px;
+        overflow: hidden;
+        border: none;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+
+    .card-header {
+        border-bottom: 1px solid rgba(0, 0, 0, .125);
+        padding: 15px;
+    }
+
+    .badge {
+        padding: 5px 10px;
+        font-weight: normal;
+    }
+</style>
+
+@if (isset($empresa->endereco->latitude) && isset($empresa->endereco->longitude))
+    <script>
+        function initMap() {
+            const location = {
+                lat: {{ $empresa->endereco->latitude }},
+                lng: {{ $empresa->endereco->longitude }}
+            };
+            const map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 15,
+                center: location,
+            });
+            new google.maps.Marker({
+                position: location,
+                map: map,
+                title: "{{ $empresa->nome }}"
+            });
+        }
+    </script>
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&callback=initMap"></script>
+@endif
 
 <style>
     .info-group {
