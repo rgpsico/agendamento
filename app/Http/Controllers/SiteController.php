@@ -35,20 +35,60 @@ class SiteController extends Controller
         return view('admin.site.lista.create');
     }
 
-    public function editSite($idsite)
-    {
-        $site = EmpresaSite::findOrFail($idsite);
+  public function editSite($idsite)
+{
+    $site = EmpresaSite::findOrFail($idsite);
 
-        // Verifica se o usuário tem acesso ao site
-        if ($site->empresa_id !== Auth::user()->empresa->id) {
-            abort(403, 'Acesso não autorizado.');
-        }
-
-        // Busca todos os templates
-        $templates = SiteTemplate::all();
-
-        return view('admin.site.lista.edit', compact('site', 'templates'));
+    // Verifica se o usuário tem acesso ao site
+    if ($site->empresa_id !== Auth::user()->empresa->id) {
+        abort(403, 'Acesso não autorizado.');
     }
+
+    // Busca todos os templates
+    $templates = SiteTemplate::all();
+
+    // --- lógica de dnsStatus e sslStatus ---
+    $ipServidor = request()->server('SERVER_ADDR') ?? '191.252.92.206';
+
+    $dnsStatus = false;
+    if (!empty($site->dominio_personalizado)) {
+        $dnsRecords = dns_get_record($site->dominio_personalizado, DNS_A);
+        $ips = collect($dnsRecords)->pluck('ip')->toArray();
+        $dnsStatus = in_array($ipServidor, $ips);
+    }
+
+    $sslStatus = false;
+    if (!empty($site->dominio_personalizado)) {
+        $stream = @stream_context_create(["ssl" => ["capture_peer_cert" => true]]);
+        $read = @stream_socket_client("ssl://{$site->dominio_personalizado}:443", $errno, $errstr, 30, STREAM_CLIENT_CONNECT, $stream);
+        $sslStatus = $read !== false;
+    }
+
+    return view('admin.site.lista.edit', compact('site', 'templates', 'dnsStatus', 'sslStatus', 'ipServidor'));
+}
+
+private function verificarDnsSsl($dominio)
+{
+    $ipServidor = request()->server('SERVER_ADDR') ?? '191.252.92.206';
+
+    $dnsStatus = false;
+    if (!empty($dominio)) {
+        $dnsRecords = dns_get_record($dominio, DNS_A);
+        $ips = collect($dnsRecords)->pluck('ip')->toArray();
+        $dnsStatus = in_array($ipServidor, $ips);
+    }
+
+    $sslStatus = false;
+    if (!empty($dominio)) {
+        $stream = @stream_context_create(["ssl" => ["capture_peer_cert" => true]]);
+        $read = @stream_socket_client("ssl://{$dominio}:443", $errno, $errstr, 30, STREAM_CLIENT_CONNECT, $stream);
+        $sslStatus = $read !== false;
+    }
+
+    return compact('dnsStatus', 'sslStatus', 'ipServidor');
+}
+
+
 
 
 
@@ -323,7 +363,6 @@ class SiteController extends Controller
     {
         // Validação
 
-        dd($request->all());
 
         $data = $request->validate([
             'titulo' => 'required|string|max:255',
