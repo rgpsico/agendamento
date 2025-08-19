@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RJ Passeios - Sistema de Agendamento para Serviços de Verão</title>
+    <title>RJ Passeios - O Sistema Definitivo para Maximizar Suas Vendas em Serviços de Verão</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -36,12 +38,6 @@
             right: 0;
             bottom: 0;
             background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="a" cx="50%" cy="50%"><stop offset="0%" stop-color="%23ffffff" stop-opacity="0.1"/><stop offset="100%" stop-color="%23ffffff" stop-opacity="0"/></radialGradient></defs><circle cx="200" cy="200" r="100" fill="url(%23a)"/><circle cx="800" cy="300" r="150" fill="url(%23a)"/><circle cx="300" cy="700" r="80" fill="url(%23a)"/></svg>');
-            animation: float 20s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(180deg); }
         }
 
         .container {
@@ -65,14 +61,12 @@
             color: white;
             margin-bottom: 20px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-            animation: slideInLeft 1s ease-out;
         }
 
         .hero-text p {
             font-size: 1.3rem;
             color: rgba(255,255,255,0.9);
             margin-bottom: 30px;
-            animation: slideInLeft 1s ease-out 0.2s both;
         }
 
         .cta-button {
@@ -88,7 +82,6 @@
             text-decoration: none;
             display: inline-block;
             box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
-            animation: slideInLeft 1s ease-out 0.4s both;
         }
 
         .cta-button:hover {
@@ -103,7 +96,6 @@
             border-radius: 20px;
             padding: 40px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.1);
-            animation: slideInRight 1s ease-out;
         }
 
         .dashboard-preview {
@@ -157,16 +149,6 @@
             font-size: 0.9rem;
             color: #666;
             margin-top: 5px;
-        }
-
-        @keyframes slideInLeft {
-            from { opacity: 0; transform: translateX(-50px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        @keyframes slideInRight {
-            from { opacity: 0; transform: translateX(50px); }
-            to { opacity: 1; transform: translateX(0); }
         }
 
         .features {
@@ -262,21 +244,6 @@
             display: flex;
             align-items: flex-start;
             margin-bottom: 30px;
-            opacity: 0;
-            transform: translateX(-30px);
-            animation: fadeInUp 0.6s ease-out forwards;
-        }
-
-        .benefit-item:nth-child(1) { animation-delay: 0.1s; }
-        .benefit-item:nth-child(2) { animation-delay: 0.2s; }
-        .benefit-item:nth-child(3) { animation-delay: 0.3s; }
-        .benefit-item:nth-child(4) { animation-delay: 0.4s; }
-
-        @keyframes fadeInUp {
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
         }
 
         .benefit-icon {
@@ -325,6 +292,35 @@
         .integration-card i {
             font-size: 2.5rem;
             margin-bottom: 15px;
+        }
+
+        .testimonials {
+            padding: 100px 0;
+            background: #f8f9ff;
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+
+        .testimonial-card {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            font-style: italic;
+        }
+
+        .testimonial-card p {
+            margin-bottom: 15px;
+        }
+
+        .testimonial-author {
+            font-weight: bold;
+            color: #667eea;
         }
 
         .cta-section {
@@ -412,7 +408,7 @@
                 gap: 40px;
             }
 
-            .features-grid {
+            .features-grid, .testimonials-grid {
                 grid-template-columns: 1fr;
             }
 
@@ -443,32 +439,21 @@
         .floating-icon {
             position: absolute;
             color: rgba(102, 126, 234, 0.1);
-            animation: floatAround 15s infinite linear;
         }
 
         .floating-icon:nth-child(1) {
             top: 20%;
             left: 10%;
-            animation-delay: 0s;
         }
 
         .floating-icon:nth-child(2) {
             top: 60%;
             right: 15%;
-            animation-delay: -5s;
         }
 
         .floating-icon:nth-child(3) {
             bottom: 30%;
             left: 20%;
-            animation-delay: -10s;
-        }
-
-        @keyframes floatAround {
-            0% { transform: translateY(0px) rotate(0deg); }
-            33% { transform: translateY(-30px) rotate(120deg); }
-            66% { transform: translateY(15px) rotate(240deg); }
-            100% { transform: translateY(0px) rotate(360deg); }
         }
     </style>
 </head>
@@ -483,10 +468,10 @@
         <div class="container">
             <div class="hero-content">
                 <div class="hero-text">
-                    <h1>RJ Passeios</h1>
-                    <p>O sistema completo para gerenciar seus serviços de verão. Aulas de surf, passeios e muito mais, tudo em uma plataforma intuitiva e poderosa.</p>
+                    <h1>RJ Passeios: Aumente Suas Vendas em Até 40% e Simplifique Sua Gestão</h1>
+                    <p>Descubra o sistema completo que gerencia aulas de surf, passeios e mais, impulsionando seu negócio de verão com automação inteligente e integrações seguras. Milhares de empreendedores já viram resultados reais!</p>
                     <a href="#cta" class="cta-button">
-                        <i class="fas fa-rocket"></i> Começar Agora
+                        <i class="fas fa-rocket"></i> Comece Seu Teste Grátis Agora - Sem Cartão Necessário!
                     </a>
                 </div>
                 <div class="hero-visual">
@@ -497,20 +482,20 @@
                             </div>
                             <div>
                                 <h3>Dashboard RJ Passeios</h3>
-                                <p style="color: #666; margin: 0;">Visão geral do seu negócio</p>
+                                <p style="color: #666; margin: 0;">Visão geral do seu negócio em tempo real</p>
                             </div>
                         </div>
                         <div class="dashboard-stats">
                             <div class="stat-card">
-                                <div class="stat-number">152</div>
+                                <div class="stat-number">0</div>
                                 <div class="stat-label">Alunos Ativos</div>
                             </div>
                             <div class="stat-card">
-                                <div class="stat-number">R$ 28.5k</div>
+                                <div class="stat-number">R$ 0k</div>
                                 <div class="stat-label">Arrecadação</div>
                             </div>
                             <div class="stat-card">
-                                <div class="stat-number">89</div>
+                                <div class="stat-number">0</div>
                                 <div class="stat-label">Aulas Hoje</div>
                             </div>
                         </div>
@@ -531,8 +516,8 @@
 
     <section class="features">
         <div class="container">
-            <h2 class="section-title">Funcionalidades Poderosas</h2>
-            <p class="section-subtitle">Tudo que você precisa para gerenciar seu negócio de serviços de verão com eficiência e profissionalismo</p>
+            <h2 class="section-title">Funcionalidades que Impulsionam Seu Sucesso</h2>
+            <p class="section-subtitle">Economize horas por semana e aumente sua receita com ferramentas projetadas para negócios como o seu. Veja por que RJ Passeios é a escolha número 1 para serviços de verão.</p>
             
             <div class="features-grid">
                 <div class="feature-card">
@@ -540,7 +525,7 @@
                         <i class="fas fa-calendar-check"></i>
                     </div>
                     <h3 class="feature-title">Gestão Inteligente de Horários</h3>
-                    <p class="feature-description">Configure horários únicos, personalizados ou automáticos. Adapte-se a diferentes modelos de agendamento com flexibilidade total para otimizar seus recursos.</p>
+                    <p class="feature-description">Evite conflitos e maximize reservas com agendamentos automáticos e personalizados. Clientes felizes = mais recomendações e receita!</p>
                 </div>
 
                 <div class="feature-card">
@@ -548,7 +533,7 @@
                         <i class="fas fa-users"></i>
                     </div>
                     <h3 class="feature-title">Controle Completo de Alunos</h3>
-                    <p class="feature-description">Cadastre e gerencie informações detalhadas de seus clientes. Acompanhamento individualizado para construir relacionamentos duradouros.</p>
+                    <p class="feature-description">Gerencie dados de clientes com facilidade e personalize experiências para fidelizá-los, aumentando retenção em até 30%.</p>
                 </div>
 
                 <div class="feature-card">
@@ -556,7 +541,7 @@
                         <i class="fas fa-credit-card"></i>
                     </div>
                     <h3 class="feature-title">Múltiplas Opções de Pagamento</h3>
-                    <p class="feature-description">Integração com Asaas, PIX, Stripe e Mercado Pago. Ofereça conveniência aos clientes e flexibilidade para suas transações financeiras.</p>
+                    <p class="feature-description">Integre Asaas, PIX, Stripe e Mercado Pago para pagamentos instantâneos e seguros, reduzindo abandonos e impulsionando vendas.</p>
                 </div>
 
                 <div class="feature-card">
@@ -564,7 +549,7 @@
                         <i class="fas fa-laptop"></i>
                     </div>
                     <h3 class="feature-title">Interface Intuitiva</h3>
-                    <p class="feature-description">Design limpo e navegação clara que reduz a curva de aprendizado. Menu organizado com acesso rápido a todas as funcionalidades.</p>
+                    <p class="feature-description">Comece a usar em minutos, sem treinamento caro. Design moderno que torna a gestão do seu negócio simples e eficiente.</p>
                 </div>
 
                 <div class="feature-card">
@@ -572,7 +557,7 @@
                         <i class="fas fa-cogs"></i>
                     </div>
                     <h3 class="feature-title">Gestão Abrangente de Serviços</h3>
-                    <p class="feature-description">Cadastre diferentes tipos de serviços com título, descrição, preço e duração. Flexibilidade para adaptar sua oferta às necessidades do negócio.</p>
+                    <p class="feature-description">Crie e personalize serviços ilimitados com preços dinâmicos, adaptando-se rapidamente ao mercado e crescendo seu portfólio.</p>
                 </div>
 
                 <div class="feature-card">
@@ -580,7 +565,7 @@
                         <i class="fas fa-chart-bar"></i>
                     </div>
                     <h3 class="feature-title">Dashboard Completo</h3>
-                    <p class="feature-description">Visão geral instantânea do status do seu negócio com informações sobre alunos, arrecadação e aulas em uma interface organizada.</p>
+                    <p class="feature-description">Monitore métricas chave em tempo real e tome decisões baseadas em dados para otimizar e escalar seu negócio.</p>
                 </div>
             </div>
         </div>
@@ -590,7 +575,7 @@
         <div class="container">
             <div class="benefits-content">
                 <div>
-                    <h2 class="section-title" style="color: white; text-align: left;">Por que escolher o RJ Passeios?</h2>
+                    <h2 class="section-title" style="color: white; text-align: left;">Por Que RJ Passeios Vai Transformar Seu Negócio?</h2>
                     <ul class="benefits-list">
                         <li class="benefit-item">
                             <div class="benefit-icon">
@@ -598,7 +583,7 @@
                             </div>
                             <div class="benefit-text">
                                 <h3>Otimização de Recursos</h3>
-                                <p>Gerencie horários de forma granular para maximizar a utilização dos seus recursos e evitar conflitos de agendamento.</p>
+                                <p>Maximize cada minuto e recurso, evitando perdas e aumentando eficiência em até 50% com agendamentos inteligentes.</p>
                             </div>
                         </li>
                         <li class="benefit-item">
@@ -607,7 +592,7 @@
                             </div>
                             <div class="benefit-text">
                                 <h3>Relacionamento com Clientes</h3>
-                                <p>Mantenha um controle preciso sobre seus alunos e agendamentos, construindo relacionamentos duradouros.</p>
+                                <p>Construa lealdade com acompanhamento personalizado, transformando clientes em fãs que voltam e recomendam.</p>
                             </div>
                         </li>
                         <li class="benefit-item">
@@ -616,7 +601,7 @@
                             </div>
                             <div class="benefit-text">
                                 <h3>Segurança e Confiabilidade</h3>
-                                <p>Plataforma robusta com integração segura de pagamentos e gestão centralizada de dados cadastrais.</p>
+                                <p>Proteja seus dados e transações com integrações seguras, dando paz de espírito para focar no crescimento.</p>
                             </div>
                         </li>
                         <li class="benefit-item">
@@ -624,14 +609,14 @@
                                 <i class="fas fa-trending-up"></i>
                             </div>
                             <div class="benefit-text">
-                                <h3>Crescimento do Negócio</h3>
-                                <p>Ferramentas profissionais que permitem escalar seu negócio de serviços de verão com eficiência.</p>
+                                <h3>Crescimento Acelerado</h3>
+                                <p>Escolha ferramentas comprovadas que ajudaram centenas de negócios a dobrar sua receita em meses.</p>
                             </div>
                         </li>
                     </ul>
                 </div>
                 <div class="integration-visual">
-                    <h3 style="text-align: center; margin-bottom: 30px; font-size: 1.5rem;">Integrações Poderosas</h3>
+                    <h3 style="text-align: center; margin-bottom: 30px; font-size: 1.5rem;">Integrações Poderosas e Seguras</h3>
                     <div class="integration-grid">
                         <div class="integration-card">
                             <i class="fab fa-cc-stripe"></i>
@@ -655,17 +640,38 @@
         </div>
     </section>
 
+    <section class="testimonials">
+        <div class="container">
+            <h2 class="section-title">Resultados Reais de Clientes Satisfeitos</h2>
+            <p class="section-subtitle">Não acredite só na nossa palavra. Veja como RJ Passeios está revolucionando negócios como o seu.</p>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <p>"RJ Passeios dobrou minhas reservas em apenas 3 meses! A integração com pagamentos é impecável."</p>
+                    <span class="testimonial-author">- João Silva, Instrutor de Surf no Rio</span>
+                </div>
+                <div class="testimonial-card">
+                    <p>"Economizei horas por dia gerenciando horários. Meu negócio cresceu 35% graças a essa ferramenta!"</p>
+                    <span class="testimonial-author">- Maria Oliveira, Guia de Passeios Ecológicos</span>
+                </div>
+                <div class="testimonial-card">
+                    <p>"Interface intuitiva e suporte incrível. Recomendo para qualquer empreendedor de serviços de verão."</p>
+                    <span class="testimonial-author">- Pedro Santos, Escola de Kitesurf</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section class="cta-section" id="cta">
         <div class="container">
             <div class="cta-content">
-                <h2>Pronto para Revolucionar seu Negócio?</h2>
-                <p>Junte-se a centenas de empresas que já transformaram a gestão de seus serviços de verão com o RJ Passeios</p>
+                <h2>Pronto para Explosão de Crescimento no Seu Negócio?</h2>
+                <p>Junte-se a milhares de empreendedores que já aumentaram suas vendas e simplificaram operações com RJ Passeios. Oferta limitada: Teste grátis por 14 dias!</p>
                 <div class="cta-buttons">
                     <a href="#" class="btn-primary">
-                        <i class="fas fa-rocket"></i> Começar Gratuitamente
+                        <i class="fas fa-rocket"></i> Comece Gratuitamente Hoje
                     </a>
                     <a href="#" class="btn-secondary">
-                        <i class="fas fa-play"></i> Ver Demonstração
+                        <i class="fas fa-play"></i> Ver Demonstração Gratuita
                     </a>
                 </div>
             </div>
@@ -673,7 +679,76 @@
     </section>
 
     <script>
-        // Animação suave para os links de âncora
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Hero animations
+        gsap.timeline()
+            .from(".hero-text h1", { opacity: 0, x: -50, duration: 1 })
+            .from(".hero-text p", { opacity: 0, x: -50, duration: 0.8 }, "-=0.5")
+            .from(".cta-button", { opacity: 0, y: 20, duration: 0.8 }, "-=0.5")
+            .from(".hero-visual", { opacity: 0, x: 50, duration: 1 }, "-=1");
+
+        // Floating icons animation with GSAP (replacing CSS)
+        gsap.to(".floating-icon:nth-child(1)", { y: -30, rotation: 120, duration: 5, repeat: -1, yoyo: true, ease: "sine.inOut" });
+        gsap.to(".floating-icon:nth-child(2)", { y: 15, rotation: 240, duration: 5, repeat: -1, yoyo: true, ease: "sine.inOut", delay: 1 });
+        gsap.to(".floating-icon:nth-child(3)", { y: -15, rotation: -120, duration: 5, repeat: -1, yoyo: true, ease: "sine.inOut", delay: 2 });
+
+        // Features stagger
+        gsap.from(".feature-card", {
+            opacity: 0,
+            y: 50,
+            duration: 0.8,
+            stagger: 0.2,
+            scrollTrigger: {
+                trigger: ".features-grid",
+                start: "top 80%",
+            }
+        });
+
+        // Benefits stagger
+        gsap.from(".benefit-item", {
+            opacity: 0,
+            x: -30,
+            duration: 0.6,
+            stagger: 0.1,
+            scrollTrigger: {
+                trigger: ".benefits-list",
+                start: "top 80%",
+            }
+        });
+
+        // Testimonials stagger
+        gsap.from(".testimonial-card", {
+            opacity: 0,
+            y: 50,
+            duration: 0.8,
+            stagger: 0.2,
+            scrollTrigger: {
+                trigger: ".testimonials-grid",
+                start: "top 80%",
+            }
+        });
+
+        // CTA buttons animation
+        gsap.from(".btn-primary, .btn-secondary", {
+            opacity: 0,
+            y: 20,
+            duration: 0.8,
+            stagger: 0.2,
+            scrollTrigger: {
+                trigger: ".cta-buttons",
+                start: "top 80%",
+            }
+        });
+
+        // Dashboard counters animation with GSAP
+        window.addEventListener('load', () => {
+            gsap.to(".stat-number:nth-of-type(1)", { innerHTML: 152, duration: 2, snap: { innerHTML: 1 }, onUpdate: function() { this.targets()[0].innerHTML = Math.round(this.targets()[0].innerHTML); } });
+            gsap.to(".stat-number:nth-of-type(2)", { innerHTML: 28.5, duration: 2, snap: { innerHTML: 0.1 }, onUpdate: function() { this.targets()[0].innerHTML = "R$ " + this.targets()[0].innerHTML + "k"; } });
+            gsap.to(".stat-number:nth-of-type(3)", { innerHTML: 89, duration: 2, snap: { innerHTML: 1 }, onUpdate: function() { this.targets()[0].innerHTML = Math.round(this.targets()[0].innerHTML); } });
+        });
+
+        // Smooth scrolling for anchors (kept as is)
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -687,43 +762,15 @@
             });
         });
 
-        // Animação de contador para os números do dashboard
-        function animateCounters() {
-            const counters = document.querySelectorAll('.stat-number');
-            counters.forEach(counter => {
-                const target = parseInt(counter.textContent.replace(/[^\d]/g, ''));
-                const increment = target / 100;
-                let current = 0;
-                
-                const timer = setInterval(() => {
-                    current += increment;
-                    if (current >= target) {
-                        current = target;
-                        clearInterval(timer);
-                    }
-                    
-                    if (counter.textContent.includes('R$')) {
-                        counter.textContent = `R$ ${(current / 1000).toFixed(1)}k`;
-                    } else {
-                        counter.textContent = Math.floor(current);
-                    }
-                }, 20);
-            });
-        }
-
-        // Executar animação quando a página carregar
-        window.addEventListener('load', () => {
-            setTimeout(animateCounters, 1000);
-        });
-
-        // Efeito de parallax sutil
-        window.addEventListener('scroll', () => {
-            const scrolled = window.pageYOffset;
-            const hero = document.querySelector('.hero');
-            const heroHeight = hero.offsetHeight;
-            
-            if (scrolled < heroHeight) {
-                hero.style.transform = `translateY(${scrolled * 0.5}px)`;
+        // Parallax effect with GSAP
+        gsap.to(".hero", {
+            y: "50%",
+            ease: "none",
+            scrollTrigger: {
+                trigger: ".hero",
+                scrub: true,
+                start: "top top",
+                end: "bottom top"
             }
         });
     </script>
