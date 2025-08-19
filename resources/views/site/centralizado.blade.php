@@ -883,54 +883,90 @@
     @endif
 
     <!-- Testimonials Section -->
-    @if($site->depoimentos->count() > 0)
-    <section id="testimonials" class="py-20" style="background: linear-gradient(135deg, var(--dark-bg) 0%, var(--darker-bg) 100%);">
-        <div class="container mx-auto px-6 max-w-7xl">
-            <div class="section-header text-center mb-16">
-                <h2 class="fade-in-up">O Que Dizem Nossos Clientes</h2>
-                <div class="section-divider fade-in-up"></div>
-                <p class="text-xl opacity-80 fade-in-up">
-                    Histórias reais de transformação e conquistas
-                </p>
-            </div>
+ 
+<?php
+// Fake testimonials data
+$fakeTestimonials = [
+    (object)[
+        'nome' => 'Ana Silva',
+        'cargo' => 'Empreendedora',
+        'depoimento' => 'Trabalhar com essa equipe transformou meu negócio! A atenção aos detalhes e o suporte foram incríveis.',
+        'nota' => 5,
+        'foto' => null,
+        'created_at' => new DateTime('2024-03-15')
+    ],
+    (object)[
+        'nome' => 'Carlos Mendes',
+        'cargo' => 'Gerente de Projetos',
+        'depoimento' => 'Resultados além das expectativas. A solução foi entregue no prazo e com qualidade excepcional.',
+        'nota' => 4,
+        'foto' => null,
+        'created_at' => new DateTime('2024-06-22')
+    ],
+    (object)[
+        'nome' => 'Mariana Costa',
+        'cargo' => 'Designer Gráfico',
+        'depoimento' => 'A experiência foi fluida e o time sempre esteve disponível para esclarecer dúvidas. Recomendo!',
+        'nota' => 5,
+        'foto' => null,
+        'created_at' => new DateTime('2025-01-10')
+    ]
+];
 
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                @foreach($site->depoimentos as $index => $depoimento)
-                <div class="testimonial-card fade-in-up" style="animation-delay: {{ $index * 0.2 }}s;">
-                    <div class="flex items-center mb-6">
-                        @if($depoimento->foto)
-                        <img src="{{ Storage::url($depoimento->foto) }}" 
-                             alt="{{ $depoimento->nome }}" class="w-16 h-16 rounded-full mr-4 object-cover">
-                        @else
-                        <div class="w-16 h-16 rounded-full mr-4 bg-gradient-to-r from-red-500 to-orange-500 flex items-center justify-center">
-                            <i class="fas fa-user text-white text-xl"></i>
-                        </div>
-                        @endif
-                        <div>
-                            <h4 class="font-bold text-lg">{{ $depoimento->nome }}</h4>
-                            <p class="text-gray-400">{{ $depoimento->cargo ?? 'Cliente' }} - {{ $depoimento->created_at->format('Y') }}</p>
-                        </div>
-                    </div>
-                    @if($depoimento->nota)
-                    <div class="text-yellow-400 mb-4">
-                        @for($i = 1; $i <= 5; $i++)
-                            @if($i <= $depoimento->nota)
-                                <i class="fas fa-star"></i>
-                            @else
-                                <i class="far fa-star"></i>
-                            @endif
-                        @endfor
+// Use real testimonials if available, otherwise use fake ones
+$testimonials = !empty($site->depoimentos) && $site->depoimentos->count() > 0 ? $site->depoimentos : $fakeTestimonials;
+?>
+
+<!-- Testimonials Section -->
+@if(!empty($testimonials) && count($testimonials) > 0)
+<section id="testimonials" class="py-20" style="background: linear-gradient(135deg, var(--dark-bg) 0%, var(--darker-bg) 100%);">
+    <div class="container mx-auto px-6 max-w-7xl">
+        <div class="section-header text-center mb-16">
+            <h2 class="fade-in-up">O Que Dizem Nossos Clientes</h2>
+            <div class="section-divider fade-in-up"></div>
+            <p class="text-xl opacity-80 fade-in-up">
+                Histórias reais de transformação e conquistas
+            </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            @foreach($testimonials as $index => $depoimento)
+            <div class="testimonial-card fade-in-up" style="animation-delay: {{ $index * 0.2 }}s;">
+                <div class="flex items-center mb-6">
+                    @if($depoimento->foto)
+                    <img src="{{ Storage::url($depoimento->foto) }}" 
+                         alt="{{ $depoimento->nome }}" class="w-16 h-16 rounded-full mr-4 object-cover">
+                    @else
+                    <div class="w-16 h-16 rounded-full mr-4 bg-gradient-to-r from-red-500 to-orange-500 flex items-center justify-center">
+                        <i class="fas fa-user text-white text-xl"></i>
                     </div>
                     @endif
-                    <p class="text-gray-300">
-                        "{{ $depoimento->depoimento }}"
-                    </p>
+                    <div>
+                        <h4 class="font-bold text-lg">{{ $depoimento->nome }}</h4>
+                        <p class="text-gray-400">{{ $depoimento->cargo ?? 'Cliente' }} - {{ $depoimento->created_at->format('Y') }}</p>
+                    </div>
                 </div>
-                @endforeach
+                @if($depoimento->nota)
+                <div class="text-yellow-400 mb-4">
+                    @for($i = 1; $i <= 5; $i++)
+                        @if($i <= $depoimento->nota)
+                            <i class="fas fa-star"></i>
+                        @else
+                            <i class="far fa-star"></i>
+                        @endif
+                    @endfor
+                </div>
+                @endif
+                <p class="text-gray-300">
+                    "{{ $depoimento->depoimento }}"
+                </p>
             </div>
+            @endforeach
         </div>
-    </section>
-    @endif
+    </div>
+</section>
+@endif
+
 
     <!-- CTA Section -->
     <section class="py-20 relative overflow-hidden" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 50%, var(--accent-color) 100%);">
@@ -1311,7 +1347,7 @@
             gsap.from("#contact .fade-in-right", {
                 duration: 0.8,
                 x: 60,
-                opacity: 0,
+                opacity: 1,
                 scrollTrigger: {
                     trigger: "#contact",
                     start: "top 80%"
