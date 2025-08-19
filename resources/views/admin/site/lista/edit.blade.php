@@ -188,13 +188,14 @@
 
 
                      @isset($dnsStatus, $sslStatus)
-    @if($dnsStatus === true && $sslStatus === false)
-        <form action="{{ route('admin.gerarSSL') }}" method="POST" style="display: inline;">
+                        @if($dnsStatus === true && $sslStatus === false)
+                         <form action="{{ route('admin.gerarSSL') }}" method="POST" style="display: inline;">
             @csrf
             <input type="hidden" name="site_id" value="{{ $site->id }}">
             <input type="submit" class="btn btn-success" value="Gerar SSL">
         </form>
     @endif
+       
 
     {{-- Mostra status atual do SSL --}}
     @if($sslStatus === true)
