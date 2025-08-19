@@ -72,7 +72,8 @@ class SiteController extends Controller
             ])
             ->firstOrFail();
                 
-        return view('site.publico', compact('site'));
+           $view_template = $site->template->path_view ?? 'site.publico';
+        return view($view_template, compact('site'));
     }
 
 

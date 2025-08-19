@@ -29,7 +29,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, {{ $site->cores['primary'] ?? '#ff6b35' }}, {{ $site->cores['secondary'] ?? '#f7931e' }});
+            background: linear-gradient(135deg, {{ $site->cores['primaria'] ?? '#ff6b35' }}, {{ $site->cores['secundaria'] ?? '#f7931e' }});
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -76,7 +76,7 @@
         .logo {
             font-size: 1.8rem;
             font-weight: bold;
-            background: linear-gradient(45deg, {{ $site->cores['primary'] ?? '#ff6b35' }}, {{ $site->cores['secondary'] ?? '#f7931e' }});
+            background: linear-gradient(45deg, {{ $site->cores['primaria'] ?? '#ff6b35' }}, {{ $site->cores['secundaria'] ?? '#f7931e' }});
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -98,12 +98,12 @@
         }
 
         .nav-menu a:hover {
-            color: {{ $site->cores['primary'] ?? '#ff6b35' }};
+            color: {{ $site->cores['primaria'] ?? '#ff6b35' }};
         }
 
         /* Hero Section */
         .hero-gradient {
-            background: linear-gradient(135deg, {{ $site->cores['primary'] ?? '#ff6b35' }} 0%, {{ $site->cores['secondary'] ?? '#f7931e' }} 50%, {{ $site->cores['accent'] ?? '#ff4500' }} 100%);
+            background: linear-gradient(135deg, {{ $site->cores['primaria'] ?? '#ff6b35' }} 0%, {{ $site->cores['secundaria'] ?? '#f7931e' }} 50%, {{ $site->cores['primaria'] ?? '#ff4500' }} 100%);
         }
 
         .hero {
@@ -218,7 +218,9 @@
 
         /* Services Section */
         .card-hover {
-            transition: all 0.3s ease;
+            /* transition: opacity 0.3s ease, transform 0.3s ease;
+            opacity: 1;
+            visibility: visible; */
         }
 
         .card-hover:hover {
@@ -227,7 +229,7 @@
         }
 
         .service-icon {
-            background: linear-gradient(45deg, {{ $site->cores['primary'] ?? '#ff6b35' }}, {{ $site->cores['secondary'] ?? '#f7931e' }});
+            background: linear-gradient(45deg, {{ $site->cores['primaria'] ?? '#ff6b35' }}, {{ $site->cores['secundaria'] ?? '#f7931e' }});
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -289,7 +291,7 @@
         /* Section Divider */
         .section-divider {
             height: 4px;
-            background: linear-gradient(45deg, {{ $site->cores['primary'] ?? '#ff6b35' }}, {{ $site->cores['secondary'] ?? '#f7931e' }});
+            background: linear-gradient(45deg, {{ $site->cores['primaria'] ?? '#ff6b35' }}, {{ $site->cores['secundaria'] ?? '#f7931e' }});
             border-radius: 2px;
             margin: 1rem auto;
         }
@@ -405,19 +407,26 @@
                 <div class="hero-image relative">
                     <div class="floating carousel-container">
                         <div class="carousel-wrapper" id="carousel">
-                            @foreach ($site->servicos as $index => $servico)
+                            @forelse ($site->servicos as $index => $servico)
                                 <div class="carousel-slide {{ $index == 0 ? 'active' : '' }}">
-                                    <img src="{{ $servico->imagem ?? 'https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80' }}" 
+                                    <img src="{{ asset('storage/' . ($servico->capa ?? $site->capa)) }}" 
                                          alt="{{ $servico->titulo ?? 'Imagem de Serviço' }}" class="rounded-2xl shadow-2xl w-full h-96 object-cover">
                                 </div>
-                            @endforeach
+                            @empty
+                                <div class="carousel-slide active">
+                                    <img src="{{ asset('storage/' . ($site->capa ?? 'default-capa.jpg')) }}" 
+                                         alt="Imagem Padrão" class="rounded-2xl shadow-2xl w-full h-96 object-cover">
+                                </div>
+                            @endforelse
                         </div>
                         
                         <!-- Carousel Navigation -->
                         <div class="carousel-nav">
-                            @foreach ($site->servicos as $index => $servico)
+                            @forelse ($site->servicos as $index => $servico)
                                 <button class="carousel-dot {{ $index == 0 ? 'active' : '' }}" onclick="goToSlide({{ $index }})"></button>
-                            @endforeach
+                            @empty
+                                <button class="carousel-dot active"></button>
+                            @endforelse
                         </div>
                     </div>
                 </div>
@@ -437,7 +446,7 @@
         <div class="container mx-auto px-6">
             <div class="text-center mb-16 section-header">
                 <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
-                    Nossos Serviços de Boxe
+                    Nossos Serviços
                 </h2>
                 <div class="section-divider max-w-md mx-auto"></div>
                 <p class="text-gray-600 text-xl max-w-2xl mx-auto">
@@ -445,9 +454,8 @@
                 </p>
             </div>
 
-           
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 ">
-                @foreach ($site->servicos as $servico)
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                @forelse ($site->servicos as $servico)
                     <div class="card-hover bg-white rounded-2xl overflow-hidden shadow-lg relative">
                         @if ($servico->destaque)
                             <div class="absolute top-4 left-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-sm font-semibold z-10">
@@ -455,7 +463,7 @@
                             </div>
                         @endif
                         <div class="h-48 relative overflow-hidden">
-                            <img src="{{ asset('servico/' . $servico->imagem ?? '') }}" alt="{{ $servico->titulo }}" class="w-full h-full object-cover">
+                            <img src="{{ asset('servico/' . ($servico->imagem ?? 'default-servico.jpg')) }}" alt="{{ $servico->titulo }}" class="w-full h-full object-cover">
                             <div class="absolute inset-0 bg-black bg-opacity-20"></div>
                             <div class="absolute top-4 right-4 bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg rounded-full p-3">
                                 <i class="fas {{ $servico->icone ?? 'fa-user' }} text-white text-xl"></i>
@@ -464,14 +472,6 @@
                         <div class="p-6">
                             <h3 class="text-2xl font-bold text-gray-800 mb-3">{{ $servico->titulo }}</h3>
                             <p class="text-gray-600 mb-4">{{ $servico->descricao }}</p>
-                            {{-- <ul class="mb-6 text-gray-600 space-y-2">
-                                @foreach ($servico->itens ?? ['Item 1', 'Item 2', 'Item 3'] as $item)
-                                    <li class="flex items-center">
-                                        <i class="fas fa-check text-green-500 mr-3"></i>
-                                        {{ $item }}
-                                    </li>
-                                @endforeach
-                            </ul> --}}
                             <div class="flex justify-between items-center">
                                 <span class="text-3xl font-bold service-icon">{{ $servico->preco ? 'R$ ' . number_format($servico->preco, 2, ',', '.') : 'Consultar' }}</span>
                                 <button class="btn-primary text-white px-6 py-3 rounded-full font-semibold transition-all duration-300 hover:scale-105" onclick="openWhatsApp('{{ $servico->titulo }}')">
@@ -480,13 +480,15 @@
                             </div>
                         </div>
                     </div>
-                @endforeach
+                @empty
+                    <p class="text-center text-gray-500 col-span-3">Nenhum serviço disponível no momento.</p>
+                @endforelse
             </div>
         </div>
     </section>
 
     <!-- About Section -->
-    <section id="about" class="py-20 bg-white parallax-bg" style="background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('{{ $site->sobre_imagem ?? 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80' }}');">
+    <section id="about" class="py-20 bg-white parallax-bg" style="background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('{{ asset('storage/' . ($site->sobre_imagem ?? 'default-sobre.jpg')) }}');">
         <div class="container mx-auto px-6">
             <div class="grid md:grid-cols-2 gap-12 items-center">
                 <div class="about-content">
@@ -508,18 +510,21 @@
                     </div>
                 </div>
                 
-            <div class="about-image">
-                <div class="grid grid-cols-2 gap-4">
-                    @foreach ($site->siteServicos as $index => $siteServico)
-                        <img 
-                            src="{{ asset('storage/sites/servicos/' . $siteServico->imagem) }}" 
-                            alt="{{ $siteServico->titulo }}" 
-                            class="rounded-lg shadow-lg about-image-item 
-                                {{ $index % 2 == 1 ? 'mt-8' : ($index == 2 ? 'mt-16' : '') }}">
-                    @endforeach
+                <div class="about-image">
+                    <div class="grid grid-cols-2 gap-4">
+                        @forelse ($site->siteServicos as $index => $siteServico)
+                            <img 
+                                src="{{ asset('storage/sites/servicos/' . ($siteServico->imagem ?? 'default-servico.jpg')) }}" 
+                                alt="{{ $siteServico->titulo }}" 
+                                class="rounded-lg shadow-lg about-image-item {{ $index % 2 == 1 ? 'mt-8' : ($index == 2 ? 'mt-16' : '') }}">
+                        @empty
+                            <img 
+                                src="{{ asset('storage/' . ($site->sobre_imagem ?? 'default-sobre.jpg')) }}" 
+                                alt="Imagem Padrão" 
+                                class="rounded-lg shadow-lg about-image-item">
+                        @endforelse
+                    </div>
                 </div>
-            </div>
-
             </div>
         </div>
     </section>
@@ -535,8 +540,8 @@
                 </p>
             </div>
         
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-1 testimonials-grid">
-                @foreach ($site->depoimentos as $depoimento)
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 testimonials-grid">
+                @forelse ($site->depoimentos as $depoimento)
                     <div class="testimonial-card">
                         <div class="flex items-center mb-4">
                             <img src="{{ $depoimento->imagem ?? 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80' }}" alt="{{ $depoimento->nome }}" class="w-12 h-12 rounded-full mr-4 object-cover">
@@ -552,7 +557,9 @@
                         </div>
                         <p class="text-gray-700 mb-4">"{{ $depoimento->texto ?? 'Depoimento inspirador de um aluno.' }}"</p>
                     </div>
-                @endforeach
+                @empty
+                    <p class="text-center text-gray-500 col-span-3">Nenhum depoimento disponível no momento.</p>
+                @endforelse
             </div>
         </div>
     </section>
@@ -670,10 +677,11 @@
                             <div>
                                 <label class="block text-gray-700 font-medium mb-2">Serviço de Interesse</label>
                                 <select name="servico" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all duration-300">
-                                    @foreach ($site->servicos as $servico)
+                                    @forelse ($site->servicos as $servico)
                                         <option>{{ $servico->titulo }}</option>
-                                    @endforeach
-                                    <option>Informações Gerais</option>
+                                    @empty
+                                        <option>Informações Gerais</option>
+                                    @endforelse
                                 </select>
                             </div>
                             
@@ -876,11 +884,9 @@
             const mensagem = formData.get('mensagem');
             
             const message = `Olá! Meu nome é ${nome}.
-            
 Telefone: ${telefone}
 Email: ${email}
 Serviço: ${servico}
-
 Mensagem: ${mensagem}`;
 
             const encodedMessage = encodeURIComponent(message);
@@ -903,7 +909,9 @@ Mensagem: ${mensagem}`;
 
         // Initialize carousel
         document.addEventListener('DOMContentLoaded', function() {
-            startCarousel();
+            if (totalSlides > 0) {
+                startCarousel();
+            }
         });
 
         // Typing animation
