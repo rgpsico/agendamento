@@ -188,22 +188,38 @@
 
 
                      @isset($dnsStatus, $sslStatus)
-                        @if($dnsStatus === true && $sslStatus === false)
-                         <form action="{{ route('admin.gerarSSL') }}" method="POST" style="display: inline;">
-            @csrf
-            <input type="hidden" name="site_id" value="{{ $site->id }}">
-            <input type="submit" class="btn btn-success" value="Gerar SSL">
-        </form>
-    @endif
-       
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">Status do SSL</h5>
+                            </div>
+                            <div class="card-body d-flex align-items-center justify-content-between">
 
-    {{-- Mostra status atual do SSL --}}
-    @if($sslStatus === true)
-        <span class="badge bg-success">✅ SSL Ativo</span>
-    @else
-        <span class="badge bg-danger">❌ SSL Não Ativo</span>
-    @endif
-@endisset
+                                {{-- Exibe status atual --}}
+                                @if($sslStatus === true)
+                                    <div class="alert alert-success mb-0 flex-grow-1 me-3">
+                                        ✅ SSL Ativo para <strong>{{ $site->dominio_personalizado }}</strong>
+                                    </div>
+                                @else
+                                    <div class="alert alert-danger mb-0 flex-grow-1 me-3">
+                                        ❌ SSL Não Ativo para <strong>{{ $site->dominio_personalizado }}</strong>
+                                    </div>
+                                @endif
+
+                                {{-- Botão de gerar SSL aparece só se DNS ok e SSL ainda não criado --}}
+                                @if($dnsStatus === true && $sslStatus === false)
+                                    <form action="{{ route('admin.gerarSSL') }}" method="POST" class="ms-3">
+                                        @csrf
+                                        <input type="hidden" name="site_id" value="{{ $site->id }}">
+                                        <button type="submit" class="btn btn-success">
+                                            <i class="bi bi-lock-fill me-1"></i> Gerar SSL
+                                        </button>
+                                    </form>
+                                @endif
+
+                            </div>
+                        </div>
+                    @endisset
+
 
                         </div>
                     </div>
