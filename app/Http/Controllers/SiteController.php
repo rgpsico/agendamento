@@ -463,9 +463,11 @@ private function verificarDnsSsl($dominio)
     {
         // Garante que o site_id foi enviado
         $request->validate([
-            'site_id' => 'required|integer|exists:empresa_sites,id'
+            'site_id' => 'required|integer|exists:empresa_site,id'
         ]);
 
+
+   
         // Busca o site pelo ID e verifica se pertence à empresa logada
         $site = EmpresaSite::where('id', $request->site_id)
             ->where('empresa_id', Auth::user()->empresa->id)
