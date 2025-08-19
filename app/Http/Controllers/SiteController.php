@@ -91,10 +91,12 @@ class SiteController extends Controller
 
         // Caso seja domínio personalizado
         $site = EmpresaSite::where('dominio_personalizado', $host)
-            ->with(['servicos', 'depoimentos', 'contatos'])
+            ->with(['servicos', 'depoimentos', 'contatos', 'template'])
             ->firstOrFail();
 
-        return view('site.publico', compact('site'));
+        $view_template = $site->template->path_view ?? 'site.publico';
+
+        return view($view_template , compact('site'));
     }
 
 
