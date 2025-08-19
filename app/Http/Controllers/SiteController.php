@@ -257,7 +257,7 @@ private function verificarDnsSsl($dominio)
      */
     public function update(Request $request, EmpresaSite $site)
     {
-        
+      
         $validated = $request->validate([
             'titulo' => 'required|string|max:255',
             'descricao' => 'nullable|string',
@@ -274,6 +274,8 @@ private function verificarDnsSsl($dominio)
             'whatsapp' => 'nullable|string|max:20',
             'template_id' => 'required|exists:site_templates,id',
         ]);
+
+
 
         $data = [
             'titulo' => $request->titulo,
@@ -310,11 +312,18 @@ private function verificarDnsSsl($dominio)
         }
 
         // Upload da capa
-        if ($request->hasFile('capa')) {
+       if ($request->hasFile('capa')) {
+            \Log::info('Arquivo capa detectado na requisição.');
             if (!empty($site->capa) && Storage::disk('public')->exists($site->capa)) {
+                \Log::info('Deletando capa antiga: ' . $site->capa);
                 Storage::disk('public')->delete($site->capa);
+            } else {
+                \Log::info('Capa antiga não encontrada ou não existe: ' . ($site->capa ?? 'vazio'));
             }
             $data['capa'] = $request->file('capa')->store('sites/capas', 'public');
+            \Log::info('Nova capa salva em: ' . $data['capa']);
+        } else {
+            \Log::error('Nenhum arquivo capa encontrado na requisição.');
         }
 
         // Upload imagem da seção sobre nós
