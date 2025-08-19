@@ -170,22 +170,14 @@
                                 @endif
                             </div>
 
-                      @isset($sslStatus, $sslValid)
-                        @if($sslStatus && !$sslValid)
-                            <div class="alert alert-danger">
-                                SSL encontrado, mas certificado inválido ou expirado (expira em: {{ $sslExpireAt ?? 'desconhecido' }}).
-                            </div>
-                        @elseif($sslStatus && $sslValid)
-                            <div class="alert alert-success">
-                                HTTPS ativo e válido (expira em: {{ $sslExpireAt }}).
-                            </div>
-                        @else
-                            <div class="alert alert-warning">
-                                HTTPS não está ativo para este domínio.
-                            </div>
-                        @endif
-                    @endisset
-
+                       @isset($dnsStatus, $sslStatus)
+                            @if($dnsStatus === true && $sslStatus === false)
+                                <form action="{{ route('gerarSSL') }}" method="POST" style="display: inline;">
+                                    @csrf
+                                    <input type="submit" class="btn btn-success" value="Gerar SSL">
+                                </form>
+                            @endif
+                        @endisset
 
 
 
