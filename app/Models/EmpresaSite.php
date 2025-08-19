@@ -13,6 +13,7 @@ class EmpresaSite extends Model
 
     protected $fillable = [
         'empresa_id',
+        'template_id', // ✅ novo campo
         'titulo',
         'slug',
         'dominio_personalizado',
@@ -35,20 +36,17 @@ class EmpresaSite extends Model
         'ativo' => 'boolean',
     ];
 
-    // // ✅ ADICIONAR: Método para customizar Route Model Binding
-    // public function resolveRouteBinding($value, $field = null)
-    // {
-    //     // Tentar encontrar o registro
-    //     $result = $this->where($field ?? $this->getRouteKeyName(), $value)->first();
 
-    //     // Se não encontrar, retornar null ao invés de dar erro 404
-    //     return $result;
-    // }
-
+    
     // Relacionamentos
     public function empresa()
     {
         return $this->belongsTo(Empresa::class, 'empresa_id', 'id');
+    }
+
+    public function template()
+    {
+        return $this->belongsTo(SiteTemplate::class, 'template_id');
     }
 
     public function servicos()
@@ -75,8 +73,6 @@ class EmpresaSite extends Model
     {
         return $this->belongsTo(EmpresaEndereco::class, 'empresa_id', 'empresa_id');
     }
-
-
 
     public function visualizacoes()
     {

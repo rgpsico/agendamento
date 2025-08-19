@@ -6,6 +6,7 @@ use App\Models\EmpresaSite;
 use App\Models\SiteContato;
 use App\Models\SiteDepoimento;
 use App\Models\SiteServico;
+use App\Models\SiteTemplate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -38,12 +39,17 @@ class SiteController extends Controller
     {
         $site = EmpresaSite::findOrFail($idsite);
 
+        // Verifica se o usuário tem acesso ao site
         if ($site->empresa_id !== Auth::user()->empresa->id) {
             abort(403, 'Acesso não autorizado.');
         }
 
-        return view('admin.site.lista.edit', compact('site'));
+        // Busca todos os templates
+        $templates = SiteTemplate::all();
+
+        return view('admin.site.lista.edit', compact('site', 'templates'));
     }
+
 
 
 
@@ -54,11 +60,21 @@ class SiteController extends Controller
     public function mostrar($slug)
     {
         $site = EmpresaSite::where('slug', $slug)
-            ->with(['servicos', 'siteServicos', 'depoimentos', 'contatos', 'endereco', 'empresa', 'empresa.modalidade'])
+            ->with([
+                'servicos',
+                'siteServicos',
+                'depoimentos',
+                'contatos',
+                'endereco',
+                'empresa',
+                'empresa.modalidade',
+                'template' // Carrega o template junto
+            ])
             ->firstOrFail();
-
+                
         return view('site.publico', compact('site'));
     }
+
 
 
     public function mostrarDominio(Request $request)
@@ -84,6 +100,7 @@ class SiteController extends Controller
 
     public function edit()
     {
+       
         $empresa = Auth::user()->empresa;
 
         $site = EmpresaSite::firstOrNew(['empresa_id' => $empresa->id]);
@@ -143,11 +160,13 @@ class SiteController extends Controller
             'sobre_itens.*.descricao' => 'nullable|string',
             'dominio_personalizado' => 'nullable|string|max:255',
             'whatsapp' => 'nullable|string|max:20',
+            'template_id' => 'required|exists:site_templates,id',
         ]);
 
         $data = [
             'empresa_id' => Auth::user()->empresa->id,
             'titulo' => $request->titulo,
+            'template_id' => $request->template_id, // novo campo
 
             'descricao' => $request->descricao,
             'cores' => [
@@ -209,11 +228,13 @@ class SiteController extends Controller
             'sobre_itens.*.descricao' => 'nullable|string',
             'dominio_personalizado' => 'nullable|string|max:255',
             'whatsapp' => 'nullable|string|max:20',
+            'template_id' => 'required|exists:site_templates,id',
         ]);
 
         $data = [
             'titulo' => $request->titulo,
             'descricao' => $request->descricao,
+            'template_id' => $request->template_id, // novo campo
             'cores' => [
                 'primaria' => $request->input('cores.primaria', '#0ea5e9'),
                 'secundaria' => $request->input('cores.secundaria', '#38b2ac'),

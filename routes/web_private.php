@@ -21,7 +21,10 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Api\PixQrController;
 use App\Http\Controllers\BoletoController;
 use App\Http\Controllers\PaymentConfigurationController;
+use App\Http\Controllers\SiteTemplateController;
 
+
+;
 Route::post('/pagamento', [StripeController::class, 'treinoStripe'])->name('stripe.pagamento');
 Route::get('/erro/pagamento', [PagamentoController::class, 'erroPagamento'])->name('erroPagamento');
 
@@ -232,6 +235,12 @@ Route::group(['prefix' => '/manager'], function () {
 });
 
 Route::post('/analytics/event', [\App\Http\Controllers\AnalyticsController::class, 'recordEvent'])->name('analytics.event');
+
+Route::resource('site-templates', SiteTemplateController::class);
+
+
+Route::get('site-templates/lista', [SiteTemplateController::class, 'index'])->name('admin.sitetemplate.index');
+
 
 Route::prefix('admin')->middleware('auth')->group(function () {
     Route::get('/relatorios', [\App\Http\Controllers\AnalyticsController::class, 'dashboard'])->name('admin.analytics.dashboard');

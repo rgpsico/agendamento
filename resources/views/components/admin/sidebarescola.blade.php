@@ -44,7 +44,26 @@
                                 <li><a href="{{ route('admin.site.servicos.index') }}">Serviços</a></li>
                                 <li><a href="{{ route('admin.site.depoimentos.index') }}">Depoimentos</a></li>
                                 <li><a href="{{ route('admin.site.contatos.index') }}">Contatos</a></li>
-                                <li><a href="{{ route('admin.site.dominios.index') }}">Domínios e SSL</a></li>
+                        
+                          
+                            
+                            </ul>
+                        </li>
+                    @endisset
+
+
+                    @isset(Auth::user()->empresa->user_id)
+                        <li class="submenu">
+                            <a href="#">
+                                <i class="fas fa-globe" style="font-size: 18px;"></i>
+                                <span>Site Templates</span>
+                                <span class="menu-arrow"></span>
+                            </a>
+                            <ul>
+                              <li><a href="{{ route('site-templates.index') }}">Lista</a></li>                            
+                             
+                          
+                            
                             </ul>
                         </li>
                     @endisset
