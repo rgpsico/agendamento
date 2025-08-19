@@ -32,7 +32,7 @@ Route::get('/login', function () {
 });
 
 
-Route::post('/gerar-ssl', [SiteController::class, 'gerarSSL'])->name('gerarSSL');
+Route::post('/gerar-ssl', [SiteController::class, 'gerarSSL'])->name('admin.gerarSSL');
 Route::get('/registerProf', [HomeController::class, 'registerProf'])->name('home.registerProf');
 Route::get('/registerAluno', [HomeController::class, 'registerAluno'])->name('home.registerAluno');
 

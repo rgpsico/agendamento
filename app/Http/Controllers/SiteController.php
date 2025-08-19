@@ -257,6 +257,7 @@ private function verificarDnsSsl($dominio)
      */
     public function update(Request $request, EmpresaSite $site)
     {
+        
         $validated = $request->validate([
             'titulo' => 'required|string|max:255',
             'descricao' => 'nullable|string',
@@ -460,12 +461,19 @@ private function verificarDnsSsl($dominio)
 
     public function gerarSSL(Request $request)
     {
+        // Garante que o site_id foi enviado
+        $request->validate([
+            'site_id' => 'required|integer|exists:empresa_sites,id'
+        ]);
 
-        $site = EmpresaSite::where('empresa_id', Auth::user()->empresa->id)->first();
+        // Busca o site pelo ID e verifica se pertence à empresa logada
+        $site = EmpresaSite::where('id', $request->site_id)
+            ->where('empresa_id', Auth::user()->empresa->id)
+            ->first();
 
-        // Remove the debug statement
         if (!$site) {
-            return redirect()->route('admin.site.dominios')->with('error', 'Domínio não encontrado.');
+            return redirect()->route('admin.site.dominios')
+                ->with('error', 'Domínio não encontrado ou não pertence à sua empresa.');
         }
 
         if (!$site->dominio_personalizado) {
@@ -482,6 +490,7 @@ private function verificarDnsSsl($dominio)
             return back()->with('error', 'Erro ao gerar SSL: ' . $process->getErrorOutput());
         }
 
-        return back()->with('success', 'SSL gerado com sucesso!');
+        return back()->with('success', "SSL para {$dominio} gerado com sucesso!");
     }
+
 }
