@@ -280,14 +280,14 @@ class EmpresaController extends Controller
             'valor_aula_ate' => 'required|min:0',
             'modalidade_id' => 'required|exists:modalidade,id',
 
-           // 'cep' => 'required',
-           // 'endereco' => 'required',
+            'cep' => 'required',
+            'endereco' => 'required',
             // 'numero' => 'required',
             // 'bairro' => 'required',
-            // 'cidade' => 'required',
-            // 'estado' => 'required',
-            // 'uf' => 'required',
-            // 'pais' => 'required',
+            'cidade' => 'required',
+            'estado' => 'required',
+            'uf' => 'required',
+            'pais' => 'required',
         ]);
 
         try {

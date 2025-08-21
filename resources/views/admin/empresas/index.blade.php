@@ -91,136 +91,7 @@
             <body>
 
                 <!-- Modal de Edição -->
-                <div id="editEmpresaModal" class="modal fade" tabindex="-1" role="dialog">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Editar Empresa</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                    aria-label="Fechar"></button>
-                            </div>
-                            <form id="editEmpresaForm" method="POST" enctype="multipart/form-data">
-                                <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                <input type="hidden" name="_method" value="PUT">
-                                <input type="hidden" id="empresa_id" name="empresa_id">
-
-                                <div class="modal-body">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group mb-3">
-                                                <label for="nome_empresa" class="form-label">Nome</label>
-                                                <input type="text" class="form-control" id="nome_empresa"
-                                                    name="nome" required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group mb-3">
-                                                <label for="email_empresa" class="form-label">Email</label>
-                                                <input type="email" class="form-control" id="email_empresa"
-                                                    name="email" required>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group mb-3">
-                                                <label for="site_url" class="form-label">Site URL</label>
-                                                <input type="url" class="form-control" id="site_url"
-                                                    name="site_url">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group mb-3">
-                                                <label for="telefone" class="form-label">Telefone</label>
-                                                <input type="text" class="form-control" id="telefone"
-                                                    name="telefone" required>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group mb-3">
-                                                <label for="cnpj" class="form-label">CPF/CNPJ</label>
-                                                <input type="text" class="form-control" id="cnpj"
-                                                    name="cnpj" required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group mb-3">
-                                                <label for="data_vencimento" class="form-label">Data
-                                                    Vencimento</label>
-                                                <input type="text" class="form-control"
-                                                    id="data_vencimento_empresa" name="data_vencimento" required>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group mb-3">
-                                        <label for="descricao" class="form-label">Descrição</label>
-                                        <textarea class="form-control" id="descricao" name="descricao" rows="3" required></textarea>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group mb-3">
-                                                <label for="valor_aula_de" class="form-label">Valor Aula (De)</label>
-                                                <input type="text" class="form-control" id="valor_aula_de"
-                                                    name="valor_aula_de" required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group mb-3">
-                                                <label for="valor_aula_ate" class="form-label">Valor Aula
-                                                    (Até)</label>
-                                                <input type="text" class="form-control" id="valor_aula_ate"
-                                                    name="valor_aula_ate" required>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group mb-3">
-                                        <label for="modalidade_id" class="form-label">Modalidade</label>
-                                        <select class="form-control" id="modalidade_id" name="modalidade_id"
-                                            required>
-                                            <option value="">Selecione uma modalidade</option>
-                                            @foreach ($modalidades as $modalidade)
-                                                <option value="{{ $modalidade->id }}"
-                                                    {{ old('modalidade_id', $empresa->modalidade_id ?? '') == $modalidade->id ? 'selected' : '' }}>
-                                                    {{ $modalidade->nome }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group mb-3">
-                                                <label for="avatar" class="form-label">Avatar</label>
-                                                <input type="file" class="form-control" id="avatar"
-                                                    name="avatar" accept="image/*">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group mb-3">
-                                                <label for="banner" class="form-label">Banner</label>
-                                                <input type="file" class="form-control" id="banner"
-                                                    name="banner" accept="image/*">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary"
-                                        data-bs-dismiss="modal">Fechar</button>
-                                    <button type="submit" class="btn btn-primary">Salvar Alterações</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
+                @include('admin.empresas._partials.editEmpresaModal')
 
                 <!-- Tabela de Empresas -->
                 <div class="row">
@@ -289,21 +160,29 @@
                                                         <div class="actions">
                                                             <!-- Botão de Editar -->
                                                             <button class="btn btn-sm bg-success-light editEmpresaBtn"
-                                                                data-id="{{ $empresa->id }}"
-                                                                data-nome="{{ $empresa->nome }}"
-                                                                data-email="{{ $empresa->user->email }}"
-                                                                data-site_url="{{ $empresa->site_url }}"
-                                                                data-descricao="{{ $empresa->descricao }}"
-                                                                data-telefone="{{ $empresa->telefone }}"
-                                                                data-cnpj="{{ $empresa->cnpj }}"
-                                                                data-valor_aula_de="{{ $empresa->valor_aula_de }}"
-                                                                data-valor_aula_ate="{{ $empresa->valor_aula_ate }}"
-                                                                data-modalidade_id="{{ $empresa->modalidade_id ?? '' }}"
-                                                                data-data_vencimento="{{ $empresa->data_vencimento }}"
-                                                                data-bs-toggle="modal"
-                                                                data-bs-target="#editEmpresaModal">
-                                                                <i class="fe fe-pencil"></i> Editar
-                                                            </button>
+                                                                    data-id="{{ $empresa->id }}"
+                                                                    data-nome="{{ $empresa->nome }}"
+                                                                    data-email="{{ $empresa->user->email }}"
+                                                                    data-site_url="{{ $empresa->site_url }}"
+                                                                    data-descricao="{{ $empresa->descricao }}"
+                                                                    data-telefone="{{ $empresa->telefone }}"
+                                                                    data-cnpj="{{ $empresa->cnpj }}"
+                                                                    data-valor_aula_de="{{ $empresa->valor_aula_de }}"
+                                                                    data-valor_aula_ate="{{ $empresa->valor_aula_ate }}"
+                                                                    data-modalidade_id="{{ $empresa->modalidade_id ?? '' }}"
+                                                                    data-data_vencimento="{{ $empresa->data_vencimento }}"
+                                                                    data-cep="{{ $empresa->endereco->cep ?? '' }}"
+                                                                    data-endereco="{{ $empresa->endereco->endereco ?? '' }}"
+                                                                    data-numero="{{ $empresa->endereco->numero ?? '' }}"
+                                                                    data-bairro="{{ $empresa->endereco->bairro ?? '' }}"
+                                                                    data-cidade="{{ $empresa->endereco->cidade ?? '' }}"
+                                                                    data-estado="{{ $empresa->endereco->estado ?? '' }}"
+                                                                    data-uf="{{ $empresa->endereco->uf ?? '' }}"
+                                                                    data-pais="{{ $empresa->endereco->pais ?? '' }}"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#editEmpresaModal">
+                                                                    <i class="fe fe-pencil"></i> Editar
+                                                                </button>
 
                                                             <!-- Botão de Ver -->
                                                             <a class="btn btn-sm bg-info-light"
@@ -352,70 +231,124 @@
     {{-- <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script> --}}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <script>
-        $(document).ready(function() {
-            // Adicionar no início do seu script, dentro do $(document).ready
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
-            });
+   <script>
+    $(document).ready(function() {
+        // Configurar CSRF para AJAX (aplicado apenas às requisições locais)
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
 
-            $('.editEmpresaBtn').click(function() {
-                let empresaId = $(this).data('id');
+        // Função para consultar ViaCEP
+        function consultarCEP(cep) {
+            // Remover caracteres não numéricos do CEP
+            cep = cep.replace(/\D/g, '');
 
-                // Preencher campos do formulário
-                $('#empresa_id').val(empresaId);
-                $('#nome_empresa').val($(this).data('nome'));
-                $('#email_empresa').val($(this).data('email'));
-                $('#site_url').val($(this).data('site_url'));
-                $('#descricao').val($(this).data('descricao'));
-                $('#telefone').val($(this).data('telefone'));
-                $('#cnpj').val($(this).data('cnpj'));
-                $('#data_vencimento_empresa').val($(this).data('data_vencimento'));
-                $('#valor_aula_de').val($(this).data('valor_aula_de'));
-                $('#valor_aula_ate').val($(this).data('valor_aula_ate'));
-
-                $('#modalidade_id option[value="' + $(this).data('modalidade_id') + '"]').prop('selected',
-                    true);
-                // Selecionar modalidade correta
-                $('#modalidade_id').val($(this).data('modalidade_id'));
-
-                // Definir action do formulário
-                $('#editEmpresaForm').attr('action', `/cliente/empresa/update/${empresaId}`);
-
-                console.log('Modalidade selecionada:', $(this).data('modalidade_id'));
-            });
-
-            $('#editEmpresaForm').submit(function(e) {
-                e.preventDefault();
-                let formData = new FormData(this);
-
+            if (cep.length === 8) { // Verifica se o CEP tem 8 dígitos
                 $.ajax({
-                    url: $(this).attr('action'),
-                    type: 'POST', // Laravel aceita _method=PUT
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function(response) {
-                        alert('Empresa atualizada com sucesso!');
-                        $('#editEmpresaModal').modal('hide');
-                        location.reload();
-                    },
-                    error: function(response) {
-                        let errorMsg = 'Erro ao atualizar empresa: ';
-                        if (response.responseJSON && response.responseJSON.message) {
-                            errorMsg += response.responseJSON.message;
-                        } else if (response.responseJSON && response.responseJSON.errors) {
-                            let errors = Object.values(response.responseJSON.errors).flat();
-                            errorMsg += errors.join(', ');
+                    url: `https://viacep.com.br/ws/${cep}/json/`,
+                    type: 'GET',
+                    dataType: 'json',               
+                    success: function(data) {
+                        if (!data.erro) {
+                            // Preencher os campos com os dados retornados
+                            $('#endereco').val(data.logradouro || '');
+                            $('#bairro').val(data.bairro || '');
+                            $('#cidade').val(data.localidade || '');
+                            $('#estado').val(data.uf || '');
+                            $('#uf').val(data.uf || '');
+                            $('#pais').val('Brasil');
                         } else {
-                            errorMsg += 'Verifique os dados.';
+                            alert('CEP não encontrado. Por favor, verifique o CEP digitado.');
+                            // Limpar os campos de endereço
+                            $('#endereco').val('');
+                            $('#bairro').val('');
+                            $('#cidade').val('');
+                            $('#estado').val('');
+                            $('#uf').val('');
+                            $('#pais').val('');
                         }
-                        alert(errorMsg);
+                    },
+                    error: function() {
+                        alert('Erro ao consultar o CEP. Tente novamente mais tarde.');
                     }
                 });
+            }
+        }
+
+        // Evento de mudança no campo CEP
+        $('#cep').on('blur', function() {
+            let cep = $(this).val();
+            if (cep) {
+                consultarCEP(cep);
+            }
+        });
+
+        // Aplicar máscara ao campo CEP (formato 99999-999)
+        $('#cep').on('input', function() {
+            let value = $(this).val().replace(/\D/g, '');
+            if (value.length > 5) {
+                $(this).val(value.replace(/(\d{5})(\d{1,3})/, '$1-$2'));
+            } else {
+                $(this).val(value);
+            }
+        });
+
+        // Preencher formulário ao clicar no botão de editar
+        $('.editEmpresaBtn').click(function() {
+            let empresaId = $(this).data('id');
+
+            // Preencher campos do formulário
+            $('#empresa_id').val(empresaId);
+            $('#nome_empresa').val($(this).data('nome'));
+            $('#email_empresa').val($(this).data('email'));
+            $('#site_url').val($(this).data('site_url'));
+            $('#descricao').val($(this).data('descricao'));
+            $('#telefone').val($(this).data('telefone'));
+            $('#cnpj').val($(this).data('cnpj'));
+            $('#data_vencimento_empresa').val($(this).data('data_vencimento'));
+            $('#valor_aula_de').val($(this).data('valor_aula_de'));
+            $('#valor_aula_ate').val($(this).data('valor_aula_ate'));
+            $('#modalidade_id').val($(this).data('modalidade_id'));
+
+            // Preencher campos de endereço
+            $('#cep').val($(this).data('cep'));
+            $('#endereco').val($(this).data('endereco'));
+            $('#numero').val($(this).data('numero'));
+            $('#bairro').val($(this).data('bairro'));
+            $('#cidade').val($(this).data('cidade'));
+            $('#estado').val($(this).data('estado'));
+            $('#uf').val($(this).data('uf'));
+            $('#pais').val($(this).data('pais'));
+
+            // Definir action do formulário
+            $('#editEmpresaForm').attr('action', `/cliente/empresa/update/${empresaId}`);
+
+            console.log('Modalidade selecionada:', $(this).data('modalidade_id'));
+        });
+
+        // Submissão do formulário via AJAX
+        $('#editEmpresaForm').submit(function(e) {
+            e.preventDefault();
+            let formData = new FormData(this);
+
+            $.ajax({
+                url: $(this).attr('action'),
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    alert('Empresa atualizada com sucesso!');
+                    $('#editEmpresaModal').modal('hide');
+                    location.reload();
+                },
+                error: function(response) {
+                    console.log(response)
+                
             });
         });
-    </script>
+    });
+</script>
 </x-admin.layout>
