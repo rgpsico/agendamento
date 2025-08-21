@@ -1343,15 +1343,15 @@ class PixQrController extends Controller
             ], 400);
         }
 
-        $pixKeys = $professor->asaas_pix_key ? json_decode($professor->asaas_pix_key, true) : [];
+        // $pixKeys = $professor->asaas_pix_key ? json_decode($professor->asaas_pix_key, true) : [];
 
    
-        if (empty($pixKeys)) {
-            return response()->json([
-                'success' => false,
-                'error' => 'Nenhuma chave PIX associada ao professor',
-            ], 400);
-        }
+        // if (empty($pixKeys)) {
+        //     return response()->json([
+        //         'success' => false,
+        //         'error' => 'Nenhuma chave PIX associada ao professor',
+        //     ], 400);
+        // }
 
         Log::debug('Gerando PIX QR Code', [
             'usuario_id' => $request->usuario_id,
