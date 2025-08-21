@@ -292,7 +292,7 @@ class EmpresaController extends Controller
             'estado' => 'required',
             'uf' => 'required',
             'pais' => 'required',
-            //'data_vencimento' =>'required'
+            'data_vencimento' =>'nullable'
         ]);
 
         try {
