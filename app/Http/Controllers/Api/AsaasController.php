@@ -149,6 +149,8 @@ class AsaasController extends Controller
             ], 200);
         }
 
+        dd($this->token);
+
         // Criar a chave Pix no Asaas
         $response = Http::withHeaders([
             'Content-Type'  => 'application/json',
