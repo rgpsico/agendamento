@@ -1362,7 +1362,7 @@ class PixQrController extends Controller
         ]);
 
         try {
-            $paymentResponse = $this->client->post($baseUrl."/payments", [
+            $paymentResponse = $this->client->post($baseUrl."v3/payments", [
                 'headers' => [
                     'access_token' => $this->apiKey,
                     'Content-Type' => 'application/json',
