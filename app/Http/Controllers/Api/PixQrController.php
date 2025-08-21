@@ -1328,7 +1328,7 @@ class PixQrController extends Controller
 
         $professor = Professor::where('usuario_id', $request->usuario_id)->first();
 
-        dd($professor);
+      
         if (!$professor) {
             return response()->json([
                 'success' => false,
@@ -1344,6 +1344,8 @@ class PixQrController extends Controller
         }
 
         $pixKeys = $professor->asaas_pix_key ? json_decode($professor->asaas_pix_key, true) : [];
+
+          dd($pixKeys );
         if (empty($pixKeys)) {
             return response()->json([
                 'success' => false,
