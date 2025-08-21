@@ -106,13 +106,14 @@ class AsaasController extends Controller
 
     public function criarClienteAsaas(array $dados): array
     {
-
+        $dados = array_filter($dados, fn($v) => !is_null($v));
+        
         $response = Http::withHeaders([
             'Content-Type'  => 'application/json',
             'access_token'  => $this->token,
-        ])->post($this->baseUri . '/api/v3/customers', $dados);
+        ])->post($this->baseUri . 'api/v3/customers', $dados);
 
-                dd($this->baseUri . '/api/v3/customers', $dados);
+              
 
         // Se falhou, lança erro detalhado
         if ($response->failed()) {
