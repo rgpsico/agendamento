@@ -249,7 +249,8 @@
                 $.ajax({
                     url: `https://viacep.com.br/ws/${cep}/json/`,
                     type: 'GET',
-                    dataType: 'json',               
+                    dataType: 'json',
+                    headers: {}, // Sobrescreve para não enviar X-CSRF-TOKEN
                     success: function(data) {
                         if (!data.erro) {
                             // Preencher os campos com os dados retornados
@@ -345,8 +346,17 @@
                     location.reload();
                 },
                 error: function(response) {
-                    console.log(response)
-                
+                    let errorMsg = 'Erro ao atualizar empresa: ';
+                    if (response.responseJSON && response.responseJSON.message) {
+                        errorMsg += response.responseJSON.message;
+                    } else if (response.responseJSON && response.responseJSON.errors) {
+                        let errors = Object.values(response.responseJSON.errors).flat();
+                        errorMsg += errors.join(', ');
+                    } else {
+                        errorMsg += 'Verifique os dados.';
+                    }
+                    alert(errorMsg);
+                }
             });
         });
     });
