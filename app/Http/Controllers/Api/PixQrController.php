@@ -1315,7 +1315,7 @@ class PixQrController extends Controller
             'due_date'    => 'nullable|date_format:Y-m-d|after_or_equal:today',
         ]);
 
-        dd($this->apiKey);
+       
 
         // Verifica API Key
         if (!$this->apiKey) {
