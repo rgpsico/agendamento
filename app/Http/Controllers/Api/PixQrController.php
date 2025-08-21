@@ -1336,7 +1336,7 @@ class PixQrController extends Controller
 
         try {
             // Cria pagamento PIX
-            dd("$baseUrl/payments");
+           
             $paymentResponse = $this->client->post("$baseUrl/payments", [
                 'headers' => [
                     'access_token' => $this->apiKey,
@@ -1365,6 +1365,9 @@ class PixQrController extends Controller
                     'Accept'       => 'application/json',
                 ],
             ])->getBody();
+
+
+            dd($qrCodeResponse);
 
             $qrCodeData = json_decode($qrCodeResponse, true);
 
