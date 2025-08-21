@@ -153,7 +153,7 @@ class AsaasController extends Controller
         $response = Http::withHeaders([
             'Content-Type'  => 'application/json',
             'access_token'  => $this->token,
-        ])->post($this->baseUri . '/pix/addressKeys', [
+        ])->post($this->baseUri . 'v3/pix/addressKeys', [
             'type' => 'EVP',
             'walletId' => $professor->asaas_wallet_id
         ]);
