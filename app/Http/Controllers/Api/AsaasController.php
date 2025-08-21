@@ -112,7 +112,7 @@ class AsaasController extends Controller
             'access_token'  => $this->token,
         ])->post($this->baseUri . '/customers', $dados);
 
-
+                dd($this->baseUri . '/customers', $dados);
 
         // Se falhou, lança erro detalhado
         if ($response->failed()) {
