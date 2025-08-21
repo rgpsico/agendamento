@@ -1327,6 +1327,8 @@ class PixQrController extends Controller
             : 'https://api.asaas.com/v3';
 
         $professor = Professor::where('usuario_id', $request->usuario_id)->first();
+
+        dd($professor);
         if (!$professor) {
             return response()->json([
                 'success' => false,
