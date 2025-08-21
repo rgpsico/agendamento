@@ -305,7 +305,7 @@ class EmpresaController extends Controller
                 'descricao' => $validatedData['descricao'],
                 'telefone' => $validatedData['telefone'],
                 'cnpj' => $validatedData['cnpj'],
-                'data_vencimento' => $validatedData['data_vencimento'],
+                'data_vencimento' => $validatedData['data_vencimento'] ?? '',
                 'valor_aula_de' => $validatedData['valor_aula_de'],
                 'valor_aula_ate' => $validatedData['valor_aula_ate'],
                 'modalidade_id' => $validatedData['modalidade_id'],
