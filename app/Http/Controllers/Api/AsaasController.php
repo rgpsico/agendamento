@@ -110,9 +110,9 @@ class AsaasController extends Controller
         $response = Http::withHeaders([
             'Content-Type'  => 'application/json',
             'access_token'  => $this->token,
-        ])->post($this->baseUri . '/customers', $dados);
+        ])->post($this->baseUri . '/api/v3/customers', $dados);
 
-                dd($this->baseUri . '/customers', $dados);
+                dd($this->baseUri . '/api/v3/customers', $dados);
 
         // Se falhou, lança erro detalhado
         if ($response->failed()) {
