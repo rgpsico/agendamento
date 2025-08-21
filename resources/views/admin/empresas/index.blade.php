@@ -327,6 +327,18 @@
         $('.editEmpresaBtn').click(function() {
             let empresaId = $(this).data('id');
             let modalidadeId = $(this).data('modalidade_id');
+              let data_vencimento = $(this).data('data_vencimento'); // exemplo: "2025-08-21 12:30:00"
+
+            let somenteData = data_vencimento.split(' ')[0]; // "2025-09-10"
+
+            // quebra em [ano, mes, dia]
+            let [ano, mes, dia] = somenteData.split('-');
+
+            // monta no formato brasileiro
+            let dataBr = `${dia}/${mes}/${ano}`;
+
+         
+
 
             // Preencher campos do formulário
             $('#empresa_id').val(empresaId);
@@ -336,7 +348,7 @@
             $('#descricao').val($(this).data('descricao'));
             $('#telefone').val($(this).data('telefone'));
             $('#cnpj').val($(this).data('cnpj'));
-            $('#data_vencimento_empresa').val($(this).data('data_vencimento'));
+            $('#data_vencimento_empresa').val(dataBr);
             $('#valor_aula_de').val($(this).data('valor_aula_de'));
             $('#valor_aula_ate').val($(this).data('valor_aula_ate'));
             $('#modalidade_id').val($(this).data('modalidade_id'));
@@ -361,6 +373,16 @@
         // Submissão do formulário via AJAX
         $('#editEmpresaForm').submit(function(e) {
             e.preventDefault();
+
+            let dataInput = $(this).find('[name="data_vencimento"]'); // ajuste o name do input
+
+            if (dataInput.length && dataInput.val()) {
+                let dataBr = dataInput.val(); // exemplo: "10/09/2025"
+                let [dia, mes, ano] = dataBr.split('/'); // quebra por "/"
+                let dataUsa = `${ano}-${mes}-${dia}`; // monta "2025-09-10"
+
+                dataInput.val(dataUsa); // substitui no campo
+            }
             let formData = new FormData(this);
 
             $.ajax({
