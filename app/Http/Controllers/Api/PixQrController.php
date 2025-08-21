@@ -1324,7 +1324,7 @@ class PixQrController extends Controller
 
         // Define base URL correta (sandbox ou produção)
         $baseUrl = env('ASAAS_ENV', 'sandbox') === 'production'
-            ? 'https://api.asaas.com/api/v3'
+            ? 'https://api.asaas.com/v3'
             : 'https://sandbox.asaas.com/api/v3';
 
         // Busca professor
