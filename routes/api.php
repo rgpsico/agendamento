@@ -169,6 +169,9 @@ Route::prefix('empresa/pagamento')->group(function () {
 });
 
 
+Route::get('/viacep/{cep}', [App\Http\Controllers\ViaCepController::class, 'getCep']);
+
+
 Route::middleware('auth')->post('/subcontas', [ProfessoresAsaasController::class, 'createSubaccount'])->name('criar-subconta-professor');
 
 

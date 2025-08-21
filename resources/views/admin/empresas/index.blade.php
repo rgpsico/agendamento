@@ -240,43 +240,70 @@
             }
         });
 
-        // Função para consultar ViaCEP
-        function consultarCEP(cep) {
-            // Remover caracteres não numéricos do CEP
-            cep = cep.replace(/\D/g, '');
-
-            if (cep.length === 8) { // Verifica se o CEP tem 8 dígitos
+        let modalidadesCache = null;
+            function carregarModalidades(selectedId = '') {
+                if (modalidadesCache) {
+                    populateModalidades(modalidadesCache, selectedId);
+                    return;
+                }
                 $.ajax({
-                    url: `https://viacep.com.br/ws/${cep}/json/`,
+                    url: '/api/modalidades',
                     type: 'GET',
                     dataType: 'json',
-                    headers: {}, // Sobrescreve para não enviar X-CSRF-TOKEN
                     success: function(data) {
-                        if (!data.erro) {
-                            // Preencher os campos com os dados retornados
-                            $('#endereco').val(data.logradouro || '');
-                            $('#bairro').val(data.bairro || '');
-                            $('#cidade').val(data.localidade || '');
-                            $('#estado').val(data.uf || '');
-                            $('#uf').val(data.uf || '');
-                            $('#pais').val('Brasil');
-                        } else {
-                            alert('CEP não encontrado. Por favor, verifique o CEP digitado.');
-                            // Limpar os campos de endereço
-                            $('#endereco').val('');
-                            $('#bairro').val('');
-                            $('#cidade').val('');
-                            $('#estado').val('');
-                            $('#uf').val('');
-                            $('#pais').val('');
-                        }
+                        modalidadesCache = data;
+                        populateModalidades(data, selectedId);
                     },
                     error: function() {
-                        alert('Erro ao consultar o CEP. Tente novamente mais tarde.');
+                        alert('Erro ao carregar modalidades. Tente novamente.');
+                        $('#modalidade_id').empty().append('<option value="">Erro ao carregar</option>');
                     }
                 });
             }
+            function populateModalidades(data, selectedId) {
+                let $select = $('#modalidade_id');
+                $select.empty();
+                $select.append('<option value="">Selecione uma modalidade</option>');
+                data.forEach(function(modalidade) {
+                    let selected = modalidade.id == selectedId ? 'selected' : '';
+                    $select.append(
+                        `<option value="${modalidade.id}" ${selected}>${modalidade.nome}</option>`
+                    );
+                });
+            }
+
+        // Função para consultar ViaCEP
+        function consultarCEP(cep) {
+        cep = cep.replace(/\D/g, '');
+        if (cep.length === 8) {
+            $.ajax({
+                url: `/viacep/${cep}`, // Rota do seu backend
+                type: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    if (!data.erro) {
+                        $('#endereco').val(data.logradouro || '');
+                        $('#bairro').val(data.bairro || '');
+                        $('#cidade').val(data.localidade || '');
+                        $('#estado').val(data.uf || '');
+                        $('#uf').val(data.uf || '');
+                        $('#pais').val('Brasil');
+                    } else {
+                        alert('CEP não encontrado. Por favor, verifique o CEP digitado.');
+                        $('#endereco').val('');
+                        $('#bairro').val('');
+                        $('#cidade').val('');
+                        $('#estado').val('');
+                        $('#uf').val('');
+                        $('#pais').val('');
+                    }
+                },
+                error: function() {
+                    alert('Erro ao consultar o CEP. Tente novamente mais tarde.');
+                }
+            });
         }
+    }
 
         // Evento de mudança no campo CEP
         $('#cep').on('blur', function() {
@@ -299,6 +326,7 @@
         // Preencher formulário ao clicar no botão de editar
         $('.editEmpresaBtn').click(function() {
             let empresaId = $(this).data('id');
+            let modalidadeId = $(this).data('modalidade_id');
 
             // Preencher campos do formulário
             $('#empresa_id').val(empresaId);
@@ -312,6 +340,7 @@
             $('#valor_aula_de').val($(this).data('valor_aula_de'));
             $('#valor_aula_ate').val($(this).data('valor_aula_ate'));
             $('#modalidade_id').val($(this).data('modalidade_id'));
+            $('#modalidade_id option[value="' + modalidadeId + '"]').prop('selected', true);
 
             // Preencher campos de endereço
             $('#cep').val($(this).data('cep'));

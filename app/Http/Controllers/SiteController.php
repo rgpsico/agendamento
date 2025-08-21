@@ -273,6 +273,7 @@ private function verificarDnsSsl($dominio)
             'dominio_personalizado' => 'nullable|string|max:255',
             'whatsapp' => 'nullable|string|max:20',
             'template_id' => 'required|exists:site_templates,id',
+            
         ]);
 
 

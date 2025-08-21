@@ -21,8 +21,12 @@ use App\Http\Controllers\BoletoController;
 use App\Http\Controllers\ProfessoresAsaasController;
 use App\Http\Controllers\PagamentoController;
 use App\Http\Controllers\SiteDepoimentoController;
-
+use App\Http\Controllers\ViaCepController;
 //   Route::get('/', [UserManagementController::class, 'index'])->name('register.aluno');
+
+
+
+
 Route::get('/create', [UserManagementController::class, 'create'])->name('register.professor');
 
 Route::post('/pagamentos/presencial', [PagamentoController::class, 'criarPagamentoPresencial'])->name('empresa.pagamento.presencial');
@@ -160,3 +164,5 @@ Route::get('/test', function () {
 
 Route::get('/treino', [AgendaController::class, 'treino'])->name('treino');
 Route::get('/logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
+
+Route::get('/viacep/{cep}', [ViaCepController::class, 'getCep']);
