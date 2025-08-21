@@ -525,42 +525,49 @@
         }
 
         function validateForm() {
-            const data_aula = $('#data_aula').val();
-            const hora_aula = $('#hora_aula').val();
-            const valor_aula = $('#valor_aula').val();
-            const titulo = $('#titulo').val();
+        const data_aula = $('#data_aula').val();
+        let hora_aula = $('#hora_aula').val(); // deixa mutável (let)
+        const valor_aula = $('#valor_aula').val();
+        const titulo = $('#titulo').val();
 
-            if (!data_aula || !hora_aula || !valor_aula || !titulo) {
-                alert('Dados do agendamento incompletos!');
-                return false;
-            }
-
-            if (!currentPaymentMethod) {
-                alert('Por favor, selecione uma forma de pagamento!');
-                return false;
-            }
-
-            // Validações específicas por forma de pagamento
-            if (currentPaymentMethod === 'cartao') {
-                const cardName = $('input[name="card_name"]').val();
-                const cardNumber = $('input[name="card_number"]').val().replace(/\s/g, '');
-                const cardExpiry = $('input[name="card_expiry"]').val();
-                const cardCvv = $('input[name="card_cvv"]').val();
-                const cardCpf = $('input[name="card_cpf"]').val();
-
-                if (!cardName || !cardNumber || !cardExpiry || !cardCvv || !cardCpf) {
-                    alert('Por favor, preencha todos os dados do cartão!');
-                    return false;
-                }
-
-                if (cardNumber.length !== 16) {
-                    alert('Número do cartão deve ter 16 dígitos!');
-                    return false;
-                }
-            }
-
-            return true;
+        if (!data_aula || !valor_aula || !titulo) {
+            alert('Dados do agendamento incompletos!');
+            return false;
         }
+
+        // Se não tiver hora preenchida, define como 06:00
+        if (!hora_aula) {
+            hora_aula = '06:00';
+            $('#hora_aula').val(hora_aula); // já joga no input
+        }
+
+        if (!currentPaymentMethod) {
+            alert('Por favor, selecione uma forma de pagamento!');
+            return false;
+        }
+
+        // Validações específicas por forma de pagamento
+        if (currentPaymentMethod === 'cartao') {
+            const cardName = $('input[name="card_name"]').val();
+            const cardNumber = $('input[name="card_number"]').val().replace(/\s/g, '');
+            const cardExpiry = $('input[name="card_expiry"]').val();
+            const cardCvv = $('input[name="card_cvv"]').val();
+            const cardCpf = $('input[name="card_cpf"]').val();
+
+            if (!cardName || !cardNumber || !cardExpiry || !cardCvv || !cardCpf) {
+                alert('Por favor, preencha todos os dados do cartão!');
+                return false;
+            }
+
+            if (cardNumber.length !== 16) {
+                alert('Número do cartão deve ter 16 dígitos!');
+                return false;
+            }
+        }
+
+        return true;
+    }
+
 
         function displayPixPayment(data) {
             // Salvar dados do PIX
