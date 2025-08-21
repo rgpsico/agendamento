@@ -18,6 +18,7 @@ use App\Models\Feriado;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class EmpresaController extends Controller
 {
@@ -262,32 +263,36 @@ class EmpresaController extends Controller
         return null;
     }
 
+  
+
     public function update(Request $request)
     {
-
         // Validação dos dados
         $validatedData = $request->validate([
             'empresa_id' => 'required|exists:empresa,id',
             'avatar' => 'nullable|image|max:2048',
             'banner' => 'nullable|image|max:2048',
             'nome' => 'required|max:255',
-            'email' => 'required|email|max:255',
+            // 'email' => [
+            //     'required',
+            //     'email',
+            //     'max:255',
+            //     Rule::unique('usuarios', 'email')->ignore($empresa->user->id ?? 0),
+            // ],
             'site_url' => 'nullable|url|max:255',
             'descricao' => 'required',
             'telefone' => 'required|max:20',
             'cnpj' => 'required|max:18',
-            'valor_aula_de' => 'required|min:0',
-            'valor_aula_ate' => 'required|min:0',
+            'valor_aula_de' => 'required|numeric|min:0',
+            'valor_aula_ate' => 'required|numeric|min:0',
             'modalidade_id' => 'required|exists:modalidade,id',
-
             'cep' => 'required',
             'endereco' => 'required',
-            // 'numero' => 'required',
-            // 'bairro' => 'required',
             'cidade' => 'required',
             'estado' => 'required',
             'uf' => 'required',
             'pais' => 'required',
+            'data_vencimento' =>'required'
         ]);
 
         try {
@@ -300,7 +305,7 @@ class EmpresaController extends Controller
                 'descricao' => $validatedData['descricao'],
                 'telefone' => $validatedData['telefone'],
                 'cnpj' => $validatedData['cnpj'],
-                //   'data_vencimento' => $validatedData['data_vencimento'],
+                'data_vencimento' => $validatedData['data_vencimento'],
                 'valor_aula_de' => $validatedData['valor_aula_de'],
                 'valor_aula_ate' => $validatedData['valor_aula_ate'],
                 'modalidade_id' => $validatedData['modalidade_id'],
@@ -313,48 +318,38 @@ class EmpresaController extends Controller
 
             // Processar upload do avatar
             if ($request->hasFile('avatar')) {
-                // Deletar avatar antigo se existir
                 if ($empresa->avatar && file_exists(public_path('/avatar/' . $empresa->avatar))) {
                     unlink(public_path('/avatar/' . $empresa->avatar));
                 }
-
                 $file = $request->file('avatar');
                 $filename = 'avatar_' . $empresa->id . '_' . time() . '.' . $file->getClientOriginalExtension();
                 $path = public_path('/avatar');
-
-                // Criar diretório se não existir
                 if (!file_exists($path)) {
                     mkdir($path, 0755, true);
                 }
-
                 $file->move($path, $filename);
                 $dataToUpdate['avatar'] = $filename;
             }
 
             // Processar upload do banner
             if ($request->hasFile('banner')) {
-                // Deletar banner antigo se existir
-                if ($empresa->banners && file_exists(public_path('/banner/' . $empresa->banners))) {
-                    unlink(public_path('/banner/' . $empresa->banners));
+                if ($empresa->banner && file_exists(public_path('/banner/' . $empresa->banner))) {
+                    unlink(public_path('/banner/' . $empresa->banner));
                 }
-
                 $file = $request->file('banner');
                 $filenameBanner = 'banner_' . $empresa->id . '_' . time() . '.' . $file->getClientOriginalExtension();
                 $path = public_path('/banner');
-
-                // Criar diretório se não existir
                 if (!file_exists($path)) {
                     mkdir($path, 0755, true);
                 }
-
                 $file->move($path, $filenameBanner);
-                $dataToUpdate['banners'] = $filenameBanner; // Corrigido: era 'banners'
+                $dataToUpdate['banner'] = $filenameBanner;
             }
 
             // Atualizar o email do usuário associado (se necessário)
-            if (isset($validatedData['email']) && $empresa->user) {
-                $empresa->user->update(['email' => $validatedData['email']]);
-            }
+            // if (isset($validatedData['email']) && $empresa->user && $empresa->user->email !== $validatedData['email']) {
+            //     $empresa->user->update(['email' => $validatedData['email']]);
+            // }
 
             // Atualizar a empresa
             $empresa->update($dataToUpdate);
@@ -366,8 +361,6 @@ class EmpresaController extends Controller
                 [
                     'cep' => $validatedData['cep'],
                     'endereco' => $validatedData['endereco'],
-                    // 'numero' => $validatedData['numero'],
-                    // 'bairro' => $validatedData['bairro'],
                     'cidade' => $validatedData['cidade'],
                     'estado' => $validatedData['estado'],
                     'uf' => $validatedData['uf'],
@@ -380,17 +373,18 @@ class EmpresaController extends Controller
                 return response()->json([
                     'success' => true,
                     'message' => 'Empresa atualizada com sucesso!',
-                    'empresa' => $empresa->fresh() // Retorna os dados atualizados
+                    'empresa' => $empresa->fresh()
                 ]);
             }
 
-            // Resposta para requisição normal
             return redirect()->back()->with('success', 'Empresa atualizada com sucesso!');
         } catch (\Exception $e) {
-            // Log do erro
-            \Log::error('Erro ao atualizar empresa: ' . $e->getMessage());
+            \Log::error('Erro ao atualizar empresa: Duplicate email', [
+                'empresa_id' => $request->empresa_id,
+          //      'email' => $validatedData['email'],
+                'error' => $e->getMessage(),
+            ]);
 
-            // Resposta para requisição AJAX
             if ($request->ajax()) {
                 return response()->json([
                     'success' => false,
@@ -398,7 +392,6 @@ class EmpresaController extends Controller
                 ], 500);
             }
 
-            // Resposta para requisição normal
             return redirect()->back()
                 ->with('error', 'Erro ao atualizar empresa: ' . $e->getMessage())
                 ->withInput();
