@@ -1309,169 +1309,91 @@ class PixQrController extends Controller
     public function generatePixQrCode(Request $request)
     {
         $request->validate([
-            'usuario_id' => 'required|exists:professores,usuario_id',
-            'value' => 'required|numeric|min:0.01|max:999999.99',
+            'usuario_id'  => 'required|exists:professores,usuario_id',
+            'value'       => 'required|numeric|min:0.01|max:999999.99',
             'description' => 'nullable|string|max:200',
-            'due_date' => 'nullable|date_format:Y-m-d|after_or_equal:today',
+            'due_date'    => 'nullable|date_format:Y-m-d|after_or_equal:today',
         ]);
 
+        // Verifica API Key
         if (!$this->apiKey) {
-            return response()->json([
-                'success' => false,
-                'error' => 'API Key do Asaas não configurada',
-            ], 500);
+            return response()->json(['success' => false, 'error' => 'API Key do Asaas não configurada'], 500);
         }
 
-        $baseUrl = env('ASAAS_ENV', 'sandbox') === 'sandbox'
-            ? 'https://api-sandbox.asaas.com/v3'
-            : 'https://api.asaas.com/v3';
+        // Define base URL correta (sandbox ou produção)
+        $baseUrl = env('ASAAS_ENV', 'sandbox') === 'production'
+            ? 'https://api.asaas.com/api/v3'
+            : 'https://sandbox.asaas.com/api/v3';
 
+        // Busca professor
         $professor = Professor::where('usuario_id', $request->usuario_id)->first();
-
-      
-        if (!$professor) {
-            return response()->json([
-                'success' => false,
-                'error' => 'Professor não encontrado para o usuario_id fornecido',
-            ], 404);
+        
+        if (!$professor || !$professor->asaas_customer_id) {
+            return response()->json(['success' => false, 'error' => 'Professor sem customer_id no Asaas'], 400);
         }
-
-        if (!$professor->asaas_customer_id) {
-            return response()->json([
-                'success' => false,
-                'error' => 'Nenhum customer_id associado ao professor',
-            ], 400);
-        }
-
-        $pixKeys = $professor->asaas_pix_key ? json_decode($professor->asaas_pix_key, true) : [];
-
-   
-        if (empty($pixKeys)) {
-            return response()->json([
-                'success' => false,
-                'error' => 'Nenhuma chave PIX associada ao professor',
-            ], 400);
-        }
-
-        Log::debug('Gerando PIX QR Code', [
-            'usuario_id' => $request->usuario_id,
-            'customer_id' => $professor->asaas_customer_id,
-            'value' => $request->value,
-            'base_url' => $baseUrl,
-            'pix_keys_count' => count($pixKeys),
-        ]);
 
         try {
-            $paymentResponse = $this->client->post($baseUrl."/payments", [
+            // Cria pagamento PIX
+            $paymentResponse = $this->client->post("$baseUrl/payments", [
                 'headers' => [
                     'access_token' => $this->apiKey,
                     'Content-Type' => 'application/json',
-                    'Accept' => 'application/json',
+                    'Accept'       => 'application/json',
                 ],
                 'json' => [
-                    'customer' => $professor->asaas_customer_id,
-                    'billingType' => 'PIX',
-                    'value' => (float) $request->value,
-                    'dueDate' => $request->due_date ?? now()->addDay()->format('Y-m-d'),
-                    'description' => $request->description ?? 'Pagamento via PIX',
+                    'customer'          => $professor->asaas_customer_id,
+                    'billingType'       => 'PIX',
+                    'value'             => (float) $request->value,
+                    'dueDate'           => $request->due_date ?? now()->addDay()->format('Y-m-d'),
+                    'description'       => $request->description ?? 'Pagamento via PIX',
                     'externalReference' => 'PIX-' . uniqid(),
-                    'installmentCount' => 1,
-                    'installmentValue' => (float) $request->value, // Added to fix invalid_installmentValue error
                 ],
-            ]);
+            ])->getBody();
 
-            $paymentData = json_decode($paymentResponse->getBody(), true);
-
-            if (!isset($paymentData['id'])) {
-                throw new \Exception('ID do pagamento não retornado pela API');
+            $paymentData = json_decode($paymentResponse, true);
+            if (empty($paymentData['id'])) {
+                throw new \Exception('Falha ao criar pagamento no Asaas');
             }
 
-            $paymentId = $paymentData['id'];
-
-            Log::debug('Pagamento criado com sucesso', [
-                'payment_id' => $paymentId,
-                'status' => $paymentData['status'] ?? 'unknown',
-            ]);
-
-            $qrCodeResponse = $this->client->get("$baseUrl/payments/$paymentId/pixQrCode", [
+            // Gera QR Code PIX
+            $qrCodeResponse = $this->client->get("$baseUrl/payments/{$paymentData['id']}/pixQrCode", [
                 'headers' => [
                     'access_token' => $this->apiKey,
-                    'Accept' => 'application/json',
+                    'Accept'       => 'application/json',
                 ],
-            ]);
+            ])->getBody();
 
-            $qrCodeData = json_decode($qrCodeResponse->getBody(), true);
-
-            if (!isset($qrCodeData['encodedImage']) || !isset($qrCodeData['payload'])) {
-                throw new \Exception('Dados do QR Code incompletos na resposta da API');
-            }
-
-            Log::debug('QR Code gerado com sucesso', [
-                'payment_id' => $paymentId,
-                'has_image' => isset($qrCodeData['encodedImage']),
-                'has_payload' => isset($qrCodeData['payload']),
-            ]);
+            $qrCodeData = json_decode($qrCodeResponse, true);
 
             return response()->json([
                 'success' => true,
                 'payment' => [
-                    'id' => $paymentId,
-                    'status' => $paymentData['status'],
-                    'value' => $paymentData['value'],
-                    'due_date' => $paymentData['dueDate'],
-                    'invoice_url' => $paymentData['invoiceUrl'] ?? null,
+                    'id'        => $paymentData['id'],
+                    'status'    => $paymentData['status'],
+                    'value'     => $paymentData['value'],
+                    'due_date'  => $paymentData['dueDate'],
+                    'invoice'   => $paymentData['invoiceUrl'] ?? null,
                 ],
                 'qr_code' => [
-                    'encoded_image' => $qrCodeData['encodedImage'],
-                    'payload' => $qrCodeData['payload'],
+                    'encoded_image'   => $qrCodeData['encodedImage'] ?? null,
+                    'payload'         => $qrCodeData['payload'] ?? null,
                     'expiration_date' => $qrCodeData['expirationDate'] ?? null,
                 ],
-            ], 200);
+            ]);
+
         } catch (\GuzzleHttp\Exception\ClientException $e) {
-            $responseBody = $e->hasResponse() ? $e->getResponse()->getBody()->getContents() : 'No response body';
-            $statusCode = $e->hasResponse() ? $e->getResponse()->getStatusCode() : 400;
-
-            Log::error('Erro na API do Asaas (Cliente): ' . $e->getMessage(), [
-                'status_code' => $statusCode,
-                'response_body' => $responseBody,
-                'usuario_id' => $request->usuario_id,
-            ]);
-
-            $errorData = json_decode($responseBody, true);
-            $errorMessage = 'Erro desconhecido';
-
-            if ($errorData && isset($errorData['errors']) && is_array($errorData['errors'])) {
-                $errorMessage = $errorData['errors'][0]['description'] ?? $errorData['errors'][0]['code'] ?? 'Erro na validação';
-            } elseif ($errorData && isset($errorData['message'])) {
-                $errorMessage = $errorData['message'];
-            }
-
+            $body = $e->hasResponse() ? $e->getResponse()->getBody()->getContents() : null;
+            $error = json_decode($body, true);
             return response()->json([
                 'success' => false,
-                'error' => 'Erro ao gerar QR Code PIX: ' . $errorMessage,
-                'details' => $errorData,
-            ], $statusCode);
-        } catch (\GuzzleHttp\Exception\ServerException $e) {
-            $responseBody = $e->hasResponse() ? $e->getResponse()->getBody()->getContents() : 'No response body';
-
-            Log::error('Erro no servidor do Asaas: ' . $e->getMessage(), [
-                'response_body' => $responseBody,
-                'usuario_id' => $request->usuario_id,
-            ]);
-
-            return response()->json([
-                'success' => false,
-                'error' => 'Erro no servidor do Asaas. Tente novamente mais tarde.',
-            ], 500);
+                'error'   => $error['errors'][0]['description'] ?? $error['message'] ?? 'Erro na API Asaas',
+            ], 400);
         } catch (\Exception $e) {
-            Log::error('Erro geral na geração do QR Code PIX: ' . $e->getMessage(), [
-                'usuario_id' => $request->usuario_id,
-            ]);
-
             return response()->json([
                 'success' => false,
-                'error' => 'Erro interno: ' . $e->getMessage(),
+                'error'   => $e->getMessage(),
             ], 500);
         }
     }
+
 }
