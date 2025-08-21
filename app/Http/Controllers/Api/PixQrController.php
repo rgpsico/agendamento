@@ -1367,7 +1367,6 @@ class PixQrController extends Controller
             ])->getBody();
 
 
-            dd($qrCodeResponse);
 
             $qrCodeData = json_decode($qrCodeResponse, true);
 
@@ -1395,6 +1394,7 @@ class PixQrController extends Controller
                 'error'   => $error['errors'][0]['description'] ?? $error['message'] ?? 'Erro na API Asaas',
             ], 400);
         } catch (\Exception $e) {
+            dd($e);
             return response()->json([
                 'success' => false,
                 'error'   => $e->getMessage(),
