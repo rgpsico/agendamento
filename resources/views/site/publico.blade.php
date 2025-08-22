@@ -4,7 +4,7 @@
     <!-- Loading Screen -->
     <div class="loading-screen" id="loading">
         <div class="wave-loader"></div>
-        <p class="text-white text-xl mt-4 loading-text">Preparando as ondas...</p>
+        <p class="text-white text-xl mt-4 loading-text">espere um pouco....</p>
     </div>
 
     <!-- WhatsApp Button -->
