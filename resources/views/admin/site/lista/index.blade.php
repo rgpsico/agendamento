@@ -13,15 +13,41 @@
                 </div>
             </div>
 
-                 @if($sites->count() < 3)
-                    <div class="text-right mb-3">
-                        <a href="{{ route('admin.site.create') }}" class="btn btn-primary">
-                            <i class="fas fa-plus"></i> Novo Site
-                        </a>
-                    </div>
-                @endif
+            @if($sites->count() < 3)
+                <div class="text-right mb-3">
+                    <a href="{{ route('admin.site.create') }}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Novo Site
+                    </a>
+                </div>
+            @endif
 
             <x-alert/>
+
+            <!-- 🔎 Formulário de Filtro -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="GET" action="{{ route('admin.site.lista') }}" class="row g-2">
+                        <div class="col-md-3">
+                            <input type="text" name="titulo" value="{{ request('titulo') }}" 
+                                   class="form-control" placeholder="Título">
+                        </div>
+                        <div class="col-md-3">
+                            <input type="text" name="slug" value="{{ request('slug') }}" 
+                                   class="form-control" placeholder="Slug">
+                        </div>
+                        <div class="col-md-3">
+                            <input type="date" name="data_inicial" value="{{ request('data_inicial') }}" class="form-control">
+                        </div>
+                        <div class="col-md-3">
+                            <input type="date" name="data_final" value="{{ request('data_final') }}" class="form-control">
+                        </div>
+                        <div class="col-md-12 text-right mt-2">
+                            <button type="submit" class="btn btn-primary">Filtrar</button>
+                            <a href="{{ route('admin.site.lista') }}" class="btn btn-secondary">Limpar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
 
             <div class="card card-table">
                 <div class="card-body">

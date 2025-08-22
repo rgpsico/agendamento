@@ -17,17 +17,31 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 class SiteController extends Controller
 {
 
-    public function lista()
+  public function lista(Request $request)
     {
         $empresaId = Auth::user()->empresa->id;
 
         $sites = EmpresaSite::where('empresa_id', $empresaId)
-            ->withCount(['visualizacoes', 'cliquesWhatsapp', 'visitantes'])
-            ->latest()
-            ->paginate(10);
+            ->withCount(['visualizacoes', 'cliquesWhatsapp', 'visitantes']);
+
+        // 🔎 Filtros
+        if ($request->filled('titulo')) {
+            $sites->where('titulo', 'like', '%' . $request->titulo . '%');
+        }
+
+        if ($request->filled('slug')) {
+            $sites->where('slug', 'like', '%' . $request->slug . '%');
+        }
+
+        if ($request->filled('data_inicial') && $request->filled('data_final')) {
+            $sites->whereBetween('created_at', [$request->data_inicial, $request->data_final]);
+        }
+
+        $sites = $sites->latest()->paginate(10)->appends($request->query());
 
         return view('admin.site.lista.index', compact('sites'));
     }
+
 
 
     public function create()
