@@ -39,13 +39,26 @@ $sobreImagens = $site->sobre_imagens ?? [
                 </div>
             </div>
             
-            <div class="about-image">
+           <div class="about-image">
                 <div class="grid grid-cols-2 gap-4">
-                    @foreach($sobreImagens as $index => $imagem)
-                        <img src="{{ $imagem }}" alt="Imagem sobre" class="rounded-lg shadow-lg about-image-item" data-index="{{ $index }}">
-                    @endforeach
+                    @if(isset($site->servicos) && count($site->servicos) > 0)
+                        @foreach($site->servicos as $index => $servico)
+                        <img src="{{ asset('servico/' . ($servico['imagem'] ?? $servico->imagem)) }}" 
+                            alt="{{ $servico['titulo'] ?? 'Imagem do serviço' }}" 
+                            class="w-[100] h-[100] object-cover rounded-lg shadow-lg about-image-item" 
+                            data-index="{{ $index }}">
+                        @endforeach
+                    @else
+                        @foreach($sobreImagens as $index => $imagem)
+                            <img src="{{ $imagem }}" 
+                                alt="Imagem sobre" 
+                                class="rounded-lg shadow-lg about-image-item" 
+                                data-index="{{ $index }}">
+                        @endforeach
+                    @endif
                 </div>
             </div>
+
         </div>
     </div>
 </section>

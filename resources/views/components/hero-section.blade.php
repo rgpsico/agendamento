@@ -1,3 +1,4 @@
+
 <section id="home" class="hero-gradient text-white min-h-screen flex items-center relative">
     <div class="wave-animation"></div>
     <div class="container mx-auto px-6 relative z-10">
@@ -28,11 +29,13 @@
                 </div>
             </div>
             <div class="hero-image">
-                <div class="floating">
-                    <img src="{{ $image ?? 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80' }}" 
-                         alt="Hero Image" class="rounded-2xl shadow-2xl w-full">
+                <div class="floating flex justify-center">
+                    <img src="{{ $image ?? 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80' }}"  
+                        alt="Hero Image" 
+                        class="rounded-2xl shadow-2xl max-w-md w-full h-auto">
                 </div>
             </div>
+
         </div>
     </div>
 

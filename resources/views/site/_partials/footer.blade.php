@@ -114,17 +114,10 @@
             let currentWord = 0;
             
             function typeWord() {
-                gsap.to('.typing-text', {
-                    duration: 2,
-                    text: words[currentWord],
-                    ease: "none",
-                    onComplete: function() {
-                        setTimeout(() => {
-                            currentWord = (currentWord + 1) % words.length;
-                            typeWord();
-                        }, 2000);
-                    }
-                });
+               gsap.fromTo('.typing-text', 
+                    { text: "" }, 
+                    { text: "Passeios Rio de Janeiro", duration: 3, ease: "none" }
+                );
             }
             typeWord();
 

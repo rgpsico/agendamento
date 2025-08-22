@@ -18,13 +18,22 @@
                             Mais Popular
                         </div>
                     @endif
-                    <div class="h-48 relative overflow-hidden">
-                        <img src="{{ $servico['imagem'] ?? asset('storage/' . $servico->imagem) }}" alt="{{ $servico['titulo'] ?? $servico->titulo }}" class="w-full h-full object-cover">
-                        <div class="absolute inset-0 bg-black bg-opacity-20"></div>
-                        <div class="absolute top-4 right-4 bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg rounded-full p-3">
-                            <i class="fas {{ $servico['icone'] ?? $servico->icone ?? 'fa-water' }} text-white text-xl"></i>
-                        </div>
+                    <div class="h-48 relative overflow-hidden rounded-md shadow-md">
+                    <img 
+                        src="{{ asset('servico/' . ($servico['imagem'] ?? $servico->imagem)) }}" 
+                        alt="{{ $servico['titulo'] ?? $servico->titulo }}"                    
+                        class="w-full h-full object-cover"
+                    />
+
+                    <!-- Overlay -->
+                    <div class="absolute inset-0 bg-black bg-opacity-20"></div>
+
+                    <!-- Ícone -->
+                    <div class="absolute top-4 right-4 bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg rounded-full p-3">
+                        <i class="fas {{ $servico['icone'] ?? $servico->icone ?? 'fa-water' }} text-white text-xl"></i>
                     </div>
+                </div>
+
                     <div class="p-6">
                         <h3 class="text-2xl font-bold text-gray-800 mb-3">{{ $servico['titulo'] ?? $servico->titulo }}</h3>
                         <p class="text-gray-600 mb-4">{{ $servico['descricao'] ?? $servico->descricao }}</p>

@@ -4,32 +4,33 @@ $depoimentos = $site->depoimentos ?? collect([]);
 $fakeTestimonials = [
     [
         'nome' => 'Ana Silva',
-        'comentario' => 'Uma experiência incrível! Os instrutores são pacientes e o ambiente é super acolhedor.',
+        'comentario' => 'Uma experiência incrível! Os passeios foram bem organizados e o ambiente super acolhedor.',
         'nota' => 5,
-        'servico' => 'Aula Individual - 2023',
+        'servico' => 'Passeio Bate e Volta - 2025',
         'foto' => 'https://picsum.photos/50/50?random=1'
     ],
     [
         'nome' => 'João Mendes',
-        'comentario' => 'Aprendi a surfar em poucas aulas! Recomendo a todos que querem uma aventura única.',
+        'comentario' => 'Vivi momentos inesquecíveis! Recomendo a todos que querem explorar lugares novos e incríveis.',
         'nota' => 4.5,
-        'servico' => 'Curso Completo - 2023',
+        'servico' => 'Passeio em Grupo - 2025',
         'foto' => 'https://picsum.photos/50/50?random=2'
     ],
     [
         'nome' => 'Mariana Costa',
-        'comentario' => 'A melhor escola de surf! Me senti segura e aprendi muito com a equipe.',
+        'comentario' => 'Excelente experiência! Me senti segura e aproveitei cada detalhe do passeio.',
         'nota' => 5,
-        'servico' => 'Aula em Grupo - 2023',
+        'servico' => 'Passeio Individual - 2025',
         'foto' => 'https://picsum.photos/50/50?random=3'
     ]
 ];
 @endphp
 
+
 <section id="testimonials" class="py-20 bg-gray-50">
     <div class="container mx-auto px-6">
         <div class="text-center mb-16 section-header">
-            <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">{{ $site->depoimentos_titulo ?? 'O Que Dizem Nossos Alunos' }}</h2>
+            <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">{{ $site->depoimentos_titulo ?? 'O Que Dizem Nossos Clientes' }}</h2>
             <div class="section-divider max-w-md mx-auto"></div>
             <p class="text-gray-600 text-xl max-w-2xl mx-auto">
                 {{ $site->depoimentos_descricao ?? 'Histórias reais de transformação e conquistas' }}

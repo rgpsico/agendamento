@@ -8,7 +8,7 @@ $servico = $depoimento['servico'] ?? ($depoimento->servico ?? 'Curso 2023');
 $foto = $fake ? $depoimento['foto'] : ($depoimento->foto ? asset('storage/' . $depoimento->foto) : 'https://picsum.photos/50/50?random=' . rand(1,100));
 @endphp
 
-<div class="testimonial-card p-6 rounded-2xl shadow-lg stagger-item">
+<div class="testimonial-card p-6 rounded-2xl shadow-lg ">
     <div class="flex items-center mb-4">
         <img src="{{ $foto }}" alt="{{ $nome }}" class="w-12 h-12 rounded-full mr-4">
         <div>
