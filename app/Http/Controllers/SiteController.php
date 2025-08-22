@@ -17,27 +17,34 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 class SiteController extends Controller
 {
 
-  public function lista(Request $request)
+   public function lista(Request $request)
     {
         $empresaId = Auth::user()->empresa->id;
 
+        $dataInicial = $request->data_inicial ? $request->data_inicial . ' 00:00:00' : null;
+        $dataFinal = $request->data_final ? $request->data_final . ' 23:59:59' : null;
+
         $sites = EmpresaSite::where('empresa_id', $empresaId)
-            ->withCount(['visualizacoes', 'cliquesWhatsapp', 'visitantes']);
-
-        // 🔎 Filtros
-        if ($request->filled('titulo')) {
-            $sites->where('titulo', 'like', '%' . $request->titulo . '%');
-        }
-
-        if ($request->filled('slug')) {
-            $sites->where('slug', 'like', '%' . $request->slug . '%');
-        }
-
-        if ($request->filled('data_inicial') && $request->filled('data_final')) {
-            $sites->whereBetween('created_at', [$request->data_inicial, $request->data_final]);
-        }
-
-        $sites = $sites->latest()->paginate(10)->appends($request->query());
+            ->withCount([
+                'visualizacoes as visualizacoes_count' => function ($query) use ($dataInicial, $dataFinal) {
+                    if ($dataInicial && $dataFinal) {
+                        $query->whereBetween('created_at', [$dataInicial, $dataFinal]);
+                    }
+                },
+                'cliquesWhatsapp as cliques_whatsapp_count' => function ($query) use ($dataInicial, $dataFinal) {
+                    if ($dataInicial && $dataFinal) {
+                        $query->whereBetween('created_at', [$dataInicial, $dataFinal]);
+                    }
+                },
+                'visitantes as visitantes_count' => function ($query) use ($dataInicial, $dataFinal) {
+                    if ($dataInicial && $dataFinal) {
+                        $query->whereBetween('created_at', [$dataInicial, $dataFinal]);
+                    }
+                },
+            ])
+            ->latest()
+            ->paginate(10)
+            ->appends($request->query());
 
         return view('admin.site.lista.index', compact('sites'));
     }
