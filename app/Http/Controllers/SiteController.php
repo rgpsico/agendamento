@@ -72,6 +72,7 @@ class SiteController extends Controller
     $ipServidor = request()->server('SERVER_ADDR') ?? '191.252.92.206';
 
     $dnsStatus = false;
+   
     if (!empty($site->dominio_personalizado)) {
         $dnsRecords = dns_get_record($site->dominio_personalizado, DNS_A);
         $ips = collect($dnsRecords)->pluck('ip')->toArray();
@@ -79,6 +80,7 @@ class SiteController extends Controller
     }
 
     $sslStatus = false;
+    
     if (!empty($site->dominio_personalizado)) {
         $stream = @stream_context_create(["ssl" => ["capture_peer_cert" => true]]);
         $read = @stream_socket_client("ssl://{$site->dominio_personalizado}:443", $errno, $errstr, 30, STREAM_CLIENT_CONNECT, $stream);
@@ -278,7 +280,7 @@ private function verificarDnsSsl($dominio)
      */
     public function update(Request $request, EmpresaSite $site)
     {
-      
+        // Validação
         $validated = $request->validate([
             'titulo' => 'required|string|max:255',
             'descricao' => 'nullable|string',
@@ -291,18 +293,28 @@ private function verificarDnsSsl($dominio)
             'sobre_itens.*.icone' => 'nullable|string|max:255',
             'sobre_itens.*.titulo' => 'nullable|string|max:255',
             'sobre_itens.*.descricao' => 'nullable|string',
-            'dominio_personalizado' => 'nullable|string|max:255',
             'whatsapp' => 'nullable|string|max:20',
             'template_id' => 'required|exists:site_templates,id',
-            
+
+            // Novos campos
+            'servicos' => 'nullable|array',
+            'servicos.*.titulo' => 'required|string|max:255',
+            'servicos.*.descricao' => 'nullable|string',
+            'servicos.*.preco' => 'nullable|numeric',
+            'servicos.*.imagem' => 'nullable|image|max:2048',
+
+            'depoimentos' => 'nullable|array',
+            'depoimentos.*.nome' => 'required|string|max:255',
+            'depoimentos.*.nota' => 'nullable|numeric|min:0|max:5',
+            'depoimentos.*.comentario' => 'nullable|string',
+            'depoimentos.*.foto' => 'nullable|image|max:2048',
         ]);
 
-
-
+        // Dados principais do site
         $data = [
             'titulo' => $request->titulo,
             'descricao' => $request->descricao,
-            'template_id' => $request->template_id, // novo campo
+            'template_id' => $request->template_id,
             'cores' => [
                 'primaria' => $request->input('cores.primaria', '#0ea5e9'),
                 'secundaria' => $request->input('cores.secundaria', '#38b2ac'),
@@ -311,64 +323,114 @@ private function verificarDnsSsl($dominio)
             'sobre_descricao' => $request->sobre_descricao,
             'sobre_itens' => $request->input('sobre_itens', []),
             'whatsapp' => $request->whatsapp,
+            'autoatendimento_ia' => $request->has('autoatendimento_ia'),
         ];
 
-        // $data['slug'] = $this->createUniqueSlug($request->titulo);
-
-        if (!empty($request->dominio_personalizado) && $request->gerar_vhost) {
-            $data['dominio_personalizado'] = $request->dominio_personalizado;
-
-            $site->vhost_criado = true;
-
-            $this->criarVirtualHost($request->dominio_personalizado);
-        }
-
-        // Upload do logo
-
-
+        // Upload logo
         if ($request->hasFile('logo')) {
-            if (!empty($site->logo) && Storage::disk('public')->exists($site->logo)) {
+            if ($site->logo && Storage::disk('public')->exists($site->logo)) {
                 Storage::disk('public')->delete($site->logo);
             }
             $data['logo'] = $request->file('logo')->store('sites/logos', 'public');
         }
 
-        // Upload da capa
-       if ($request->hasFile('capa')) {
-            \Log::info('Arquivo capa detectado na requisição.');
-            if (!empty($site->capa) && Storage::disk('public')->exists($site->capa)) {
-                \Log::info('Deletando capa antiga: ' . $site->capa);
+        // Upload capa
+        if ($request->hasFile('capa')) {
+            if ($site->capa && Storage::disk('public')->exists($site->capa)) {
                 Storage::disk('public')->delete($site->capa);
-            } else {
-                \Log::info('Capa antiga não encontrada ou não existe: ' . ($site->capa ?? 'vazio'));
             }
             $data['capa'] = $request->file('capa')->store('sites/capas', 'public');
-            \Log::info('Nova capa salva em: ' . $data['capa']);
-        } else {
-            \Log::error('Nenhum arquivo capa encontrado na requisição.');
         }
 
-        // Upload imagem da seção sobre nós
+        // Upload sobre_imagem
         if ($request->hasFile('sobre_imagem')) {
-            if (!empty($site->sobre_imagem) && Storage::disk('public')->exists($site->sobre_imagem)) {
+            if ($site->sobre_imagem && Storage::disk('public')->exists($site->sobre_imagem)) {
                 Storage::disk('public')->delete($site->sobre_imagem);
             }
             $data['sobre_imagem'] = $request->file('sobre_imagem')->store('sites/sobre', 'public');
         }
 
-        if ($request->filled('dominio')) {
-            $data['dominio_personalizado'] = $request->dominio;
-        }
-
+        // Atualiza dados do site
         $site->update($data);
 
-        if ($request->filled('dominio_personalizado')) {
-            $data['dominio_personalizado'] = $request->dominio;
-            //   $this->criarVirtualHost($request->dominio);
+        // --- Serviços ---
+       // Serviços
+if ($request->filled('servicos')) {
+    foreach ($request->servicos as $servicoInput) {
+        $imagemPath = null;
+        if (!empty($servicoInput['imagem'])) {
+            $imagemPath = $servicoInput['imagem']->store('sites/servicos', 'public');
         }
+
+        if (!empty($servicoInput['id'])) {
+            // Atualiza existente
+            $servico = SiteServico::find($servicoInput['id']);
+            if ($servico) {
+                $servico->update([
+                    'titulo' => $servicoInput['titulo'],
+                    'descricao' => $servicoInput['descricao'] ?? null,
+                    'preco' => $servicoInput['preco'] ?? null,
+                    'imagem' => $imagemPath ?? $servicoInput['imagem_existente'] ?? $servico->imagem,
+                ]);
+            }
+        } else {
+            // Cria novo
+            SiteServico::create([
+                'site_id' => $site->id,
+                'titulo' => $servicoInput['titulo'],
+                'descricao' => $servicoInput['descricao'] ?? null,
+                'preco' => $servicoInput['preco'] ?? null,
+                'imagem' => $imagemPath ?? null,
+            ]);
+        }
+    }
+}
+
+// Depoimentos
+        if ($request->filled('depoimentos')) {
+        foreach ($request->depoimentos as $depoimentoInput) {
+            // Se marcado para deletar
+            if (!empty($depoimentoInput['deleted']) && $depoimentoInput['deleted'] == 1 && !empty($depoimentoInput['id'])) {
+                $depo = SiteDepoimento::find($depoimentoInput['id']);
+                if ($depo) {
+                    if ($depo->foto && Storage::disk('public')->exists($depo->foto)) {
+                        Storage::disk('public')->delete($depo->foto);
+                    }
+                    $depo->delete();
+                }
+                continue;
+            }
+
+            $fotoPath = null;
+            if (!empty($depoimentoInput['foto'])) {
+                $fotoPath = $depoimentoInput['foto']->store('sites/depoimentos', 'public');
+            }
+
+            if (!empty($depoimentoInput['id'])) {
+                $depo = SiteDepoimento::find($depoimentoInput['id']);
+                if ($depo) {
+                    $depo->update([
+                        'nome' => $depoimentoInput['nome'],
+                        'nota' => $depoimentoInput['nota'] ?? null,
+                        'comentario' => $depoimentoInput['comentario'] ?? null,
+                        'foto' => $fotoPath ?? $depoimentoInput['foto_existente'] ?? $depo->foto,
+                    ]);
+                }
+            } else {
+                SiteDepoimento::create([
+                    'site_id' => $site->id,
+                    'nome' => $depoimentoInput['nome'],
+                    'nota' => $depoimentoInput['nota'] ?? null,
+                    'comentario' => $depoimentoInput['comentario'] ?? null,
+                    'foto' => $fotoPath ?? null,
+                ]);
+            }
+        }
+    }
 
         return redirect()->back()->with('success', 'Configurações do site atualizadas com sucesso!');
     }
+
 
     protected function criarOuAtualizarVirtualHost($dominio)
     {

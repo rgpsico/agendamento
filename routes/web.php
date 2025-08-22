@@ -64,6 +64,8 @@ Route::middleware('auth')->post('/subcontas', [ProfessoresAsaasController::class
 
 
 
+
+
 Route::prefix('admin')->group(function () {
     Route::get('/usuarios', [UserManagementController::class, 'index'])->name('admin.usuarios.index');
     Route::get('/usuarios/criar', [UserManagementController::class, 'create'])->name('admin.usuarios.create');
@@ -112,7 +114,7 @@ Route::prefix('admin/site/servicos')->middleware(['auth'])->name('admin.site.ser
     Route::post('store', [SiteServicoController::class, 'store'])->name('store');
     Route::get('{servico}/edit', [SiteServicoController::class, 'edit'])->name('edit');
     Route::put('{servico}/update', [SiteServicoController::class, 'update'])->name('update');
-    Route::delete('{servico}/destroy', [SiteServicoController::class, 'destroy'])->name('destroy');
+    Route::any('{servico}/destroy', [SiteServicoController::class, 'destroy'])->name('destroy');
 });
 
 
@@ -124,7 +126,7 @@ Route::prefix('admin/site/depoimentos')->middleware('auth')->name('admin.site.de
     Route::post('store', [SiteDepoimentoController::class, 'store'])->name('store');
     Route::get('{depoimento}/edit', [SiteDepoimentoController::class, 'edit'])->name('edit');
     Route::put('{depoimento}/update', [SiteDepoimentoController::class, 'update'])->name('update');
-    Route::delete('{depoimento}/destroy', [SiteDepoimentoController::class, 'destroy'])->name('destroy');
+    Route::post('{depoimento}/destroy', [SiteDepoimentoController::class, 'destroy'])->name('destroy');
 });
 
 

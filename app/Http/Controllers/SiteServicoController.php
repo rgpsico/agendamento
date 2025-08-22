@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\SiteServico;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class SiteServicoController extends Controller
 {
@@ -75,10 +76,18 @@ class SiteServicoController extends Controller
         return redirect()->route('admin.site.servicos.index')->with('success', 'Serviço atualizado com sucesso!');
     }
 
-    public function destroy(SiteServico $servico)
+     public function destroy(SiteServico $servico)
     {
+        // Verifica se existe imagem associada
+        if ($servico->imagem && Storage::exists($servico->imagem)) {
+            Storage::delete($servico->imagem);
+        }
+
+        // Exclui o depoimento
         $servico->delete();
 
-        return redirect()->route('admin.site.servicos.index')->with('success', 'Serviço removido com sucesso!');
+        return redirect()
+            ->back()
+            ->with('success', 'Depoimento e imagem removidos com sucesso!');
     }
 }

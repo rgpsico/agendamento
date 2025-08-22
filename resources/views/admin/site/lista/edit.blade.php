@@ -1,7 +1,7 @@
 <x-admin.layout title="Configurações do Site">
     <div class="page-wrapper">
         <div class="content container-fluid">
-
+        
             <div class="page-header">
                 <div class="row">
                     <div class="col-sm-12">
@@ -141,6 +141,63 @@
                                 </div>
 
 
+                                <!-- Seção 4: Serviços -->
+                            <div class="form-section mb-4">
+                                <h5 class="mb-3">Serviços</h5>
+
+                                <div id="servicos-container">
+                                    @php
+                                        $servicos = old('servicos', $site->siteServicos ?? []);
+                                    @endphp
+
+                                    @foreach($servicos as $index => $servico)
+                                    <div class="servico-bloco border p-3 mb-3 bg-light rounded position-relative">
+                                          <input type="hidden" name="servicos[{{ $index }}][id]" value="{{ $servico->id }}">
+                                        <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2" data-idservico="{{ $servico->id }}" id="servicoRemover" >Remover</button>
+                                        <input type="text" name="servicos[{{ $index }}][titulo]" class="form-control mb-2" placeholder="Título do Serviço" value="{{ $servico['titulo'] ?? '' }}">
+                                        <textarea name="servicos[{{ $index }}][descricao]" class="form-control mb-2" placeholder="Descrição do Serviço">{{ $servico['descricao'] ?? '' }}</textarea>
+                                        <input type="number" step="0.01" name="servicos[{{ $index }}][preco]" class="form-control mb-2" placeholder="Preço" value="{{ $servico['preco'] ?? '' }}">
+                                        <input type="file" name="servicos[{{ $index }}][imagem]" class="form-control">
+                                        @if(!empty($servico['imagem']))
+                                            <img src="{{ asset('storage/' . $servico['imagem']) }}" height="80" class="mt-2">
+                                        @endif
+                                    </div>
+                                    @endforeach
+                                </div>
+
+                                <button type="button" class="btn btn-secondary mt-2" onclick="adicionarServico()">+ Adicionar Serviço</button>
+                            </div>
+
+                            <!-- Seção 5: Depoimentos -->
+                            <div class="form-section mb-4">
+                                <h5 class="mb-3">Depoimentos</h5>
+
+                                <div id="depoimentos-container">
+                                    @php
+                                        $depoimentos = old('depoimentos', $site->depoimentos ?? []);
+                                    @endphp
+
+                                    @foreach($depoimentos as $index => $depoimento)
+                                    <div class="depoimento-bloco border p-3 mb-3 bg-light rounded position-relative">
+                                         <input type="hidden" name="depoimentos[{{ $index }}][id]" value="{{ $depoimento->id }}">
+                                        <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2" id="depoimentoremover" data-iddepoimento="{{ $depoimento->id }}" >Remover</button>
+                                        <input type="text" name="depoimentos[{{ $index }}][nome]" class="form-control mb-2" placeholder="Nome" value="{{ $depoimento['nome'] ?? '' }}">
+                                        <input type="number" name="depoimentos[{{ $index }}][nota]" class="form-control mb-2" placeholder="Nota (0 a 5)" min="0" max="5" value="{{ $depoimento['nota'] ?? '' }}">
+                                        <textarea name="depoimentos[{{ $index }}][comentario]" class="form-control mb-2" placeholder="Comentário">{{ $depoimento['comentario'] ?? '' }}</textarea>
+                                        <input type="file" name="depoimentos[{{ $index }}][foto]" class="form-control">
+                                        @if(!empty($depoimento['foto']))
+                                            <img src="{{ asset('storage/' . $depoimento['foto']) }}" height="80" class="mt-2">
+                                        @endif
+                                    </div>
+                                    @endforeach
+                                </div>
+
+                                <button type="button" class="btn btn-secondary mt-2" onclick="adicionarDepoimento()">+ Adicionar Depoimento</button>
+                            </div>
+
+
+
+
                                 <!-- Seção Domínio e Virtual Host -->
                                <div class="form-section mb-4">
                                 <h5 class="mb-3">Domínio Personalizado e Virtual Host</h5>
@@ -229,6 +286,106 @@
 
         </div>
     </div>
+
+
+    <script>
+        $(document).ready(function() {
+        // Remove depoimento ao clicar no botão
+            $(document).on('click', '#depoimentoremover', function() {
+            const id = $(this).data('iddepoimento');
+
+                if (!id) {
+                    alert('ID do depoimento não encontrado!');
+                    return;
+                }
+
+                if (confirm('Tem certeza que deseja remover este depoimento?')) {
+                    $.ajax({
+                        url: '/admin/site/depoimentos/' + id + '/destroy',
+                        type: 'POST',
+                        data: {
+                            _token: $('meta[name="csrf-token"]').attr('content') // usa o CSRF do blade
+                        },
+                        success: function(response) {
+                            alert('Depoimento removido com sucesso!');
+                            location.reload(); // ou remove o bloco da tela sem reload
+                        },
+                        error: function(xhr) {
+                            alert('Erro ao remover depoimento: ' + xhr.status);
+                        }
+                    });
+                }
+            });
+
+
+            $(document).on('click', '#servicoRemover', function() {
+    const id = $(this).data('idservico');
+
+    if (!id) {
+        alert('ID do serviço não encontrado!');
+        return;
+    }
+
+        if (confirm('Tem certeza que deseja remover este serviço?')) {
+            $.ajax({
+                url: '/admin/site/servicos/' + id + '/destroy',
+                type: 'POST',
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(response) {
+                    alert('Serviço removido com sucesso!');
+                    location.reload(); // ou remover só o bloco do DOM
+                },
+                error: function(xhr) {
+                    alert('Erro ao remover serviço: ' + xhr.status);
+                }
+            });
+        }
+    });
+
+        });
+
+        
+
+
+    let depoimentoIndex = {{ count($depoimentos) }};
+    function adicionarDepoimento() {
+        const container = document.getElementById('depoimentos-container');
+        const div = document.createElement('div');
+        div.classList.add('depoimento-bloco', 'border', 'p-3', 'mb-3', 'bg-light', 'rounded', 'position-relative');
+        div.innerHTML = `
+            <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2" onclick="this.parentElement.remove()">Remover</button>
+            <input type="text" name="depoimentos[\${depoimentoIndex}][nome]" class="form-control mb-2" placeholder="Nome">
+            <input type="number" name="depoimentos[\${depoimentoIndex}][nota]" class="form-control mb-2" placeholder="Nota (0 a 5)" min="0" max="5">
+            <textarea name="depoimentos[\${depoimentoIndex}][comentario]" class="form-control mb-2" placeholder="Comentário"></textarea>
+            <input type="file" name="depoimentos[\${depoimentoIndex}][foto]" class="form-control">
+        `;
+        container.appendChild(div);
+        depoimentoIndex++;
+    }
+</script>
+
+
+
+    <script>
+    let servicoIndex = {{ count($servicos) }};
+    function adicionarServico() {
+        const container = document.getElementById('servicos-container');
+        const div = document.createElement('div');
+        div.classList.add('servico-bloco', 'border', 'p-3', 'mb-3', 'bg-light', 'rounded', 'position-relative');
+        div.innerHTML = `
+            <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2" onclick="this.parentElement.remove()">Remover</button>
+            <input type="text" name="servicos[\${servicoIndex}][titulo]" class="form-control mb-2" placeholder="Título do Serviço">
+            <textarea name="servicos[\${servicoIndex}][descricao]" class="form-control mb-2" placeholder="Descrição do Serviço"></textarea>
+            <input type="number" step="0.01" name="servicos[\${servicoIndex}][preco]" class="form-control mb-2" placeholder="Preço">
+            <input type="file" name="servicos[\${servicoIndex}][imagem]" class="form-control">
+        `;
+        container.appendChild(div);
+        servicoIndex++;
+    }
+</script>
+
 
     <script>
         let itemIndex = {{ count($sobreItens) }};

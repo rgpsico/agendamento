@@ -169,6 +169,16 @@ Route::prefix('empresa/pagamento')->group(function () {
 });
 
 
+use App\Http\Controllers\Api\SiteDepoimentoControllerApi;
+
+Route::middleware('auth:sanctum')->prefix('site')->group(function () {
+    Route::get('depoimentos', [SiteDepoimentoControllerApi::class, 'index']);
+    Route::post('depoimentos', [SiteDepoimentoControllerApi::class, 'store']);
+    Route::get('depoimentos/{depoimento}', [SiteDepoimentoControllerApi::class, 'show']);
+    Route::put('depoimentos/{depoimento}', [SiteDepoimentoControllerApi::class, 'update']);
+    Route::delete('depoimentos/{depoimento}', [SiteDepoimentoControllerApi::class, 'destroy']);
+});
+
 Route::get('/viacep/{cep}', [App\Http\Controllers\ViaCepController::class, 'getCep']);
 
 
