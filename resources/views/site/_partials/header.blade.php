@@ -215,5 +215,11 @@
             background: linear-gradient(90deg, transparent 0%, {{ $corPrimaria }} 50%, transparent 100%);
             margin: 2rem 0;
         }
+
+        @media (max-width: 768px) {
+    #home {
+        padding-top: 100px; /* ajuste o valor conforme a altura do menu */
+    }
+}
     </style>
 </head>
