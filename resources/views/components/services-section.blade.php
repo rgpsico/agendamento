@@ -55,10 +55,14 @@
                                     R$ {{ number_format($servico['preco'] ?? $servico->preco, 2, ',', '.') }}
                                 </span>
                             @endif
-                            <button class="btn-primary text-white px-6 py-3 rounded-full font-semibold transition-all duration-300 hover:scale-105">
+
+                            <a href="https://wa.me/{{ preg_replace('/\D/', '', $site->whatsapp) }}?text=Olá! Gostaria de reservar o serviço: {{ $servico['titulo'] ?? $servico->titulo }}" 
+                            target="_blank"
+                            class="btn-primary text-white px-6 py-3 rounded-full font-semibold transition-all duration-300 hover:scale-105">
                                 Reservar
-                            </button>
+                            </a>
                         </div>
+
                     </div>
                 </div>
             @endforeach
