@@ -6,26 +6,26 @@ use Twilio\Rest\Client;
 
 class TwilioService
 {
-    protected $sid;
-    protected $token;
+    protected $client;
     protected $from;
 
     public function __construct()
     {
-        $this->sid = env('TWILIO_SID');
-        $this->token = env('TWILIO_AUTH_TOKEN');
-        $this->from = env('TWILIO_WHATSAPP_FROM');
+        $this->client = new Client(
+            env('TWILIO_SID'),
+            env('TWILIO_TOKEN')
+        );
+
+        $this->from = env("TWILIO_WHATSAPP");
     }
 
-    public function sendWhatsAppMessage($to, $message)
+    public function sendWhatsApp($to, $message)
     {
-        $client = new Client($this->sid, $this->token);
-
-        $client->messages->create(
-            "whatsapp:+5521990271287", // Número de destinatário
+        return $this->client->messages->create(
+            "whatsapp:$to", // destino
             [
-                'from' => 'whatsapp:+14155238886', // Número de WhatsApp Sandbox
-                'body' => 'Mensagem de teste via Twilio 10'
+                "from" => $this->from,
+                "body" => $message
             ]
         );
     }

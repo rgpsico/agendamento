@@ -28,12 +28,13 @@ use App\Http\Controllers\BoletoController;
 use App\Http\Controllers\OpenAIController;
 use App\Http\Controllers\SiteCliqueWhatsappController;
 use App\Http\Controllers\SiteVisualizacaoController;
-
+use App\Http\Controllers\Api\GoogleADSController;
+use App\Http\Controllers\SiteVisitanteController;
 use Illuminate\Http\Request;
 use Twilio\Rest\Client;
 use Illuminate\Support\Facades\Route;
 
-
+use App\Http\Controllers\ContatoController;
 
 Route::post('empresa/gerar-boleto', [BoletoController::class, 'gerarBoleto'])->name('boleto.asaas');
 Route::get('empresa/userexisterasaas/{customerId}', [BoletoController::class, 'customerExistsInAsaas'])->name('asaas.user.existirs');
@@ -216,8 +217,16 @@ Route::post('/test-twilio', function () {
 });
 
 
-use App\Http\Controllers\Api\GoogleADSController;
-use App\Http\Controllers\SiteVisitanteController;
+use App\Http\Controllers\WhatsAppController;
+
+Route::post('/whatsapp/send', [WhatsAppController::class, 'send']);
+Route::post('/whatsapp/receive', [WhatsAppController::class, 'receive']);
+
+
+
+Route::post('/contato/enviar', [ContatoController::class, 'enviar'])->name('contato.enviar');
+
+
 
 Route::prefix('google-ads')->group(function () {
     Route::get('auth-url', [GoogleADSController::class, 'getAuthUrl']);
