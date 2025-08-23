@@ -380,6 +380,8 @@
             transition: all 0.3s ease;
             text-decoration: none;
             display: inline-block;
+            opacity: 1;
+            visibility: visible;
         }
 
         .btn-secondary {
@@ -394,6 +396,15 @@
             transition: all 0.3s ease;
             text-decoration: none;
             display: inline-block;
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Estado inicial para animações GSAP */
+        .gsap-loaded .btn-primary,
+        .gsap-loaded .btn-secondary {
+            opacity: 0;
+            transform: translateY(20px);
         }
 
         .btn-primary:hover, .btn-secondary:hover {
@@ -823,17 +834,25 @@
 
                 // CTA buttons animation
                 if (document.querySelector('.cta-buttons')) {
-                    gsap.from(".btn-primary, .btn-secondary", {
-                        opacity: 0,
-                        y: 20,
-                        duration: 0.8,
-                        stagger: 0.2,
-                        scrollTrigger: {
-                            trigger: ".cta-buttons",
-                            start: "top 80%",
-                            toggleActions: "play none none reverse"
+                    gsap.fromTo(".btn-primary, .btn-secondary", 
+                        {
+                            opacity: 0,
+                            y: 20
+                        },
+                        {
+                            opacity: 1,
+                            y: 0,
+                            duration: 0.8,
+                            stagger: 0.2,
+                            ease: "back.out(1.7)",
+                            scrollTrigger: {
+                                trigger: ".cta-buttons",
+                                start: "top 85%",
+                                toggleActions: "play none none none",
+                                once: true
+                            }
                         }
-                    });
+                    );
                 }
 
                 // Parallax effect suave para o hero
@@ -865,16 +884,12 @@
                     .cta-button { animation-delay: 0.4s; }
                     .hero-visual { animation-delay: 0.6s; }
                     
-                    .feature-card {
+                    .btn-primary, .btn-secondary {
                         animation: slideInUp 0.8s ease-out forwards;
                     }
                     
-                    .feature-card:nth-child(1) { animation-delay: 0.1s; }
-                    .feature-card:nth-child(2) { animation-delay: 0.2s; }
-                    .feature-card:nth-child(3) { animation-delay: 0.3s; }
-                    .feature-card:nth-child(4) { animation-delay: 0.4s; }
-                    .feature-card:nth-child(5) { animation-delay: 0.5s; }
-                    .feature-card:nth-child(6) { animation-delay: 0.6s; }
+                    .btn-primary { animation-delay: 0.1s; }
+                    .btn-secondary { animation-delay: 0.3s; }
                     
                     @keyframes fadeInUp {
                         from {
