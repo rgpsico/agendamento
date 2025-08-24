@@ -27,7 +27,7 @@ class EmailController extends Controller
         return response()->json([
             "status" => "enviado",
             "sid" => $response->sid
-
+            
         ]);
     }
 
@@ -74,11 +74,13 @@ class EmailController extends Controller
             'mensagem' => 'required|string',
         ]);
 
+        dd($site->empresa->user->email);
+
         // Enviar e-mail
         Mail::send('emails.contato', ['data' => $data, 'site' => $site], function ($message) use ($site, $data) {
-            $message->to($data['email'] ?? 'contato@rjpasseios.com.br')
+            $message->to($site->empresa->user->email ?? 'contato@rjpasseios.com.br')
                     ->subject("Novo contato do site: {$data['nome']}")
-                    ->from($site->empresa->user->email, $data['nome']);
+                    ->from($data['email'], $data['nome']);
         });
 
         return back()->with('success', 'Mensagem enviada com sucesso!');
