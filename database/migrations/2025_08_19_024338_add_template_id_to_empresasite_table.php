@@ -20,9 +20,11 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::table('empresa_site', function (Blueprint $table) {
-            $table->dropForeign(['template_id']);
-            $table->dropColumn('template_id');
+         Schema::table('empresa_site', function (Blueprint $table) {
+            if (Schema::hasColumn('empresa_site', 'template_id')) {
+                $table->dropForeign(['template_id']);
+                $table->dropColumn('template_id');
+            }
         });
     }
 };

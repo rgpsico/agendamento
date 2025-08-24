@@ -195,6 +195,110 @@
                                 <button type="button" class="btn btn-secondary mt-2" onclick="adicionarDepoimento()">+ Adicionar Depoimento</button>
                             </div>
 
+                         <div class="form-section mb-4">
+    <h5 class="mb-3">Códigos de Rastreamento</h5>
+
+    <div id="tracking-container">
+        @php
+            $trackingCodes = old('tracking_codes', $site->trackingCodes ?? []);
+        @endphp
+
+        @foreach($trackingCodes as $index => $tracking)
+        <div class="tracking-bloco border p-3 mb-3 bg-light rounded position-relative">
+            <input type="hidden" name="tracking_codes[{{ $index }}][id]" value="{{ $tracking['id'] ?? '' }}">
+            <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2" data-idtracking="{{ $tracking['id'] ?? '' }}" id="trackingRemover">Remover</button>
+            
+            <div class="row">
+                <div class="col-md-6 mb-2">
+                    <label>Nome</label>
+                    <input type="text" name="tracking_codes[{{ $index }}][name]" class="form-control" value="{{ $tracking['name'] ?? '' }}" placeholder="Ex: Google Analytics">
+                </div>
+                <div class="col-md-6 mb-2">
+                    <label>Provedor</label>
+                    <input type="text" name="tracking_codes[{{ $index }}][provider]" class="form-control" value="{{ $tracking['provider'] ?? '' }}" placeholder="Ex: Google, Meta">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-2">
+                    <label>Código</label>
+                    <input type="text" name="tracking_codes[{{ $index }}][code]" class="form-control" value="{{ $tracking['code'] ?? '' }}" placeholder="Ex: G-XXXXXX">
+                </div>
+                <div class="col-md-6 mb-2">
+                    <label>Tipo</label>
+                    <select name="tracking_codes[{{ $index }}][type]" class="form-control">
+                        <option value="analytics" {{ ($tracking['type'] ?? '') == 'analytics' ? 'selected' : '' }}>Analytics</option>
+                        <option value="ads" {{ ($tracking['type'] ?? '') == 'ads' ? 'selected' : '' }}>Anúncios</option>
+                        <option value="pixel" {{ ($tracking['type'] ?? '') == 'pixel' ? 'selected' : '' }}>Pixel</option>
+                        <option value="other" {{ ($tracking['type'] ?? '') == 'other' ? 'selected' : '' }}>Outro</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="mb-2">
+                <label>Script (opcional)</label>
+                <textarea name="tracking_codes[{{ $index }}][script]" class="form-control" rows="3" placeholder="Cole aqui o script de rastreamento se necessário">{{ $tracking['script'] ?? '' }}</textarea>
+            </div>
+
+            <div class="form-check">
+                <input type="checkbox" name="tracking_codes[{{ $index }}][status]" class="form-check-input" value="1" {{ !empty($tracking['status']) ? 'checked' : '' }}>
+                <label class="form-check-label">Ativo</label>
+            </div>
+        </div>
+        @endforeach
+    </div>
+
+    <button type="button" class="btn btn-secondary mt-2" onclick="adicionarTracking()">+ Adicionar Código</button>
+</div>
+
+<script>
+    let trackingIndex = {{ count($trackingCodes) }};
+    function adicionarTracking() {
+        const container = document.getElementById('tracking-container');
+        const div = document.createElement('div');
+        div.classList.add('tracking-bloco', 'border', 'p-3', 'mb-3', 'bg-light', 'rounded', 'position-relative');
+        div.innerHTML = `
+            <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2" onclick="this.parentElement.remove()">Remover</button>
+            <div class="row">
+                <div class="col-md-6 mb-2">
+                    <label>Nome</label>
+                    <input type="text" name="tracking_codes[${trackingIndex}][name]" class="form-control" placeholder="Ex: Google Analytics">
+                </div>
+                <div class="col-md-6 mb-2">
+                    <label>Provedor</label>
+                    <input type="text" name="tracking_codes[${trackingIndex}][provider]" class="form-control" placeholder="Ex: Google, Meta">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-2">
+                    <label>Código</label>
+                    <input type="text" name="tracking_codes[${trackingIndex}][code]" class="form-control" placeholder="Ex: G-XXXXXX">
+                </div>
+                <div class="col-md-6 mb-2">
+                    <label>Tipo</label>
+                    <select name="tracking_codes[${trackingIndex}][type]" class="form-control">
+                        <option value="analytics">Analytics</option>
+                        <option value="ads">Anúncios</option>
+                        <option value="pixel">Pixel</option>
+                        <option value="other">Outro</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mb-2">
+                <label>Script (opcional)</label>
+                <textarea name="tracking_codes[${trackingIndex}][script]" class="form-control" rows="3" placeholder="Cole aqui o script de rastreamento se necessário"></textarea>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" name="tracking_codes[${trackingIndex}][status]" class="form-check-input" value="1">
+                <label class="form-check-label">Ativo</label>
+            </div>
+        `;
+        container.appendChild(div);
+        trackingIndex++;
+    }
+</script>
+
+
 
 
 
@@ -386,6 +490,56 @@
     }
 </script>
 
+<script>
+    let trackingIndex = {{ count($trackingCodes) }};
+    function adicionarTracking() {
+        const container = document.getElementById('tracking-container');
+        const div = document.createElement('div');
+        div.classList.add('tracking-bloco', 'border', 'p-3', 'mb-3', 'bg-light', 'rounded', 'position-relative');
+        div.innerHTML = `
+            <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2" onclick="this.parentElement.remove()">Remover</button>
+            
+            <div class="row">
+                <div class="col-md-6 mb-2">
+                    <label>Nome</label>
+                    <input type="text" name="tracking_codes[\${trackingIndex}][name]" class="form-control" placeholder="Ex: Google Analytics">
+                </div>
+                <div class="col-md-6 mb-2">
+                    <label>Provedor</label>
+                    <input type="text" name="tracking_codes[\${trackingIndex}][provider]" class="form-control" placeholder="Ex: Google, Meta">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-2">
+                    <label>Código</label>
+                    <input type="text" name="tracking_codes[\${trackingIndex}][code]" class="form-control" placeholder="Ex: G-XXXXXX">
+                </div>
+                <div class="col-md-6 mb-2">
+                    <label>Tipo</label>
+                    <select name="tracking_codes[\${trackingIndex}][type]" class="form-control">
+                        <option value="analytics">Analytics</option>
+                        <option value="ads">Anúncios</option>
+                        <option value="pixel">Pixel</option>
+                        <option value="other">Outro</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="mb-2">
+                <label>Script (opcional)</label>
+                <textarea name="tracking_codes[\${trackingIndex}][script]" class="form-control" rows="3" placeholder="Cole aqui o script de rastreamento"></textarea>
+            </div>
+
+            <div class="form-check">
+                <input type="checkbox" name="tracking_codes[\${trackingIndex}][status]" class="form-check-input" value="1" checked>
+                <label class="form-check-label">Ativo</label>
+            </div>
+        `;
+        container.appendChild(div);
+        trackingIndex++;
+    }
+</script>
 
     <script>
         let itemIndex = {{ count($sobreItens) }};

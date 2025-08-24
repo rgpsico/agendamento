@@ -37,6 +37,11 @@ class EmpresaSite extends Model
     ];
 
 
+    public function trackingCodes()
+{
+    return $this->hasMany(TrackingCode::class, 'site_id');
+}
+
     
     // Relacionamentos
     public function empresa()
