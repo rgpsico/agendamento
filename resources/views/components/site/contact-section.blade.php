@@ -4,7 +4,10 @@
             <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">{{ $site->contato_titulo ?? 'Fale Conosco' }}</h2>
             <div class="section-divider max-w-md mx-auto"></div>
             <p class="text-gray-600 text-xl max-w-2xl mx-auto">
-                {{ $site->contato_descricao ?? 'Estamos aqui para tirar suas dúvidas e ajudar você a começar sua jornada no surf' }}
+                <p>
+    {{ $site->contato_descricao ?? 'Estamos aqui para tirar suas dúvidas e ajudar você a começar sua jornada' }}
+</p>
+
             </p>
         </div>
 

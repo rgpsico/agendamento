@@ -21,14 +21,21 @@
 
     <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-4ZMP2C63TR">
+{{ dd('aaaa')}}
 </script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
 
-  gtag('config', 'G-4ZMP2C63TR');
-</script>
+@foreach($site->trackingCodes as $tracking)
+    @if($tracking->status && $tracking->type === 'analytics')
+        <script async src="https://www.googletagmanager.com/gtag/js?id={{ $tracking->code }}"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', '{{ $tracking->code }}');
+        </script>
+    @endif
+@endforeach
+
     @php
         $corPrimaria = $site->cores['primaria'] ?? '#667eea';
         $corSecundaria = $site->cores['secundaria'] ?? '#764ba2';

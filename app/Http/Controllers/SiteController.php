@@ -132,7 +132,8 @@ private function verificarDnsSsl($dominio)
                 'endereco',
                 'empresa',
                 'empresa.modalidade',
-                'template' // Carrega o template junto
+                'template', // Carrega o template junto
+                'trackingCodes' // Carrega os tracking codes ativos
             ])
             ->firstOrFail();
                 

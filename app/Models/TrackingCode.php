@@ -10,7 +10,7 @@ class TrackingCode extends Model
     use HasFactory;
 
     protected $fillable = [
-        'site_id-',
+        'site_id',
         'name',
         'provider',
         'code',
