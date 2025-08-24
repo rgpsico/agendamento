@@ -74,7 +74,7 @@ class EmailController extends Controller
             'mensagem' => 'required|string',
         ]);
 
-        dd($site->empresa->user->email);
+       
 
         // Enviar e-mail
         Mail::send('emails.contato', ['data' => $data, 'site' => $site], function ($message) use ($site, $data) {
@@ -84,5 +84,5 @@ class EmailController extends Controller
         });
 
         return back()->with('success', 'Mensagem enviada com sucesso!');
-}
+    }
 }
