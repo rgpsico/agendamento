@@ -78,7 +78,7 @@ class EmailController extends Controller
 
         // Enviar e-mail
         Mail::send('emails.contato', ['data' => $data, 'site' => $site], function ($message) use ($site, $data) {
-            $message->to($data['email'] ?? 'contato@rjpasseios.com.br')
+            $message->to($site->empresa->user->email ?? 'contato@rjpasseios.com.br')
                     ->subject("Novo contato do site: {$data['nome']}")
                     ->from($data['email'], $data['nome']);
         });
