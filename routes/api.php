@@ -33,7 +33,7 @@ use App\Http\Controllers\SiteVisitanteController;
 use Illuminate\Http\Request;
 use Twilio\Rest\Client;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\EmailController;
 use App\Http\Controllers\ContatoController;
 
 Route::post('empresa/gerar-boleto', [BoletoController::class, 'gerarBoleto'])->name('boleto.asaas');
@@ -234,6 +234,9 @@ Route::prefix('google-ads')->group(function () {
     Route::post('create-campaign', [GoogleADSController::class, 'createCampaign']);
     Route::post('create-cliente', [GoogleADSController::class, 'createCustomerClient']);
 });
+
+
+Route::post('email/teste', [EmailController::class, 'teste']);
 
 
 

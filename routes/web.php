@@ -22,6 +22,9 @@ use App\Http\Controllers\ProfessoresAsaasController;
 use App\Http\Controllers\PagamentoController;
 use App\Http\Controllers\SiteDepoimentoController;
 use App\Http\Controllers\ViaCepController;
+use App\Http\Controllers\EmailController;
+use App\Http\Controllers\SiteCliqueWhatsappController;
+use App\Http\Controllers\ProfessoresController;
 //   Route::get('/', [UserManagementController::class, 'index'])->name('register.aluno');
 
 
@@ -164,7 +167,9 @@ Route::post('/avaliar-aula', [AvaliacaoController::class, 'storeAvaliacao'])->na
 Route::get('/avaliacao/{agendamento_id}', [AvaliacaoController::class, 'getAvaliacoes'])->name('avaliacao.getAvaliacoes');
 
 Route::get('/check-payment-status/{cobranca_id}', [PagamentoController::class, 'checkPaymentStatus'])->name('check-payment-status');
+
 Route::post('/asaas', [PixQrController::class, 'fazerAgendamentoPix'])->name('empresa.pagamento.asaas');
+Route::post('/contato/enviar/{site}', [EmailController::class, 'enviar'])->name('site.email.enviar');
 
 
 Route::get('/test', function () {

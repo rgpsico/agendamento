@@ -34,45 +34,43 @@
                 </div>
 
                 <!-- Contact Form -->
-                <div class="contact-form">
-                    <form class="space-y-6">
-                        <div class="grid md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-gray-700 font-medium mb-2">Nome</label>
-                                <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300">
-                            </div>
-                            <div>
-                                <label class="block text-gray-700 font-medium mb-2">Telefone</label>
-                                <input type="tel" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300">
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-gray-700 font-medium mb-2">Email</label>
-                            <input type="email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300">
-                        </div>
-                        
-                        <div>
-                            <label class="block text-gray-700 font-medium mb-2">Serviço de Interesse</label>
-                            <select class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300">
-                                @foreach($site->servicos ?? [] as $servico)
-                                    <option>{{ $servico->titulo }}</option>
-                                @endforeach
-                                <option>Informações Gerais</option>
-                            </select>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-gray-700 font-medium mb-2">Mensagem</label>
-                            <textarea rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300" placeholder="Conte-nos mais sobre seu interesse..."></textarea>
-                        </div>
-                        
-                        <button type="submit" class="w-full btn-primary text-white font-semibold py-4 rounded-lg hover:scale-105 transition-all duration-300">
-                            <i class="fas fa-paper-plane mr-2"></i>
-                            Enviar Mensagem
-                        </button>
-                    </form>
-                </div>
+                <form class="space-y-6">
+    <div class="grid md:grid-cols-2 gap-4">
+        <div>
+            <label class="block text-gray-700 font-medium mb-2">Nome</label>
+            <input type="text" name="nome" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300">
+        </div>
+        <div>
+            <label class="block text-gray-700 font-medium mb-2">Telefone</label>
+            <input type="tel" name="telefone" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300">
+        </div>
+    </div>
+
+    <div>
+        <label class="block text-gray-700 font-medium mb-2">Email</label>
+        <input type="email" name="email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300">
+    </div>
+
+    <div>
+        <label class="block text-gray-700 font-medium mb-2">Serviço de Interesse</label>
+        <select name="servico_interesse" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300">
+            @foreach($site->servicos ?? [] as $servico)
+                <option>{{ $servico->titulo }}</option>
+            @endforeach
+            <option>Informações Gerais</option>
+        </select>
+    </div>
+
+    <div>
+        <label class="block text-gray-700 font-medium mb-2">Mensagem</label>
+        <textarea name="mensagem" rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300" placeholder="Conte-nos mais sobre seu interesse..."></textarea>
+    </div>
+
+    <button type="button" id="enviar-email" data-siteid="{{ $site->id }}" class="w-full btn-primary text-white font-semibold py-4 rounded-lg hover:scale-105 transition-all duration-300">
+        <i class="fas fa-paper-plane mr-2"></i> Enviar Mensagem
+    </button>
+</form>
+ </div>
             </div>
         </div>
     </div>

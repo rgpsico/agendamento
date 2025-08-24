@@ -1,5 +1,45 @@
 $(document).ready(function() {
 
+
+    $(document).ready(function() {
+
+ 
+        $(document).on('click', '#enviar-email', function(e) {
+        e.preventDefault(); // evita recarregar a página
+        let submitBtn = $(this);
+        let form = submitBtn.closest('form'); // pega o formulário pai do botão
+        let site_id = submitBtn.data('siteid');
+        let url = '/contato/enviar/' + site_id;
+
+        submitBtn.prop('disabled', true).text('Enviando...');
+
+        $.ajax({
+            type: 'POST',
+            url: url,
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+            data: form.serialize(), // agora pega os campos corretos
+            success: function(response) {
+                alert('Mensagem enviada com sucesso!');
+                form[0].reset();
+                submitBtn.prop('disabled', false).text('Enviar Mensagem');
+            },
+            error: function(xhr) {
+                let errors = xhr.responseJSON?.errors;
+                if(errors){
+                    let msg = Object.values(errors).map(e => e.join(', ')).join('\n');
+                    alert('Erro:\n' + msg);
+                } else {
+                    alert('Ocorreu um erro ao enviar a mensagem.');
+                }
+                submitBtn.prop('disabled', false).text('Enviar Mensagem');
+            }
+        });
+    });
+
+
+});
+
+
     // Função para registrar clique no WhatsApp
     function registrarCliquesWhatsapp(selector, empresaSiteId, whatsappNumero) {
         $(document).on('click', selector, function(e) {
