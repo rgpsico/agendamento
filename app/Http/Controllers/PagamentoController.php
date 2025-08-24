@@ -7,6 +7,7 @@ use App\Models\Agendamento;
 use App\Models\AlunoProfessor;
 use App\Models\Alunos;
 use App\Models\Empresa;
+use App\Models\Modalidade;
 use App\Models\PagamentoGateway;
 use App\Models\Pagamento;
 use App\Models\Professor;
@@ -697,8 +698,8 @@ class PagamentoController extends Controller
 
 
 
-        if ($disponibilidade) {
-
+        if ($disponibilidade) 
+        {
             return redirect()->back()->with('error', 'O professor já possui um agendamento neste horário. Procure uma nova data ou horário diferente')->withInput();
         }
 
@@ -727,6 +728,32 @@ class PagamentoController extends Controller
             'qr_code_pix' => null, // Não aplicável
             'resposta_api' => null, // Não aplicável
         ]);
+
+        try {
+            $twilioService = new \App\Services\TwilioService();
+
+            // Buscar dados do aluno e professor para enviar
+            $aluno = Alunos::find($request->input('aluno_id'));
+            $professor = Professor::find($request->input('professor_id'));
+            $modalidade = Modalidade::find($request->input('modalidade_id'));
+            
+            $mensagem = "Olá! Novo agendamento confirmado:\n\n";
+            $mensagem .= "Aluno: {$aluno->usuario->nome}\n";
+            $mensagem .= "Professor: {$professor->usuario->nome}\n";
+            $mensagem .= "Modalidade: {$modalidade->nome}\n";
+            $mensagem .= "Data da Aula: " . \Carbon\Carbon::parse($agendamento->data_da_aula)->format('d/m/Y') . "\n";
+            $mensagem .= "Horário: {$agendamento->horario}\n";
+            $mensagem .= "Valor: R$ {$agendamento->valor_aula}\n";
+            $mensagem .= "Status do Pagamento: {$pagamento->status}";
+
+            // Enviar para um número fixo ou para o professor/aluno, ex: número do professor
+            $twilioService->sendWhatsApp($professor->empresa->telefone, $mensagem);
+
+        } catch (\Exception $e) {
+            dd($e->getMessage());
+            \Log::error('Erro ao enviar WhatsApp: ' . $e->getMessage());
+            // Não bloqueia o fluxo do usuário caso o WhatsApp falhe
+        }
 
         // Redirecionar para a página de confirmação
         return redirect()->route('home.checkoutsucesso', ['id' => $request->input('professor_id')])
