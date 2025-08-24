@@ -19,6 +19,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/TextPlugin.min.js"></script>
 
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-4ZMP2C63TR">
+</script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-4ZMP2C63TR');
+</script>
     @php
         $corPrimaria = $site->cores['primaria'] ?? '#667eea';
         $corSecundaria = $site->cores['secundaria'] ?? '#764ba2';
