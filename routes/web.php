@@ -118,6 +118,13 @@ Route::prefix('admin/site/servicos')->middleware(['auth'])->name('admin.site.ser
 });
 
 
+use App\Http\Controllers\TrackingCodesController;
+
+Route::prefix('admin')->middleware('auth')->group(function () {
+    Route::post('site/{site_id}/tracking/store', [TrackingCodesController::class, 'store'])->name('tracking.store');
+    Route::put('tracking/{id}/update', [TrackingCodesController::class, 'update'])->name('tracking.update');
+    Route::post('tracking/{id}/destroy', [TrackingCodesController::class, 'destroy'])->name('tracking.destroy');
+});
 
 
 Route::prefix('admin/site/depoimentos')->middleware('auth')->name('admin.site.depoimentos.')->group(function () {
