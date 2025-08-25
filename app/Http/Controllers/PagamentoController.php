@@ -673,25 +673,25 @@ class PagamentoController extends Controller
     public function criarPagamentoPresencial(CriarPagamentoPresencialRequest  $request)
     {       
           
-    $tipo_de_horario = Servicos::where('id',$request->servico_id)->value('tipo_agendamento');
-          
-        // Verificar disponibilidade do professor
-    if (Agendamento::verificarDisponibilidade($request, $tipo_de_horario))  
-        {    
-            return redirect()->back()
-            ->with('error', 'O professor já possui um agendamento neste horário. Procure uma nova data ou horário diferente')
-            ->withInput();
-        }
-  
-    // Criar o agendamento
-     $agendamento = Agendamento::criarAgendamento($request->all());
-   
-            // Criar o registro de pagamento
-    $pagamento = Pagamento::criarPagamentoPresencial($agendamento, $request->all());
+        $tipo_de_horario = Servicos::where('id',$request->servico_id)->value('tipo_agendamento');
+            
+            // Verificar disponibilidade do professor
+        if (Agendamento::verificarDisponibilidade($request, $tipo_de_horario))  
+            {    
+                return redirect()->back()
+                ->with('error', 'O professor já possui um agendamento neste horário. Procure uma nova data ou horário diferente')
+                ->withInput();
+            }
     
+        // Criar o agendamento
+        $agendamento = Agendamento::criarAgendamento($request->all());
+    
+                // Criar o registro de pagamento
+        $pagamento = Pagamento::criarPagamentoPresencial($agendamento, $request->all());
+        
 
-    $twilioService = new \App\Services\TwilioService();
-    $twilioService->enviarConfirmacaoAgendamento($agendamento, $pagamento);
+        $twilioService = new \App\Services\TwilioService();
+        $twilioService->enviarConfirmacaoAgendamento($agendamento, $pagamento);
  
 
         // Redirecionar para a página de confirmação
