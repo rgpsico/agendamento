@@ -387,6 +387,7 @@
 
             // Manipular seleção de forma de pagamento
             $('.payment-method').on('click', function() {
+            
                 var method = $(this).data('method');
                 currentPaymentMethod = method;
 
@@ -968,6 +969,7 @@
                 hora_aula: $('#hora_aula').val(),
                 valor_aula: $('#valor_aula').val(),
                 titulo: $('#titulo').val(),
+               servico_id:JSON.parse(localStorage.getItem('servicos'))[0].id,
                 payment_method: currentPaymentMethod,
                 status: currentPaymentMethod === 'presencial' ? $('#presencial-status').val() :
                 'RECEIVED', // Alterar para RECEIVED para PIX confirmado

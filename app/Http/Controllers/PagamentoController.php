@@ -11,6 +11,7 @@ use App\Models\Modalidade;
 use App\Models\PagamentoGateway;
 use App\Models\Pagamento;
 use App\Models\Professor;
+use App\Models\Servicos;
 use App\Services\AsaasService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -24,6 +25,7 @@ use Illuminate\Support\Facades\Log; // Import the Log facade
 use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\PagamentoComCartaoRequest;
 use App\Services\AgendamentoService;
+use App\Http\Requests\CriarPagamentoPresencialRequest;
 
 class PagamentoController extends Controller
 {
@@ -668,92 +670,29 @@ class PagamentoController extends Controller
 
 
 
-    public function criarPagamentoPresencial(Request $request)
-    {
-        // Validação dos dados do agendamento
-        $validator = Validator::make($request->all(), [
-            'aluno_id' => 'required|exists:alunos,id',
-            'professor_id' => 'required|exists:professores,id',
-            'modalidade_id' => 'required|exists:modalidade,id',
-            'data_aula' => 'required|date_format:Y-m-d',
-            'hora_aula' => 'required|date_format:H:i',
-            'valor_aula' => 'required|numeric|min:0',
-            'status' => 'required|in:PENDING,RECEIVED',
-            'titulo' => 'required|string|max:255',
-        ]);
-
-
-
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
-
-
-
+    public function criarPagamentoPresencial(CriarPagamentoPresencialRequest  $request)
+    {       
+          
+    $tipo_de_horario = Servicos::where('id',$request->servico_id)->value('tipo_agendamento');
+          
         // Verificar disponibilidade do professor
-        $disponibilidade = Agendamento::where('professor_id', $request->input('professor_id'))
-            ->where('data_da_aula', $request->input('data_aula'))
-            ->where('horario', $request->input('hora_aula'))
-            ->exists();
-
-
-
-        if ($disponibilidade) 
-        {
-            return redirect()->back()->with('error', 'O professor já possui um agendamento neste horário. Procure uma nova data ou horário diferente')->withInput();
+    if (Agendamento::verificarDisponibilidade($request, $tipo_de_horario))  
+        {    
+            return redirect()->back()
+            ->with('error', 'O professor já possui um agendamento neste horário. Procure uma nova data ou horário diferente')
+            ->withInput();
         }
+  
+    // Criar o agendamento
+     $agendamento = Agendamento::criarAgendamento($request->all());
+   
+            // Criar o registro de pagamento
+    $pagamento = Pagamento::criarPagamentoPresencial($agendamento, $request->all());
+    
 
-
-        // Criar o agendamento
-        $agendamento = Agendamento::create([
-            'aluno_id' => $request->input('aluno_id'),
-            'professor_id' => $request->input('professor_id'),
-            'modalidade_id' => $request->input('modalidade_id'),
-            'data_da_aula' => $request->input('data_aula'),
-            'horario' => $request->input('hora_aula'),
-            'valor_aula' => $request->input('valor_aula'),
-        ]);
-
-        // Criar o registro de pagamento
-        $pagamento = Pagamento::create([
-            'agendamento_id' => $agendamento->id,
-            'aluno_id' => $request->input('aluno_id'),
-            'pagamento_gateway_id' => null, // Não usado para pagamento presencial
-            'asaas_payment_id' => null, // Não usado para pagamento presencial
-            'status' => $request->input('status', 'PENDING'), // PENDING ou RECEIVED
-            'valor' => $request->input('valor_aula'),
-            'metodo_pagamento' => 'PRESENCIAL',
-            'data_vencimento' => null, // Não aplicável
-            'url_boleto' => null, // Não aplicável
-            'qr_code_pix' => null, // Não aplicável
-            'resposta_api' => null, // Não aplicável
-        ]);
-
-        try {
-            $twilioService = new \App\Services\TwilioService();
-
-            // Buscar dados do aluno e professor para enviar
-            $aluno = Alunos::find($request->input('aluno_id'));
-            $professor = Professor::find($request->input('professor_id'));
-            $modalidade = Modalidade::find($request->input('modalidade_id'));
-            
-            $mensagem = "Olá! Novo agendamento confirmado:\n\n";
-            $mensagem .= "Aluno: {$aluno->usuario->nome}\n";
-            $mensagem .= "Professor: {$professor->usuario->nome}\n";
-            $mensagem .= "Modalidade: {$modalidade->nome}\n";
-            $mensagem .= "Data da Aula: " . \Carbon\Carbon::parse($agendamento->data_da_aula)->format('d/m/Y') . "\n";
-            $mensagem .= "Horário: {$agendamento->horario}\n";
-            $mensagem .= "Valor: R$ {$agendamento->valor_aula}\n";
-            $mensagem .= "Status do Pagamento: {$pagamento->status}";
-
-            // Enviar para um número fixo ou para o professor/aluno, ex: número do professor
-            $twilioService->sendWhatsApp($professor->empresa->telefone, $mensagem);
-
-        } catch (\Exception $e) {
-            dd($e->getMessage());
-            \Log::error('Erro ao enviar WhatsApp: ' . $e->getMessage());
-            // Não bloqueia o fluxo do usuário caso o WhatsApp falhe
-        }
+    $twilioService = new \App\Services\TwilioService();
+    $twilioService->enviarConfirmacaoAgendamento($agendamento, $pagamento);
+ 
 
         // Redirecionar para a página de confirmação
         return redirect()->route('home.checkoutsucesso', ['id' => $request->input('professor_id')])

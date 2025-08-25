@@ -55,9 +55,9 @@
                     @isset(Auth::user()->empresa->user_id)
                         <li class="submenu">
                             <a href="#">
-                                <i class="fas fa-globe" style="font-size: 18px;"></i>
+                             <i class="fas fa-layer-group" style="font-size: 14px; margin-left: 5px;"></i>
                                 <span>Site Templates</span>
-                                <i class="fas fa-layer-group" style="font-size: 14px; margin-left: 5px;"></i>
+                             
                                 <span class="menu-arrow"></span>
                             </a>
                             <ul>

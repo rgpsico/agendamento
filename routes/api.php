@@ -36,6 +36,11 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\ContatoController;
 
+
+Route::post('pagamento/presencial', [PagamentoController::class, 'criarPagamentoPresencial'])->name('empresa.pagamento.prensencial');
+
+
+
 Route::post('empresa/gerar-boleto', [BoletoController::class, 'gerarBoleto'])->name('boleto.asaas');
 Route::get('empresa/userexisterasaas/{customerId}', [BoletoController::class, 'customerExistsInAsaas'])->name('asaas.user.existirs');
 Route::get('empresa/baixarboletoasaas/{boletoId}', [BoletoController::class, 'downloadBoleto'])->name('asaas.user.downloadBoleto');
@@ -47,6 +52,7 @@ Route::post('enviar-boleto', [BoletoController::class, 'sendBoletoToClient'])->n
 
 Route::post('/events', [GoogleCalendarController::class, 'createEvent']);
 Route::post('/pagarComCartao', [PagamentoController::class, 'pagarComCartao'])->name('empresa.pagamento.cartao');
+
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

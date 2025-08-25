@@ -19,6 +19,36 @@ class Agendamento extends Model
         return $this->hasMany(Disponibilidade::class, 'id_dia');
     }
 
+    
+    public static function verificarDisponibilidade($request, $tipo_de_horario)
+    {
+        
+        if($tipo_de_horario == 'DIA'){
+            return false; // Permitir agendamento para horários flexíveis
+        }
+
+        return self::where('professor_id', $request->professor_id)
+                    ->where('data_da_aula', $request->data_aula)
+                    ->where('horario', $request->hora_aula)
+                    ->exists();
+    }
+
+
+    public static function criarAgendamento(array $dados)
+    {
+        return self::create([
+            'aluno_id' => $dados['aluno_id'],
+            'professor_id' => $dados['professor_id'],
+            'modalidade_id' => $dados['modalidade_id'],
+            'data_da_aula' => $dados['data_aula'],
+            'horario' => $dados['hora_aula'],
+            'valor_aula' => $dados['valor_aula'],
+        ]);
+    }
+
+
+
+
 
 
     public function aluno()
