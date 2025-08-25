@@ -77,11 +77,15 @@ class EmailController extends Controller
        
 
         // Enviar e-mail
-        Mail::send('emails.contato', ['data' => $data, 'site' => $site], function ($message) use ($site, $data) {
-            $message->to($site->empresa->user->email ?? 'contato@rjpasseios.com.br')
-                    ->subject("Novo contato do site: {$data['nome']}")
-                    ->from($data['email'], $data['nome']);
-        });
+      Mail::send('emails.contato', ['data' => $data, 'site' => $site], function ($message) use ($site, $data) {
+        // Destinatário: e-mail do dono do sistema ou fallback
+        $toEmail = $site->empresa->user->email ?? 'contato@rjpasseios.com.br';
+        
+        // Configurar o e-mail
+        $message->to($toEmail)
+                ->subject("Novo contato do site: {$data['nome']}")
+                ->from('contato@rjpasseios.com.br', 'RJPasseios'); // Remetente fixo autenticado no Zoho
+    });
 
         return back()->with('success', 'Mensagem enviada com sucesso!');
     }
