@@ -1,6 +1,6 @@
 <x-admin.layout title="{{$pageTitle}}">
     <div class="page-wrapper">
-        <div class="content container-fluid">
+        <div class="content container-fluid" style="padding: 5%">
 
             <div class="page-header">
 						<div class="row">
