@@ -458,6 +458,8 @@
                         $('.boleto-info .badge').removeClass('bg-warning').addClass('bg-success').text(
                             'Pago');
 
+                            
+
                         Swal.fire({
                             icon: 'success',
                             title: 'Pagamento Confirmado!',
