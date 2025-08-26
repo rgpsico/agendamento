@@ -1,5 +1,10 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
-    <!-- Outros links e scripts -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sidebar Mobile Corrigida</title>
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -24,6 +29,8 @@
             height: 100vh;
             overflow: hidden;
             z-index: 1000;
+            top: 0;
+            left: 0;
         }
 
         .sidebar::before {
@@ -109,7 +116,7 @@
             display: flex;
             align-items: center;
             padding: 12px 15px;
-      color: rgba(9, 12, 14, 0.8);
+            color: rgba(9, 12, 14, 0.8);
             text-decoration: none;
             border-radius: 12px;
             font-weight: 500;
@@ -161,6 +168,7 @@
             margin-right: 12px;
             font-size: 16px;
             transition: transform 0.3s ease;
+            color: rgba(9, 12, 14, 0.8);
         }
 
         .sidebar-menu li a:hover i {
@@ -170,12 +178,7 @@
         .sidebar-menu li a span {
             flex: 1;
             font-size: 14px;
-              color: rgba(9, 12, 14, 0.8);
-        }
-
-        
-        .sidebar-menu li i {         
-              color: rgba(9, 12, 14, 0.8);
+            color: rgba(9, 12, 14, 0.8);
         }
 
         /* Menu Arrow */
@@ -201,7 +204,6 @@
             max-height: 0;
             overflow: hidden;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            /* background: rgba(255, 255, 255, 0.15); */
             margin: 5px 0;
             border-radius: 8px;
             backdrop-filter: blur(10px);
@@ -253,35 +255,78 @@
             color: rgba(0, 77, 105, 1);
         }
 
-        /* Sidebar Disabled State */
-        .sidebar-disabled {
-            pointer-events: none;
-            opacity: 0.5;
-            cursor: not-allowed;
-            filter: grayscale(1);
+        /* Sidebar Toggle Button */
+        .sidebar-toggle {
+            position: fixed !important;
+            top: 20px !important;
+            left: 20px !important;
+            background: #00bcd4 !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 8px !important;
+            padding: 10px 12px !important;
+            z-index: 1100 !important;
+            font-size: 18px !important;
+            box-shadow: 0 4px 15px rgba(0, 188, 212, 0.3) !important;
+            transition: all 0.3s ease !important;
+            cursor: pointer !important;
         }
 
-        .sidebar-disabled::after {
-            content: '';
-            position: absolute;
+        .sidebar-toggle:hover {
+            background: #0097a7 !important;
+            transform: scale(1.05) !important;
+            box-shadow: 0 6px 20px rgba(0, 188, 212, 0.4) !important;
+        }
+
+        /* Overlay para fechar o menu no mobile */
+        .sidebar-overlay {
+            position: fixed;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.3);
-            z-index: 10;
-            backdrop-filter: blur(2px);
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Content area */
+        .content {
+            margin-left: 280px;
+            padding: 20px;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
         }
 
         /* Responsive */
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
-                transition: transform 0.3s ease;
             }
 
             .sidebar.mobile-active {
                 transform: translateX(0);
+            }
+
+            .content {
+                margin-left: 0;
+            }
+
+            .sidebar-toggle {
+                display: block !important;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .sidebar-toggle {
+                display: none !important;
             }
         }
 
@@ -328,15 +373,19 @@
             0%, 100% { transform: scale(1); opacity: 1; }
             50% { transform: scale(1.1); opacity: 0.8; }
         }
-
-        .content{        
-            padding: 10%;
-            transition: margin-left 0.3s ease;
-        }
     </style>
 </head>
 
 <body>
+    <!-- Botão Toggle para Mobile -->
+    <button class="sidebar-toggle d-md-none" id="sidebarToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Overlay para fechar o menu no mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
+    <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-inner slimscroll">
             <div id="sidebar-menu" class="sidebar-menu">
@@ -346,84 +395,73 @@
 
                     <!-- Dashboard -->
                     <li class="menu-item" data-delay="0.1">
-                        <a href="{{ route('cliente.dashboard') }}" class="pulse-icon">
+                        <a href="#dashboard" class="pulse-icon">
                             <i class="fe fe-home"></i> 
                             <span>Dashboard</span>
-                            {{-- <div class="notification-badge"></div> --}}
                         </a>
                     </li>
 
-                   
+                    <!-- Site Templates -->
+                    <li class="submenu menu-item" data-delay="0.3">
+                        <a href="#" class="submenu-toggle">
+                            <i class="fas fa-layer-group"></i>
+                            <span>Site Templates</span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <ul>
+                            <li><a href="#templates-list">Lista</a></li>                            
+                        </ul>
+                    </li>
 
-                    
-                    @if (Auth::user()->isAdmin)
-                        <li class="submenu menu-item" data-delay="0.3">
-                            <a href="#" class="submenu-toggle">
-                                <i class="fas fa-layer-group"></i>
-                                <span>Site Templates</span>
-                                <span class="menu-arrow"></span>
-                            </a>
-                            <ul>
-                                <li><a href="{{ route('site-templates.index') }}">Lista</a></li>                            
-                            </ul>
-                        </li>
-                    @endisset
+                    <!-- Serviços -->
+                    <li class="submenu menu-item" data-delay="0.4">
+                        <a href="#" class="submenu-toggle">
+                            <i class="fe fe-activity"></i>
+                            <span>Serviços</span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <ul>
+                            <li><a href="#services-list">Listar Serviços</a></li>
+                        </ul>
+                    </li>
 
-                    @isset(Auth::user()->empresa->user_id)
-                        <!-- Serviços -->
-                        <li class="submenu menu-item" data-delay="0.4">
-                            <a href="#" class="submenu-toggle">
-                                <i class="fe fe-activity"></i>
-                                <span>Serviços</span>
-                                <span class="menu-arrow"></span>
-                            </a>
-                            <ul>
-                                <li><a href="{{ route('admin.servico.index') }}">Listar Serviços</a></li>
-                              
-                            </ul>
-                        </li>
-                    @endisset
+                    <!-- Horários -->
+                    <li class="submenu menu-item" data-delay="0.5">
+                        <a href="#" class="submenu-toggle">
+                            <i class="fas fa-clock"></i>
+                            <span>Horários</span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <ul>
+                            <li><a href="#schedule-unique">Únicos</a></li>
+                            <li><a href="#schedule-custom">Personalizado</a></li>
+                            <li><a href="#schedule-auto">Automáticos</a></li>
+                        </ul>
+                    </li>
 
-                    @isset(Auth::user()->empresa->user_id)
-                        <!-- Horários -->
-                        <li class="submenu menu-item" data-delay="0.5">
-                            <a href="#" class="submenu-toggle">
-                                <i class="fas fa-clock"></i>
-                                <span>Horários</span>
-                                <span class="menu-arrow"></span>
-                            </a>
-                            <ul>
-                                <li><a href="{{ route('empresa.disponibilidade') }}">Únicos</a></li>
-                                <li><a href="{{ route('empresa.disponibilidadePersonalizada') }}">Personalizado</a></li>
-                                <li><a href="{{ route('empresa.horarios.auto') }}">Automáticos</a></li>
-                            </ul>
-                        </li>
+                    <!-- Site -->
+                    <li class="submenu menu-item" data-delay="0.2">
+                        <a href="#" class="submenu-toggle">
+                            <i class="fas fa-globe"></i>
+                            <span>Site</span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <ul>
+                            <li><a href="#site-list">Lista</a></li>
+                            <li><a href="#site-config">Configurações do Site</a></li>
+                            <li><a href="#site-services">Serviços</a></li>
+                            <li><a href="#site-testimonials">Depoimentos</a></li>
+                            <li><a href="#site-contacts">Contatos</a></li>
+                        </ul>
+                    </li>
 
-                         @isset(Auth::user()->empresa->user_id)
-                        <li class="submenu menu-item" data-delay="0.2">
-                            <a href="#" class="submenu-toggle">
-                                <i class="fas fa-globe"></i>
-                                <span>Site</span>
-                                <span class="menu-arrow"></span>
-                            </a>
-                            <ul>
-                                <li><a href="{{ route('admin.site.lista') }}">Lista</a></li>
-                                <li><a href="{{ route('admin.site.configuracoes') }}">Configurações do Site</a></li>
-                                <li><a href="{{ route('admin.site.servicos.index') }}">Serviços</a></li>
-                                <li><a href="{{ route('admin.site.depoimentos.index') }}">Depoimentos</a></li>
-                                <li><a href="{{ route('admin.site.contatos.index') }}">Contatos</a></li>
-                            </ul>
-                        </li>
-                    @endisset
-
-                        <!-- Alunos -->
-                        <li class="menu-item" data-delay="0.6">
-                            <a href="{{ route('alunos.index') }}">
-                                <i class="fe fe-users"></i>
-                                <span>Alunos</span>
-                            </a>
-                        </li>
-                    @endisset
+                    <!-- Alunos -->
+                    <li class="menu-item" data-delay="0.6">
+                        <a href="#students">
+                            <i class="fe fe-users"></i>
+                            <span>Alunos</span>
+                        </a>
+                    </li>
 
                     <!-- Agenda -->
                     <li class="submenu menu-item" data-delay="0.7">
@@ -433,20 +471,18 @@
                             <span class="menu-arrow"></span>
                         </a>
                         <ul>
-                            <li><a href="{{ route('agenda.index') }}">Listar Aulas</a></li>
-                            <li><a href="{{ route('agenda.calendario') }}">Calendário</a></li>
+                            <li><a href="#agenda-list">Listar Aulas</a></li>
+                            <li><a href="#agenda-calendar">Calendário</a></li>
                         </ul>
                     </li>
 
-                    @isset(Auth::user()->empresa->id)
-                        <!-- Fotos -->
-                        <li class="menu-item" data-delay="0.8">
-                            <a href="{{ route('empresa.fotos', ['userId' => Auth::user()->id]) }}">
-                                <i class="fe fe-camera"></i>
-                                <span>Fotos</span>
-                            </a>
-                        </li>
-                    @endisset
+                    <!-- Fotos -->
+                    <li class="menu-item" data-delay="0.8">
+                        <a href="#photos">
+                            <i class="fe fe-camera"></i>
+                            <span>Fotos</span>
+                        </a>
+                    </li>
 
                     <!-- Dados Cadastrais -->
                     <li class="submenu menu-item" data-delay="0.9">
@@ -456,117 +492,163 @@
                             <span class="menu-arrow"></span>
                         </a>
                         <ul>
-                            <li>
-                                <a href="{{ route('empresa.configuracao', ['userId' => Auth::user()->id]) }}">
-                                    <i class="fe fe-briefcase"></i> <span> Empresa</span>
-                                </a>
-                            </li>
-                            @isset(Auth::user()->empresa->user_id)
-                                <li>
-                                    <a href="{{ route('empresa.endereco', ['userId' => Auth::user()->id]) }}">
-                                        <i class="fe fe-map-pin"></i> <span> Endereço</span>
-                                    </a>
-                                </li>
-                                <li><a href="{{ route('configuracoes.indexAdmin') }}">Sistema Geral</a></li>
-                            @endisset
+                            <li><a href="#company-data">Empresa</a></li>
+                            <li><a href="#company-address">Endereço</a></li>
+                            <li><a href="#system-general">Sistema Geral</a></li>
                         </ul>
                     </li>
 
                     <!-- Pagamentos -->
-                    @isset(Auth::user()->empresa->user_id)
-                        <li class="submenu menu-item" data-delay="1.0">
-                            <a href="#" class="submenu-toggle">
-                                <i class="fas fa-credit-card"></i>
-                                <span>Pagamentos</span>
-                                <span class="menu-arrow"></span>
-                            </a>
-                            <ul>
-                                <li><a href="{{ route('pagamento.index') }}">Listar</a></li>
-                                <li><a href="{{ route('empresa.pagamento.create') }}">Cadastrar</a></li>
-                                <li><a href="{{ route('empresa.pagamento.config.index') }}">Configurações</a></li>
-                            </ul>
-                        </li>
+                    <li class="submenu menu-item" data-delay="1.0">
+                        <a href="#" class="submenu-toggle">
+                            <i class="fas fa-credit-card"></i>
+                            <span>Pagamentos</span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <ul>
+                            <li><a href="#payments-list">Listar</a></li>
+                            <li><a href="#payments-create">Cadastrar</a></li>
+                            <li><a href="#payments-config">Configurações</a></li>
+                        </ul>
+                    </li>
 
-                        <li class="submenu menu-item" data-delay="1.1">
-                            <a href="#" class="submenu-toggle">
-                                <i class="fas fa-plug"></i>
-                                <span>Integrações</span>
-                                <span class="menu-arrow"></span>
-                            </a>
-                            <ul>
-                                <li><a href="{{ route('integracao.assas.escola') }}">Asaas</a></li>
-                                <li><a href="{{ route('integracao.assas.pix') }}">PIX</a></li>
-                                <li><a href="{{ route('integracoes.stripe') }}">Stripe</a></li>
-                                <li><a href="{{ route('integracoes.mercadopago') }}">Mercado Pago</a></li>
-                                <li><a href="{{ route('integracoes.configuracoes') }}">Configurações Gerais</a></li>
-                                <li><a href="{{ route('integracoes.relatorios') }}">Relatórios de Pagamentos</a></li>
-                            </ul>
-                        </li>
-                    @endisset
+                    <!-- Integrações -->
+                    <li class="submenu menu-item" data-delay="1.1">
+                        <a href="#" class="submenu-toggle">
+                            <i class="fas fa-plug"></i>
+                            <span>Integrações</span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <ul>
+                            <li><a href="#integration-asaas">Asaas</a></li>
+                            <li><a href="#integration-pix">PIX</a></li>
+                            <li><a href="#integration-stripe">Stripe</a></li>
+                            <li><a href="#integration-mercadopago">Mercado Pago</a></li>
+                        </ul>
+                    </li>
 
-                    @if (Auth::user()->isAdmin)
-                        <!-- Gestão de Empresas -->
-                        <li class="submenu menu-item" data-delay="1.2">
-                            <a href="#" class="submenu-toggle">
-                                <i class="fas fa-building"></i>
-                                <span>Empresas</span>
-                                <span class="menu-arrow"></span>
-                            </a>
-                            <ul>
-                                <li><a href="{{ route('empresa.index') }}">Listar</a></li>
-                                <li><a href="#">Cadastrar</a></li>
-                            </ul>
-                        </li>
+                    <!-- Empresas -->
+                    <li class="submenu menu-item" data-delay="1.2">
+                        <a href="#" class="submenu-toggle">
+                            <i class="fas fa-building"></i>
+                            <span>Empresas</span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <ul>
+                            <li><a href="#companies-list">Listar</a></li>
+                            <li><a href="#companies-create">Cadastrar</a></li>
+                        </ul>
+                    </li>
 
-                        <!-- Modalidades -->
-                        <li class="submenu menu-item" data-delay="1.3">
-                            <a href="#" class="submenu-toggle">
-                                <i class="fas fa-swimmer"></i>
-                                <span>Modalidades</span>
-                                <span class="menu-arrow"></span>
-                            </a>
-                            <ul>
-                                <li><a href="{{ route('modalidade.index') }}">Listar</a></li>
-                                <li><a href="{{ route('modalidade.create') }}">Cadastrar</a></li>
-                            </ul>
-                        </li>
+                    <!-- Modalidades -->
+                    <li class="submenu menu-item" data-delay="1.3">
+                        <a href="#" class="submenu-toggle">
+                            <i class="fas fa-swimmer"></i>
+                            <span>Modalidades</span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <ul>
+                            <li><a href="#modalities-list">Listar</a></li>
+                            <li><a href="#modalities-create">Cadastrar</a></li>
+                        </ul>
+                    </li>
 
-                        <li class="submenu menu-item" data-delay="1.4">
-                            <a href="#" class="submenu-toggle">
-                                <i class="fas fa-user-cog"></i>
-                                <span>Usuários</span>
-                                <span class="menu-arrow"></span>
-                            </a>
-                            <ul>
-                                <li><a href="{{ route('admin.usuarios.index') }}">Usuários</a></li>           
-                                <li><a href="{{ route('configuracoes.permissoes') }}">Permissões</a></li>                            
-                            </ul>
-                        </li>
-                        
-                        <!-- Configurações -->
-                        <li class="submenu menu-item" data-delay="1.5">
-                            <a href="#" class="submenu-toggle">
-                                <i class="fas fa-cogs"></i>
-                                <span>Configurações</span>
-                                <span class="menu-arrow"></span>
-                            </a>
-                            <ul>
-                                <li><a href="{{ route('configuracoes.permissoes') }}">Permissões</a></li>
-                                <li><a href="{{ route('configuracoes.pagamentos') }}">Pagamentos</a></li>
-                                <li><a href="{{ route('configuracoes.empresa') }}">Empresa</a></li>
-                                <li><a href="{{ route('admin.usuarios.index') }}">Usuários</a></li>
-                                <li><a href="{{ route('configuracoes.index') }}">Sistema</a></li>
-                            </ul>
-                        </li>
-                    @endif
+                    <!-- Usuários -->
+                    <li class="submenu menu-item" data-delay="1.4">
+                        <a href="#" class="submenu-toggle">
+                            <i class="fas fa-user-cog"></i>
+                            <span>Usuários</span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <ul>
+                            <li><a href="#users-list">Usuários</a></li>           
+                            <li><a href="#permissions">Permissões</a></li>                            
+                        </ul>
+                    </li>
+                    
+                    <!-- Configurações -->
+                    <li class="submenu menu-item" data-delay="1.5">
+                        <a href="#" class="submenu-toggle">
+                            <i class="fas fa-cogs"></i>
+                            <span>Configurações</span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <ul>
+                            <li><a href="#config-permissions">Permissões</a></li>
+                            <li><a href="#config-payments">Pagamentos</a></li>
+                            <li><a href="#config-company">Empresa</a></li>
+                            <li><a href="#config-users">Usuários</a></li>
+                            <li><a href="#config-system">Sistema</a></li>
+                        </ul>
+                    </li>
                 </ul>
             </div>
         </div>
     </div>
 
+
     <script>
         // Enhanced Sidebar Animations with GSAP
         document.addEventListener('DOMContentLoaded', function() {
+            // Elementos
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+            const mainContent = document.getElementById('mainContent');
+
+            // Função para abrir/fechar sidebar no mobile
+            function toggleSidebar() {
+                sidebar.classList.toggle('mobile-active');
+                sidebarOverlay.classList.toggle('active');
+                
+                // Animar o ícone do botão
+                const icon = sidebarToggle.querySelector('i');
+                if (sidebar.classList.contains('mobile-active')) {
+                    gsap.to(icon, { rotation: 90, duration: 0.3 });
+                } else {
+                    gsap.to(icon, { rotation: 0, duration: 0.3 });
+                }
+            }
+
+            // Função para fechar sidebar
+            function closeSidebar() {
+                sidebar.classList.remove('mobile-active');
+                sidebarOverlay.classList.remove('active');
+                
+                const icon = sidebarToggle.querySelector('i');
+                gsap.to(icon, { rotation: 0, duration: 0.3 });
+            }
+
+            // Event Listeners
+            sidebarToggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleSidebar();
+            });
+
+            // Fechar ao clicar no overlay
+            sidebarOverlay.addEventListener('click', function(e) {
+                e.preventDefault();
+                closeSidebar();
+            });
+
+            // Fechar ao clicar em um link do menu no mobile
+            const sidebarLinks = sidebar.querySelectorAll('a:not(.submenu-toggle)');
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    if (window.innerWidth <= 768) {
+                        closeSidebar();
+                    }
+                });
+            });
+
+            // Fechar ao redimensionar para desktop
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 768) {
+                    closeSidebar();
+                }
+            });
+
             // GSAP Timeline for sidebar animations
             const tl = gsap.timeline();
 
@@ -675,14 +757,6 @@
                 }
             );
 
-            // Loading state simulation
-            function showLoadingState() {
-                $('.menu-item').addClass('loading-item');
-                setTimeout(() => {
-                    $('.menu-item').removeClass('loading-item');
-                }, 2000);
-            }
-
             // Notification animation
             gsap.to('.notification-badge', {
                 scale: 1.2,
@@ -691,22 +765,7 @@
                 repeat: -1,
                 ease: "power2.inOut"
             });
-
-            // Responsive sidebar toggle
-            function toggleMobileSidebar() {
-                if (window.innerWidth <= 768) {
-                    $('#sidebar').toggleClass('mobile-active');
-                }
-            }
-
-            // Add mobile toggle button if needed
-            $(document).on('click', '.sidebar-toggle', toggleMobileSidebar);
-        });
-
-        // Company Status Check (mantendo a funcionalidade original)
-        $(document).ready(function() {
-            // Função para verificar status da empresa será chamada aqui
-            // quando necessário, mantendo a compatibilidade
         });
     </script>
 </body>
+</html>
