@@ -36,12 +36,14 @@ class WebhookController extends Controller
     public function handleAsaasWebhook(Request $request)
     {
 
+    
         // Log para confirmar que o webhook foi chamado
         Log::warning('Asaas webhook aqui', ['payload' => $request->all()]);
 
         // Obter o payload do webhook
         $payload = $request->all();
         $resultadoEnvio = $this->enviarDadosParaEndpoint($payload);
+       
         // Verificar o token de autenticação
         $asaasToken = $request->header('asaas-access-token');
         if ($asaasToken !== '123456@') {
@@ -55,7 +57,6 @@ class WebhookController extends Controller
             ]);
             return response()->json(['error' => 'Token inválido'], 401);
         }
-
 
         if (!is_array($payload) || !isset($payload['event']) || !isset($payload['payment'])) {
 
@@ -89,6 +90,7 @@ class WebhookController extends Controller
             ]);
         }
 
+
         // Processar eventos de pagamento
         switch ($payload['event']) {
             case 'PAYMENT_CONFIRMED':
@@ -120,7 +122,8 @@ class WebhookController extends Controller
         }
 
 
-        if ($payload['event'] === 'PAYMENT_RECEIVED' && $payload['payment']['billingType'] === 'BOLETO') {
+        if ($payload['event'] === 'PAYMENT_RECEIVED' || $payload['payment']['billingType'] === 'BOLETO') {
+          
             $payment = $payload['payment'];
             $customerId = $payment['customer']; // Ex.: cus_000006746814
             $paymentId = $payment['id']; // Ex.: pay_ybk2slp8gh48i0iy
@@ -170,6 +173,7 @@ class WebhookController extends Controller
 
             return response()->json(['received' => true], 200);
         }
+          return response()->json(['tipo diferente' => true], 200);
     }
 
     /**
