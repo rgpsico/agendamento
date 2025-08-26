@@ -1,6 +1,6 @@
 <x-admin.layout title="Cadastrar Empresa">
     <div class="page-wrapper">
-        <div class="content container-fluid" style="padding: 3%">
+        <div class="content container-fluid" style="padding: 5%">
 
             <!-- Modal de boas-vindas -->
             <div class="modal fade" id="welcomeModal" tabindex="-1" aria-hidden="true">
