@@ -333,10 +333,31 @@
             padding: 10%;
             transition: margin-left 0.3s ease;
         }
+
+            .sidebar-toggle {
+            background: #00bcd4;
+            color: white;
+            border-radius: 8px;
+            padding: 6px 10px;
+            z-index: 2000;
+        }
+
+        /* Ajusta o conteúdo quando sidebar aparece no mobile */
+        @media (max-width: 768px) {
+            .content.with-sidebar {
+                margin-left: 280px;
+                transition: margin-left 0.3s ease;
+            }
+        }
     </style>
 </head>
 
 <body>
+
+    <button class="sidebar-toggle d-md-none btn btn-link position-fixed top-0 start-0 m-2 z-1050">
+        <i class="fas fa-bars fa-lg"></i>
+    </button>
+    
     <div class="sidebar" id="sidebar">
         <div class="sidebar-inner slimscroll">
             <div id="sidebar-menu" class="sidebar-menu">
@@ -707,6 +728,14 @@
         $(document).ready(function() {
             // Função para verificar status da empresa será chamada aqui
             // quando necessário, mantendo a compatibilidade
+        });
+
+           document.addEventListener('DOMContentLoaded', function() {
+            // Toggle Sidebar no Mobile
+            $('.sidebar-toggle').on('click', function() {
+                $('#sidebar').toggleClass('mobile-active');
+                $('#main-content').toggleClass('with-sidebar');
+            });
         });
     </script>
 </body>
