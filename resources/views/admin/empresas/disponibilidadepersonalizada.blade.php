@@ -1,6 +1,6 @@
 <x-admin.layout title="Serviços">
     <div class="page-wrapper">
-        <div class="content container-fluid">
+        <div class="content container-fluid" style="padding: 5%">
 
             <x-header.titulo pageTitle="Serviços" />
             <x-alert />

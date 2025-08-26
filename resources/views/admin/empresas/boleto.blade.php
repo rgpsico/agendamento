@@ -1,6 +1,6 @@
 <x-admin.layout title="Pagamento de Boleto">
     <div class="page-wrapper">
-        <div class="content container-fluid">
+        <div class="content container-fluid" style="padding: 5%">
             <!-- Page Header -->
             <x-header.titulo pageTitle="Pagamento de Boleto" />
             <!-- /Page Header -->
