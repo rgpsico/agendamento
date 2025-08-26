@@ -365,7 +365,8 @@
                         </li>
                     @endisset
 
-                    @isset(Auth::user()->empresa->user_id)
+                    
+                    @if (Auth::user()->isAdmin)
                         <li class="submenu menu-item" data-delay="0.3">
                             <a href="#" class="submenu-toggle">
                                 <i class="fas fa-layer-group"></i>
