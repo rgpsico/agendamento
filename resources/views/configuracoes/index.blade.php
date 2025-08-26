@@ -1,6 +1,6 @@
 <x-admin.layout title="Configurações">
     <div class="page-wrapper">
-        <div class="content container-fluid">
+        <div class="content container-fluid" style="padding: 5%">
             <h3 class="mb-4">Configurações do Sistema</h3>
 
             @if(session('success'))
