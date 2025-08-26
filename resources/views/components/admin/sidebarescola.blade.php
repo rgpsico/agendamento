@@ -245,7 +245,7 @@
     .sidebar {
         color: #fff;
         border-radius: 22px 0 0 22px;
-        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        box-shadow: 0 8px 3px 0 rgba(31, 38, 135, 0.37);
         overflow: hidden;
         min-height: 100vh;
     }
@@ -257,8 +257,8 @@
     .sidebar-menu ul li a:hover, .sidebar-menu ul li.active > a {
         background: rgba(46, 134, 222, 0.18);
         color: #00d2ff !important;
-        box-shadow: 0 2px 12px 0 rgba(0,210,255,0.15);
-        text-shadow: 0 0 8px #00d2ff66;
+        box-shadow: 0 2px 1px 0 rgba(0,210,255,0.15);
+        text-shadow: 0 0 1px #00d2ff66;
     }
     .sidebar-menu .menu-title span {
         color: #00d2ff;
@@ -276,14 +276,14 @@
     function animateGradient() {
         gradStep += 0.5;
         const angle = 135 + 45 * Math.sin(gradStep/20);
-        sidebar.style.background = `linear-gradient(${angle}deg, #1e3c72 0%, #2a5298 50%, #00d2ff 100%)`;
+        sidebar.style.background = `linear-gradient(${angle}deg, #1e3c72 0%, #2a5298 5%, #00d2ff 100%)`;
         requestAnimationFrame(animateGradient);
     }
     animateGradient();
 
     // Brilho pulsante
     gsap.to(sidebar, {
-        boxShadow: "0 0 60px 10px #00d2ff, 0 0 0 0 #2a5298",
+        boxShadow: "0 0 6px 1px #00d2ff, 0 0 0 0 #2a5298",
         duration: 2,
         repeat: -1,
         yoyo: true,
