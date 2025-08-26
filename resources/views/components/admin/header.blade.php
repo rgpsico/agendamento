@@ -37,7 +37,11 @@
     <script src="{{ asset('admin/js/jquery-3.6.3.min.js') }}"></script>
     {{-- <script src="{{ asset('admin/js/jquery-ui.min.js') }}"></script> --}}
 
-
+<style>
+    .container-fluid{
+        padding: 5% !important;
+    }
+    </style>
 
 </head>
 
@@ -222,4 +226,3 @@
         {{-- <x-admin.sidebar/> --}}
         <x-admin.sidebarescola />
         <!-- /Sidebar -->
-{{ dd("aaaa") }}
