@@ -263,7 +263,8 @@
     </div>
 
     <div class="page-wrapper">
-        <div class="content container-fluid">
+        <div class="content container-fluid" style="padding: 3%">
+            
 
             @include('admin.empresas._partials.header')
 
