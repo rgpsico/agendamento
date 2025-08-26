@@ -20,7 +20,7 @@
                                             <th>Titulo</th>
                                             <th>Descricao</th>
                                             <th>Preço</th>
-                                            <th>Tempo de Aulasss</th>
+                                            <th>Tempo de Aula</th>
                                            <th class="text-center">Ação</th>
                                         </tr>
                                     </thead>
