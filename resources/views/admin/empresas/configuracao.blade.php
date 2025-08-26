@@ -1,6 +1,6 @@
 <x-admin.layout title="Configurar Métodos de Pagamento">
     <div class="page-wrapper">
-        <div class="content container-fluid">
+        <div class="content container-fluid" style="padding: 5%">
             <!-- Page Header -->
             <x-header.titulo
                 pageTitle="{{ isset($paymentConfig) ? 'Editar Configurações de Pagamento' : 'Configurar Métodos de Pagamento' }}" />
