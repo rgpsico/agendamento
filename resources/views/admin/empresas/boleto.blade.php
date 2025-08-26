@@ -449,7 +449,7 @@
             socket.on('enviarpedidoentregadores', function(recebendopagamento) {
                 console.log('Pagamento recebido:', recebendopagamento.payment.id);
                 $("#boleto-gerado-fim").val(recebendopagamento.payment.id);
-
+                console.log('Tipo de evento:', recebendopagamento.event);
                 if (recebendopagamento.event == "PAYMENT_RECEIVED") {
                     if ($('#boleto-gerado-inicio').val() == recebendopagamento.payment.id) {
                         console.log("PAGAMENTO CONFIRMADO!");
