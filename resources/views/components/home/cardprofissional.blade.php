@@ -271,10 +271,10 @@
         </div>
     </div>
 </div>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.6/jquery.inputmask.min.js"></script>
 <script>
     function handleImageError(imageElement) {
         var defaultImage = 'https://picsum.photos/536/354';
-        $(imageElement).attr('src', defaultImage).css('opacity', '0').fadeTo(300, 1);
+       // $(imageElement).attr('src', defaultImage).css('opacity', '0').fadeTo(300, 1);
     }
 </script>
