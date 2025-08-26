@@ -379,7 +379,7 @@
                             </a>
                             <ul>
                                 <li><a href="{{ route('admin.servico.index') }}">Listar Serviços</a></li>
-                                <li><a href="{{ route('admin.servico.create') }}">Cadastrar Serviço</a></li>
+                              
                             </ul>
                         </li>
                     @endisset
