@@ -240,7 +240,105 @@
                             </ul>
                         </li>
 
+<!-- Adicione este CSS dentro da tag <style> existente ou crie uma nova -->
+<style>
+    .sidebar {
+        color: #fff;
+        border-radius: 22px 0 0 22px;
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        overflow: hidden;
+        min-height: 100vh;
+    }
+    .sidebar-menu ul li a {
+        color: #fff !important;
+        border-radius: 8px;
+        transition: background 0.3s, color 0.3s, box-shadow 0.3s;
+    }
+    .sidebar-menu ul li a:hover, .sidebar-menu ul li.active > a {
+        background: rgba(46, 134, 222, 0.18);
+        color: #00d2ff !important;
+        box-shadow: 0 2px 12px 0 rgba(0,210,255,0.15);
+        text-shadow: 0 0 8px #00d2ff66;
+    }
+    .sidebar-menu .menu-title span {
+        color: #00d2ff;
+        font-weight: bold;
+        letter-spacing: 1px;
+    }
+</style>
 
+<!-- Mantenha apenas UM script GSAP, assim: -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+    const sidebar = document.getElementById('sidebar');
+    // Gradiente animado
+    let gradStep = 0;
+    function animateGradient() {
+        gradStep += 0.5;
+        const angle = 135 + 45 * Math.sin(gradStep/20);
+        sidebar.style.background = `linear-gradient(${angle}deg, #1e3c72 0%, #2a5298 50%, #00d2ff 100%)`;
+        requestAnimationFrame(animateGradient);
+    }
+    animateGradient();
+
+    // Brilho pulsante
+    gsap.to(sidebar, {
+        boxShadow: "0 0 60px 10px #00d2ff, 0 0 0 0 #2a5298",
+        duration: 2,
+        repeat: -1,
+        yoyo: true,
+        ease: "power1.inOut"
+    });
+</script><!-- Adicione este CSS dentro da tag <style> existente ou crie uma nova -->
+<style>
+    .sidebar {
+        color: #fff;
+        border-radius: 22px 0 0 22px;
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        overflow: hidden;
+        min-height: 100vh;
+    }
+    .sidebar-menu ul li a {
+        color: #fff !important;
+        border-radius: 8px;
+        transition: background 0.3s, color 0.3s, box-shadow 0.3s;
+    }
+    .sidebar-menu ul li a:hover, .sidebar-menu ul li.active > a {
+        background: rgba(46, 134, 222, 0.18);
+        color: #00d2ff !important;
+        box-shadow: 0 2px 12px 0 rgba(0,210,255,0.15);
+        text-shadow: 0 0 8px #00d2ff66;
+    }
+    .sidebar-menu .menu-title span {
+        color: #00d2ff;
+        font-weight: bold;
+        letter-spacing: 1px;
+    }
+</style>
+
+<!-- Mantenha apenas UM script GSAP, assim: -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+    const sidebar = document.getElementById('sidebar');
+    // Gradiente animado
+    let gradStep = 0;
+    function animateGradient() {
+        gradStep += 0.5;
+        const angle = 135 + 45 * Math.sin(gradStep/20);
+        sidebar.style.background = `linear-gradient(${angle}deg, #1e3c72 0%, #2a5298 50%, #00d2ff 100%)`;
+        requestAnimationFrame(animateGradient);
+    }
+    animateGradient();
+
+    // Brilho pulsante
+    gsap.to(sidebar, {
+        boxShadow: "0 0 60px 10px #00d2ff, 0 0 0 0 #2a5298",
+        duration: 2,
+        repeat: -1,
+        yoyo: true,
+        ease: "power1.inOut"
+    });
+</script>
 
                         
                     @endif
@@ -253,8 +351,72 @@
 
 
     <!-- Script para verificar o status da empresa e bloquear a sidebar -->
+<!-- GSAP CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+    // Aplica gradiente azul animado na sidebar
+    const sidebar = document.getElementById('sidebar');
+    sidebar.style.background = 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)';
+    sidebar.style.transition = 'background 0.5s';
+
+    // Animação de brilho azul usando GSAP
+    gsap.to(sidebar, {
+        boxShadow: "0 0 40px 10px #2a5298",
+        duration: 2,
+        repeat: -1,
+        yoyo: true,
+        ease: "power1.inOut"
+    });
+</script><!-- GSAP CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+    // Aplica gradiente azul animado na sidebar
+    const sidebar = document.getElementById('sidebar');
+    sidebar.style.background = 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)';
+    sidebar.style.transition = 'background 0.5s';
+
+    // Animação de brilho azul usando GSAP
+    gsap.to(sidebar, {
+        boxShadow: "0 0 40px 10px #2a5298",
+        duration: 2,
+        repeat: -1,
+        yoyo: true,
+        ease: "power1.inOut"
+    });
+</script><!-- GSAP CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+    // Aplica gradiente azul animado na sidebar
+    const sidebar = document.getElementById('sidebar');
+    sidebar.style.background = 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)';
+    sidebar.style.transition = 'background 0.5s';
+
+    // Animação de brilho azul usando GSAP
+    gsap.to(sidebar, {
+        boxShadow: "0 0 40px 10px #2a5298",
+        duration: 2,
+        repeat: -1,
+        yoyo: true,
+        ease: "power1.inOut"
+    });
+</script><!-- GSAP CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+    // Aplica gradiente azul animado na sidebar
+    const sidebar = document.getElementById('sidebar');
+    sidebar.style.background = 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)';
+    sidebar.style.transition = 'background 0.5s';
+
+    // Animação de brilho azul usando GSAP
+    gsap.to(sidebar, {
+        boxShadow: "0 0 40px 10px #2a5298",
+        duration: 2,
+        repeat: -1,
+        yoyo: true,
+        ease: "power1.inOut"
+    });
+</script>
 
 
-    
 
 </body>
