@@ -348,22 +348,7 @@
                         </a>
                     </li>
 
-                    @isset(Auth::user()->empresa->user_id)
-                        <li class="submenu menu-item" data-delay="0.2">
-                            <a href="#" class="submenu-toggle">
-                                <i class="fas fa-globe"></i>
-                                <span>Site</span>
-                                <span class="menu-arrow"></span>
-                            </a>
-                            <ul>
-                                <li><a href="{{ route('admin.site.lista') }}">Lista</a></li>
-                                <li><a href="{{ route('admin.site.configuracoes') }}">Configurações do Site</a></li>
-                                <li><a href="{{ route('admin.site.servicos.index') }}">Serviços</a></li>
-                                <li><a href="{{ route('admin.site.depoimentos.index') }}">Depoimentos</a></li>
-                                <li><a href="{{ route('admin.site.contatos.index') }}">Contatos</a></li>
-                            </ul>
-                        </li>
-                    @endisset
+                   
 
                     
                     @if (Auth::user()->isAdmin)
@@ -408,6 +393,23 @@
                                 <li><a href="{{ route('empresa.horarios.auto') }}">Automáticos</a></li>
                             </ul>
                         </li>
+
+                         @isset(Auth::user()->empresa->user_id)
+                        <li class="submenu menu-item" data-delay="0.2">
+                            <a href="#" class="submenu-toggle">
+                                <i class="fas fa-globe"></i>
+                                <span>Site</span>
+                                <span class="menu-arrow"></span>
+                            </a>
+                            <ul>
+                                <li><a href="{{ route('admin.site.lista') }}">Lista</a></li>
+                                <li><a href="{{ route('admin.site.configuracoes') }}">Configurações do Site</a></li>
+                                <li><a href="{{ route('admin.site.servicos.index') }}">Serviços</a></li>
+                                <li><a href="{{ route('admin.site.depoimentos.index') }}">Depoimentos</a></li>
+                                <li><a href="{{ route('admin.site.contatos.index') }}">Contatos</a></li>
+                            </ul>
+                        </li>
+                    @endisset
 
                         <!-- Alunos -->
                         <li class="menu-item" data-delay="0.6">
