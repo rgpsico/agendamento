@@ -222,3 +222,4 @@
         {{-- <x-admin.sidebar/> --}}
         <x-admin.sidebarescola />
         <!-- /Sidebar -->
+{{ dd("aaaa") }}
