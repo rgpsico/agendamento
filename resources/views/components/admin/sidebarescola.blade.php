@@ -377,10 +377,7 @@
 </head>
 
 <body>
-    <!-- Botão Toggle para Mobile -->
-    <button class="sidebar-toggle d-md-none" id="sidebarToggle">
-        <i class="fas fa-bars"></i>
-    </button>
+  
 
     <!-- Overlay para fechar o menu no mobile -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
