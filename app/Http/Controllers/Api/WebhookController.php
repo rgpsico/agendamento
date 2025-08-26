@@ -122,7 +122,10 @@ class WebhookController extends Controller
         }
 
 
-        if ($payload['event'] === 'PAYMENT_RECEIVED' || $payload['payment']['billingType'] === 'BOLETO') {
+          if($payload['event'] === 'PAYMENT_RECEIVED' && ( $payload['payment']['billingType'] === 'PIX' 
+                                                        || $payload['payment']['billingType'] === 'BOLETO')
+                                                        )
+            {
           
             $payment = $payload['payment'];
             $customerId = $payment['customer']; // Ex.: cus_000006746814
