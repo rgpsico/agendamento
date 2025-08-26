@@ -1,9 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Font Awesome -->
+    <!-- Outros links e scripts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -15,7 +11,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- GSAP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-
+    
     <style>
         /* Modern Sidebar Styles - Beach Sports Theme */
         .sidebar {
@@ -113,7 +109,7 @@
             display: flex;
             align-items: center;
             padding: 12px 15px;
-            color: rgba(9, 12, 14, 0.8);
+      color: rgba(9, 12, 14, 0.8);
             text-decoration: none;
             border-radius: 12px;
             font-weight: 500;
@@ -174,11 +170,12 @@
         .sidebar-menu li a span {
             flex: 1;
             font-size: 14px;
-            color: rgba(9, 12, 14, 0.8);
+              color: rgba(9, 12, 14, 0.8);
         }
 
-        .sidebar-menu li i {
-            color: rgba(9, 12, 14, 0.8);
+        
+        .sidebar-menu li i {         
+              color: rgba(9, 12, 14, 0.8);
         }
 
         /* Menu Arrow */
@@ -204,6 +201,7 @@
             max-height: 0;
             overflow: hidden;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            /* background: rgba(255, 255, 255, 0.15); */
             margin: 5px 0;
             border-radius: 8px;
             backdrop-filter: blur(10px);
@@ -285,15 +283,6 @@
             .sidebar.mobile-active {
                 transform: translateX(0);
             }
-
-            .content {
-                transform: translateX(0);
-                transition: transform 0.3s ease;
-            }
-
-            .content.with-sidebar {
-                transform: translateX(280px);
-            }
         }
 
         /* Loading Animation */
@@ -340,27 +329,16 @@
             50% { transform: scale(1.1); opacity: 0.8; }
         }
 
-        .content {
+        .content{        
             padding: 10%;
-            transition: transform 0.3s ease;
-        }
-
-        .sidebar-toggle {
-            background: #00bcd4;
-            color: white;
-            border-radius: 8px;
-            padding: 6px 10px;
-            z-index: 2000;
+            transition: margin-left 0.3s ease;
         }
     </style>
 </head>
-<body>
-    <button class="sidebar-toggle d-md-none btn btn-link position-fixed top-0 start-0 m-2">
-        <i class="fas fa-bars fa-lg"></i>
-    </button>
 
+<body>
     <div class="sidebar" id="sidebar">
-        <div class="sidebar-inner">
+        <div class="sidebar-inner slimscroll">
             <div id="sidebar-menu" class="sidebar-menu">
                 <ul>
                     <!-- Seção: Menu -->
@@ -369,11 +347,15 @@
                     <!-- Dashboard -->
                     <li class="menu-item" data-delay="0.1">
                         <a href="{{ route('cliente.dashboard') }}" class="pulse-icon">
-                            <i class="fas fa-home"></i>
+                            <i class="fe fe-home"></i> 
                             <span>Dashboard</span>
+                            {{-- <div class="notification-badge"></div> --}}
                         </a>
                     </li>
 
+                   
+
+                    
                     @if (Auth::user()->isAdmin)
                         <li class="submenu menu-item" data-delay="0.3">
                             <a href="#" class="submenu-toggle">
@@ -382,24 +364,27 @@
                                 <span class="menu-arrow"></span>
                             </a>
                             <ul>
-                                <li><a href="{{ route('site-templates.index') }}">Lista</a></li>
+                                <li><a href="{{ route('site-templates.index') }}">Lista</a></li>                            
                             </ul>
                         </li>
-                    @endif
+                    @endisset
 
                     @isset(Auth::user()->empresa->user_id)
                         <!-- Serviços -->
                         <li class="submenu menu-item" data-delay="0.4">
                             <a href="#" class="submenu-toggle">
-                                <i class="fas fa-activity"></i>
+                                <i class="fe fe-activity"></i>
                                 <span>Serviços</span>
                                 <span class="menu-arrow"></span>
                             </a>
                             <ul>
                                 <li><a href="{{ route('admin.servico.index') }}">Listar Serviços</a></li>
+                              
                             </ul>
                         </li>
+                    @endisset
 
+                    @isset(Auth::user()->empresa->user_id)
                         <!-- Horários -->
                         <li class="submenu menu-item" data-delay="0.5">
                             <a href="#" class="submenu-toggle">
@@ -414,7 +399,7 @@
                             </ul>
                         </li>
 
-                        <!-- Site -->
+                         @isset(Auth::user()->empresa->user_id)
                         <li class="submenu menu-item" data-delay="0.2">
                             <a href="#" class="submenu-toggle">
                                 <i class="fas fa-globe"></i>
@@ -429,11 +414,12 @@
                                 <li><a href="{{ route('admin.site.contatos.index') }}">Contatos</a></li>
                             </ul>
                         </li>
+                    @endisset
 
                         <!-- Alunos -->
                         <li class="menu-item" data-delay="0.6">
                             <a href="{{ route('alunos.index') }}">
-                                <i class="fas fa-users"></i>
+                                <i class="fe fe-users"></i>
                                 <span>Alunos</span>
                             </a>
                         </li>
@@ -442,7 +428,7 @@
                     <!-- Agenda -->
                     <li class="submenu menu-item" data-delay="0.7">
                         <a href="#" class="submenu-toggle">
-                            <i class="fas fa-calendar"></i>
+                            <i class="fe fe-calendar"></i>
                             <span>Agenda</span>
                             <span class="menu-arrow"></span>
                         </a>
@@ -456,7 +442,7 @@
                         <!-- Fotos -->
                         <li class="menu-item" data-delay="0.8">
                             <a href="{{ route('empresa.fotos', ['userId' => Auth::user()->id]) }}">
-                                <i class="fas fa-camera"></i>
+                                <i class="fe fe-camera"></i>
                                 <span>Fotos</span>
                             </a>
                         </li>
@@ -465,20 +451,20 @@
                     <!-- Dados Cadastrais -->
                     <li class="submenu menu-item" data-delay="0.9">
                         <a href="#" class="submenu-toggle">
-                            <i class="fas fa-file"></i>
+                            <i class="fe fe-file"></i>
                             <span>Dados Cadastrais</span>
                             <span class="menu-arrow"></span>
                         </a>
                         <ul>
                             <li>
                                 <a href="{{ route('empresa.configuracao', ['userId' => Auth::user()->id]) }}">
-                                    <i class="fas fa-briefcase"></i> <span>Empresa</span>
+                                    <i class="fe fe-briefcase"></i> <span> Empresa</span>
                                 </a>
                             </li>
                             @isset(Auth::user()->empresa->user_id)
                                 <li>
                                     <a href="{{ route('empresa.endereco', ['userId' => Auth::user()->id]) }}">
-                                        <i class="fas fa-map-pin"></i> <span>Endereço</span>
+                                        <i class="fe fe-map-pin"></i> <span> Endereço</span>
                                     </a>
                                 </li>
                                 <li><a href="{{ route('configuracoes.indexAdmin') }}">Sistema Geral</a></li>
@@ -486,8 +472,8 @@
                         </ul>
                     </li>
 
+                    <!-- Pagamentos -->
                     @isset(Auth::user()->empresa->user_id)
-                        <!-- Pagamentos -->
                         <li class="submenu menu-item" data-delay="1.0">
                             <a href="#" class="submenu-toggle">
                                 <i class="fas fa-credit-card"></i>
@@ -501,7 +487,6 @@
                             </ul>
                         </li>
 
-                        <!-- Integrações -->
                         <li class="submenu menu-item" data-delay="1.1">
                             <a href="#" class="submenu-toggle">
                                 <i class="fas fa-plug"></i>
@@ -546,7 +531,6 @@
                             </ul>
                         </li>
 
-                        <!-- Usuários -->
                         <li class="submenu menu-item" data-delay="1.4">
                             <a href="#" class="submenu-toggle">
                                 <i class="fas fa-user-cog"></i>
@@ -554,11 +538,11 @@
                                 <span class="menu-arrow"></span>
                             </a>
                             <ul>
-                                <li><a href="{{ route('admin.usuarios.index') }}">Usuários</a></li>
-                                <li><a href="{{ route('configuracoes.permissoes') }}">Permissões</a></li>
+                                <li><a href="{{ route('admin.usuarios.index') }}">Usuários</a></li>           
+                                <li><a href="{{ route('configuracoes.permissoes') }}">Permissões</a></li>                            
                             </ul>
                         </li>
-
+                        
                         <!-- Configurações -->
                         <li class="submenu menu-item" data-delay="1.5">
                             <a href="#" class="submenu-toggle">
@@ -580,29 +564,25 @@
         </div>
     </div>
 
-    <div class="content">
-        <h1>Conteúdo Principal</h1>
-        <p>Este é o conteúdo da página que se move quando a sidebar é exibida no mobile.</p>
-    </div>
-
     <script>
+        // Enhanced Sidebar Animations with GSAP
         document.addEventListener('DOMContentLoaded', function() {
             // GSAP Timeline for sidebar animations
             const tl = gsap.timeline();
 
             // Animate menu title
-            tl.fromTo('.menu-title',
+            tl.fromTo('.menu-title', 
                 { opacity: 0, x: -20 },
                 { opacity: 1, x: 0, duration: 0.6, ease: "power2.out" }
             );
 
             // Animate menu items with stagger
-            tl.fromTo('.menu-item',
+            tl.fromTo('.menu-item', 
                 { opacity: 0, x: -30 },
-                {
-                    opacity: 1,
-                    x: 0,
-                    duration: 0.5,
+                { 
+                    opacity: 1, 
+                    x: 0, 
+                    duration: 0.5, 
                     stagger: 0.1,
                     ease: "back.out(1.7)"
                 },
@@ -628,24 +608,28 @@
 
                 if (!isActive) {
                     $submenu.addClass('active');
-                    gsap.fromTo($submenuList[0],
+                    
+                    // Animate submenu opening
+                    gsap.fromTo($submenuList[0], 
                         { maxHeight: 0, opacity: 0 },
-                        {
-                            maxHeight: 500,
+                        { 
+                            maxHeight: 500, 
                             opacity: 1,
-                            duration: 0.4,
-                            ease: "power2.out"
+                            duration: 0.4, 
+                            ease: "power2.out" 
                         }
                     );
-                    gsap.fromTo($submenuList.find('li'),
+
+                    // Animate submenu items
+                    gsap.fromTo($submenuList.find('li'), 
                         { opacity: 0, x: -20 },
-                        {
-                            opacity: 1,
-                            x: 0,
-                            duration: 0.3,
+                        { 
+                            opacity: 1, 
+                            x: 0, 
+                            duration: 0.3, 
                             stagger: 0.05,
                             delay: 0.1,
-                            ease: "power2.out"
+                            ease: "power2.out" 
                         }
                     );
                 } else {
@@ -664,6 +648,8 @@
             $('.sidebar-menu a').each(function() {
                 if ($(this).attr('href') === currentUrl) {
                     $(this).addClass('active');
+                    
+                    // If it's in a submenu, open the parent
                     const $parentSubmenu = $(this).closest('.submenu');
                     if ($parentSubmenu.length) {
                         $parentSubmenu.addClass('active');
@@ -689,6 +675,14 @@
                 }
             );
 
+            // Loading state simulation
+            function showLoadingState() {
+                $('.menu-item').addClass('loading-item');
+                setTimeout(() => {
+                    $('.menu-item').removeClass('loading-item');
+                }, 2000);
+            }
+
             // Notification animation
             gsap.to('.notification-badge', {
                 scale: 1.2,
@@ -698,12 +692,21 @@
                 ease: "power2.inOut"
             });
 
-            // Toggle Sidebar no Mobile
-            $('.sidebar-toggle').on('click', function() {
-                $('#sidebar').toggleClass('mobile-active');
-                $('.content').toggleClass('with-sidebar');
-            });
+            // Responsive sidebar toggle
+            function toggleMobileSidebar() {
+                if (window.innerWidth <= 768) {
+                    $('#sidebar').toggleClass('mobile-active');
+                }
+            }
+
+            // Add mobile toggle button if needed
+            $(document).on('click', '.sidebar-toggle', toggleMobileSidebar);
+        });
+
+        // Company Status Check (mantendo a funcionalidade original)
+        $(document).ready(function() {
+            // Função para verificar status da empresa será chamada aqui
+            // quando necessário, mantendo a compatibilidade
         });
     </script>
 </body>
-</html>
