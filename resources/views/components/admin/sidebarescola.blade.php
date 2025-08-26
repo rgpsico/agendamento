@@ -330,7 +330,7 @@
         }
 
         .content{        
-            padding: 20px;
+            padding: 10%;
             transition: margin-left 0.3s ease;
         }
     </style>
