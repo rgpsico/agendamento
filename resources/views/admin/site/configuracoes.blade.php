@@ -1,6 +1,6 @@
 <x-admin.layout title="Configurações do Site">
     <div class="page-wrapper">
-        <div class="content container-fluid">
+        <div class="content container-fluid" style="padding: 5%">
 
             <div class="page-header">
                 <div class="row">
@@ -8,7 +8,7 @@
                         <h3 class="page-title">Gerenciar Site</h3>
                         <ul class="breadcrumb">
                             <li class="breadcrumb-item"><a href="">Admin</a></li>
-                            <li class="breadcrumb-item active">55rft t t t t t t t t t t t t t t sss</li>
+                            <li class="breadcrumb-item active">Site</li>
                         </ul>
                     </div>
                 </div>
