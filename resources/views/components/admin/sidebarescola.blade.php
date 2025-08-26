@@ -377,7 +377,7 @@
 </head>
 
 <body>
-  
+    <!-- Botão Toggle para Mobile -->
 
     <!-- Overlay para fechar o menu no mobile -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
