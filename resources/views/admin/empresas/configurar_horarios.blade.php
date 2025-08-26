@@ -1,7 +1,7 @@
 <x-admin.layout title="Configurar Horários">
     <div class="page-wrapper">
         <div class="content container-fluid">
-
+            {{ dd("aaaa") }}
             <x-header.titulo pageTitle="Horários para {{ $servico->nome }}"/>
             <x-alert/>
 
