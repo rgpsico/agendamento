@@ -217,7 +217,7 @@
                     <h5 class="modal-title" id="modalBoasVindasLabel">
                         <i class="fas fa-sparkles me-2"></i>Bem-vindo(a)!
                     </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    <button type="button" class="btn-close" id="fecharModalBoasVindas" data-bs-dismiss="modal" aria-label="Fechar"></button>
                 </div>
                 <div class="modal-body">
                     <div class="welcome-icon">
