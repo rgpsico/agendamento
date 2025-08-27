@@ -98,7 +98,7 @@
                                             :value="$model->nome ?? ''" />
                                     </div>
                                     <div class="col-md-6">
-                                        <x-text-input name="email" size="30" label="Email" :value="$model->user->email ?? 'rgyr2010@hotmail.com'" />
+                                        <x-text-input name="email" size="30" label="Email" :value="$model->user->email ?? ''" />
                                     </div>
                                     <div class="col-md-6">
                                         <x-select-modalidade label="Modalidade" :model="$model" :modalidades="$modalidades" />
