@@ -251,13 +251,28 @@
 }
 </style>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.6/jquery.inputmask.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Aplica a máscara de telefone
+   
+    function handleImageError (imageElement) {
+        var defaultImage = 'https://picsum.photos/536/354';
+        $(imageElement).attr('src', defaultImage).css('opacity', '0').fadeTo(300, 1);
+    }
+
+       //  $('.phone-input').inputmask('(99) 99999-9999');
+    });
+</script>
+
 <div class="card">
     <div class="card-body">
         <div class="doctor-widget">
             <div class="doc-info-left">
                 <div class="doctor-img">
                     <a href="{{ route('home.show', ['id' => $value->user_id]) }}">                        
-                        <img src="{{ asset('avatar/' . $value->avatar) }}" class="img-fluid" onerror="handleImageError(this)" alt="Usuario Image">
+                        <img src="{{ asset('avatar/' . $value->avatar) }}" class="img-fluid" alt="Usuario Image">
                     </a>
                 </div>              
                 <div class="doc-info-cont">
@@ -271,10 +286,3 @@
         </div>
     </div>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.6/jquery.inputmask.min.js"></script>
-<script>
-    function handleImageError(imageElement) {
-        var defaultImage = 'https://picsum.photos/536/354';
-       // $(imageElement).attr('src', defaultImage).css('opacity', '0').fadeTo(300, 1);
-    }
-</script>

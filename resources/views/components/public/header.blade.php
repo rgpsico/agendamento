@@ -160,6 +160,8 @@
                     const password = document.getElementById(passwordId);
                     const confirmPassword = document.getElementById(confirmPasswordId);
 
+                    if (!password || !confirmPassword) return; // ← evita o erro
+
                     function checkMatch() {
                         if (password.value !== confirmPassword.value) {
                             confirmPassword.setCustomValidity('As senhas não coincidem');
@@ -171,6 +173,7 @@
                     password.addEventListener('input', checkMatch);
                     confirmPassword.addEventListener('input', checkMatch);
                 }
+
 
                 // Aplicar validação para ambos os formulários
                 validatePasswordMatch('alunoSenha', 'alunoConfirmarSenha');
