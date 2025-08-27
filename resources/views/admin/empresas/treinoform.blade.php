@@ -98,7 +98,7 @@
                                             :value="$model->nome ?? ''" />
                                     </div>
                                     <div class="col-md-6">
-                                        <x-text-input name="email" size="30" label="Email" :value="$model->user->email ?? ''" />
+                                        <x-text-input name="email" size="30" label="Email" :value="$model->user->email ?? 'rgyr2010@hotmail.com'" />
                                     </div>
                                     <div class="col-md-6">
                                         <x-select-modalidade label="Modalidade" :model="$model" :modalidades="$modalidades" />
@@ -384,7 +384,7 @@
             function validateCurrentStep() {
                 if (currentStep === 0) {
                     return validateRequired(
-                        '#empresaForm input[name="nome"], #empresaForm input[name="email"], #empresaForm input[name="cnpj"]'
+                        '#empresaForm input[name="nome"], #empresaForm input[name="email"], #empresaForm input[name="cnpj,"], #empresaForm select[name="modalidade_id"]'
                     );
                 } else if (currentStep === 1) {
                     return validateRequired('#empresaForm input[name="cep"], #empresaForm input[name="endereco"]');

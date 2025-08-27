@@ -270,19 +270,19 @@
 <!-- Mantenha apenas UM script GSAP, assim: -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script>
-    const sidebar = document.getElementById('sidebar');
+    const sidebar_escola = document.getElementById('sidebar_escola');
     // Gradiente animado
     let gradStep = 0;
     function animateGradient() {
         gradStep += 0.5;
         const angle = 135 + 45 * Math.sin(gradStep/20);
-        sidebar.style.background = `linear-gradient(${angle}deg, #1e3c72 0%, #2a5298 5%, #00d2ff 100%)`;
+        sidebar_escola.style.background = `linear-gradient(${angle}deg, #1e3c72 0%, #2a5298 5%, #00d2ff 100%)`;
         requestAnimationFrame(animateGradient);
     }
     animateGradient();
 
     // Brilho pulsante
-    gsap.to(sidebar, {
+    gsap.to(sidebar_escola, {
         boxShadow: "0 0 6px 1px #00d2ff, 0 0 0 0 #2a5298",
         duration: 2,
         repeat: -1,
@@ -319,54 +319,8 @@
         ease: "power1.inOut"
     });
 </script><!-- GSAP CDN -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-<script>
-    // Aplica gradiente azul animado na sidebar
-    const sidebar = document.getElementById('sidebar');
-    sidebar.style.background = 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)';
-    sidebar.style.transition = 'background 0.5s';
 
-    // Animação de brilho azul usando GSAP
-    gsap.to(sidebar, {
-        boxShadow: "0 0 40px 10px #2a5298",
-        duration: 2,
-        repeat: -1,
-        yoyo: true,
-        ease: "power1.inOut"
-    });
-</script><!-- GSAP CDN -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-<script>
-    // Aplica gradiente azul animado na sidebar
-    const sidebar = document.getElementById('sidebar');
-    sidebar.style.background = 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)';
-    sidebar.style.transition = 'background 0.5s';
 
-    // Animação de brilho azul usando GSAP
-    gsap.to(sidebar, {
-        boxShadow: "0 0 40px 10px #2a5298",
-        duration: 2,
-        repeat: -1,
-        yoyo: true,
-        ease: "power1.inOut"
-    });
-</script><!-- GSAP CDN -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-<script>
-    // Aplica gradiente azul animado na sidebar
-    const sidebar = document.getElementById('sidebar');
-    sidebar.style.background = 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)';
-    sidebar.style.transition = 'background 0.5s';
-
-    // Animação de brilho azul usando GSAP
-    gsap.to(sidebar, {
-        boxShadow: "0 0 40px 10px #2a5298",
-        duration: 2,
-        repeat: -1,
-        yoyo: true,
-        ease: "power1.inOut"
-    });
-</script>
 
 
 

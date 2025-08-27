@@ -279,7 +279,7 @@
                         $('#loading-customer').hide();
                         $('#btn-criar-customer').prop('disabled', false);
 
-                        let errorMessage = 'Erro ao criar ID Asaas';
+                        let errorMessage = 'Erro ao criar ID Asaas criarCustomerAsaas';
 
                         if (xhr.responseJSON) {
                             if (xhr.responseJSON.message) {
@@ -289,7 +289,7 @@
                             }
                         }
 
-                        console.error('Erro detalhado:', xhr.responseText);
+                        console.error('Erro detalhado criarCustomerAsaas:', xhr.responseText);
 
                         Swal.fire({
                             icon: 'error',
@@ -347,7 +347,7 @@
                             }
                         }
 
-                        console.error('Erro detalhado:', xhr.responseText);
+                        console.error('Erro detalhado criarChavePix:', xhr.responseText);
 
                         Swal.fire({
                             icon: 'error',

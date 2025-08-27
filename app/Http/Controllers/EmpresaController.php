@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfessorStoreRequest;
+use App\Http\Requests\StoreEmpresaRequest;
 use App\Models\Agendamento;
 use App\Models\DiaDaSemana;
 use App\Models\Disponibilidade;
@@ -103,52 +104,30 @@ class EmpresaController extends Controller
         return view('admin.' . $this->view . '.' . $viewSuffix, $mergedData);
     }
 
-    public function store(Request $request)
+    public function store(StoreEmpresaRequest $request)
     {
         try {
-            // Valide tudo (ajuste as regras conforme seu cenário)
-            $validated = $request->validate([
-                // Empresa
-                'nome' => 'required|max:255',
-                'email' => 'required|email|max:255',
-                'descricao' => 'required',
-                'telefone' => 'required|max:20',
-                'cnpj' => 'required|max:18',
-                'valor_aula_de' => 'required|min:0',
-                'valor_aula_ate' => 'required|min:0',
-                'modalidade_id' => 'required|exists:modalidade,id',
-                'user_id' => 'required|exists:usuarios,id',
-                'avatar' => 'nullable|image|max:2048',
-                'banner' => 'nullable|image|max:2048',
-                // Endereço
-                'cep' => 'required',
-                'endereco' => 'required',
-                //  'numero' => 'required',
-                // 'bairro' => 'required',
-                'cidade' => 'required',
-                'estado' => 'required',
-                'uf' => 'required',
-                'pais' => 'required',
-            ]);
+            // Dados já validados pelo FormRequest
+            $validated = $request->validated();
 
-            // Salva a empresa
+            // Cria a empresa
             $empresa = Empresa::create([
-                'nome' => $validated['nome'],
-                'descricao' => $validated['descricao'],
-                'telefone' => $validated['telefone'],
-                'cnpj' => $validated['cnpj'],
+                'nome'          => $validated['nome'],
+                'descricao'     => $validated['descricao'],
+                'telefone'      => $validated['telefone'],
+                'cnpj'          => $validated['cnpj'],
                 'valor_aula_de' => $validated['valor_aula_de'],
-                'valor_aula_ate' => $validated['valor_aula_ate'],
+                'valor_aula_ate'=> $validated['valor_aula_ate'],
                 'modalidade_id' => $validated['modalidade_id'],
-                'user_id' => $validated['user_id'],
+                'user_id'       => $validated['user_id'],
             ]);
 
-            // Atualiza o email do usuário, se quiser
+            // Atualiza o email do usuário vinculado
             if ($empresa->user) {
                 $empresa->user->update(['email' => $validated['email']]);
             }
 
-            // Atualiza o professor para associar à empresa (se for necessário)
+            // Atualiza o professor para associar à empresa
             Professor::where('usuario_id', $validated['user_id'])->update([
                 'empresa_id' => $empresa->id
             ]);
@@ -169,29 +148,35 @@ class EmpresaController extends Controller
                 $empresa->update(['banners' => $filenameBanner]);
             }
 
-
-            // Salva o endereço da empresa (na tabela relacionada)
+            // Salva o endereço da empresa
             EmpresaEndereco::updateOrCreate(
                 ['empresa_id' => $empresa->id],
                 [
-                    'cep' => $validated['cep'],
-                    'endereco' => $validated['endereco'],
+                    'cep'     => $validated['cep'],
+                    'endereco'=> $validated['endereco'],
                     // 'numero' => $validated['numero'],
                     // 'bairro' => $validated['bairro'],
-                    'cidade' => $validated['cidade'],
-                    'estado' => $validated['estado'],
-                    'uf' => $validated['uf'],
-                    'pais' => $validated['pais'],
+                    'cidade'  => $validated['cidade'],
+                    'estado'  => $validated['estado'],
+                    'uf'      => $validated['uf'],
+                    'pais'    => $validated['pais'],
                 ]
             );
 
-            $criarServico = $this->criarServicoAutomatico($empresa->id, $validated['modalidade_id']);
+            // Cria serviço automático
+            $this->criarServicoAutomatico($empresa->id, $validated['modalidade_id']);
 
-            return redirect()->route('empresa.pagamento.boleto')->with('success', 'Empresa criada com sucesso!');
+            return redirect()
+                ->route('empresa.pagamento.boleto')
+                ->with('success', 'Empresa criada com sucesso!');
         } catch (\Exception $e) {
-            return redirect()->back()->withErrors(['error' => 'Erro ao criar empresa: ' . $e->getMessage()])->withInput();
+            return redirect()
+                ->back()
+                ->withErrors(['error' => 'Erro ao criar empresa: ' . $e->getMessage()])
+                ->withInput();
         }
     }
+
 
 
 
@@ -267,6 +252,7 @@ class EmpresaController extends Controller
 
     public function update(Request $request)
     {
+      
         // Validação dos dados
         $validatedData = $request->validate([
             'empresa_id' => 'required|exists:empresa,id',

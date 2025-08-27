@@ -43,6 +43,7 @@
     <script>
         const data = @json($chartData);
         console.log(data);
+        
         // Configurações padrão
         const chartOptions = {
             responsive: true,
