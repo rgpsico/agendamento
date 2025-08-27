@@ -1,43 +1,42 @@
 describe('Registro de Professor', () => {
     beforeEach(() => {
-        cy.visit('http://localhost:8000/agendamento'); // página inicial onde tem o botão de registrar
+        cy.visit('http://localhost:8000/agendamento');
     });
 
     it('deve registrar um professor com sucesso', () => {
-        // Abre o modal de registro
+        // Verifica se o modal de boas-vindas aparece
+        cy.get('#welcomeModal', { timeout: 5000 }).should('be.visible');
 
-        // cy.get('#welcomeModal').should('be.visible');
+        // Clica no botão de fechar o modal de boas-vindas
+        cy.get('#fecharModalBoasVindas').click();
 
-        // clica no botão de fechar
-        setTimeout(() => {
-            cy.get('#fecharModalBoasVindas').click();
+        // Garante que o modal foi fechado
+        cy.get('#welcomeModal').should('not.be.visible');
 
-            // garante que o modal foi fechado
-            //    cy.get('#modalBoasVindas').should('not.be.visible');
+        // Clica no botão que abre o modal de registro
+        cy.get('[data-bs-target="#registerModal"]', { timeout: 5000 }).click();
 
-            cy.get('#registerModal').click();
-            cy.get('#professor-tab').click();
-        }, 1000);
+        // Verifica se o modal de registro está visível
+        cy.get('#registerModal', { timeout: 5000 }).should('be.visible');
 
-        setTimeout(() => {
-            // garante que o modal foi fechado
-            //    cy.get('#modalBoasVindas').should('not.be.visible');
+        // Clica na aba de professor
+        cy.get('#professor-tab', { timeout: 5000 }).should('be.visible').click();
 
-            cy.get('#professor-tab').click();
-        }, 2000);
+        // Preenche o formulário
+        cy.get('#professorNome').type('Professor Teste');
+        cy.get('#professorEmail').type('professor.teste@example.com');
+        cy.get('#professorSenha').type('123456');
 
-        // cy.get('#professorNome').type('Professor Teste');
-        // cy.get('#professorEmail').type('professor.teste@example.com');
-        // cy.get('#professorSenha').type('123456');
-        // cy.get('form').submit();
+        // Submete o formulário
+        cy.get('#professorForm').submit(); // Substitua '#professorForm' pelo ID real do formulário
 
-        // // Verifica se o modal de boas-vindas aparece
-        // cy.contains('Bem-vindo!').should('be.visible');
+        // Verifica se o modal de boas-vindas aparece após o registro
+        cy.contains('Bem-vindo!').should('be.visible');
 
-        // // Clica no botão que fecha o modal
-        // cy.get('[data-bs-dismiss="modal"]').click();
+        // Clica no botão que fecha o modal
+        cy.get('[data-bs-dismiss="modal"]').click();
 
-        // // Verifica se o modal não está mais visível
-        // cy.get('#modalBoasVindas').should('not.be.visible');
+        // Verifica se o modal não está mais visível
+        cy.get('#modalBoasVindas').should('not.be.visible');
     });
 });
