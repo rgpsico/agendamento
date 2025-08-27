@@ -16,8 +16,8 @@
 <x-filterHome/>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<script>
-    $(document).on('click', ".buscar_empresa", function() {
+{{-- <script>
+    $(document).on('click', ".aaaa", function() {
         $('.listar_empresas').empty();
         
         // busca todos os checkboxes que foram marcados
@@ -113,6 +113,6 @@
             });
         });
 });
-  
+   --}}
 
 </script>

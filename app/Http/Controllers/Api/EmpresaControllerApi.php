@@ -17,22 +17,26 @@ class EmpresaControllerApi extends Controller
 
     public function search(Request $request)
     {
-        $tipos = $request->input('tipo');
+        $modalidades = $request->input('modalidades');
 
         $nome = $request->input('nome_empresa');
 
         $query = Empresa::with('modalidade', 'endereco', 'galeria', 'avaliacao');
 
-        if ($tipos) {
-            $tipos = explode(',', $tipos); // divide a string em um array
-            $query = $query->whereIn('modalidade_id', $tipos); // filtra por todos os tipos
+
+          $query = Empresa::with('modalidade', 'endereco', 'galeria', 'avaliacao')
+        ->where('status', 'ativo'); // ✅ só empresas ativas
+     
+        if ($modalidades) {
+            $modalidades = explode(',', $modalidades); 
+            $query = $query->whereIn('modalidade_id', $modalidades); 
         }
 
         if ($nome) {
             $query = $query->where('nome', 'like', "%{$nome}%"); // pesquisa por empresas cujo nome contém a string fornecida
         }
-
-        return $query->get();
+        
+           return $query->get();
     }
 
     public function verificarStatus($empresaId)

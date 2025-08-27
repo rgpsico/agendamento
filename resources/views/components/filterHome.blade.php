@@ -32,7 +32,7 @@
     </div>
    
         <div class="btn-search">
-            <button type="button" class="btn w-100 buscar_empresa" id="buscar_empresa">Buscar</button>
+            <button type="button" class="btn w-100 " >Buscar</button>
         </div>	
     </div>
 </div>
