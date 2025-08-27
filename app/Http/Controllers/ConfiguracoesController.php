@@ -40,14 +40,15 @@ class ConfiguracoesController extends Controller
         $config = ConfiguracaoGeral::first();
 
         return view('configuracoesadmin.index', [
-            'tipoAgendamento' => $config->agendamento_tipo ?? 'horarios',
-            'whatsappNumero' => $config->whatsapp_numero ?? '',
-            'loginImage' => $config->login_image ? asset('storage/' . $config->login_image) : null,
-            'registerImage' => $config->register_image ? asset('storage/' . $config->register_image) : null,
-            'homeMode' => $config->home_mode ?? 'carousel',
-            'carouselImages' => json_decode($config->carousel_images ?? '[]', true),
-            'sistemaTipo' => $config->sistema_tipo ?? 'passeio',
-        ]);
+        'tipoAgendamento' => optional($config)->agendamento_tipo ?? 'horarios',
+        'whatsappNumero' => optional($config)->whatsapp_numero ?? '',
+        'loginImage' => optional($config)->login_image ? asset('storage/' . $config->login_image) : null,
+        'registerImage' => optional($config)->register_image ? asset('storage/' . $config->register_image) : null,
+        'homeMode' => optional($config)->home_mode ?? 'carousel',
+        'carouselImages' => json_decode(optional($config)->carousel_images ?? '[]', true),
+        'sistemaTipo' => optional($config)->sistema_tipo ?? 'passeio',
+    ]);
+
     }
 
 

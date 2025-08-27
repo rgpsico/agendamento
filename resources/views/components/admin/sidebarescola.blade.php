@@ -143,7 +143,7 @@
                                     <i class="fe fe-briefcase"></i> <span> Empresa</span>
                                 </a>
                             </li>
-                            @isset(Auth::user()->empresa->user_id)
+                            @isset(Auth::user()->isAdmin)
                                 <li>
                                     <a href="{{ route('empresa.endereco', ['userId' => Auth::user()->id]) }}">
                                         <i class="fe fe-map-pin"></i> <span> Endereço</span>
@@ -185,6 +185,7 @@
                             </ul>
                         </li>
                     @endisset
+                   
                     @if (Auth::user()->isAdmin)
                         <!-- Gestão de Empresas -->
                         <li class="submenu">

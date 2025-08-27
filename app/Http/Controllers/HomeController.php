@@ -246,17 +246,21 @@ class HomeController extends Controller
     {
         $modalidade = Modalidade::all();
         $config = ConfiguracaoGeral::first();
+        
         return view(
             'public.registrar.login',
             [
                 'pageTitle' => $this->pageTitle,
                 'modalidade' => $modalidade,
                 'view' => $this->view,
-                'loginImage' => $config->login_image ? asset('storage/' . $config->login_image) : null,
+                'loginImage' => optional($config)->login_image 
+                    ? asset('storage/' . $config->login_image) 
+                    : null,
                 'route' => $this->route
             ]
         );
     }
+
 
     public function redirectToGoogle()
     {
