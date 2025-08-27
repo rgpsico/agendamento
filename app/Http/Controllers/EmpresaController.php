@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\FileUploadHelper;
 use App\Http\Requests\ProfessorStoreRequest;
 use App\Http\Requests\StoreEmpresaRequest;
 use App\Models\Agendamento;
@@ -16,6 +17,7 @@ use App\Models\Servicos;
 use App\Models\Usuario;
 use App\Models\Alunos;
 use App\Models\Feriado;
+use App\Services\ServicoService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -104,67 +106,40 @@ class EmpresaController extends Controller
         return view('admin.' . $this->view . '.' . $viewSuffix, $mergedData);
     }
 
-    public function store(StoreEmpresaRequest $request)
+    public function store(StoreEmpresaRequest $request, ServicoService $servicoService)
     {
         try {
             // Dados já validados pelo FormRequest
-            $validated = $request->validated();
-
-            // Cria a empresa
-            $empresa = Empresa::create([
-                'nome'          => $validated['nome'],
-                'descricao'     => $validated['descricao'],
-                'telefone'      => $validated['telefone'],
-                'cnpj'          => $validated['cnpj'],
-                'valor_aula_de' => $validated['valor_aula_de'],
-                'valor_aula_ate'=> $validated['valor_aula_ate'],
-                'modalidade_id' => $validated['modalidade_id'],
-                'user_id'       => $validated['user_id'],
-            ]);
-
-            // Atualiza o email do usuário vinculado
-            if ($empresa->user) {
-                $empresa->user->update(['email' => $validated['email']]);
-            }
+            $validated = $request->validated();       
+        
+             $CriarEmpresa = Empresa::createEmpresa($validated);
+    
+            if ($CriarEmpresa->user) {
+                $CriarEmpresa->user->update(['email' => $validated['email']]);            }
 
             // Atualiza o professor para associar à empresa
             Professor::where('usuario_id', $validated['user_id'])->update([
-                'empresa_id' => $empresa->id
+                'empresa_id' => $CriarEmpresa->id
             ]);
 
-            // Upload do avatar
-            if ($request->hasFile('avatar')) {
-                $file = $request->file('avatar');
-                $filename = time() . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('/avatar'), $filename);
-                $empresa->update(['avatar' => $filename]);
+           
+            $UploadDoavatar = FileUploadHelper::uploadFile($request, 'avatar', 'avatar');
+
+            if ($UploadDoavatar) {
+                $CriarEmpresa->update(['avatar' => $UploadDoavatar]);
             }
 
-            // Upload do banner
-            if ($request->hasFile('banner')) {
-                $file = $request->file('banner');
-                $filenameBanner = time() . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('/banner'), $filenameBanner);
-                $empresa->update(['banners' => $filenameBanner]);
+            $UploadDobanner = FileUploadHelper::uploadFile($request, 'banner', 'banner');
+            if ($UploadDobanner) {
+                $CriarEmpresa->update(['banners' => $UploadDobanner]);
             }
 
             // Salva o endereço da empresa
-            EmpresaEndereco::updateOrCreate(
-                ['empresa_id' => $empresa->id],
-                [
-                    'cep'     => $validated['cep'],
-                    'endereco'=> $validated['endereco'],
-                    // 'numero' => $validated['numero'],
-                    // 'bairro' => $validated['bairro'],
-                    'cidade'  => $validated['cidade'],
-                    'estado'  => $validated['estado'],
-                    'uf'      => $validated['uf'],
-                    'pais'    => $validated['pais'],
-                ]
-            );
+            EmpresaEndereco::createOrUpdateEndereco($CriarEmpresa->id, $validated);
 
             // Cria serviço automático
-            $this->criarServicoAutomatico($empresa->id, $validated['modalidade_id']);
+            
+             $servicoService->criarServicoAutomatico($CriarEmpresa->id, $validated['modalidade_id']);
 
             return redirect()
                 ->route('empresa.pagamento.boleto')

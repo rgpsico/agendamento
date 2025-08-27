@@ -24,8 +24,8 @@ class StoreEmpresaRequest extends FormRequest
             'valor_aula_ate' => 'required|numeric|min:0',
             'modalidade_id' => 'required|exists:modalidade,id',
             'user_id' => 'required|exists:usuarios,id',
-            'avatar' => 'nullable|image|max:2048',
-            'banner' => 'nullable|image|max:2048',
+            //'avatar' => 'nullable|image|max:2048',
+            //'banner' => 'nullable|image|max:2048',
             
             // Endereço
             'cep' => 'required',

@@ -83,4 +83,20 @@ class Empresa extends Model
     {
         return $this->hasMany(Professor::class, 'empresa_id', 'id');
     }
+
+     public static function createEmpresa(array $data)
+    {
+        return self::create([
+            'nome'          => $data['nome'],
+            'descricao'     => $data['descricao'],
+            'telefone'      => $data['telefone'],
+            'cnpj'          => $data['cnpj'],
+            'valor_aula_de' => $data['valor_aula_de'],
+            'valor_aula_ate'=> $data['valor_aula_ate'],
+            'modalidade_id' => $data['modalidade_id'],
+            'user_id'       => $data['user_id'],
+            'avatar'        => $data['avatar'] ?? 'avatar/default.png',
+            'banners'       => $data['banners'] ?? 'banner/default.jpg',
+        ]);
+    }
 }

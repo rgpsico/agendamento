@@ -24,4 +24,21 @@ class EmpresaEndereco extends Model
     {
         return $this->belongsTo(Empresa::class, 'empresa_id', 'id');
     }
+
+    public static function createOrUpdateEndereco(int $empresaId, array $data)
+    {
+        return self::updateOrCreate(
+            ['empresa_id' => $empresaId],
+            [
+                'cep'      => $data['cep'],
+                'endereco' => $data['endereco'],
+                // 'numero'  => $data['numero'] ?? null,
+                // 'bairro'  => $data['bairro'] ?? null,
+                'cidade'   => $data['cidade'],
+                'estado'   => $data['estado'],
+                'uf'       => $data['uf'],
+                'pais'     => $data['pais'],
+            ]
+        );
+    }
 }
