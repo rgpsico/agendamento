@@ -112,8 +112,9 @@ class EmpresaController extends Controller
         
              $CriarEmpresa = Empresa::createEmpresa($validated);
     
-            if ($CriarEmpresa->user) {
-                $CriarEmpresa->user->update(['email' => $validated['email']]);            }
+            // if ($CriarEmpresa->user) {
+            //     $CriarEmpresa->user->update(['email' => $validated['email']]);         
+            //    }
 
             // Atualiza o professor para associar à empresa
             Professor::where('usuario_id', $validated['user_id'])->update([
@@ -676,12 +677,16 @@ class EmpresaController extends Controller
     {
 
         $model = Empresa::where('user_id', $userId)->first();
+        $userId =  Usuario::find($userId);
+       $email_user = $userId->email;
+
         $modalidades = Modalidade::all();
         return view(
             'admin.empresas.treinoform',
             [
                 'pageTitle' =>  'Configuração',
                 'model' => $model,
+                'email_user' => $email_user,
                 'modalidades' => $modalidades
             ]
         );

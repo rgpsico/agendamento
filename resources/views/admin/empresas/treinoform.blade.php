@@ -11,6 +11,7 @@
                                 <i class="fas fa-star me-2"></i>
                                 Bem-vindo!
                             </h5>
+                           
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                                 aria-label="Close"></button>
                         </div>
@@ -98,7 +99,14 @@
                                             :value="$model->nome ?? ''" />
                                     </div>
                                     <div class="col-md-6">
-                                        <x-text-input name="email" size="30" label="Email" :value="$model->user->email ?? ''" />
+                                        <div class="form-group">
+                                             <label>Email</label>
+                                        <input type="text" id="email" disabled
+                                            class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
+                                            name="email" size="30"
+                                            value="{{ old('email', isset($email_user) ? $email_user : '') }}"
+                                            placeholder="E-mail" readonly>
+                                        </div>
                                     </div>
                                     <div class="col-md-6">
                                         <x-select-modalidade label="Modalidade" :model="$model" :modalidades="$modalidades" />
