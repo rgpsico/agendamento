@@ -16,7 +16,7 @@ class StoreEmpresaRequest extends FormRequest
         return [
             // Empresa
             'nome' => 'required|max:255',
-            'email' => 'required|email|max:255|unique:usuarios,email',
+       //     'email' => 'required|email|max:255|unique:usuarios,email',
             'descricao' => 'required',
             'telefone' => 'required|max:20',
             'cnpj' => 'required|max:18',
