@@ -18,6 +18,7 @@ use App\Models\Usuario;
 use App\Models\Alunos;
 use App\Models\Feriado;
 use App\Services\ServicoService;
+use App\Services\SiteService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -29,15 +30,12 @@ class EmpresaController extends Controller
     protected $view = "empresas";
     protected $route = "empresa";
 
+    protected $siteService;
 
-
-    public function __construct(
-        Empresa $model,
-        Usuario $usuario,
-        Agendamento $agendamento,
-        Professor $professor
-
-    ) {}
+    public function __construct(SiteService $siteService)
+    {
+        $this->siteService = $siteService;
+    }
 
 
     public function dashboard(Request $request)
@@ -136,6 +134,7 @@ class EmpresaController extends Controller
 
             // Salva o endereço da empresa
             EmpresaEndereco::createOrUpdateEndereco($CriarEmpresa->id, $validated);
+            $this->siteService->criarSiteAutomatico($CriarEmpresa->id, $validated['modalidade_id']);
 
             // Cria serviço automático
             
@@ -271,7 +270,7 @@ class EmpresaController extends Controller
                 'valor_aula_ate' => $validatedData['valor_aula_ate'],
                 'modalidade_id' => $validatedData['modalidade_id'],
             ];
-
+         $this->siteService->criarSiteAutomatico($empresa->id, $validatedData['modalidade_id']);
             // Adicionar site_url se fornecido
             if (!empty($validatedData['site_url'])) {
                 $dataToUpdate['site_url'] = $validatedData['site_url'];

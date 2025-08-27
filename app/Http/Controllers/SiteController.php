@@ -282,6 +282,7 @@ private function verificarDnsSsl($dominio)
      */
    public function update(Request $request, EmpresaSite $site)
 {
+   
     // Validação
     $validated = $request->validate([
         'titulo' => 'required|string|max:255',

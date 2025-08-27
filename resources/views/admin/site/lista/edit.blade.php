@@ -143,30 +143,32 @@
 
                                 <!-- Seção 4: Serviços -->
                             <div class="form-section mb-4">
-                                <h5 class="mb-3">Serviços</h5>
+                <h5 class="mb-3">Serviços</h5>
 
-                                <div id="servicos-container">
-                                    @php
-                                        $servicos = old('servicos', $site->siteServicos ?? []);
-                                    @endphp
+                <div id="servicos-container">
+                    @php
+                        $servicos = old('servicos', $site->siteServicos ?? []);
+                    @endphp
 
-                                    @foreach($servicos as $index => $servico)
-                                    <div class="servico-bloco border p-3 mb-3 bg-light rounded position-relative">
-                                          <input type="hidden" name="servicos[{{ $index }}][id]" value="{{ $servico->id }}">
-                                        <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2" data-idservico="{{ $servico->id }}" id="servicoRemover" >Remover</button>
-                                        <input type="text" name="servicos[{{ $index }}][titulo]" class="form-control mb-2" placeholder="Título do Serviço" value="{{ $servico['titulo'] ?? '' }}">
-                                        <textarea name="servicos[{{ $index }}][descricao]" class="form-control mb-2" placeholder="Descrição do Serviço">{{ $servico['descricao'] ?? '' }}</textarea>
-                                        <input type="number" step="0.01" name="servicos[{{ $index }}][preco]" class="form-control mb-2" placeholder="Preço" value="{{ $servico['preco'] ?? '' }}">
-                                        <input type="file" name="servicos[{{ $index }}][imagem]" class="form-control">
-                                        @if(!empty($servico['imagem']))
-                                            <img src="{{ asset('storage/' . $servico['imagem']) }}" height="80" class="mt-2">
-                                        @endif
-                                    </div>
-                                    @endforeach
-                                </div>
+                    @foreach($servicos as $index => $servico)
+                        <div class="servico-bloco border p-3 mb-3 bg-light rounded position-relative">
+                            <input type="hidden" name="servicos[{{ $index }}][id]" value="{{ is_object($servico) ? $servico->id : ($servico['id'] ?? '') }}">
+                            <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2" data-idservico="{{ is_object($servico) ? $servico->id : ($servico['id'] ?? '') }}" id="servicoRemover">Remover</button>
+                            <input type="text" name="servicos[{{ $index }}][titulo]" class="form-control mb-2" placeholder="Título do Serviço" value="{{ is_object($servico) ? $servico->titulo : ($servico['titulo'] ?? '') }}">
+                            <textarea name="servicos[{{ $index }}][descricao]" class="form-control mb-2" placeholder="Descrição do Serviço">{{ is_object($servico) ? $servico->descricao : ($servico['descricao'] ?? '') }}</textarea>
+                            <input type="number" step="0.01" name="servicos[{{ $index }}][preco]" class="form-control mb-2" placeholder="Preço" value="{{ is_object($servico) ? $servico->preco : ($servico['preco'] ?? '') }}">
+                            <input type="file" name="servicos[{{ $index }}][imagem]" class="form-control">
+                            @if(!empty($servico['imagem']) && is_array($servico))
+                                <img src="{{ asset('storage/' . $servico['imagem']) }}" height="80" class="mt-2">
+                            @elseif(is_object($servico) && !empty($servico->imagem))
+                                <img src="{{ asset('storage/' . $servico->imagem) }}" height="80" class="mt-2">
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
 
-                                <button type="button" class="btn btn-secondary mt-2" onclick="adicionarServico()">+ Adicionar Serviço</button>
-                            </div>
+                <button type="button" class="btn btn-secondary mt-2" onclick="adicionarServico()">+ Adicionar Serviço</button>
+            </div>
 
                             <!-- Seção 5: Depoimentos -->
                             <div class="form-section mb-4">
