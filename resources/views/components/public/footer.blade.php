@@ -357,7 +357,7 @@
                     <div class="footer-widget footer-about">
                         <div class="footer-logo">
                             <a href="/">
-                              <img src="https://rjpasseios.com.br/wp-content/uploads/2024/12/cropped-logo-1.png"
+                              <img src="{{ asset('logo-footer.png') }}"
                                 class="img-fluid" alt="Logo">
                             </a>
                         </div>
