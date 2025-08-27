@@ -270,7 +270,7 @@ class EmpresaController extends Controller
                 'valor_aula_ate' => $validatedData['valor_aula_ate'],
                 'modalidade_id' => $validatedData['modalidade_id'],
             ];
-         $this->siteService->criarSiteAutomatico($empresa->id, $validatedData['modalidade_id']);
+     
             // Adicionar site_url se fornecido
             if (!empty($validatedData['site_url'])) {
                 $dataToUpdate['site_url'] = $validatedData['site_url'];
@@ -314,6 +314,7 @@ class EmpresaController extends Controller
             // Atualizar a empresa
             $empresa->update($dataToUpdate);
 
+            $this->siteService->criarSiteAutomatico($empresa->id, $validatedData['modalidade_id']);
             $criarServico = $this->criarServicoAutomatico($empresa->id, $validatedData['modalidade_id']);
 
             EmpresaEndereco::updateOrCreate(
