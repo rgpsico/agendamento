@@ -110,4 +110,67 @@ class Empresa extends Model
             'banners'       => $data['banners'] ?? 'banner/default.jpg',
         ]);
     }
+
+
+   
+
+        /**
+         * Atualiza os dados principais da empresa.
+         *
+         * @param array $data
+         * @return void
+         */
+        public function atualizarDados(array $data): void
+        {
+            $this->update([
+                'nome' => $data['nome'],
+                'descricao' => $data['descricao'],
+                'telefone' => $data['telefone'],
+                'cnpj' => $data['cnpj'],
+                'data_vencimento' => $data['data_vencimento'] ?? today()->format('Y-m-d'),
+                'valor_aula_de' => $data['valor_aula_de'],
+                'valor_aula_ate' => $data['valor_aula_ate'],
+                'modalidade_id' => $data['modalidade_id'],
+                'site_url' => $data['site_url'] ?? $this->site_url,
+                'avatar' => $data['avatar'] ?? $this->avatar,
+                'banner' => $data['banner'] ?? $this->banner,
+            ]);
+        }
+
+
+        /**
+     * Atualiza ou cria o endereço da empresa.
+     *
+     * @param array $data
+     * @return EmpresaEndereco
+     */
+    public function atualizarEndereco(array $data): EmpresaEndereco
+    {
+        return $this->endereco()->updateOrCreate(
+            ['empresa_id' => $this->id],
+            [
+                'cep' => $data['cep'],
+                'endereco' => $data['endereco'],
+                'cidade' => $data['cidade'],
+                'estado' => $data['estado'],
+                'uf' => $data['uf'],
+                'pais' => $data['pais'],
+            ]
+        );
+    }
+
+    /**
+     * Sincroniza os bairros da empresa.
+     *
+     * @param array|null $bairros
+     * @return void
+     */
+    public function atualizarBairros(?array $bairros): void
+    {
+        if (!empty($bairros)) {
+            $this->bairros()->sync($bairros);
+        } else {
+            $this->bairros()->detach();
+        }
+    }
 }

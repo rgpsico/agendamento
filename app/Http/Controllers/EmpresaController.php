@@ -26,7 +26,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
-
+   use App\Http\Requests\UpdateEmpresaRequest;
 class EmpresaController extends Controller
 {
     protected $pageTitle = "Empresa TESTE";
@@ -228,103 +228,63 @@ class EmpresaController extends Controller
 
   
 
-   public function update(Request $request)
+
+
+
+
+
+    public function update(UpdateEmpresaRequest $request)
     {
-        
-        // Validação dos dados
-        $validatedData = $request->validate([
-            'empresa_id' => 'required|exists:empresa,id',
-            'avatar' => 'nullable|image|max:2048',
-            'banner' => 'nullable|image|max:2048',
-            'nome' => 'required|max:255',
-            'site_url' => 'nullable|url|max:255',
-            'descricao' => 'required',
-            'telefone' => 'required|max:20',
-            'cnpj' => 'required|max:18',
-            'valor_aula_de' => 'required|numeric|min:0',
-            'valor_aula_ate' => 'required|numeric|min:0',
-            'modalidade_id' => 'required|exists:modalidade,id',
-            'cep' => 'required',
-            'endereco' => 'required',
-            'cidade' => 'required',
-            'estado' => 'required',
-            'uf' => 'required',
-            'pais' => 'required',
-            'data_vencimento' =>'nullable',
-            'bairros' => 'nullable|array|max:5',      // ✅ limitar no máximo 5 bairros
-            'bairros.*' => 'exists:loc_bairros,id', // ✅ cada bairro deve existir
-        ]);
-
         try {
-            $empresa = Empresa::findOrFail($request->empresa_id);
+            // Pega os dados validados do Form Request
+            $validatedData = $request->validated();
 
-            $dataToUpdate = [
-                'nome' => $validatedData['nome'],
-                'descricao' => $validatedData['descricao'],
-                'telefone' => $validatedData['telefone'],
-                'cnpj' => $validatedData['cnpj'],
-                'data_vencimento' => $validatedData['data_vencimento'] ?? today()->format('Y-m-d'),
-                'valor_aula_de' => $validatedData['valor_aula_de'],
-                'valor_aula_ate' => $validatedData['valor_aula_ate'],
-                'modalidade_id' => $validatedData['modalidade_id'],
-            ];
+            // Recupera a empresa
+            $empresa = Empresa::findOrFail($validatedData['empresa_id']);
 
-            if (!empty($validatedData['site_url'])) {
-                $dataToUpdate['site_url'] = $validatedData['site_url'];
-            }
-
-            // Uploads de avatar e banner (igual ao seu código)
+            // =========================
+            // Upload de arquivos usando helper
+            // =========================
             if ($request->hasFile('avatar')) {
+                // Remove avatar antigo
                 if ($empresa->avatar && file_exists(public_path('/avatar/' . $empresa->avatar))) {
                     unlink(public_path('/avatar/' . $empresa->avatar));
                 }
-                $file = $request->file('avatar');
-                $filename = 'avatar_' . $empresa->id . '_' . time() . '.' . $file->getClientOriginalExtension();
-                $path = public_path('/avatar');
-                if (!file_exists($path)) mkdir($path, 0755, true);
-                $file->move($path, $filename);
-                $dataToUpdate['avatar'] = $filename;
+                $validatedData['avatar'] = FileUploadHelper::uploadFile($request, 'avatar', 'avatar');
             }
 
             if ($request->hasFile('banner')) {
+                // Remove banner antigo
                 if ($empresa->banner && file_exists(public_path('/banner/' . $empresa->banner))) {
                     unlink(public_path('/banner/' . $empresa->banner));
                 }
-                $file = $request->file('banner');
-                $filenameBanner = 'banner_' . $empresa->id . '_' . time() . '.' . $file->getClientOriginalExtension();
-                $path = public_path('/banner');
-                if (!file_exists($path)) mkdir($path, 0755, true);
-                $file->move($path, $filenameBanner);
-                $dataToUpdate['banners'] = $filenameBanner;
+                $validatedData['banner'] = FileUploadHelper::uploadFile($request, 'banner', 'banner');
             }
 
-            // Atualizar empresa
-            $empresa->update($dataToUpdate);
+            // =========================
+            // Atualiza dados da empresa
+            // =========================
+            $empresa->atualizarDados($validatedData);
 
-            // Atualizar endereço
-            EmpresaEndereco::updateOrCreate(
-                ['empresa_id' => $empresa->id],
-                [
-                    'cep' => $validatedData['cep'],
-                    'endereco' => $validatedData['endereco'],
-                    'cidade' => $validatedData['cidade'],
-                    'estado' => $validatedData['estado'],
-                    'uf' => $validatedData['uf'],
-                    'pais' => $validatedData['pais'],
-                ]
-            );
+            // =========================
+            // Atualiza endereço
+            // =========================
+            $empresa->atualizarEndereco($validatedData);
 
-            // ✅ Sincronizar bairros (atualiza os selecionados, remove os não selecionados)
-            if (!empty($validatedData['bairros'])) {
-                $empresa->bairros()->sync($validatedData['bairros']);
-             
-            } else {
-                $empresa->bairros()->detach(); // remove todos se não veio nenhum
-            }
+            // =========================
+            // Sincroniza bairros
+            // =========================
+            $empresa->atualizarBairros($validatedData['bairros'] ?? null);
 
+            // =========================
+            // Cria site e serviços automáticos
+            // =========================
             $this->siteService->criarSiteAutomatico($empresa->id, $validatedData['modalidade_id']);
             $this->criarServicoAutomatico($empresa->id, $validatedData['modalidade_id']);
 
+            // =========================
+            // Retorno
+            // =========================
             return $request->ajax()
                 ? response()->json(['success' => true, 'message' => 'Empresa atualizada com sucesso!', 'empresa' => $empresa->fresh()])
                 : redirect()->back()->with('success', 'Empresa atualizada com sucesso!');
@@ -340,6 +300,8 @@ class EmpresaController extends Controller
                 : redirect()->back()->with('error', 'Erro ao atualizar empresa: ' . $e->getMessage())->withInput();
         }
     }
+
+
 
 
 
