@@ -258,6 +258,7 @@ class EmpresaController extends Controller
                 if ($empresa->banner && file_exists(public_path('/banner/' . $empresa->banner))) {
                     unlink(public_path('/banner/' . $empresa->banner));
                 }
+              
                 $validatedData['banner'] = FileUploadHelper::uploadFile($request, 'banner', 'banner');
             }
 
@@ -276,11 +277,7 @@ class EmpresaController extends Controller
             // =========================
             $empresa->atualizarBairros($validatedData['bairros'] ?? null);
 
-            // =========================
-            // Cria site e serviços automáticos
-            // =========================
-            $this->siteService->criarSiteAutomatico($empresa->id, $validatedData['modalidade_id']);
-            $this->criarServicoAutomatico($empresa->id, $validatedData['modalidade_id']);
+         
 
             // =========================
             // Retorno
