@@ -29,6 +29,7 @@ use App\Http\Controllers\OpenAIController;
 use App\Http\Controllers\SiteCliqueWhatsappController;
 use App\Http\Controllers\SiteVisualizacaoController;
 use App\Http\Controllers\Api\GoogleADSController;
+use App\Http\Controllers\Api\PermissionApiController;
 use App\Http\Controllers\SiteVisitanteController;
 use Illuminate\Http\Request;
 use Twilio\Rest\Client;
@@ -56,6 +57,18 @@ Route::post('/pagarComCartao', [PagamentoController::class, 'pagarComCartao'])->
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
+});
+
+
+
+
+
+Route::prefix('permissions')->group(function () {
+    Route::get('/', [PermissionApiController::class, 'index']);
+    Route::get('/{id}', [PermissionApiController::class, 'show']);
+    Route::post('/store', [PermissionApiController::class, 'store']);
+    Route::post('/update/{id}', [PermissionApiController::class, 'update']);
+    Route::post('/delete/{id}', [PermissionApiController::class, 'destroy']);
 });
 
 

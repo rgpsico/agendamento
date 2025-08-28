@@ -21,6 +21,8 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Api\PixQrController;
 use App\Http\Controllers\BoletoController;
 use App\Http\Controllers\PaymentConfigurationController;
+use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SiteTemplateController;
 
 
@@ -36,7 +38,12 @@ Route::prefix('usuario')->group(function () {
 
 Route::post('/webhook/asaas', [PagamentoController::class, 'webhookAsaas'])->name('webhook.asaas');
 
-
+Route::middleware(['auth'])->group(function () {
+     Route::get('permissions/lista', [PermissionController::class, 'index'])->name('admin.permissions.index');
+    Route::resource('permissions', PermissionController::class);
+    Route::resource('roles', RoleController::class);
+    Route::resource('users', UserController::class);
+});
 
 Route::post('/pix/chave', [PixQrController::class, 'criarChavePix'])->name('pix.chave');
 Route::get('/integracao', [PagamentoController::class, 'mostrarIntegracao'])->name('integracao.assas.escola')->middleware('auth');
