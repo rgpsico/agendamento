@@ -725,6 +725,26 @@ class EmpresaController extends Controller
         }
     }
 
+      public function galleryDestroy($id)
+    {
+        try {
+            $foto = EmpresaGaleria::findOrFail($id);
+
+            // Excluir arquivo do Storage (ou public_path se ainda usar)
+            $filePath = public_path('galeria_escola/' . $foto->image);
+            if(file_exists($filePath)) {
+                unlink($filePath);
+            }
+
+            // Excluir registro do banco
+            $foto->delete();
+
+            return response()->json(['success' => true, 'message' => 'Imagem excluída com sucesso']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Erro ao excluir imagem: ' . $e->getMessage()]);
+        }
+    }
+
     // Método adicional para reativar empresa
     public function restore($id)
     {

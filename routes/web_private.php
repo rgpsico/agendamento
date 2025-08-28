@@ -173,7 +173,7 @@ Route::prefix('cliente')->middleware('auth')->group(function () {
         Route::get('/fotos', [EmpresaController::class, 'fotos'])->name('empresa.fotos');
         Route::get('/{userId}/endereco_empresa', [EmpresaController::class, 'endereco'])->name('empresa.endereco');
         Route::post('/uploadEmpresa', [EmpresaController::class, 'uploadImage'])->name('empresa.upload');
-        Route::delete('/{id}/excluirImagens', [EmpresaController::class, 'destroy'])->name('gallery.destroy');
+        Route::post('/{id}/excluirImagens', [EmpresaController::class, 'galleryDestroy'])->name('gallery.destroy');
 
 
         Route::group(['prefix' => '/alunos'], function () {
