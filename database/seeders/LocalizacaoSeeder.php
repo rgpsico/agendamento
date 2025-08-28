@@ -1,84 +1,68 @@
-<?php
+<?php 
 
 namespace Database\Seeders;
-
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class LocalizacaoSeeder extends Seeder
+class LocalizacaoSeeder  extends Seeder
 {
     public function run()
     {
-        // 1️⃣ País
-        $brasilId = DB::table('countries')->insertGetId([
-            'name' => 'Brasil',
-            'code' => 'BR',
+        // País
+        $brasilId = DB::table('localizacoes')->insertGetId([
+            'nome' => 'Brasil',
+            'tipo' => 'pais',
+            'parent_id' => null,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
 
-        // 2️⃣ Estado
-        $rjId = DB::table('states')->insertGetId([
-            'country_id' => $brasilId,
-            'name' => 'Rio de Janeiro',
-            'code' => 'RJ',
+        // Estado
+        $rjId = DB::table('localizacoes')->insertGetId([
+            'nome' => 'Rio de Janeiro',
+            'tipo' => 'estado',
+            'parent_id' => $brasilId,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
 
-        // 3️⃣ Cidade
-        $rioCidadeId = DB::table('cities')->insertGetId([
-            'state_id' => $rjId,
-            'name' => 'Rio de Janeiro',
+        // Cidade
+        $rioCidadeId = DB::table('localizacoes')->insertGetId([
+            'nome' => 'Rio de Janeiro',
+            'tipo' => 'cidade',
+            'parent_id' => $rjId,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
 
-        // 4️⃣ Zonas
-        $zonas = [
-            'Zona Sul',
-            'Zona Norte',
-            'Zona Oeste',
-            'Centro',
-        ];
-
+        // Zonas
+        $zonas = ['Zona Sul', 'Zona Norte', 'Zona Oeste', 'Centro'];
         $zonaIds = [];
         foreach ($zonas as $zona) {
-            $zonaIds[$zona] = DB::table('zones')->insertGetId([
-                'city_id' => $rioCidadeId,
-                'name' => $zona,
+            $zonaIds[$zona] = DB::table('localizacoes')->insertGetId([
+                'nome' => $zona,
+                'tipo' => 'zona',
+                'parent_id' => $rioCidadeId,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
         }
 
-        // 5️⃣ Bairros da Zona Sul
+        // Bairros da Zona Sul
         $bairrosZonaSul = [
-            'Copacabana',
-            'Ipanema',
-            'Leblon',
-            'Botafogo',
-            'Flamengo',
-            'Laranjeiras',
-            'Glória',
-            'Humaitá',
-            'Urca',
-            'Leme',
-            'Gávea',
-            'Jardim Botânico',
-            'Lagoa'
+            'Copacabana', 'Ipanema', 'Leblon', 'Botafogo', 'Flamengo',
+            'Laranjeiras', 'Glória', 'Humaitá', 'Urca', 'Leme',
+            'Gávea', 'Jardim Botânico', 'Lagoa'
         ];
 
         foreach ($bairrosZonaSul as $bairro) {
-            DB::table('neighborhoods')->insert([
-                'city_id' => $rioCidadeId,
-                'zone_id' => $zonaIds['Zona Sul'],
-                'name' => $bairro,
+            DB::table('localizacoes')->insert([
+                'nome' => $bairro,
+                'tipo' => 'bairro',
+                'parent_id' => $zonaIds['Zona Sul'],
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
         }
-
-        // 6️⃣ Você pode adicionar bairros das outras zonas depois
     }
 }

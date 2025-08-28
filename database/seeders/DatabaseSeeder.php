@@ -14,7 +14,7 @@ class DatabaseSeeder extends Seeder
     {
 
           $this->call([
-            BairrosZonaSulSeeder::class,
+            LocalizacaoSeeder::class,
         ]);
        // $this->call(FeriadosSeeder::class);
         //$this->call(MigrateRolesSeeder::class);

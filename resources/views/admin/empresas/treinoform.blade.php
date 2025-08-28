@@ -157,18 +157,27 @@
                                             :value="$model->endereco->endereco ?? ''" id="endereco" />
                                     </div>
 
-                                    <div class="col-md-4">
-                                        <label class="form-label fw-bold">Bairro</label>
-                                        <select name="bairros[]" class="form-select" multiple>
-                                            @foreach($bairros as $bairro)
-                                                <option value="{{ $bairro->id }}"
-                                                    @if(isset($model) && $model->bairros->contains($bairro->id)) selected @endif>
-                                                    {{ $bairro->nome }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                        <small class="text-muted">Selecione um ou mais bairros atendidos pela empresa</small>
-                                     </div>
+                                   <select name="bairros[]" class="form-select" multiple id="bairrosSelect">
+    @foreach($bairros as $bairro)
+        <option value="{{ $bairro->id }}"
+            @if(isset($model) && $model->bairros->contains($bairro->id)) selected @endif>
+            {{ $bairro->name }}
+        </option>
+    @endforeach
+</select>
+<small class="text-muted">Selecione até 5 bairros atendidos pela empresa</small>
+
+<script>
+    const select = document.getElementById('bairrosSelect');
+    select.addEventListener('change', () => {
+        const selected = Array.from(select.selectedOptions);
+        if (selected.length > 5) {
+            alert('Você só pode selecionar no máximo 5 bairros!');
+            selected[selected.length - 1].selected = false; // desmarca o último selecionado
+        }
+    });
+</script>
+
 
                                     {{-- <div class="col-md-3">
                                         <x-text-input name="numero" size="10" label="Número" :value="$model->endereco->numero ?? ''"

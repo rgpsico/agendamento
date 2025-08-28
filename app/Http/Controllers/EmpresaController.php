@@ -17,11 +17,13 @@ use App\Models\Servicos;
 use App\Models\Usuario;
 use App\Models\Alunos;
 use App\Models\Feriado;
+use App\Models\Localizacao;
 use App\Services\ServicoService;
 use App\Services\SiteService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class EmpresaController extends Controller
@@ -225,21 +227,15 @@ class EmpresaController extends Controller
 
   
 
-    public function update(Request $request)
+   public function update(Request $request)
     {
-      
+        
         // Validação dos dados
         $validatedData = $request->validate([
             'empresa_id' => 'required|exists:empresa,id',
             'avatar' => 'nullable|image|max:2048',
             'banner' => 'nullable|image|max:2048',
             'nome' => 'required|max:255',
-            // 'email' => [
-            //     'required',
-            //     'email',
-            //     'max:255',
-            //     Rule::unique('usuarios', 'email')->ignore($empresa->user->id ?? 0),
-            // ],
             'site_url' => 'nullable|url|max:255',
             'descricao' => 'required',
             'telefone' => 'required|max:20',
@@ -253,31 +249,30 @@ class EmpresaController extends Controller
             'estado' => 'required',
             'uf' => 'required',
             'pais' => 'required',
-            'data_vencimento' =>'nullable'
+            'data_vencimento' =>'nullable',
+            'bairros' => 'nullable|array|max:5',      // ✅ limitar no máximo 5 bairros
+            'bairros.*' => 'exists:neighborhoods,id', // ✅ cada bairro deve existir
         ]);
 
         try {
-            // Buscar a empresa pelo ID
             $empresa = Empresa::findOrFail($request->empresa_id);
 
-            // Preparar dados para atualização
             $dataToUpdate = [
                 'nome' => $validatedData['nome'],
                 'descricao' => $validatedData['descricao'],
                 'telefone' => $validatedData['telefone'],
                 'cnpj' => $validatedData['cnpj'],
-                'data_vencimento' => $validatedData['data_vencimento'] ?? today()->format('Y-m-d'), // Formatar data para YYYY-MM-DD
+                'data_vencimento' => $validatedData['data_vencimento'] ?? today()->format('Y-m-d'),
                 'valor_aula_de' => $validatedData['valor_aula_de'],
                 'valor_aula_ate' => $validatedData['valor_aula_ate'],
                 'modalidade_id' => $validatedData['modalidade_id'],
             ];
-     
-            // Adicionar site_url se fornecido
+
             if (!empty($validatedData['site_url'])) {
                 $dataToUpdate['site_url'] = $validatedData['site_url'];
             }
 
-            // Processar upload do avatar
+            // Uploads de avatar e banner (igual ao seu código)
             if ($request->hasFile('avatar')) {
                 if ($empresa->avatar && file_exists(public_path('/avatar/' . $empresa->avatar))) {
                     unlink(public_path('/avatar/' . $empresa->avatar));
@@ -285,14 +280,11 @@ class EmpresaController extends Controller
                 $file = $request->file('avatar');
                 $filename = 'avatar_' . $empresa->id . '_' . time() . '.' . $file->getClientOriginalExtension();
                 $path = public_path('/avatar');
-                if (!file_exists($path)) {
-                    mkdir($path, 0755, true);
-                }
+                if (!file_exists($path)) mkdir($path, 0755, true);
                 $file->move($path, $filename);
                 $dataToUpdate['avatar'] = $filename;
             }
 
-            // Processar upload do banner
             if ($request->hasFile('banner')) {
                 if ($empresa->banner && file_exists(public_path('/banner/' . $empresa->banner))) {
                     unlink(public_path('/banner/' . $empresa->banner));
@@ -300,24 +292,15 @@ class EmpresaController extends Controller
                 $file = $request->file('banner');
                 $filenameBanner = 'banner_' . $empresa->id . '_' . time() . '.' . $file->getClientOriginalExtension();
                 $path = public_path('/banner');
-                if (!file_exists($path)) {
-                    mkdir($path, 0755, true);
-                }
+                if (!file_exists($path)) mkdir($path, 0755, true);
                 $file->move($path, $filenameBanner);
                 $dataToUpdate['banner'] = $filenameBanner;
             }
 
-            // Atualizar o email do usuário associado (se necessário)
-            // if (isset($validatedData['email']) && $empresa->user && $empresa->user->email !== $validatedData['email']) {
-            //     $empresa->user->update(['email' => $validatedData['email']]);
-            // }
-
-            // Atualizar a empresa
+            // Atualizar empresa
             $empresa->update($dataToUpdate);
 
-            $this->siteService->criarSiteAutomatico($empresa->id, $validatedData['modalidade_id']);
-            $criarServico = $this->criarServicoAutomatico($empresa->id, $validatedData['modalidade_id']);
-
+            // Atualizar endereço
             EmpresaEndereco::updateOrCreate(
                 ['empresa_id' => $empresa->id],
                 [
@@ -330,35 +313,33 @@ class EmpresaController extends Controller
                 ]
             );
 
-            // Resposta para requisição AJAX
-            if ($request->ajax()) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Empresa atualizada com sucesso!',
-                    'empresa' => $empresa->fresh()
-                ]);
+            // ✅ Sincronizar bairros (atualiza os selecionados, remove os não selecionados)
+            if (!empty($validatedData['bairros'])) {
+                $empresa->bairros()->sync($validatedData['bairros']);
+             
+            } else {
+                $empresa->bairros()->detach(); // remove todos se não veio nenhum
             }
 
-            return redirect()->back()->with('success', 'Empresa atualizada com sucesso!');
+            $this->siteService->criarSiteAutomatico($empresa->id, $validatedData['modalidade_id']);
+            $this->criarServicoAutomatico($empresa->id, $validatedData['modalidade_id']);
+
+            return $request->ajax()
+                ? response()->json(['success' => true, 'message' => 'Empresa atualizada com sucesso!', 'empresa' => $empresa->fresh()])
+                : redirect()->back()->with('success', 'Empresa atualizada com sucesso!');
+
         } catch (\Exception $e) {
-            \Log::error('Erro ao atualizar empresa: Duplicate email', [
+            \Log::error('Erro ao atualizar empresa', [
                 'empresa_id' => $request->empresa_id,
-          //      'email' => $validatedData['email'],
                 'error' => $e->getMessage(),
             ]);
 
-            if ($request->ajax()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Erro ao atualizar empresa: ' . $e->getMessage()
-                ], 500);
-            }
-
-            return redirect()->back()
-                ->with('error', 'Erro ao atualizar empresa: ' . $e->getMessage())
-                ->withInput();
+            return $request->ajax()
+                ? response()->json(['success' => false, 'message' => 'Erro ao atualizar empresa: ' . $e->getMessage()], 500)
+                : redirect()->back()->with('error', 'Erro ao atualizar empresa: ' . $e->getMessage())->withInput();
         }
     }
+
 
 
     public function endereco_update(Request $request)
@@ -677,19 +658,20 @@ class EmpresaController extends Controller
     {
 
       
-        $bairros = Localizacao::where('tipo', 'bairro')->get();
+        $bairros = DB::table('neighborhoods')->get(); 
         $model = Empresa::where('user_id', $userId)->first();
         $userId =  Usuario::find($userId);
        $email_user = $userId->email;
 
         $modalidades = Modalidade::all();
         return view(
-            'admin.empresas.treinoform',
+            'admin.empresas.treinoform',    
             [
                 'pageTitle' =>  'Configuração',
                 'model' => $model,
                 'email_user' => $email_user,
-                'modalidades' => $modalidades
+                'modalidades' => $modalidades,
+                'bairros' => $bairros
             ]
         );
     }
