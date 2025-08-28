@@ -15,6 +15,7 @@
     <!-- Navigation -->
     @include('site._partials.menu')
 
+
     <!-- Hero Section -->
     <x-hero-section 
         :title="$site->titulo ?? 'Aprenda a surfar com os melhores instrutores'"

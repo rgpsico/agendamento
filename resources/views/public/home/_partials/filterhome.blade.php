@@ -37,7 +37,7 @@
             <select class="form-select ps-5" id="bairro_filtro" style="border-radius: 8px; border: 1px solid #e0e0e0;">
                 <option value="">Todos os bairros</option>
                 @foreach($bairros as $bairro)
-                    <option value="{{ $bairro->id }}">{{ $bairro->name }}</option>
+                    <option value="{{ $bairro->id }}">{{ $bairro->nome }}</option>
                 @endforeach
             </select>
         </div>

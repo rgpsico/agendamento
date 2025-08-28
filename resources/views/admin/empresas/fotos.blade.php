@@ -75,7 +75,7 @@
                     const fotoId = item.getAttribute('data-id');
 
                     if(confirm('Deseja realmente excluir esta imagem?')) {
-                        fetch("{{ route('gallery.destroy',['id' =>  $foto->id]) }}", {
+                        fetch("{{ route('gallery.destroy',['id' =>]) }}", {
                             method: 'POST',
                             headers: {
                                 'X-CSRF-TOKEN': '{{ csrf_token() }}',

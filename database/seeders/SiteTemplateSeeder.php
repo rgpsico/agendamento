@@ -1,0 +1,50 @@
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use App\Models\SiteTemplate;
+
+class SiteTemplateSeeder extends Seeder
+{
+    public function run()
+    {
+        $templates = [
+            [
+                'titulo' => 'Público',
+                'slug' => 'publico',
+                'descricao' => 'Template padrão público',
+                'preview_image' => 'templates/publico.png', // caso tenha preview
+                'path_view' => 'site.publico',
+            ],
+            [
+                'titulo' => 'Centralizado',
+                'slug' => 'centralizado',
+                'descricao' => 'Template centralizado',
+                'preview_image' => 'templates/centralizado.png',
+                'path_view' => 'site.centralizado',
+            ],
+            [
+                'titulo' => 'Vendas',
+                'slug' => 'vendas',
+                'descricao' => 'Template focado em vendas',
+                'preview_image' => 'templates/vendas.png',
+                'path_view' => 'site.vendas',
+            ],
+            [
+                'titulo' => 'Boxe',
+                'slug' => 'boxe',
+                'descricao' => 'Template esportivo de boxe',
+                'preview_image' => 'templates/boxe.png',
+                'path_view' => 'site.boxe',
+            ],
+        ];
+
+        foreach ($templates as $template) {
+            SiteTemplate::updateOrCreate(
+                ['slug' => $template['slug']], // evita duplicar
+                $template
+            );
+        }
+    }
+}

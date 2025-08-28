@@ -39,21 +39,21 @@ class EmpresaControllerApi extends Controller
 
         // 🔎 Filtro por bairros
        if ($bairros) {
-        $bairros = is_array($bairros) ? $bairros : explode(',', $bairros);
+            $bairros = is_array($bairros) ? $bairros : explode(',', $bairros);
 
-        $query->whereHas('bairros', function ($q) use ($bairros) {
-            // Separar IDs (numéricos) e nomes (strings)
-            $ids   = array_filter($bairros, fn($v) => is_numeric($v));
-            $nomes = array_filter($bairros, fn($v) => !is_numeric($v));
+            $query->whereHas('bairros', function ($q) use ($bairros) {
+                $ids   = array_filter($bairros, fn($v) => is_numeric($v));
+                $nomes = array_filter($bairros, fn($v) => !is_numeric($v));
 
-            if ($ids) {
-                $q->orWhereIn('id', $ids);
-            }
-            if ($nomes) {
-                $q->orWhereIn('nome', $nomes); // <-- agora está correto
-            }
-        });
-    }
+                if ($ids) {
+                    $q->whereIn('id', $ids);
+                }
+                if ($nomes) {
+                    $q->orWhereIn('nome', $nomes); // OR aqui faz sentido para nomes, mas não entre ID e nome
+                }
+            });
+        }
+
 
 
 
