@@ -253,12 +253,12 @@
             </div>
         </div>
     </div>
-    @include('public.home._partials.filterhome');
+    @include('public.home._partials.filterhome')
     
     @include('public.home._partials.batepapo')
     <!-- /Page Content -->
     <script src="{{ asset('admin/js/jquery-3.6.3.min.js') }}"></script>
-    <script src="{{ asset('js/home.js') }}"></script>4
+    <script src="{{ asset('js/home.js') }}"></script>
 
     <script>
         $(document).ready(function() {

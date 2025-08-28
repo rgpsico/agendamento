@@ -1,3 +1,9 @@
+<style>
+    #bairro_filtro {
+    position: relative;
+    z-index: 1;
+}
+</style>
 <div class="content">
         <div class="container">
             <div class="row">
