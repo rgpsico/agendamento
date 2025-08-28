@@ -156,6 +156,20 @@
                                         <x-text-input name="endereco" size="30" label="Endereço"
                                             :value="$model->endereco->endereco ?? ''" id="endereco" />
                                     </div>
+
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold">Bairro</label>
+                                        <select name="bairros[]" class="form-select" multiple>
+                                            @foreach($bairros as $bairro)
+                                                <option value="{{ $bairro->id }}"
+                                                    @if(isset($model) && $model->bairros->contains($bairro->id)) selected @endif>
+                                                    {{ $bairro->nome }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        <small class="text-muted">Selecione um ou mais bairros atendidos pela empresa</small>
+                                     </div>
+
                                     {{-- <div class="col-md-3">
                                         <x-text-input name="numero" size="10" label="Número" :value="$model->endereco->numero ?? ''"
                                             id="numero" />

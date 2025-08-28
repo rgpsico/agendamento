@@ -676,6 +676,8 @@ class EmpresaController extends Controller
     public function configuracao($userId)
     {
 
+      
+        $bairros = Localizacao::where('tipo', 'bairro')->get();
         $model = Empresa::where('user_id', $userId)->first();
         $userId =  Usuario::find($userId);
        $email_user = $userId->email;
