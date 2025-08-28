@@ -4,10 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Bairro extends Model
-{
-    protected $table = 'bairros';
-    protected $fillable = ['nome'];
+class Bairro extends Model{
+    
+protected $table = 'neighborhoods';
+protected $fillable = ['name', 'city_id', 'zone_id'];
 
     public function empresas()
     {

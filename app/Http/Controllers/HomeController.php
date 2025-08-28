@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Agendamento;
 use App\Models\Alunos;
 use App\Models\Aulas;
+use App\Models\Bairro;
 use App\Models\Configuracao;
 use App\Models\Disponibilidade;
 use App\Models\Empresa;
@@ -46,9 +47,10 @@ class HomeController extends Controller
 
     public function index()
     {
+       
         $model = $this->model::with('modalidade', 'endereco', 'galeria', 'avaliacao')->where('status', 'ativo')->get();
         $modalidade = Modalidade::all();
-
+        $bairros = Bairro::all();
 
         // Adiciona configuração de agendamento para cada empresa
         foreach ($model as $empresa) {
@@ -64,7 +66,8 @@ class HomeController extends Controller
                 'view' => $this->view,
                 'route' => $this->route,
                 'model' =>  $model,
-                'modalidade' => $modalidade
+                'modalidade' => $modalidade,
+                'bairros' => $bairros
             ]
         );
     }

@@ -15,18 +15,20 @@ class EmpresaControllerApi extends Controller
         return $empresas = Empresa::with('endereco', 'galeria', 'avaliacao')->get();
     }
 
-    public function search(Request $request)
+   public function search(Request $request)
     {
+        
         $modalidades = $request->input('modalidades');   // ex: "1,2,3"
         $nome        = $request->input('nome_empresa');
         $bairros     = $request->input('bairros');       // ex: "Copacabana,Ipanema" ou array [1,2]
-
+       
         $query = Empresa::with('modalidade', 'endereco', 'galeria', 'avaliacao', 'bairros')
-            ->where('status', 'ativo'); // ✅ só empresas ativas
+            ->where('status', 'ativo'); // só empresas ativas
 
         // 🔎 Filtro por modalidades
         if ($modalidades) {
-            $modalidades = explode(',', $modalidades);
+           
+            $modalidades = is_array($modalidades) ? $modalidades : explode(',', $modalidades);
             $query->whereIn('modalidade_id', $modalidades);
         }
 
@@ -36,17 +38,27 @@ class EmpresaControllerApi extends Controller
         }
 
         // 🔎 Filtro por bairros
-        if ($bairros) {
-            $bairros = is_string($bairros) ? explode(',', $bairros) : (array) $bairros;
+       if ($bairros) {
+            $bairros = is_array($bairros) ? $bairros : explode(',', $bairros);
 
             $query->whereHas('bairros', function ($q) use ($bairros) {
-                $q->whereIn('nome', $bairros) // se vierem os nomes
-                ->orWhereIn('id', $bairros); // se vierem os IDs
+                // Separar IDs (numéricos) e nomes (strings)
+                $ids   = array_filter($bairros, fn($v) => is_numeric($v));
+                $nomes = array_filter($bairros, fn($v) => !is_numeric($v));
+
+                if ($ids) {
+                    $q->orWhereIn('id', $ids);
+                }
+                if ($nomes) {
+                    $q->orWhereIn('nome', $nomes); // <-- coluna correta
+                }
             });
         }
 
+
         return $query->get();
     }
+
 
 
     public function verificarStatus($empresaId)
