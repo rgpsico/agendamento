@@ -295,7 +295,7 @@ class EmpresaController extends Controller
                 $path = public_path('/banner');
                 if (!file_exists($path)) mkdir($path, 0755, true);
                 $file->move($path, $filenameBanner);
-                $dataToUpdate['banner'] = $filenameBanner;
+                $dataToUpdate['banners'] = $filenameBanner;
             }
 
             // Atualizar empresa

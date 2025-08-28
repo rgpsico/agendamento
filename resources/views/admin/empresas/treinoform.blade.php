@@ -131,6 +131,31 @@
                                             :value="$model->valor_aula_ate ?? ''" placeholder="R$ 0,00" />
                                     </div>
                                 </div>
+
+                                                        <!-- Avatar Upload -->
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="avatar">Avatar da Empresa</label>
+                                        <input type="file" class="form-control" id="avatar" name="avatar" accept="image/*">
+                                        <small class="text-muted">Formatos aceitos: JPG, PNG (máx. 2MB)</small>
+                                        <div class="mt-2">
+                                            <img id="avatarPreview" src="{{ isset($model->avatar) ? asset('avatar/' . $model->avatar) : '' }}"
+                                                class="img-fluid rounded" style="max-width: 150px; display: {{ isset($model->avatar) ? 'block' : 'none' }};">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Banner Upload -->
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="banner">Banner da Empresa</label>
+                                        <input type="file" class="form-control" id="banner" name="banner" accept="image/*">
+                                        <small class="text-muted">Formatos aceitos: JPG, PNG (máx. 5MB)</small>
+                                        <div class="mt-2">
+                                            <img id="bannerPreview" src="{{asset('banner/' . $model->banners)}}"
+                                                class="img-fluid rounded" style="max-width: 300px; display: {{ isset($model->banners) ? 'block' : 'none' }};">
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                             <!-- Step 2: Endereço -->
