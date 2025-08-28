@@ -5,22 +5,29 @@
 
      @include('components.modal-editar-permission')
     @include('components.modal-delete')
+    @include('components.modal-create-permission')
     
     <div class="page-wrapper">
         <div class="content container-fluid">
 
             <!-- Page Header -->
             <div class="page-header">
-                <div class="row">
-                    <div class="col-10">
-                        <h3 class="page-title">Permissões</h3>
-                        <ul class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="">Admin</a></li>
-                            <li class="breadcrumb-item"><a href="javascript:(0);">Permissões</a></li>
-                        </ul>
-                    </div>
+            <div class="row">
+                <div class="col-10">
+                    <h3 class="page-title">Permissões</h3>
+                    <ul class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="">Admin</a></li>
+                        <li class="breadcrumb-item"><a href="javascript:(0);">Permissões</a></li>
+                    </ul>
+                </div>
+                <div class="col-2 text-end">
+                    <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal_create">
+                        <i class="fe fe-plus"></i> Nova Permissão
+                    </a>
                 </div>
             </div>
+        </div>
+
             <!-- /Page Header -->
 
             <div class="row">
@@ -137,6 +144,54 @@
             });
 
         });
+
+
+        // Criar
+        $(document).on("click", "#criar_permission", function() {
+            var nome = $('#create_nome_permission').val();
+            var guard = $('#create_guard_permission').val();
+
+            $.ajax({
+                url: '/api/permissions/store',
+                method: 'POST',
+                data: { name: nome, guard_name: guard },
+                success: function(response) {
+                    // adiciona a nova linha sem precisar recarregar
+                    $('.datatable tbody').append(`
+                        <tr class="linha_id-${response.id}">
+                            <td>${response.id}</td>
+                            <td>${response.name}</td>
+                            <td>${response.guard_name}</td>
+                            <td class="text-center">
+                                <div class="actions">
+                                    <a class="btn btn-sm bg-info-light"
+                                        data-nome="${response.name}"
+                                        data-guard="${response.guard_name}"
+                                        data-id="${response.id}"
+                                        id="editar_bt">
+                                        <i class="fe fe-pencil"></i> Editar
+                                    </a>
+                                    <a data-bs-toggle="modal"
+                                        href="#delete_modal"
+                                        data-id="${response.id}"
+                                        class="btn btn-sm bg-danger-light bt_excluir">
+                                        <i class="fe fe-trash"></i> Excluir
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    `);
+
+                    $('#modal_create').modal('hide');
+                    $('#create_nome_permission').val('');
+                    alert('Permissão criada com sucesso!');
+                },
+                error: function(xhr) {
+                    alert('Erro ao criar permissão!');
+                }
+            });
+        });
+
     </script>
 
 </x-admin.layout>
