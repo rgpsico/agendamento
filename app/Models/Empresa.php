@@ -38,6 +38,12 @@ class Empresa extends Model
         'data_vencimento' => 'date'
     ];
 
+
+        public function bairros()
+    {
+        return $this->belongsToMany(Bairro::class, 'empresa_bairro', 'empresa_id', 'bairro_id');
+    }
+
     // Relacionamentos existentes
     public function site()
     {

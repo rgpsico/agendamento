@@ -13,7 +13,10 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
 
-        $this->call(FeriadosSeeder::class);
+          $this->call([
+            BairrosZonaSulSeeder::class,
+        ]);
+       // $this->call(FeriadosSeeder::class);
         //$this->call(MigrateRolesSeeder::class);
         // \App\Models\Usuario::factory(10)->create();
 

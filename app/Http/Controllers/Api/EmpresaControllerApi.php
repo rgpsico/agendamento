@@ -17,27 +17,37 @@ class EmpresaControllerApi extends Controller
 
     public function search(Request $request)
     {
-        $modalidades = $request->input('modalidades');
+        $modalidades = $request->input('modalidades');   // ex: "1,2,3"
+        $nome        = $request->input('nome_empresa');
+        $bairros     = $request->input('bairros');       // ex: "Copacabana,Ipanema" ou array [1,2]
 
-        $nome = $request->input('nome_empresa');
+        $query = Empresa::with('modalidade', 'endereco', 'galeria', 'avaliacao', 'bairros')
+            ->where('status', 'ativo'); // ✅ só empresas ativas
 
-        $query = Empresa::with('modalidade', 'endereco', 'galeria', 'avaliacao');
-
-
-          $query = Empresa::with('modalidade', 'endereco', 'galeria', 'avaliacao')
-        ->where('status', 'ativo'); // ✅ só empresas ativas
-     
+        // 🔎 Filtro por modalidades
         if ($modalidades) {
-            $modalidades = explode(',', $modalidades); 
-            $query = $query->whereIn('modalidade_id', $modalidades); 
+            $modalidades = explode(',', $modalidades);
+            $query->whereIn('modalidade_id', $modalidades);
         }
 
+        // 🔎 Filtro por nome
         if ($nome) {
-            $query = $query->where('nome', 'like', "%{$nome}%"); // pesquisa por empresas cujo nome contém a string fornecida
+            $query->where('nome', 'like', "%{$nome}%");
         }
-        
-           return $query->get();
+
+        // 🔎 Filtro por bairros
+        if ($bairros) {
+            $bairros = is_string($bairros) ? explode(',', $bairros) : (array) $bairros;
+
+            $query->whereHas('bairros', function ($q) use ($bairros) {
+                $q->whereIn('nome', $bairros) // se vierem os nomes
+                ->orWhereIn('id', $bairros); // se vierem os IDs
+            });
+        }
+
+        return $query->get();
     }
+
 
     public function verificarStatus($empresaId)
     {
