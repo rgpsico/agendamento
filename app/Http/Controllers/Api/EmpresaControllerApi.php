@@ -50,7 +50,7 @@ class EmpresaControllerApi extends Controller
                 $q->orWhereIn('id', $ids);
             }
             if ($nomes) {
-                $q->orWhereIn('name', $nomes); // <-- agora está correto
+                $q->orWhereIn('nome', $nomes); // <-- agora está correto
             }
         });
     }

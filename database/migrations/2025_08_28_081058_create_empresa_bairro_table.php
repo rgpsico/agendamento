@@ -6,17 +6,21 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('empresa_bairro', function (Blueprint $table) {
+        Schema::create('loc_empresa_bairro', function (Blueprint $table) {
             $table->unsignedBigInteger('empresa_id');
             $table->unsignedBigInteger('bairro_id');
 
-            $table->foreign('empresa_id')->references('id')->on('empresa')->onDelete('cascade');
-            $table->foreign('bairro_id')->references('id')->on('bairros')->onDelete('cascade');
+            $table->foreign('empresa_id')
+                  ->references('id')
+                  ->on('empresa') // tabela de empresas
+                  ->onDelete('cascade');
+
+            $table->foreign('bairro_id')
+                  ->references('id')
+                  ->on('loc_bairros') // tabela de bairros
+                  ->onDelete('cascade');
 
             $table->primary(['empresa_id', 'bairro_id']);
         });
@@ -24,6 +28,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('empresa_bairro');
+        Schema::dropIfExists('loc_empresa_bairro');
     }
 };

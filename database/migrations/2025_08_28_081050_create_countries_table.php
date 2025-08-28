@@ -7,16 +7,16 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::create('cities', function (Blueprint $table) {
+        Schema::create('loc_paises', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('state_id')->constrained()->cascadeOnDelete();
-            $table->string('name');
+            $table->string('nome');
+            $table->string('codigo', 5)->nullable();
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('cities');
+        Schema::dropIfExists('loc_paises');
     }
 };

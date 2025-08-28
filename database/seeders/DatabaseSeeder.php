@@ -16,6 +16,8 @@ class DatabaseSeeder extends Seeder
           $this->call([
             LocalizacaoSeeder::class,
         ]);
+
+        
        // $this->call(FeriadosSeeder::class);
         //$this->call(MigrateRolesSeeder::class);
         // \App\Models\Usuario::factory(10)->create();

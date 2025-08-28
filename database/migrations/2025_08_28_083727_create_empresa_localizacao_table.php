@@ -8,16 +8,16 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::create('empresa_localizacao', function (Blueprint $table) {
+        Schema::create('loc_empresa_localizacao', function (Blueprint $table) {
             $table->id();
             $table->foreignId('empresa_id')->constrained('empresa')->cascadeOnDelete();
-            $table->foreignId('localizacao_id')->constrained('neighborhoods')->cascadeOnDelete();
+            $table->foreignId('localizacao_id')->constrained('loc_bairros')->cascadeOnDelete();
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('empresa_localizacao');
+        Schema::dropIfExists('loc_empresa_localizacao');
     }
 };

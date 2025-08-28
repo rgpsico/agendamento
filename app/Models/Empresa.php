@@ -39,9 +39,14 @@ class Empresa extends Model
     ];
 
 
-        public function bairros()
+      public function bairros()
     {
-        return $this->belongsToMany(Bairro::class, 'empresa_bairro', 'empresa_id', 'bairro_id');
+        return $this->belongsToMany(
+           Bairros::class,
+            'loc_empresa_bairro', // nome da tabela pivot correta
+            'empresa_id',         // FK desta tabela para empresas
+            'bairro_id'           // FK desta tabela para bairros
+        );
     }
 
     // Relacionamentos existentes

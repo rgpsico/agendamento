@@ -7,17 +7,18 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::create('states', function (Blueprint $table) {
+        Schema::create('loc_zonas', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('country_id')->constrained()->cascadeOnDelete();
-            $table->string('name');
-            $table->string('code', 5)->nullable();
+            $table->foreignId('cidade_id')
+                  ->constrained('loc_cidades') // referência correta
+                  ->cascadeOnDelete();
+            $table->string('nome'); // ex: Zona Sul, Zona Norte
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('states');
+        Schema::dropIfExists('loc_zonas');
     }
 };

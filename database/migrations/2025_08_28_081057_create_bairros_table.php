@@ -11,15 +11,17 @@ return new class extends Migration
      */
    public function up(): void
     {
-        Schema::create('bairros', function (Blueprint $table) {
+        Schema::create('loc_bairros', function (Blueprint $table) {
             $table->id();
-            $table->string('nome')->unique();
+             $table->foreignId('cidade_id')->constrained('loc_cidades')->cascadeOnDelete();
+            $table->foreignId('zona_id')->constrained('loc_zonas')->cascadeOnDelete();
+            $table->string('nome'); // ex: Copacabana, Ipanema
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('bairros');
+        Schema::dropIfExists('loc_bairros');
     }
 };

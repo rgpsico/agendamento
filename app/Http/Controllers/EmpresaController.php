@@ -16,6 +16,7 @@ use App\Models\Professor;
 use App\Models\Servicos;
 use App\Models\Usuario;
 use App\Models\Alunos;
+use App\Models\Bairros;
 use App\Models\Feriado;
 use App\Models\Localizacao;
 use App\Services\ServicoService;
@@ -251,7 +252,7 @@ class EmpresaController extends Controller
             'pais' => 'required',
             'data_vencimento' =>'nullable',
             'bairros' => 'nullable|array|max:5',      // ✅ limitar no máximo 5 bairros
-            'bairros.*' => 'exists:neighborhoods,id', // ✅ cada bairro deve existir
+            'bairros.*' => 'exists:loc_bairros,id', // ✅ cada bairro deve existir
         ]);
 
         try {
@@ -658,7 +659,8 @@ class EmpresaController extends Controller
     {
 
       
-        $bairros = DB::table('neighborhoods')->get(); 
+        $bairros = Bairros::get(); 
+       
         $model = Empresa::where('user_id', $userId)->first();
         $userId =  Usuario::find($userId);
        $email_user = $userId->email;
