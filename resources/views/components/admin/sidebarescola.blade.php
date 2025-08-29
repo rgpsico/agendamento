@@ -212,48 +212,19 @@
                                 <li><a href="{{ route('modalidade.create') }}">Cadastrar</a></li>
                             </ul>
                         </li>
-
                         <li class="submenu">
                             <a href="#">
-                                <i class="fas fa-cogs" style="font-size: 18px;"></i>
-                                <span>Usúarios</span>
+                                <i class="fas fa-users-cog" style="font-size: 18px;"></i>
+                                <span>Usuários & Perfis</span>
                                 <span class="menu-arrow"></span>
                             </a>
                             <ul>
-                                <li><a href="{{ route('admin.usuarios.index') }}">Usuários</a></li>           
-                                <li><a href="{{ route('configuracoes.permissoes') }}">Permissões</a></li>                            
+                                <li><a href="{{ route('admin.usuarios.index') }}">Usuários</a></li>
+                                <li><a href="{{ route('admin.perfis.index') }}">Perfis</a></li>
+                                <li><a href="{{ route('admin.permissions.index') }}">Permissões</a></li>
                             </ul>
                         </li>
 
-                    <li class="submenu">
-                        <a href="#">
-                            <i class="fas fa-cogs" style="font-size: 18px;"></i>
-                            <span>Usuários & Acessos</span>
-                            <span class="menu-arrow"></span>
-                        </a>
-                        <ul>
-                            <li><a href="{{ route('admin.usuarios.index') }}">Criar Perfil</a></li>
-                            <li><a href="{{ route('admin.usuarios.index') }}">Usuários</a></li>
-                            <li><a href="{{ route('admin.permissions.index') }}">Permissões</a></li>
-                            
-                        </ul>
-                    </li>
-
-
-                       <li class="submenu">
-                        <a href="#">
-                            <i class="fas fa-cogs" style="font-size: 18px;"></i>
-                            <span>Criação de pefil</span>
-                            <span class="menu-arrow"></span>
-                        </a>
-                        <ul>
-                            <li><a href="{{ route('admin.perfis.index') }}">listar Perfil</a></li>
-                          
-                        </ul>
-                    </li>
-
-                        
-                        <!-- Configurações -->
                         <li class="submenu">
                             <a href="#">
                                 <i class="fas fa-cogs" style="font-size: 18px;"></i>
@@ -261,13 +232,11 @@
                                 <span class="menu-arrow"></span>
                             </a>
                             <ul>
-                                <li><a href="{{ route('configuracoes.permissoes') }}">Permissões</a></li>
-                                <li><a href="{{ route('configuracoes.pagamentos') }}">Pagamentos</a></li>
-                                <li><a href="{{ route('configuracoes.empresa') }}">Empresa</a></li>
-                                <li><a href="{{ route('admin.usuarios.index') }}">Usuários</a></li>
+                                <li><a href="{{ route('configuracoes.empresa') }}">Empresa</a></li>                       
                                 <li><a href="{{ route('configuracoes.index') }}">Sistema</a></li>
                             </ul>
                         </li>
+
 
 <!-- Adicione este CSS dentro da tag <style> existente ou crie uma nova -->
 <style>
