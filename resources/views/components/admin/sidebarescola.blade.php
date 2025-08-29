@@ -222,6 +222,7 @@
                                 <li><a href="{{ route('admin.usuarios.index') }}">Usuários</a></li>
                                 <li><a href="{{ route('admin.perfis.index') }}">Perfis</a></li>
                                 <li><a href="{{ route('admin.permissions.index') }}">Permissões</a></li>
+                                <li><a href="{{ route('admin.roles.index') }}">Papés</a></li>
                             </ul>
                         </li>
 

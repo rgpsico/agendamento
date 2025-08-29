@@ -26,6 +26,8 @@ use App\Http\Controllers\ViaCepController;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\SiteCliqueWhatsappController;
 use App\Http\Controllers\ProfessoresController;
+use App\Http\Controllers\RoleController;
+
 //   Route::get('/', [UserManagementController::class, 'index'])->name('register.aluno');
 
 
@@ -56,6 +58,16 @@ Route::prefix('admin/perfis')->name('admin.perfis.')->group(function () {
     Route::put('/{perfil}', [PerfilController::class, 'update'])->name('update');
     Route::delete('/{perfil}', [PerfilController::class, 'destroy'])->name('destroy');
 });
+
+Route::prefix('admin/roles')->name('admin.roles.')->group(function () {
+    Route::get('/', [RoleController::class, 'index'])->name('index');
+    Route::get('/create', [RoleController::class, 'create'])->name('create');
+    Route::post('/', [RoleController::class, 'store'])->name('store');
+    Route::get('/{role}/edit', [RoleController::class, 'edit'])->name('edit');
+    Route::put('/{role}', [RoleController::class, 'update'])->name('update');
+    Route::delete('/{role}', [RoleController::class, 'destroy'])->name('destroy');
+});
+
 
 
 Route::get('/google/prof/redirect', [SocialLiteController::class, 'professorRedirectToGoogle'])->name('prof.login.google');
