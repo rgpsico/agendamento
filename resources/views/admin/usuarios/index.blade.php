@@ -19,6 +19,7 @@
                 </div>
             </div>
          </div>
+      <x-alert-messages />
 
 
             <div class="row">

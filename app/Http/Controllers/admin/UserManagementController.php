@@ -92,22 +92,22 @@ class UserManagementController extends Controller
 
 
     public function edit(Usuario $user)
-{
-    // Pega todos os roles, permissões e perfis
-    $roles = Role::all();
-    $permissions = Permission::all();
-    $perfis = Perfil::all(); // <-- trazer todos os perfis
+    {
+        // Pega todos os roles, permissões e perfis
+        $roles = Role::all();
+        $permissions = Permission::all();
+        $perfis = Perfil::all(); // <-- trazer todos os perfis
 
-    return view('admin.usuarios.edit', [
-        'user' => $user,
-        'roles' => $roles,
-        'permissions' => $permissions,
-        'perfis' => $perfis, // <-- enviar para a view
-        'userRoles' => $user->roles->pluck('name')->toArray(),
-        'userPermissions' => $user->getDirectPermissions()->pluck('name')->toArray(),
-        'userPerfis' => $user->perfis->pluck('id')->toArray() // <-- ids dos perfis que o usuário já possui
-    ]);
-}
+        return view('admin.usuarios.edit', [
+            'user' => $user,
+            'roles' => $roles,
+            'permissions' => $permissions,
+            'perfis' => $perfis, // <-- enviar para a view
+            'userRoles' => $user->roles->pluck('name')->toArray(),
+            'userPermissions' => $user->getDirectPermissions()->pluck('name')->toArray(),
+            'userPerfis' => $user->perfis->pluck('id')->toArray() // <-- ids dos perfis que o usuário já possui
+        ]);
+    }
 
 
    public function update(Request $request, Usuario $user)

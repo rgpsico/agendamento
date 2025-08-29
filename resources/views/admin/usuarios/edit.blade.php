@@ -1,7 +1,9 @@
 <x-admin.layout title="Editar Usuário">
     <div class="page-wrapper">
-        <div class="content container-fluid">
+         <!-- Mensagens de Sucesso -->
+       
 
+     <x-alert-messages />
             <h3>Editar Usuário</h3>
 
             <form action="{{ route('admin.usuarios.update', $user->id) }}" method="POST">
