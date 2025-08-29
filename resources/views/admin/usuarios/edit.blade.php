@@ -27,21 +27,24 @@
                 </div>
 
                 <!-- Senha -->
-                <div class="row mt-3">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label>Senha</label>
-                            <input type="password" name="password" class="form-control">
-                            <small class="text-muted">Deixe em branco para não alterar</small>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label>Confirmar Senha</label>
-                            <input type="password" name="password_confirmation" class="form-control">
-                        </div>
+             @can('alterar_senha') {{-- ou @can('alterar_senha') se usar permissão --}}
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Senha</label>
+                        <input type="password" name="password" class="form-control">
+                        <small class="text-muted">Deixe em branco para não alterar</small>
                     </div>
                 </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Confirmar Senha</label>
+                        <input type="password" name="password_confirmation" class="form-control">
+                    </div>
+                </div>
+            </div>
+            @endcan
+
 
                 <!-- Perfis -->
                 <div class="row mt-4">

@@ -186,7 +186,7 @@
                         </li>
                     @endisset
                    
-                    @if (Auth::user()->isAdmin)
+                      @can('admin-access') 
                         <!-- Gestão de Empresas -->
                         <li class="submenu">
                             <a href="#">
@@ -199,8 +199,9 @@
                                 <li><a href="#">Cadastrar</a></li>
                             </ul>
                         </li>
-
+                      @endcan
                         <!-- Modalidades -->
+                      
                         <li class="submenu">
                             <a href="#">
                                 <i class="fas fa-swimmer"></i>
@@ -212,7 +213,9 @@
                                 <li><a href="{{ route('modalidade.create') }}">Cadastrar</a></li>
                             </ul>
                         </li>
+                        
                         <li class="submenu">
+                     
                             <a href="#">
                                 <i class="fas fa-users-cog" style="font-size: 18px;"></i>
                                 <span>Usuários & Perfis</span>
@@ -220,11 +223,13 @@
                             </a>
                             <ul>
                                 <li><a href="{{ route('admin.usuarios.index') }}">Usuários</a></li>
-                                <li><a href="{{ route('admin.perfis.index') }}">Perfis</a></li>
+                                {{-- <li><a href="{{ route('admin.perfis.index') }}">Perfis</a></li> --}}
                                 <li><a href="{{ route('admin.permissions.index') }}">Permissões</a></li>
-                                <li><a href="{{ route('admin.roles.index') }}">Papés</a></li>
+                                <li><a href="{{ route('admin.roles.index') }}">Papéis</a></li>
                             </ul>
-                        </li>
+                       
+                    </li>
+
 
                         <li class="submenu">
                             <a href="#">
@@ -273,11 +278,13 @@
     // Gradiente animado
     let gradStep = 0;
     function animateGradient() {
-        gradStep += 0.5;
-        const angle = 135 + 45 * Math.sin(gradStep/20);
-        sidebar_escola.style.background = `linear-gradient(${angle}deg, #1e3c72 0%, #2a5298 5%, #00d2ff 100%)`;
-        requestAnimationFrame(animateGradient);
-    }
+    if (!sidebar_escola) return; // evita erro
+    gradStep += 0.5;
+    const angle = 135 + 45 * Math.sin(gradStep/20);
+    sidebar_escola.style.background = `linear-gradient(${angle}deg, #1e3c72 0%, #2a5298 5%, #00d2ff 100%)`;
+    requestAnimationFrame(animateGradient);
+}
+
     animateGradient();
 
     // Brilho pulsante

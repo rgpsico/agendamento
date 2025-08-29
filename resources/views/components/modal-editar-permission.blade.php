@@ -1,24 +1,27 @@
-<div class="modal fade" id="modal_editar" tabindex="-1" aria-labelledby="modalEditarPermissao" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Editar Permissão</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-      </div>
-      <div class="modal-body">
-        <input type="hidden" id="permission_id">
-        <div class="form-group">
-          <label for="nome_permission">Nome</label>
-          <input type="text" id="nome_permission" class="form-control">
+ <div class="modal fade" id="modal_editar_permission" tabindex="-1" aria-labelledby="modalEditarPermissionLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalEditarPermissionLabel">Editar Permissão</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editar_permission_form">
+                        <input type="hidden" id="permission_id">
+                        <div class="mb-3">
+                            <label for="nome_permission" class="form-label">Nome</label>
+                            <input type="text" class="form-control" id="nome_permission" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="guard_permission" class="form-label">Guard</label>
+                            <input type="text" class="form-control" id="guard_permission" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-primary" id="salvar_editar_permission">Salvar</button>
+                </div>
+            </div>
         </div>
-        <div class="form-group mt-2">
-          <label for="guard_permission">Guard</label>
-          <input type="text" id="guard_permission" class="form-control" value="web">
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" id="salvar_permission" class="btn btn-primary">Salvar</button>
-      </div>
     </div>
-  </div>
-</div>

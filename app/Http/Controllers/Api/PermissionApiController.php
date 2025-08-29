@@ -26,15 +26,22 @@ class PermissionApiController extends Controller
         return view('permissions.edit', compact('permission'));
     }
 
-    public function update(Request $request, Permission $permission)
+    public function update(Request $request, $id)
     {
+        $permission = Permission::findOrFail($id);
+
         $request->validate([
             'name' => 'required|unique:permissions,name,' . $permission->id
         ]);
-        $permission->update(['name' => $request->name]);
 
-        return redirect()->route('permissions.index')->with('success', 'Permissão atualizada!');
+        $permission->update([
+            'name' => $request->name,
+            'guard_name' => $request->guard_name,
+        ]);
+
+        return response()->json($permission); // se for AJAX
     }
+
 
     public function destroy(Permission $permission)
     {

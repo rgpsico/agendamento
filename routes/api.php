@@ -67,7 +67,7 @@ Route::prefix('permissions')->group(function () {
     Route::get('/', [PermissionApiController::class, 'index']);
     Route::get('/{id}', [PermissionApiController::class, 'show']);
     Route::post('/store', [PermissionApiController::class, 'store']);
-    Route::post('/update/{id}', [PermissionApiController::class, 'update']);
+    Route::put('/update/{id}', [PermissionApiController::class, 'update']);
     Route::post('/delete/{id}', [PermissionApiController::class, 'destroy']);
 });
 
