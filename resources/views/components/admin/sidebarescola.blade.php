@@ -225,16 +225,30 @@
                             </ul>
                         </li>
 
-                        <li class="submenu">
+                    <li class="submenu">
                         <a href="#">
                             <i class="fas fa-cogs" style="font-size: 18px;"></i>
                             <span>Usuários & Acessos</span>
                             <span class="menu-arrow"></span>
                         </a>
                         <ul>
+                            <li><a href="{{ route('admin.usuarios.index') }}">Criar Perfil</a></li>
                             <li><a href="{{ route('admin.usuarios.index') }}">Usuários</a></li>
                             <li><a href="{{ route('admin.permissions.index') }}">Permissões</a></li>
-                            {{-- <li><a href="{{ route('configuracoes.roles') }}">Papéis</a></li> --}}
+                            
+                        </ul>
+                    </li>
+
+
+                       <li class="submenu">
+                        <a href="#">
+                            <i class="fas fa-cogs" style="font-size: 18px;"></i>
+                            <span>Criação de pefil</span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <ul>
+                            <li><a href="{{ route('admin.perfis.index') }}">listar Perfil</a></li>
+                          
                         </ul>
                     </li>
 

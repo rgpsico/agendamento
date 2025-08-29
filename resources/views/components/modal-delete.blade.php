@@ -1,3 +1,4 @@
+
 <div class="modal delete_modal fade show" id="delete_modal" role="dialog" aria-modal="true" >
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">

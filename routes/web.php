@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SocialLiteController;
@@ -46,6 +47,16 @@ Route::prefix('admin/usuarios')->name('admin.usuarios.')->group(function () {
     Route::get('/{user}/permissions', [UserManagementController::class, 'getPermissions'])->name('permissions.get');
     Route::post('/{user}/permissions', [UserManagementController::class, 'updatePermissions'])->name('permissions.update');
 });
+
+Route::prefix('admin/perfis')->name('admin.perfis.')->group(function () {
+    Route::get('/', [PerfilController::class, 'index'])->name('index');
+    Route::get('/create', [PerfilController::class, 'create'])->name('create');
+    Route::post('/', [PerfilController::class, 'store'])->name('store');
+    Route::get('/{perfil}/edit', [PerfilController::class, 'edit'])->name('edit');
+    Route::put('/{perfil}', [PerfilController::class, 'update'])->name('update');
+    Route::delete('/{perfil}', [PerfilController::class, 'destroy'])->name('destroy');
+});
+
 
 Route::get('/google/prof/redirect', [SocialLiteController::class, 'professorRedirectToGoogle'])->name('prof.login.google');
 Route::get('/google/prof/callback', [SocialLiteController::class, 'professorGoogleCallback'])->name('prof.handle.google');
