@@ -36,7 +36,7 @@ use Twilio\Rest\Client;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\ContatoController;
-
+use App\Http\Controllers\EmpresaController;
 
 Route::post('pagamento/presencial', [PagamentoController::class, 'criarPagamentoPresencial'])->name('empresa.pagamento.prensencial');
 
@@ -62,7 +62,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 
-
+  Route::delete('/gallery/{id}', [EmpresaController::class, 'galleryDestroy'])->name('gallery.destroy');
 Route::prefix('permissions')->group(function () {
     Route::get('/', [PermissionApiController::class, 'index']);
     Route::get('/{id}', [PermissionApiController::class, 'show']);

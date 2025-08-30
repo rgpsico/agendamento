@@ -73,10 +73,10 @@
                     e.preventDefault();
                     const item = this.closest('.galeria-item');
                     const fotoId = item.getAttribute('data-id');
-
+                        ///{id}/excluirImagens
                     if(confirm('Deseja realmente excluir esta imagem?')) {
-                        fetch("{{ route('gallery.destroy',['id' =>]) }}", {
-                            method: 'POST',
+                         fetch(`/api/gallery/${fotoId}`, {
+                            method: 'DELETE',
                             headers: {
                                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
                                 'Content-Type': 'application/json'
