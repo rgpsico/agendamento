@@ -37,17 +37,28 @@ class ConfiguracoesController extends Controller
     {
       
         // Buscar as configurações salvas
-        $config = ConfiguracaoGeral::first();
+    
 
-        return view('configuracoesadmin.index', [
-        'tipoAgendamento' => optional($config)->agendamento_tipo ?? 'horarios',
-        'whatsappNumero' => optional($config)->whatsapp_numero ?? '',
-        'loginImage' => optional($config)->login_image ? asset('storage/' . $config->login_image) : null,
-        'registerImage' => optional($config)->register_image ? asset('storage/' . $config->register_image) : null,
-        'homeMode' => optional($config)->home_mode ?? 'carousel',
-        'carouselImages' => json_decode(optional($config)->carousel_images ?? '[]', true),
-        'sistemaTipo' => optional($config)->sistema_tipo ?? 'passeio',
-    ]);
+        $config = ConfiguracaoGeral::first();
+            return view('configuracoesadmin.index', [
+                'nomeSistema' => $config->nome_sistema ?? '',
+                'logoHeader' => $config->logo_header ?? null,
+                'logoFooter' => $config->logo_footer ?? null,
+                'modalBoasVindas' => $config->modal_boas_vindas ?? '',
+                'loginImage' => $config->login_image ?? null,
+                'registerImage' => $config->register_image ?? null,
+                'homeMode' => $config->home_mode ?? 'slider',
+                'sliderImages' => $config->slider_images ?? [],
+                'homeImage' => $config->home_image ?? null,
+                'homeTitle' => $config->home_title ?? '',
+                'sistemaTipo' => $config->sistema_tipo ?? 'passeio',
+                'instagram' => $config->instagram ?? '',
+                'whatsapp' => $config->whatsapp ?? '',
+                'tiktok' => $config->tiktok ?? '',
+                'email' => $config->email ?? '',
+                'politicaPrivacidade' => $config->politica_privacidade ?? '',
+                'termosCondicoes' => $config->termos_condicoes ?? '',
+            ]);
 
     }
 
@@ -64,20 +75,67 @@ class ConfiguracoesController extends Controller
     }
 
     public function salvar(Request $request)
-    {
+{
+    // Busca ou cria a única configuração global
+    $config = ConfiguracaoGeral::first() ?? new ConfiguracaoGeral();
 
-        $empresaId = auth()->user()->empresa->id ?? null;
+    // Campos de texto e seleções
+    $config->fill([
+        'nome_sistema' => $request->input('nome_sistema') ?? 'Agendamento',
+        'modal_boas_vindas' => $request->input('modal_boas_vindas') ?? 'Seja bem vindo',
+        'home_mode' => $request->input('home_mode') ?? 'padrao',
+        'home_title' => $request->input('home_title') ?? 'Passeio',
+        'sistema_tipo' => $request->input('sistema_tipo') ?? 'horario',
+        'instagram' => $request->input('instagram'),
+        'whatsapp' => $request->input('whatsapp'),
+        'tiktok' => $request->input('tiktok'),
+        'email' => $request->input('email'),
+        'politica_privacidade' => $request->input('politica_privacidade'),
+        'termos_condicoes' => $request->input('termos_condicoes'),
+        'agendamento_tipo' => $request->input('agendamento_tipo'),
+        'whatsapp_numero' => $request->input('whatsapp_numero'),
+    ]);
 
-        // Atualiza o tipo de agendamento
-        Configuracao::set($empresaId, 'agendamento_tipo', $request->input('agendamento_tipo'));
-
-        // Atualiza o número do WhatsApp, se necessário
-        if ($request->input('agendamento_tipo') === 'whatsapp') {
-            Configuracao::set($empresaId, 'whatsapp_numero', $request->input('whatsapp_numero'));
-        }
-
-        return redirect()->back()->with('success', 'Configurações atualizadas com sucesso!');
+    // Upload da imagem de login
+    if ($request->hasFile('login_image')) {
+        $config->login_image = $request->file('login_image')->store('configuracoes', 'public');
     }
+
+    // Upload da imagem de registro
+    if ($request->hasFile('register_image')) {
+        $config->register_image = $request->file('register_image')->store('configuracoes', 'public');
+    }
+
+    // Upload da imagem de logo header
+    if ($request->hasFile('logo_header')) {
+        $config->logo_header = $request->file('logo_header')->store('configuracoes', 'public');
+    }
+
+    // Upload da imagem de logo footer
+    if ($request->hasFile('logo_footer')) {
+        $config->logo_footer = $request->file('logo_footer')->store('configuracoes', 'public');
+    }
+
+    // Upload da imagem padrão da home
+    if ($request->hasFile('home_image')) {
+        $config->home_image = $request->file('home_image')->store('configuracoes', 'public');
+    }
+
+    // Upload múltiplo do slider
+    if ($request->hasFile('slider_images')) {
+        $paths = [];
+        foreach ($request->file('slider_images') as $file) {
+            $paths[] = $file->store('configuracoes', 'public');
+        }
+        $config->slider_images = $paths;
+    }
+
+    $config->save();
+
+    return redirect()->back()->with('success', 'Configurações do sistema atualizadas com sucesso!');
+}
+
+
 
 
     public function salvarConfigGeral(Request $request)
