@@ -4,7 +4,7 @@
     <!-- Breadcrumb -->
 
     @include('public.home._partials.modalregister')
-    <x-home.breadcrumb title="Busque Seu Passeio " />
+    <x-home.breadcrumb  />
     <!-- /Breadcrumb -->
 
     <!-- Page Content -->

@@ -76,8 +76,10 @@ class ConfiguracoesController extends Controller
 
     public function salvar(Request $request)
 {
+
+
     // Busca ou cria a única configuração global
-    $config = ConfiguracaoGeral::first() ?? new ConfiguracaoGeral();
+    $config = ConfiguracaoGeral::first();
 
     // Campos de texto e seleções
     $config->fill([
@@ -99,6 +101,7 @@ class ConfiguracoesController extends Controller
     // Upload da imagem de login
     if ($request->hasFile('login_image')) {
         $config->login_image = $request->file('login_image')->store('configuracoes', 'public');
+    
     }
 
     // Upload da imagem de registro
@@ -109,6 +112,7 @@ class ConfiguracoesController extends Controller
     // Upload da imagem de logo header
     if ($request->hasFile('logo_header')) {
         $config->logo_header = $request->file('logo_header')->store('configuracoes', 'public');
+              
     }
 
     // Upload da imagem de logo footer

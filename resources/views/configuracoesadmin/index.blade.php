@@ -36,7 +36,7 @@
                 
                 <!-- Aba: Configurações Gerais -->
                 <div class="tab-pane fade show active" id="gerais">
-                    <form action="{{ route('configuracoes.salvar') }}" method="POST">
+                    <form action="{{ route('configuracoes.salvar') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="form-group">
                             <label>Nome do Sistema:</label>

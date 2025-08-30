@@ -48,6 +48,7 @@ class HomeController extends Controller
     public function index()
     {
        
+       
         $model = $this->model::with('modalidade', 'endereco', 'galeria', 'avaliacao')->where('status', 'ativo')->get();
         $modalidade = Modalidade::all();
         $bairros = Bairros::all();
@@ -67,7 +68,8 @@ class HomeController extends Controller
                 'route' => $this->route,
                 'model' =>  $model,
                 'modalidade' => $modalidade,
-                'bairros' => $bairros
+                'bairros' => $bairros,
+                'teste' => 'eeee'
             ]
         );
     }

@@ -181,7 +181,7 @@ Route::prefix('cliente')->middleware('auth')->group(function () {
         Route::get('/{userId}/endereco_empresa', [EmpresaController::class, 'endereco'])->name('empresa.endereco');
         Route::post('/uploadEmpresa', [EmpresaController::class, 'uploadImage'])->name('empresa.upload');
         // Route::post('/{id}/excluirImagens', [EmpresaController::class, 'galleryDestroy'])->name('gallery.destroy');
-            Route::delete('/gallery/{id}', [EmpresaController::class, 'galleryDestroy'])->name('gallery.destroy');
+          
 
 
         Route::group(['prefix' => '/alunos'], function () {
