@@ -12,7 +12,7 @@
                 <li class="nav-item">
                     <a class="nav-link active" data-bs-toggle="tab" href="#gerais">Gerais</a>
                 </li>
-                @if(Auth::user()->isAdmin)
+            
                     <li class="nav-item">
                         <a class="nav-link" data-bs-toggle="tab" href="#login">Login & Registro</a>
                     </li>
@@ -28,7 +28,7 @@
                     <li class="nav-item">
                         <a class="nav-link" data-bs-toggle="tab" href="#legais">Políticas & Termos</a>
                     </li>
-                @endif
+            
             </ul>
 
             <!-- Conteúdo das Abas -->
