@@ -151,9 +151,12 @@
                                         <input type="file" class="form-control" id="banner" name="banner" accept="image/*">
                                         <small class="text-muted">Formatos aceitos: JPG, PNG (máx. 5MB)</small>
                                         <div class="mt-2">
-                                            <img id="bannerPreview" src="{{asset('banner/' . $model->banners)}}"
+                                                @isset($model->banners)
+                                                           <img id="bannerPreview" src="{{asset('banner/' . $model->banners)}}"
                                                 class="img-fluid rounded" style="max-width: 300px; display: {{ isset($model->banners) ? 'block' : 'none' }};">
-                                        </div>
+                               
+                                                @endisset
+                                              </div>
                                     </div>
                                 </div>
                             </div>

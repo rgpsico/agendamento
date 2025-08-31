@@ -14,18 +14,23 @@
                             </span>
                         </a>
                         <!-- Logo -->
-            
+                     
                         <a href="{{ route('home.index') }}" class="navbar-brand logo">
-                            <img src="{{ $config->logo_header ? asset('storage/'.$config->logo_header) : 'https://via.placeholder.com/150x50?text=Logo' }}"
+                               @isset($config->logo_header )
+                                     <img src="{{ $config->logo_header ? asset('storage/'.$config->logo_header) : 'https://via.placeholder.com/150x50?text=Logo' }}"
                                 class="img-fluid" alt="Logo">
+                                @else
+                                    <img src="https://rjpasseios.com.br/wp-content/uploads/2024/12/cropped-logo-1.png"
+                                    class="img-fluid" alt="Logo">
+                            @endisset
                         </a>
                     </div>
 
                     <div class="main-menu-wrapper">
                         <div class="menu-header">
                             <a href="" class="menu-logo">
-                               <img src="{{ $config->logo_header ? asset('storage/'.$config->logo_header) : 'https://via.placeholder.com/150x50?text=Logo' }}"
-                                class="img-fluid" alt="Logo">
+                                <img src="https://rjpasseios.com.br/wp-content/uploads/2024/12/cropped-logo-1.png"
+                                    class="img-fluid" alt="Logo">
                             </a>
                             <a id="menu_close" class="menu-close" href="javascript:void(0);">
                                 <i class="fas fa-times"></i>

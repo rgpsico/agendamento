@@ -239,7 +239,7 @@
                             </a>
                             <ul>
                                 <li><a href="{{ route('configuracoes.empresa') }}">Empresa</a></li>                       
-                                <li><a href="{{ route('configuracoes.index') }}">Sistema</a></li>
+                                 <li><a href="{{ route('empresa.pagamento.config.index') }}">Configurações</a></li>
                             </ul>
                         </li>
 
