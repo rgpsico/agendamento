@@ -1,6 +1,22 @@
 <x-admin.layout title="Listar Templates">
 
-    @include('components.modal-delete') {{-- Modal de exclusão padrão --}}
+ <div class="modal fade" id="delete_modal_template" tabindex="-1" aria-labelledby="deleteModalPermissionLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalPermissionLabel">Confirmar Exclusão</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Tem certeza que deseja excluir esta permissão?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger confirmar_exclusao_template" data_id="">Excluir</button>
+                </div>
+            </div>
+        </div>
+    </div>
     
     <div class="page-wrapper">
         <div class="content container-fluid">
@@ -74,26 +90,32 @@
             // Exclusão via modal
             $(document).on("click", ".bt_excluir", function() {
                 var id = $(this).data('id');
-                $('.confirmar_exclusao').attr('data_id', id);
-                $(".delete_modal").modal('show');
+                $('.confirmar_exclusao_template').attr('data_id', id);
+                $("#delete_modal_template").modal('show');
             });
 
-            $(document).on("click", ".confirmar_exclusao", function() {
-                var id = $(this).attr('data_id');
+           $(document).on("click", ".confirmar_exclusao_template", function() {
+            var id = $(this).attr('data_id');
 
-                $.ajax({
-                    url:'/site-templates/' + id,
-                    type: 'DELETE',
-                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
-                    success: function(result) {
-                        $(".modal").modal('hide');
+            $.ajax({
+                url: '/site-templates/' + id,
+                type: 'DELETE',
+                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                success: function(result) {
+                    if (result.success) {
+                        $("#delete_modal_template").modal('hide');
                         $(".linha_id-" + id).fadeOut();
-                    },
-                    error: function(request,msg,error) {
-                        console.log(error);
+                    } else {
+                        alert(result.message);
                     }
-                });
+                },
+                error: function(xhr) {
+                    console.log(xhr.responseText);
+                    alert("Ocorreu um erro ao excluir.");
+                }
             });
+        });
+
         });
     </script>
 

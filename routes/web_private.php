@@ -247,8 +247,6 @@ Route::post('/analytics/event', [\App\Http\Controllers\AnalyticsController::clas
 Route::resource('site-templates', SiteTemplateController::class);
 
 
-Route::get('site-templates/lista', [SiteTemplateController::class, 'index'])->name('admin.sitetemplate.index');
-
 
 Route::prefix('admin')->middleware('auth')->group(function () {
     Route::get('/relatorios', [\App\Http\Controllers\AnalyticsController::class, 'dashboard'])->name('admin.analytics.dashboard');

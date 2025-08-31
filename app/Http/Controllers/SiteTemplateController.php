@@ -77,10 +77,22 @@ class SiteTemplateController extends Controller
             ->with('success', 'Template atualizado com sucesso!');
     }
 
-
     public function destroy(SiteTemplate $siteTemplate)
     {
-        $siteTemplate->delete();
-        return redirect()->route('admin.sitetemplate.index')->with('success', 'Template removido!');
+        try {
+            $siteTemplate->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Template removido com sucesso!'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao excluir template.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
+
 }
