@@ -39,7 +39,7 @@ class ConfiguracoesController extends Controller
         // Buscar as configurações salvas
     
 
-        $config = ConfiguracaoGeral::first();
+    $config = ConfiguracaoGeral::firstOrCreate([]);
             return view('configuracoesadmin.index', [
                 'nomeSistema' => $config->nome_sistema ?? '',
                 'logoHeader' => $config->logo_header ?? null,
