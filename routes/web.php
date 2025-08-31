@@ -16,7 +16,7 @@ use App\Http\Controllers\SiteContatoController;
 use App\Http\Controllers\SiteController;
 use App\Http\Controllers\SiteServicoController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\Admin\UserManagementController;
+use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\Api\AsaasController;
 use App\Http\Controllers\BoletoController;
 use App\Http\Controllers\ProfessoresAsaasController;
