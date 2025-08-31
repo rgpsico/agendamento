@@ -39,7 +39,7 @@ class ConfiguracoesController extends Controller
         // Buscar as configurações salvas
     
 
-    $config = ConfiguracaoGeral::firstOrCreate([]);
+        $config = ConfiguracaoGeral::first();
             return view('configuracoesadmin.index', [
                 'nomeSistema' => $config->nome_sistema ?? '',
                 'logoHeader' => $config->logo_header ?? null,
@@ -79,8 +79,7 @@ class ConfiguracoesController extends Controller
 
 
     // Busca ou cria a única configuração global
-    $config = ConfiguracaoGeral::first();
-
+   $config = ConfiguracaoGeral::firstOrCreate([]);
     // Campos de texto e seleções
     $config->fill([
         'nome_sistema' => $request->input('nome_sistema') ?? 'Agendamento',
