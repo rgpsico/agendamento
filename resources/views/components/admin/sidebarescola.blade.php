@@ -149,7 +149,7 @@
                                         <i class="fe fe-map-pin"></i> <span> Endereço</span>
                                     </a>
                                 </li>
-                                <li><a href="{{ route('configuracoes.indexAdmin') }}">Sistema Geral</a></li>
+                               
                             @endisset
                         </ul>
                     </li>
@@ -238,8 +238,9 @@
                                 <span class="menu-arrow"></span>
                             </a>
                             <ul>
+                                <li><a href="{{ route('configuracoes.indexAdmin') }}">Sistema Geral</a></li>
                                 <li><a href="{{ route('configuracoes.empresa') }}">Empresa</a></li>                       
-                                 <li><a href="{{ route('empresa.pagamento.config.index') }}">Configurações</a></li>
+                            
                             </ul>
                         </li>
 
