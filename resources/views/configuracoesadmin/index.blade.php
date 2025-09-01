@@ -176,26 +176,54 @@
                     </form>
                 </div>
 
+                 <div class="tab-content mt-3">
+                
+                <!-- Aba: Seeds do Sistema -->
                 <div class="tab-pane fade" id="seeds">
                     <h5>Rodar Seeds do Sistema</h5>
-                    <p>Escolha o nicho do sistema e rode as seeds de acordo com o tipo selecionado.</p>
+                    <p>Escolha o nicho ou a localização que deseja popular.</p>
 
-                    <div class="form-group mb-3">
-                        <label for="nichoSeed">Selecione o Nicho:</label>
-                        <select id="nichoSeed" class="form-control">
-                            <option value="">-- Selecione --</option>
-                            <option value="pet">Pet</option>
-                            <option value="praia">Esportes de Praia</option>
-                            <option value="estetica">Estética / Beleza</option>
-                        </select>
-                    </div>
+                    <div class="row mb-4">
+                        <!-- Seeds de Nichos -->
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="nichoSeed">Selecione o Nicho:</label>
+                                <select id="nichoSeed" class="form-control">
+                                    <option value="">-- Selecione --</option>
+                                    <option value="pet">Pet</option>
+                                    <option value="praia">Esportes de Praia</option>
+                                    <option value="estetica">Estética / Beleza</option>
+                                </select>
+                            </div>
+                            <div class="form-group mb-3">
+                                <button id="rodarSeedNicho" class="btn btn-success w-100">Rodar Seed de Nicho</button>
+                            </div>
+                        </div>
 
-                    <div class="form-group mb-3">
-                        <button id="rodarSeed" class="btn btn-success">Rodar Seed</button>
+                        <!-- Seeds de Localizações -->
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="localizacaoSeed">Rodar Seeds de Localização:</label>
+                                <select id="localizacaoSeed" class="form-control">
+                                    <option value="pais">País</option>
+                                    <option value="estado">Estado</option>
+                                    <option value="cidade">Cidade</option>
+                                    <option value="zona">Zona</option>
+                                    <option value="bairro">Bairro</option>
+                                </select>
+                            </div>
+                            <div class="form-group mb-3">
+                                <button id="rodarSeedLocalizacao" class="btn btn-info w-100">Rodar Seed de Localização</button>
+                            </div>
+                        </div>
                     </div>
 
                     <div id="resultadoSeed" class="mt-3"></div>
                 </div>
+
+            </div>
+        </div>
+    </div>
 
             </div>
 
@@ -224,40 +252,20 @@
         });
     </script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
 
-            // Toggle home fields
-            const homeMode = document.querySelector('select[name="home_mode"]');
-            const sliderField = document.getElementById("sliderImages");
-            const imagemField = document.getElementById("imagemHome");
-            function toggleHomeFields() {
-                if(homeMode.value === 'slider') {
-                    sliderField.style.display = 'block';
-                    imagemField.style.display = 'none';
-                } else {
-                    sliderField.style.display = 'none';
-                    imagemField.style.display = 'block';
-                }
-            }
-            if(homeMode) {
-                homeMode.addEventListener("change", toggleHomeFields);
-                toggleHomeFields();
-            }
-
-            // Rodar seed
-            const rodarSeedBtn = document.getElementById('rodarSeed');
             const resultadoSeed = document.getElementById('resultadoSeed');
 
-            rodarSeedBtn.addEventListener('click', function() {
+            // Rodar Seed de Nicho
+            document.getElementById('rodarSeedNicho').addEventListener('click', function() {
                 const nicho = document.getElementById('nichoSeed').value;
                 if(!nicho) {
                     alert('Selecione um nicho antes de rodar a seed.');
                     return;
                 }
-
-                resultadoSeed.innerHTML = "Rodando seed...";
+                resultadoSeed.innerHTML = "Rodando seed de nicho...";
                 gsap.to(resultadoSeed, {opacity: 1, duration: 0.5});
 
                 fetch(`/configuracoes/seeds/run/${nicho}`, {
@@ -273,7 +281,31 @@
                     gsap.from(resultadoSeed, {y: -20, opacity: 0, duration: 0.5});
                 })
                 .catch(err => {
-                    resultadoSeed.innerHTML = `<div class="alert alert-danger">Erro ao rodar seed.</div>`;
+                    resultadoSeed.innerHTML = `<div class="alert alert-danger">Erro ao rodar seed de nicho.</div>`;
+                    console.error(err);
+                });
+            });
+
+            // Rodar Seed de Localização
+            document.getElementById('rodarSeedLocalizacao').addEventListener('click', function() {
+                const tipo = document.getElementById('localizacaoSeed').value;
+                resultadoSeed.innerHTML = `Rodando seed de ${tipo}...`;
+                gsap.to(resultadoSeed, {opacity: 1, duration: 0.5});
+
+                fetch(`/configuracoes/seeds/run/localizacao/${tipo}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json',
+                    },
+                })
+                .then(res => res.json())
+                .then(data => {
+                    resultadoSeed.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
+                    gsap.from(resultadoSeed, {y: -20, opacity: 0, duration: 0.5});
+                })
+                .catch(err => {
+                    resultadoSeed.innerHTML = `<div class="alert alert-danger">Erro ao rodar seed de localização.</div>`;
                     console.error(err);
                 });
             });
