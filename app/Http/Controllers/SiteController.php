@@ -300,46 +300,110 @@ private function verificarDnsSsl($dominio)
     }
 
     // Salvar serviços
-    if (!empty($validated['servicos'])) {
-        foreach ($validated['servicos'] as $servicoData) {
-            $servico = $site->siteServicos()->create([
-                'titulo' => $servicoData['titulo'],
-                'descricao' => $servicoData['descricao'],
-                'preco' => $servicoData['preco'],
-            ]);
-            if ($request->hasFile("servicos.{$servicoData['index']}.imagem")) {
-                $servico->imagem = $request->file("servicos.{$servicoData['index']}.imagem")->store('servicos', 'public');
-                $servico->save();
+    if ($request->filled('servicos')) {
+        foreach ($request->servicos as $servicoInput) {
+            $imagemPath = null;
+            if (!empty($servicoInput['imagem'])) {
+                $imagemPath = $servicoInput['imagem']->store('sites/servicos', 'public');
+            }
+
+            if (!empty($servicoInput['id'])) {
+                $servico = SiteServico::find($servicoInput['id']);
+                if ($servico) {
+                    $servico->update([
+                        'titulo' => $servicoInput['titulo'],
+                        'descricao' => $servicoInput['descricao'] ?? null,
+                        'preco' => $servicoInput['preco'] ?? null,
+                        'imagem' => $imagemPath ?? $servicoInput['imagem_existente'] ?? $servico->imagem,
+                    ]);
+                }
+            } else {
+                SiteServico::create([
+                    'site_id' => $site->id,
+                    'titulo' => $servicoInput['titulo'],
+                    'descricao' => $servicoInput['descricao'] ?? null,
+                    'preco' => $servicoInput['preco'] ?? null,
+                    'imagem' => $imagemPath ?? null,
+                ]);
             }
         }
     }
 
-    // Salvar depoimentos
-    if (!empty($validated['depoimentos'])) {
-        foreach ($validated['depoimentos'] as $index => $depoimentoData) {
-            $depoimento = $site->depoimentos()->create([
-                'nome' => $depoimentoData['nome'],
-                'nota' => $depoimentoData['nota'],
-                'comentario' => $depoimentoData['comentario'],
-            ]);
-            if ($request->hasFile("depoimentos.{$index}.foto")) {
-                $depoimento->foto = $request->file("depoimentos.{$index}.foto")->store('depoimentos', 'public');
-                $depoimento->save();
+    // --- Depoimentos ---
+    if ($request->filled('depoimentos')) {
+        foreach ($request->depoimentos as $depoimentoInput) {
+            if (!empty($depoimentoInput['deleted']) && $depoimentoInput['deleted'] == 1 && !empty($depoimentoInput['id'])) {
+                $depo = SiteDepoimento::find($depoimentoInput['id']);
+                if ($depo) {
+                    if ($depo->foto && Storage::disk('public')->exists($depo->foto)) {
+                        Storage::disk('public')->delete($depo->foto);
+                    }
+                    $depo->delete();
+                }
+                continue;
+            }
+
+            $fotoPath = null;
+            if (!empty($depoimentoInput['foto'])) {
+                $fotoPath = $depoimentoInput['foto']->store('sites/depoimentos', 'public');
+            }
+
+            if (!empty($depoimentoInput['id'])) {
+                $depo = SiteDepoimento::find($depoimentoInput['id']);
+                if ($depo) {
+                    $depo->update([
+                        'nome' => $depoimentoInput['nome'],
+                        'nota' => $depoimentoInput['nota'] ?? null,
+                        'comentario' => $depoimentoInput['comentario'] ?? null,
+                        'foto' => $fotoPath ?? $depoimentoInput['foto_existente'] ?? $depo->foto,
+                    ]);
+                }
+            } else {
+                SiteDepoimento::create([
+                    'site_id' => $site->id,
+                    'nome' => $depoimentoInput['nome'],
+                    'nota' => $depoimentoInput['nota'] ?? null,
+                    'comentario' => $depoimentoInput['comentario'] ?? null,
+                    'foto' => $fotoPath ?? null,
+                ]);
             }
         }
     }
 
-    // Salvar códigos de rastreamento
-    if (!empty($validated['tracking_codes'])) {
-        foreach ($validated['tracking_codes'] as $trackingData) {
-            $site->trackingCodes()->create([
-                'name' => $trackingData['name'],
-                'provider' => $trackingData['provider'],
-                'code' => $trackingData['code'],
-                'type' => $trackingData['type'],
-                'script' => $trackingData['script'],
-                'status' => $trackingData['status'] ?? false,
-            ]);
+    // --- Tracking Codes ---
+    if ($request->filled('tracking_codes')) {
+        foreach ($request->tracking_codes as $trackingInput) {
+            if (!empty($trackingInput['deleted']) && $trackingInput['deleted'] == 1 && !empty($trackingInput['id'])) {
+                $track = TrackingCode::find($trackingInput['id']);
+                if ($track) {
+                    $track->delete();
+                }
+                continue;
+            }
+
+            if (!empty($trackingInput['id'])) {
+                $track = TrackingCode::find($trackingInput['id']);
+                if ($track) {
+                    $track->update([
+                        'name' => $trackingInput['name'],
+                        'provider' => $trackingInput['provider'],
+                        'code' => $trackingInput['code'],
+                        'type' => $trackingInput['type'],
+                        'script' => $trackingInput['script'] ?? null,
+                        'status' => $trackingInput['status'] ?? true,
+                    ]);
+                }
+            } else {
+                TrackingCode::create([
+                    'site_id' => $site->id,
+                    'name' => $trackingInput['name'],
+                    'provider' => $trackingInput['provider'],
+                    'code' => $trackingInput['code'],
+                    'type' => $trackingInput['type'],
+                    'script' => $trackingInput['script'] ?? null,
+                    'status' => $trackingInput['status'] ?? true,
+                ]);
+            }
         }
     }
 
