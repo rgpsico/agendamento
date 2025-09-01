@@ -23,7 +23,17 @@ class DatabaseSeeder extends Seeder
            $this->call([
             SiteTemplateSeeder::class,
         ]);
-       // $this->call(FeriadosSeeder::class);
+      
+         
+         $this->call(FeriadosSeeder::class);
+   
+
+        $this->call(SiteTemplateSeeder::class);
+
+
+         $this->call(RolesAndPermissionsSeeder::class);
+
+
         //$this->call(MigrateRolesSeeder::class);
         // \App\Models\Usuario::factory(10)->create();
 
