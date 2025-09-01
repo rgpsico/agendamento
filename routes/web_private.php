@@ -120,6 +120,7 @@ Route::prefix('configuracoes')->group(function () {
     Route::get('/sistema', [ConfiguracoesController::class, 'sistema'])->name('configuracoes.sistema');
     Route::get('/configuracoes', [ConfiguracoesController::class, 'index'])->name('configuracoes.index');
     Route::post('/configuracoes/salvar', [ConfiguracoesController::class, 'salvar'])->name('configuracoes.salvar');
+    Route::post('/seeds/run/{nicho}', [ConfiguracoesController::class, 'runSeed'])->name('configuracoes.runSeed');
 });
 
 Route::prefix('cliente')->middleware('auth')->group(function () {
@@ -251,3 +252,4 @@ Route::resource('site-templates', SiteTemplateController::class);
 Route::prefix('admin')->middleware('auth')->group(function () {
     Route::get('/relatorios', [\App\Http\Controllers\AnalyticsController::class, 'dashboard'])->name('admin.analytics.dashboard');
 });
+

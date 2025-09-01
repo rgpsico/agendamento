@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Configuracao;
 use App\Models\ConfiguracaoGeral;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 
 class ConfiguracoesController extends Controller
 {
@@ -75,68 +76,88 @@ class ConfiguracoesController extends Controller
     }
 
     public function salvar(Request $request)
-{
+    {
 
 
-    // Busca ou cria a única configuração global
-   $config = ConfiguracaoGeral::firstOrCreate([]);
-    // Campos de texto e seleções
-    $config->fill([
-        'nome_sistema' => $request->input('nome_sistema') ?? 'Agendamento',
-        'modal_boas_vindas' => $request->input('modal_boas_vindas') ?? 'Seja bem vindo',
-        'home_mode' => $request->input('home_mode') ?? 'padrao',
-        'home_title' => $request->input('home_title') ?? 'Passeio',
-        'sistema_tipo' => $request->input('sistema_tipo') ?? 'horario',
-        'instagram' => $request->input('instagram'),
-        'whatsapp' => $request->input('whatsapp'),
-        'tiktok' => $request->input('tiktok'),
-        'email' => $request->input('email'),
-        'politica_privacidade' => $request->input('politica_privacidade'),
-        'termos_condicoes' => $request->input('termos_condicoes'),
-        'agendamento_tipo' => $request->input('agendamento_tipo'),
-        'whatsapp_numero' => $request->input('whatsapp_numero'),
-    ]);
+        // Busca ou cria a única configuração global
+    $config = ConfiguracaoGeral::firstOrCreate([]);
+        // Campos de texto e seleções
+        $config->fill([
+            'nome_sistema' => $request->input('nome_sistema') ?? 'Agendamento',
+            'modal_boas_vindas' => $request->input('modal_boas_vindas') ?? 'Seja bem vindo',
+            'home_mode' => $request->input('home_mode') ?? 'padrao',
+            'home_title' => $request->input('home_title') ?? 'Passeio',
+            'sistema_tipo' => $request->input('sistema_tipo') ?? 'horario',
+            'instagram' => $request->input('instagram'),
+            'whatsapp' => $request->input('whatsapp'),
+            'tiktok' => $request->input('tiktok'),
+            'email' => $request->input('email'),
+            'politica_privacidade' => $request->input('politica_privacidade'),
+            'termos_condicoes' => $request->input('termos_condicoes'),
+            'agendamento_tipo' => $request->input('agendamento_tipo'),
+            'whatsapp_numero' => $request->input('whatsapp_numero'),
+        ]);
 
-    // Upload da imagem de login
-    if ($request->hasFile('login_image')) {
-        $config->login_image = $request->file('login_image')->store('configuracoes', 'public');
-    
-    }
-
-    // Upload da imagem de registro
-    if ($request->hasFile('register_image')) {
-        $config->register_image = $request->file('register_image')->store('configuracoes', 'public');
-    }
-
-    // Upload da imagem de logo header
-    if ($request->hasFile('logo_header')) {
-        $config->logo_header = $request->file('logo_header')->store('configuracoes', 'public');
-              
-    }
-
-    // Upload da imagem de logo footer
-    if ($request->hasFile('logo_footer')) {
-        $config->logo_footer = $request->file('logo_footer')->store('configuracoes', 'public');
-    }
-
-    // Upload da imagem padrão da home
-    if ($request->hasFile('home_image')) {
-        $config->home_image = $request->file('home_image')->store('configuracoes', 'public');
-    }
-
-    // Upload múltiplo do slider
-    if ($request->hasFile('slider_images')) {
-        $paths = [];
-        foreach ($request->file('slider_images') as $file) {
-            $paths[] = $file->store('configuracoes', 'public');
+        // Upload da imagem de login
+        if ($request->hasFile('login_image')) {
+            $config->login_image = $request->file('login_image')->store('configuracoes', 'public');
+        
         }
-        $config->slider_images = $paths;
+
+        // Upload da imagem de registro
+        if ($request->hasFile('register_image')) {
+            $config->register_image = $request->file('register_image')->store('configuracoes', 'public');
+        }
+
+        // Upload da imagem de logo header
+        if ($request->hasFile('logo_header')) {
+            $config->logo_header = $request->file('logo_header')->store('configuracoes', 'public');
+                
+        }
+
+        // Upload da imagem de logo footer
+        if ($request->hasFile('logo_footer')) {
+            $config->logo_footer = $request->file('logo_footer')->store('configuracoes', 'public');
+        }
+
+        // Upload da imagem padrão da home
+        if ($request->hasFile('home_image')) {
+            $config->home_image = $request->file('home_image')->store('configuracoes', 'public');
+        }
+
+        // Upload múltiplo do slider
+        if ($request->hasFile('slider_images')) {
+            $paths = [];
+            foreach ($request->file('slider_images') as $file) {
+                $paths[] = $file->store('configuracoes', 'public');
+            }
+            $config->slider_images = $paths;
+        }
+
+        $config->save();
+
+        return redirect()->back()->with('success', 'Configurações do sistema atualizadas com sucesso!');
     }
 
-    $config->save();
+    public function runSeed($nicho)
+    {
+        switch($nicho) {
+            case 'pet':
+                Artisan::call('db:seed', ['--class' => 'PetModalidadesSeeder']);
+                break;
+            case 'praia':
+                Artisan::call('db:seed', ['--class' => 'EsportesPraiaSeeder']);
+                break;
+            case 'estetica':
+                Artisan::call('db:seed', ['--class' => 'EsteticaSeeder']);
+                break;
+            default:
+                return response()->json(['message' => 'Nicho inválido'], 400);
+        }
 
-    return redirect()->back()->with('success', 'Configurações do sistema atualizadas com sucesso!');
+        return response()->json(['message' => 'Seed do nicho ' . $nicho . ' executada com sucesso!']);
 }
+
 
 
 

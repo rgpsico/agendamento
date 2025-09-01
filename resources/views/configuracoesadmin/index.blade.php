@@ -8,27 +8,14 @@
             @endif
 
             <!-- Abas de Configuração -->
-            <ul class="nav nav-tabs" id="configTabs">
-                <li class="nav-item">
-                    <a class="nav-link active" data-bs-toggle="tab" href="#gerais">Gerais</a>
-                </li>
-            
-                    <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="tab" href="#login">Login & Registro</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="tab" href="#home">Página Inicial</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="tab" href="#sistema">Sistema</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="tab" href="#redes">Redes Sociais</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="tab" href="#legais">Políticas & Termos</a>
-                    </li>
-            
+           <ul class="nav nav-tabs" id="configTabs">
+                <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#gerais">Gerais</a></li>
+                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#login">Login & Registro</a></li>
+                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#home">Página Inicial</a></li>
+                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#sistema">Sistema</a></li>
+                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#redes">Redes Sociais</a></li>
+                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#legais">Políticas & Termos</a></li>
+                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#seeds">Seeds do Sistema</a></li>
             </ul>
 
             <!-- Conteúdo das Abas -->
@@ -189,6 +176,29 @@
                     </form>
                 </div>
 
+                <div class="tab-pane fade" id="seeds">
+                    <h5>Rodar Seeds do Sistema</h5>
+                    <p>Escolha o nicho do sistema e rode as seeds de acordo com o tipo selecionado.</p>
+
+                    <div class="form-group mb-3">
+                        <label for="nichoSeed">Selecione o Nicho:</label>
+                        <select id="nichoSeed" class="form-control">
+                            <option value="">-- Selecione --</option>
+                            <option value="pet">Pet</option>
+                            <option value="praia">Esportes de Praia</option>
+                            <option value="estetica">Estética / Beleza</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <button id="rodarSeed" class="btn btn-success">Rodar Seed</button>
+                    </div>
+
+                    <div id="resultadoSeed" class="mt-3"></div>
+                </div>
+
+            </div>
+
             </div>
         </div>
     </div>
@@ -211,6 +221,63 @@
 
             homeMode.addEventListener("change", toggleHomeFields);
             toggleHomeFields();
+        });
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            // Toggle home fields
+            const homeMode = document.querySelector('select[name="home_mode"]');
+            const sliderField = document.getElementById("sliderImages");
+            const imagemField = document.getElementById("imagemHome");
+            function toggleHomeFields() {
+                if(homeMode.value === 'slider') {
+                    sliderField.style.display = 'block';
+                    imagemField.style.display = 'none';
+                } else {
+                    sliderField.style.display = 'none';
+                    imagemField.style.display = 'block';
+                }
+            }
+            if(homeMode) {
+                homeMode.addEventListener("change", toggleHomeFields);
+                toggleHomeFields();
+            }
+
+            // Rodar seed
+            const rodarSeedBtn = document.getElementById('rodarSeed');
+            const resultadoSeed = document.getElementById('resultadoSeed');
+
+            rodarSeedBtn.addEventListener('click', function() {
+                const nicho = document.getElementById('nichoSeed').value;
+                if(!nicho) {
+                    alert('Selecione um nicho antes de rodar a seed.');
+                    return;
+                }
+
+                resultadoSeed.innerHTML = "Rodando seed...";
+                gsap.to(resultadoSeed, {opacity: 1, duration: 0.5});
+
+                fetch(`/configuracoes/seeds/run/${nicho}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json',
+                    },
+                })
+                .then(res => res.json())
+                .then(data => {
+                    resultadoSeed.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
+                    gsap.from(resultadoSeed, {y: -20, opacity: 0, duration: 0.5});
+                })
+                .catch(err => {
+                    resultadoSeed.innerHTML = `<div class="alert alert-danger">Erro ao rodar seed.</div>`;
+                    console.error(err);
+                });
+            });
+
         });
     </script>
 </x-admin.layout>
