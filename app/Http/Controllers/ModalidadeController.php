@@ -26,7 +26,7 @@ class ModalidadeController extends Controller
     public function create()
     {
         $model =  $this->model;
-        $pageTitle =  $this->pageTitle;
+        $pageTitle =  'Criar Modalidade';
         return view('admin.modalidade.create', compact('model', 'pageTitle'));
     }
 

@@ -27,7 +27,18 @@
                                 <form action="{{ route('admin.site.store') }}" method="POST" enctype="multipart/form-data">
                       
                                 @csrf
-
+                            
+                                <div class="form-group mb-3">
+                                    <label for="template_id">Template do Site</label>
+                                    <select name="template_id" id="template_id" class="form-control">
+                                        <option value="">-- Selecione um template --</option>
+                                        @foreach($templates as $template)
+                                            <option value="{{ $template->id }}">
+                                                {{ $template->titulo }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
                                 <!-- Seção 1: Informações gerais -->
                                 <div class="form-section mb-4">
                                     <h5 class="mb-3">Informações Gerais</h5>

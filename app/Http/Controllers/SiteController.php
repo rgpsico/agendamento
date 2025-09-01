@@ -52,9 +52,14 @@ class SiteController extends Controller
 
 
 
-    public function create()
+  public function create()
     {
-        return view('admin.site.lista.create');
+        // Aqui você pega todos os templates disponíveis
+        // Supondo que você tenha um Model Template
+        $templates = SiteTemplate::all(); // ou algum filtro específico
+
+        // Retorna a view passando os templates
+        return view('admin.site.lista.create', compact('templates'));
     }
 
   public function editSite($idsite)

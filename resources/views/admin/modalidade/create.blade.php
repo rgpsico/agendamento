@@ -1,4 +1,4 @@
-<x-admin.layout title="Criar Alunos">
+<x-admin.layout title="Criar Modalidade">
     <div class="page-wrapper">
         <div class="content container-fluid">
 

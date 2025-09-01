@@ -210,7 +210,7 @@
                             </a>
                             <ul>
                                 <li><a href="{{ route('modalidade.index') }}">Listar</a></li>
-                                <li><a href="{{ route('modalidade.create') }}">Cadastrar</a></li>
+                              
                             </ul>
                         </li>
                         
