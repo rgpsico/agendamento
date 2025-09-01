@@ -64,6 +64,7 @@ class SiteController extends Controller
 
   public function editSite($idsite)
 {
+   
     $site = EmpresaSite::findOrFail($idsite);
 
     // Verifica se o usuário tem acesso ao site
@@ -218,67 +219,134 @@ private function verificarDnsSsl($dominio)
 
 
     public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'titulo' => 'required|string|max:255',
-            'descricao' => 'nullable|string',
-            'cores' => 'required|array',
-            'cores.primaria' => 'required|string',
-            'cores.secundaria' => 'required|string',
-            'sobre_titulo' => 'nullable|string|max:255',
-            'sobre_descricao' => 'nullable|string',
-            'sobre_itens' => 'nullable|array',
-            'sobre_itens.*.icone' => 'nullable|string|max:255',
-            'sobre_itens.*.titulo' => 'nullable|string|max:255',
-            'sobre_itens.*.descricao' => 'nullable|string',
-            'dominio_personalizado' => 'nullable|string|max:255',
-            'whatsapp' => 'nullable|string|max:20',
-            'template_id' => 'required|exists:site_templates,id',
-        ]);
+{
+    $validated = $request->validate([
+        'template_id' => 'required|exists:site_templates,id',
+        'titulo' => 'required|string|max:255',
+        'descricao' => 'nullable|string',
+        'logo' => 'nullable|image|max:2048',
+        'capa' => 'nullable|image|max:2048',
+        'cores.primaria' => 'required|string',
+        'cores.secundaria' => 'required|string',
+        'sobre_titulo' => 'nullable|string|max:255',
+        'sobre_descricao' => 'nullable|string',
+        'whatsapp' => 'nullable|string|max:20',
+        'autoatendimento_ia' => 'boolean',
+        'sobre_imagem' => 'nullable|image|max:2048',
+        'sobre_itens.*.icone' => 'nullable|string|max:255',
+        'sobre_itens.*.titulo' => 'nullable|string|max:255',
+        'sobre_itens.*.descricao' => 'nullable|string',
+        'servicos.*.titulo' => 'nullable|string|max:255',
+        'servicos.*.descricao' => 'nullable|string',
+        'servicos.*.preco' => 'nullable|numeric|min:0',
+        'servicos.*.imagem' => 'nullable|image|max:2048',
+        'depoimentos.*.nome' => 'nullable|string|max:255',
+        'depoimentos.*.nota' => 'nullable|integer|min:0|max:5',
+        'depoimentos.*.comentario' => 'nullable|string',
+        'depoimentos.*.foto' => 'nullable|image|max:2048',
+        'tracking_codes.*.name' => 'nullable|string|max:255',
+        'tracking_codes.*.provider' => 'nullable|string|max:255',
+        'tracking_codes.*.code' => 'nullable|string|max:255',
+        'tracking_codes.*.type' => 'nullable|in:analytics,ads,pixel,other',
+        'tracking_codes.*.script' => 'nullable|string',
+        'tracking_codes.*.status' => 'boolean',
+        'dominio_personalizado' => 'nullable|string|max:255',
+        'gerar_vhost' => 'boolean',
+    ]);
 
-        $data = [
-            'empresa_id' => Auth::user()->empresa->id,
-            'titulo' => $request->titulo,
-            'template_id' => $request->template_id, // novo campo
+    // Lógica para salvar o site e os dados relacionados
+    // Exemplo:
 
-            'descricao' => $request->descricao,
-            'cores' => [
-                'primaria' => $request->input('cores.primaria', '#0ea5e9'),
-                'secundaria' => $request->input('cores.secundaria', '#38b2ac'),
-            ],
-            'sobre_titulo' => $request->sobre_titulo,
-            'sobre_descricao' => $request->sobre_descricao,
-            'sobre_itens' => $request->input('sobre_itens', []),
-            'dominio_personalizado' => $request->input('dominio_personalizado'),
-            'whatsapp' => $request->whatsapp,
-        ];
+    $slug = Str::slug($validated['titulo']);
 
-        $data['slug'] = $this->createUniqueSlug($request->titulo);
-
-        // Upload do logo
-        if ($request->hasFile('logo')) {
-            $data['logo'] = $request->file('logo')->store('sites/logos', 'public');
-        }
-
-        // Upload da capa
-        if ($request->hasFile('capa')) {
-            $data['capa'] = $request->file('capa')->store('sites/capas', 'public');
-        }
-
-        // Upload imagem da seção sobre nós
-        if ($request->hasFile('sobre_imagem')) {
-            $data['sobre_imagem'] = $request->file('sobre_imagem')->store('sites/sobre', 'public');
-        }
-
-        $site = EmpresaSite::create($data);
-
-        // Se quiser, pode criar o virtual host aqui futuramente
-        // $this->criarVirtualHost($site->dominio_personalizado);
-
-        return redirect()
-            ->route('admin.site.lista')
-            ->with('success', 'Site criado com sucesso!');
+    // Ensure the slug is unique (optional, if uniqueness is required)
+    $originalSlug = $slug;
+    $counter = 1;
+    while (EmpresaSite::where('slug', $slug)->exists()) {
+        $slug = $originalSlug . '-' . $counter++;
     }
+    $site = EmpresaSite::create([
+        'empresa_id' => Auth::user()->empresa->id,
+        'template_id' => $validated['template_id'],
+        'titulo' => $validated['titulo'],
+        'slug' => $slug, // Add the slug here
+        'descricao' => $validated['descricao'],
+        'cores' => [
+            'primaria' => $validated['cores']['primaria'],
+            'secundaria' => $validated['cores']['secundaria'],
+        ],
+        'sobre_titulo' => $validated['sobre_titulo'],
+        'sobre_descricao' => $validated['sobre_descricao'],
+        'whatsapp' => $validated['whatsapp'],
+        'autoatendimento_ia' => $validated['autoatendimento_ia'] ?? false,
+        'dominio_personalizado' => $validated['dominio_personalizado'],
+        'gerar_vhost' => $validated['gerar_vhost'] ?? false,
+    ]);
+
+    // Salvar arquivos (logo, capa, sobre_imagem, etc.)
+    if ($request->hasFile('logo')) {
+        $site->logo = $request->file('logo')->store('logos', 'public');
+    }
+    if ($request->hasFile('capa')) {
+        $site->capa = $request->file('capa')->store('capas', 'public');
+    }
+    if ($request->hasFile('sobre_imagem')) {
+        $site->sobre_imagem = $request->file('sobre_imagem')->store('sobre_imagens', 'public');
+    }
+
+    // Salvar itens do "Sobre Nós"
+    if (!empty($validated['sobre_itens'])) {
+        $site->sobre_itens = $validated['sobre_itens'];
+    }
+
+    // Salvar serviços
+    if (!empty($validated['servicos'])) {
+        foreach ($validated['servicos'] as $servicoData) {
+            $servico = $site->siteServicos()->create([
+                'titulo' => $servicoData['titulo'],
+                'descricao' => $servicoData['descricao'],
+                'preco' => $servicoData['preco'],
+            ]);
+            if ($request->hasFile("servicos.{$servicoData['index']}.imagem")) {
+                $servico->imagem = $request->file("servicos.{$servicoData['index']}.imagem")->store('servicos', 'public');
+                $servico->save();
+            }
+        }
+    }
+
+    // Salvar depoimentos
+    if (!empty($validated['depoimentos'])) {
+        foreach ($validated['depoimentos'] as $index => $depoimentoData) {
+            $depoimento = $site->depoimentos()->create([
+                'nome' => $depoimentoData['nome'],
+                'nota' => $depoimentoData['nota'],
+                'comentario' => $depoimentoData['comentario'],
+            ]);
+            if ($request->hasFile("depoimentos.{$index}.foto")) {
+                $depoimento->foto = $request->file("depoimentos.{$index}.foto")->store('depoimentos', 'public');
+                $depoimento->save();
+            }
+        }
+    }
+
+    // Salvar códigos de rastreamento
+    if (!empty($validated['tracking_codes'])) {
+        foreach ($validated['tracking_codes'] as $trackingData) {
+            $site->trackingCodes()->create([
+                'name' => $trackingData['name'],
+                'provider' => $trackingData['provider'],
+                'code' => $trackingData['code'],
+                'type' => $trackingData['type'],
+                'script' => $trackingData['script'],
+                'status' => $trackingData['status'] ?? false,
+            ]);
+        }
+    }
+
+    $site->save();
+
+    return redirect()->route('admin.site.lista')->with('success', 'Site criado com sucesso!');
+}
 
 
 
@@ -637,6 +705,54 @@ private function verificarDnsSsl($dominio)
         }
 
         return back()->with('success', "SSL para {$dominio} gerado com sucesso!");
+    }
+
+
+
+    public function destroy($idsite)
+    {
+        // Find the site or fail
+        $site = EmpresaSite::findOrFail($idsite);
+
+        // Check if the user is authorized to delete the site
+        if ($site->empresa_id !== Auth::user()->empresa->id) {
+            return redirect()->route('admin.site.lista')->with('error', 'Acesso não autorizado.');
+        }
+
+        // Delete associated files (logo, capa, sobre_imagem, etc.)
+        if ($site->logo) {
+            Storage::disk('public')->delete($site->logo);
+        }
+        if ($site->capa) {
+            Storage::disk('public')->delete($site->capa);
+        }
+        if ($site->sobre_imagem) {
+            Storage::disk('public')->delete($site->sobre_imagem);
+        }
+
+        // Delete related services and their images
+        foreach ($site->siteServicos as $servico) {
+            if ($servico->imagem) {
+                Storage::disk('public')->delete($servico->imagem);
+            }
+            $servico->delete();
+        }
+
+        // Delete related testimonials and their images
+        foreach ($site->depoimentos as $depoimento) {
+            if ($depoimento->foto) {
+                Storage::disk('public')->delete($depoimento->foto);
+            }
+            $depoimento->delete();
+        }
+
+        // Delete related tracking codes (no files associated)
+        $site->trackingCodes()->delete();
+
+        // Delete the site
+        $site->delete();
+
+        return redirect()->route('admin.site.lista')->with('success', 'Site excluído com sucesso!');
     }
 
 }

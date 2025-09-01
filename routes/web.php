@@ -120,6 +120,7 @@ Route::prefix('admin/site')->middleware(['auth'])->group(function () {
     Route::get('create', [SiteController::class, 'create'])->name('admin.site.create');
     Route::post('criar', [SiteController::class, 'store'])->name('admin.site.store');
     Route::get('edit/{idsite}', [SiteController::class, 'editSite'])->name('admin.site.edit');
+    Route::delete('{idsite}', [SiteController::class, 'destroy'])->name('admin.site.destroy'); // New destroy route
 
     Route::get('configuracoes', [SiteController::class, 'edit'])->name('admin.site.configuracoes');
     Route::resource('servicos', SiteController::class)->names('admin.site.servicos');
@@ -127,8 +128,6 @@ Route::prefix('admin/site')->middleware(['auth'])->group(function () {
     Route::resource('contatos', SiteController::class)->names('admin.site.contatos');
 
     Route::get('dominios', [SiteController::class, 'dominios'])->name('admin.site.dominios')->middleware('can:admin');
-
-    Route::get('configuracoes', [SiteController::class, 'edit'])->name('admin.site.configuracoes');
 
     // Atualizar configurações do site
     Route::put('configuracoes/{site}', [SiteController::class, 'update'])->name('admin.site.configuracoes.update');

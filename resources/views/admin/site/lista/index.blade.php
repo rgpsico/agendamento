@@ -69,25 +69,30 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse($sites as $site)
-                                    <tr class="table-row">
-                                        <td>{{ $site->titulo }}</td>
-                                        <td>{{ $site->slug }}</td>
-                                        <td>{{ $site->created_at->format('d/m/Y H:i') }}</td>
-                                        <td>{{ $site->visualizacoes_count ?? 0 }}</td>
-                                        <td>{{ $site->cliques_whatsapp_count ?? 0 }}</td>
-                                        <td>{{ $site->visitantes_count ?? 0 }}</td>
-                                        <td>
-                                            <a href="{{ route('admin.site.edit', $site->id) }}" class="btn btn-sm btn-warning btn-animated">Editar</a>
-                                            <a href="{{ route('site.publico', $site->slug) }}" target="_blank" class="btn btn-sm btn-success btn-animated">Ver Site</a>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="7" class="text-center">Nenhum site cadastrado ainda.</td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
+                            @forelse($sites as $site)
+                                <tr class="table-row">
+                                    <td>{{ $site->titulo }}</td>
+                                    <td>{{ $site->slug }}</td>
+                                    <td>{{ $site->created_at->format('d/m/Y H:i') }}</td>
+                                    <td>{{ $site->visualizacoes_count ?? 0 }}</td>
+                                    <td>{{ $site->cliques_whatsapp_count ?? 0 }}</td>
+                                    <td>{{ $site->visitantes_count ?? 0 }}</td>
+                                    <td>
+                                        <a href="{{ route('admin.site.edit', $site->id) }}" class="btn btn-sm btn-warning btn-animated">Editar</a>
+                                        <a href="{{ route('site.publico', $site->slug) }}" target="_blank" class="btn btn-sm btn-success btn-animated">Ver Site</a>
+                                        <form action="{{ route('admin.site.destroy', $site->id) }}" method="POST" style="display:inline;" class="delete-form">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-danger btn-animated delete-btn">Excluir</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="7" class="text-center">Nenhum site cadastrado ainda.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
                         </table>
 
                         <div class="mt-3">
@@ -203,4 +208,20 @@
             });
         });
     </script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Existing GSAP animations remain unchanged...
+
+        // Add confirmation for delete buttons
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (confirm('Tem certeza que deseja excluir este site? Esta ação não pode ser desfeita.')) {
+                    button.closest('form').submit();
+                }
+            });
+        });
+    });
+</script>
 </x-admin.layout>
