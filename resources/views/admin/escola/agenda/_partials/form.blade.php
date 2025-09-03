@@ -37,7 +37,7 @@
 </div>
 
     
-<x-modalidadeselect :modalidadeId="isset($model) ? $model->modalidade_id : null" />
+
 
     
     
