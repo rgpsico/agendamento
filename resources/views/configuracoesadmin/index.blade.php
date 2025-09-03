@@ -179,47 +179,61 @@
                  <div class="tab-content mt-3">
                 
                 <!-- Aba: Seeds do Sistema -->
-                <div class="tab-pane fade" id="seeds">
-                    <h5>Rodar Seeds do Sistema</h5>
-                    <p>Escolha o nicho ou a localização que deseja popular.</p>
+              <div class="tab-pane fade show active" id="seeds">
+                <h4 class="mb-3">Rodar Seeds do Sistema</h4>
+                <p class="text-muted">Escolha o que deseja popular no sistema. Ao rodar um seed, os dados padrões serão cadastrados automaticamente.</p>
 
-                    <div class="row mb-4">
-                        <!-- Seeds de Nichos -->
-                        <div class="col-md-6">
-                            <div class="form-group mb-3">
-                                <label for="nichoSeed">Selecione o Nicho:</label>
-                                <select id="nichoSeed" class="form-control">
+                <div class="row g-4">
+                    <!-- Card Seeds de Nicho -->
+                    <div class="col-md-6">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-success text-white">
+                                <i class="bi bi-briefcase"></i> Seeds de Nicho
+                            </div>
+                            <div class="card-body">
+                                <p>Popular o sistema com nichos pré-definidos.</p>
+                                <select id="nichoSeed" class="form-select mb-3">
                                     <option value="">-- Selecione --</option>
-                                    <option value="pet">Pet</option>
-                                    <option value="praia">Esportes de Praia</option>
-                                    <option value="estetica">Estética / Beleza</option>
+                                    <option value="pet">🐶 Pet</option>
+                                    <option value="praia">🏖️ Esportes de Praia</option>
+                                    <option value="estetica">💄 Estética / Beleza</option>
+                                    <option value="cabelereiro">💇‍♂️ Cabelereiro</option>
+                                    <option value="academia">🏋️ Academia</option>
                                 </select>
-                            </div>
-                            <div class="form-group mb-3">
-                                <button id="rodarSeedNicho" class="btn btn-success w-100">Rodar Seed de Nicho</button>
-                            </div>
-                        </div>
-
-                        <!-- Seeds de Localizações -->
-                        <div class="col-md-6">
-                            <div class="form-group mb-3">
-                                <label for="localizacaoSeed">Rodar Seeds de Localização:</label>
-                                <select id="localizacaoSeed" class="form-control">
-                                    <option value="pais">País</option>
-                                    <option value="estado">Estado</option>
-                                    <option value="cidade">Cidade</option>
-                                    <option value="zona">Zona</option>
-                                    <option value="bairro">Bairro</option>
-                                </select>
-                            </div>
-                            <div class="form-group mb-3">
-                                <button id="rodarSeedLocalizacao" class="btn btn-info w-100">Rodar Seed de Localização</button>
+                                <button id="rodarSeedNicho" class="btn btn-success w-100">
+                                    Rodar Seed de Nicho
+                                </button>
                             </div>
                         </div>
                     </div>
 
-                    <div id="resultadoSeed" class="mt-3"></div>
+                    <!-- Card Seeds de Localização -->
+                    <div class="col-md-6">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-info text-white">
+                                <i class="bi bi-geo-alt"></i> Seeds de Localização
+                            </div>
+                            <div class="card-body">
+                                <p>Cadastrar localidades no sistema automaticamente.</p>
+                                <select id="localizacaoSeed" class="form-select mb-3">
+                                    <option value="pais">🌍 País</option>
+                                    <option value="estado">🏛️ Estado</option>
+                                    <option value="cidade">🏙️ Cidade</option>
+                                    <option value="zona">📍 Zona</option>
+                                    <option value="bairro">🏘️ Bairro</option>
+                                </select>
+                                <button id="rodarSeedLocalizacao" class="btn btn-info w-100">
+                                    Rodar Seed de Localização
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
+                <!-- Resultado -->
+                <div id="resultadoSeed" class="mt-4 alert d-none"></div>
+            </div>
+
 
             </div>
         </div>
