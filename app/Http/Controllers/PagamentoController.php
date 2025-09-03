@@ -43,7 +43,6 @@ class PagamentoController extends Controller
         $this->aluno_professor = $aluno_professor;
         $this->asaasService = $asaasService;
         $this->agendamentoService = $agendamentoService;
-        $this->notificacaoService = $notificacaoService;
         $this->baseUri = env('ASAAS_ENV') === 'production' ? env('ASAAS_URL') : env('ASAAS_SANDBOX_URL');
     }
 
@@ -711,7 +710,7 @@ class PagamentoController extends Controller
         // $canais = ['whatsapp', 'email']; // ambos
         $canais = ['whatsapp', 'email'];
 
-        $this->notificacaoService->enviarAgendamento($agendamento, $pagamento, $canais);
+        $notificationService->enviarAgendamento($agendamento, $pagamento, $canais);
 
         // Redirecionar para a página de confirmação
         return redirect()->route('home.checkoutsucesso', ['id' => $professorId])
