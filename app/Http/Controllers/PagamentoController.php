@@ -43,6 +43,7 @@ class PagamentoController extends Controller
         $this->aluno_professor = $aluno_professor;
         $this->asaasService = $asaasService;
         $this->agendamentoService = $agendamentoService;
+        $this->notificacaoService = $notificacaoService;
         $this->baseUri = env('ASAAS_ENV') === 'production' ? env('ASAAS_URL') : env('ASAAS_SANDBOX_URL');
     }
 
