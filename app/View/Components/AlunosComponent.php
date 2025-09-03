@@ -31,6 +31,9 @@ class AlunosComponent extends Component
      */
     public function render(): View|Closure|string
     {
+
+
+        //teste
         return view('components.alunosComponent');
     }
 }
