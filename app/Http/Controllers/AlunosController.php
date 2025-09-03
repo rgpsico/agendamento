@@ -56,6 +56,7 @@ class AlunosController extends Controller
 
     public function create()
     {
+      
 
         $fillable = [
             'nome',

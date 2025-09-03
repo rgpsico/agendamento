@@ -6,6 +6,7 @@ use App\Http\Requests\PaymentRequest;
 use App\Models\Agendamento;
 use App\Models\Alunos;
 use App\Models\Empresa;
+use App\Models\Modalidade;
 use App\Models\Professor;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
@@ -93,10 +94,13 @@ class AgendaController extends Controller
 
     public function create()
     {
+       $modalidade = Modalidade::all();
 
         return view(
             $this->view . '.create',
-            ['pageTitle' => $this->pageTitle]
+            ['pageTitle' => $this->pageTitle,
+            'modalidades' => $modalidade
+            ]
         );
     }
 
