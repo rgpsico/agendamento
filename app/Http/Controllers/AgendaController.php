@@ -99,7 +99,8 @@ class AgendaController extends Controller
         return view(
             $this->view . '.create',
             ['pageTitle' => $this->pageTitle,
-            'modalidades' => $modalidades
+            'modalidades' => $modalidades,
+               'selectedModalidade' => isset($model) ? $model->modalidade_id : null
             ]
         );
     }
