@@ -108,7 +108,7 @@ class AgendaController extends Controller
     public function store(PaymentRequest $request)
     {
 
-        dd($request->all());
+  
         // Se a validação falhar, o usuário será redirecionado de volta ao formulário com erros de validação.
 
         // Crie o novo usuário
@@ -136,22 +136,24 @@ class AgendaController extends Controller
         );
     }
 
-    public function edit($id)
-    {
+ public function edit($id)
+{
+    $model = $this->model->find($id);
+    $modalidades = Modalidade::all();
 
-        $model = $this->model->find($id);
+    return view(
+        $this->view . '.create',
+        [
+            'pageTitle'   => $this->pageTitle,
+            'model'       => $model,
+            'view'        => $this->view,
+            'route'       => $this->route,
+            'modalidades' => $modalidades,
+            'selectedModalidade' => $model->modalidade_id ?? null, // já manda a selecionada
+        ]
+    );
+}
 
-
-        return view(
-            $this->view . '.create',
-            [
-                'pageTitle' => $this->pageTitle,
-                'model' => $model,
-                'view' => $this->view,
-                'route' => $this->route
-            ]
-        );
-    }
 
     public function destroy($id)
     {
