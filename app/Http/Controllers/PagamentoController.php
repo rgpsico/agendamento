@@ -27,16 +27,17 @@ use App\Http\Requests\PagamentoComCartaoRequest;
 use App\Services\AgendamentoService;
 use App\Http\Requests\CriarPagamentoPresencialRequest;
 use App\Services\TwilioService;
-
+use App\Services\NotificationService;
 class PagamentoController extends Controller
 {
     protected $aluno_professor, $baseUri;
-    protected $asaasService, $agendamentoService;
+    protected $asaasService, $agendamentoService, $notificacaoService;
 
     public function __construct(
         AlunoProfessor $aluno_professor,
         AsaasService $asaasService,
-        AgendamentoService $agendamentoService
+        AgendamentoService $agendamentoService,
+        NotificationService $notificacaoService
 
     ) {
         $this->aluno_professor = $aluno_professor;
@@ -671,7 +672,7 @@ class PagamentoController extends Controller
 
 
 
-  public function criarPagamentoPresencial(CriarPagamentoPresencialRequest $request)
+    public function criarPagamentoPresencial(CriarPagamentoPresencialRequest $request)
     {
         $tipo_de_horario = Servicos::where('id', $request->servico_id)->value('tipo_agendamento');
 
@@ -695,20 +696,27 @@ class PagamentoController extends Controller
         $professor = Professor::find($professorId);
 
         if ($professor && $alunoId) {
-            // Verifica se já existe vínculo
             if (!$professor->alunos()->where('aluno_id', $alunoId)->exists()) {
                 $professor->alunos()->attach($alunoId);
             }
         }
 
-        // Enviar confirmação por WhatsApp/SMS (Twilio)
-        $twilioService = new TwilioService();
-        $twilioService->enviarConfirmacaoAgendamento($agendamento, $pagamento);
+        // ➕ Enviar confirmação pelo canal configurado (WhatsApp, E-mail ou ambos)
+        $notificationService = app(\App\Services\NotificationService::class);
+
+        // Aqui você pode decidir o canal dinamicamente, por exemplo:
+        // $canais = ['whatsapp']; // só WhatsApp
+        // $canais = ['email'];    // só Email
+        // $canais = ['whatsapp', 'email']; // ambos
+        $canais = ['whatsapp', 'email'];
+
+        $this->notificacaoService->enviarAgendamento($agendamento, $pagamento, $canais);
 
         // Redirecionar para a página de confirmação
         return redirect()->route('home.checkoutsucesso', ['id' => $professorId])
             ->with('success', 'Agendamento e pagamento presencial registrados com sucesso');
     }
+
 
 
 
