@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\PagamentoComCartaoRequest;
 use App\Services\AgendamentoService;
 use App\Http\Requests\CriarPagamentoPresencialRequest;
+use App\Services\TwilioService;
 
 class PagamentoController extends Controller
 {
@@ -670,34 +671,45 @@ class PagamentoController extends Controller
 
 
 
-    public function criarPagamentoPresencial(CriarPagamentoPresencialRequest  $request)
-    {       
-          
-        $tipo_de_horario = Servicos::where('id',$request->servico_id)->value('tipo_agendamento');
-            
-            // Verificar disponibilidade do professor
-        if (Agendamento::verificarDisponibilidade($request, $tipo_de_horario))  
-            {    
-                return redirect()->back()
+  public function criarPagamentoPresencial(CriarPagamentoPresencialRequest $request)
+    {
+        $tipo_de_horario = Servicos::where('id', $request->servico_id)->value('tipo_agendamento');
+
+        // Verificar disponibilidade do professor
+        if (Agendamento::verificarDisponibilidade($request, $tipo_de_horario)) {
+            return redirect()->back()
                 ->with('error', 'O professor já possui um agendamento neste horário. Procure uma nova data ou horário diferente')
                 ->withInput();
-            }
-    
+        }
+
         // Criar o agendamento
         $agendamento = Agendamento::criarAgendamento($request->all());
-    
-                // Criar o registro de pagamento
-        $pagamento = Pagamento::criarPagamentoPresencial($agendamento, $request->all());
-        
 
-        $twilioService = new \App\Services\TwilioService();
+        // Criar o registro de pagamento
+        $pagamento = Pagamento::criarPagamentoPresencial($agendamento, $request->all());
+
+        // ➕ Vincular aluno ao professor se ainda não for aluno
+        $professorId = $request->input('professor_id');
+        $alunoId = $request->input('aluno_id');
+
+        $professor = Professor::find($professorId);
+
+        if ($professor && $alunoId) {
+            // Verifica se já existe vínculo
+            if (!$professor->alunos()->where('aluno_id', $alunoId)->exists()) {
+                $professor->alunos()->attach($alunoId);
+            }
+        }
+
+        // Enviar confirmação por WhatsApp/SMS (Twilio)
+        $twilioService = new TwilioService();
         $twilioService->enviarConfirmacaoAgendamento($agendamento, $pagamento);
- 
 
         // Redirecionar para a página de confirmação
-        return redirect()->route('home.checkoutsucesso', ['id' => $request->input('professor_id')])
+        return redirect()->route('home.checkoutsucesso', ['id' => $professorId])
             ->with('success', 'Agendamento e pagamento presencial registrados com sucesso');
     }
+
 
 
     public function verRecibo($id)

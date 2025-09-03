@@ -29,7 +29,7 @@
             <label>Horário</label>
             <div class="cal-icon">
             
-                <input type="time" class="form-control timepicker" name="horario" value="{{ isset($model) && $model->horario ? \Carbon\Carbon::parse($model->horario)->format('H:i') : old('horario') }}">
+                <input type="time" class="form-control timepicker" name="horario_aula" value="{{ isset($model) && $model->horario ? \Carbon\Carbon::parse($model->horario)->format('H:i') : old('horario') }}">
             </div>
         </div>
     </div>

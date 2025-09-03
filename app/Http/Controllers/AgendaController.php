@@ -94,6 +94,7 @@ class AgendaController extends Controller
 
     public function create()
     {
+       
        $modalidades = Modalidade::all();
 
         return view(
