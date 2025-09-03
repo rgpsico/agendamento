@@ -94,12 +94,12 @@ class AgendaController extends Controller
 
     public function create()
     {
-       $modalidade = Modalidade::all();
+       $modalidades = Modalidade::all();
 
         return view(
             $this->view . '.create',
             ['pageTitle' => $this->pageTitle,
-            'modalidades' => $modalidade
+            'modalidades' => $modalidades
             ]
         );
     }
