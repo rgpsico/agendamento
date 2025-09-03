@@ -41,7 +41,7 @@
         </tr>
         <tr>
             <td style="padding-top: 20px; text-align: center;">
-                <p style="color: #777; font-size: 14px;">Obrigado por usar nossos serviços!<br>Equipe [Seu Sistema]</p>
+                <p style="color: #777; font-size: 14px;">Obrigado por usar nossos serviços!<br>Equipe RJPASSEIOS</p>
             </td>
         </tr>
     </table>
