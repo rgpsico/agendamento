@@ -13,7 +13,7 @@
                                      class="img-fluid" alt="Logo">
                             </a>
                         </div>
-                        <div class="footer-about-content" style="color:#fff;">
+                        <div class="footer-about-content footer-descricao" style="color:#fff; text-align: left;">
                             <p style="color:#fff;">
                                 {{  $config->footer_descricao ?? 
                                 ' 

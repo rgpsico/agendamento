@@ -25,6 +25,7 @@ class ModalidadeSelect extends Component
      */
     public function render(): View|Closure|string
     {
+        
         return view('components.modalidadeselect');
     }
 }

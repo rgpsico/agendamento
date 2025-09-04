@@ -26,16 +26,18 @@ use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\PagamentoComCartaoRequest;
 use App\Services\AgendamentoService;
 use App\Http\Requests\CriarPagamentoPresencialRequest;
-
+use App\Services\TwilioService;
+use App\Services\NotificationService;
 class PagamentoController extends Controller
 {
     protected $aluno_professor, $baseUri;
-    protected $asaasService, $agendamentoService;
+    protected $asaasService, $agendamentoService, $notificacaoService;
 
     public function __construct(
         AlunoProfessor $aluno_professor,
         AsaasService $asaasService,
-        AgendamentoService $agendamentoService
+        AgendamentoService $agendamentoService,
+        NotificationService $notificacaoService
 
     ) {
         $this->aluno_professor = $aluno_professor;
@@ -670,34 +672,52 @@ class PagamentoController extends Controller
 
 
 
-    public function criarPagamentoPresencial(CriarPagamentoPresencialRequest  $request)
-    {       
-          
-        $tipo_de_horario = Servicos::where('id',$request->servico_id)->value('tipo_agendamento');
-            
-            // Verificar disponibilidade do professor
-        if (Agendamento::verificarDisponibilidade($request, $tipo_de_horario))  
-            {    
-                return redirect()->back()
+    public function criarPagamentoPresencial(CriarPagamentoPresencialRequest $request)
+    {
+        $tipo_de_horario = Servicos::where('id', $request->servico_id)->value('tipo_agendamento');
+
+        // Verificar disponibilidade do professor
+        if (Agendamento::verificarDisponibilidade($request, $tipo_de_horario)) {
+            return redirect()->back()
                 ->with('error', 'O professor já possui um agendamento neste horário. Procure uma nova data ou horário diferente')
                 ->withInput();
-            }
-    
+        }
+
         // Criar o agendamento
         $agendamento = Agendamento::criarAgendamento($request->all());
-    
-                // Criar o registro de pagamento
-        $pagamento = Pagamento::criarPagamentoPresencial($agendamento, $request->all());
-        
 
-        $twilioService = new \App\Services\TwilioService();
-        $twilioService->enviarConfirmacaoAgendamento($agendamento, $pagamento);
- 
+        // Criar o registro de pagamento
+        $pagamento = Pagamento::criarPagamentoPresencial($agendamento, $request->all());
+
+        // ➕ Vincular aluno ao professor se ainda não for aluno
+        $professorId = $request->input('professor_id');
+        $alunoId = $request->input('aluno_id');
+
+        $professor = Professor::find($professorId);
+
+        if ($professor && $alunoId) {
+            if (!$professor->alunos()->where('aluno_id', $alunoId)->exists()) {
+                $professor->alunos()->attach($alunoId);
+            }
+        }
+
+        // ➕ Enviar confirmação pelo canal configurado (WhatsApp, E-mail ou ambos)
+        $notificationService = app(\App\Services\NotificationService::class);
+
+        // Aqui você pode decidir o canal dinamicamente, por exemplo:
+        // $canais = ['whatsapp']; // só WhatsApp
+        // $canais = ['email'];    // só Email
+        // $canais = ['whatsapp', 'email']; // ambos
+        $canais = ['whatsapp', 'email'];
+
+        $notificationService->enviarAgendamento($agendamento, $pagamento, $canais);
 
         // Redirecionar para a página de confirmação
-        return redirect()->route('home.checkoutsucesso', ['id' => $request->input('professor_id')])
+        return redirect()->route('home.checkoutsucesso', ['id' => $professorId])
             ->with('success', 'Agendamento e pagamento presencial registrados com sucesso');
     }
+
+
 
 
     public function verRecibo($id)

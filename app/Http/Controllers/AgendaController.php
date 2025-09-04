@@ -6,6 +6,7 @@ use App\Http\Requests\PaymentRequest;
 use App\Models\Agendamento;
 use App\Models\Alunos;
 use App\Models\Empresa;
+use App\Models\Modalidade;
 use App\Models\Professor;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
@@ -93,17 +94,22 @@ class AgendaController extends Controller
 
     public function create()
     {
+       
+       $modalidades = Modalidade::all();
 
         return view(
             $this->view . '.create',
-            ['pageTitle' => $this->pageTitle]
+            ['pageTitle' => $this->pageTitle,
+            'modalidades' => $modalidades,
+               'selectedModalidade' => isset($model) ? $model->modalidade_id : null
+            ]
         );
     }
 
     public function store(PaymentRequest $request)
     {
 
-        dd($request->all());
+  
         // Se a validação falhar, o usuário será redirecionado de volta ao formulário com erros de validação.
 
         // Crie o novo usuário
@@ -131,22 +137,24 @@ class AgendaController extends Controller
         );
     }
 
-    public function edit($id)
-    {
+ public function edit($id)
+{
+    $model = $this->model->find($id);
+    $modalidades = Modalidade::all();
 
-        $model = $this->model->find($id);
+    return view(
+        $this->view . '.create',
+        [
+            'pageTitle'   => $this->pageTitle,
+            'model'       => $model,
+            'view'        => $this->view,
+            'route'       => $this->route,
+            'modalidades' => $modalidades,
+            'selectedModalidade' => $model->modalidade_id ?? null, // já manda a selecionada
+        ]
+    );
+}
 
-
-        return view(
-            $this->view . '.create',
-            [
-                'pageTitle' => $this->pageTitle,
-                'model' => $model,
-                'view' => $this->view,
-                'route' => $this->route
-            ]
-        );
-    }
 
     public function destroy($id)
     {

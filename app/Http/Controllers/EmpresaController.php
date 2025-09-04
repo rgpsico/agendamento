@@ -556,6 +556,7 @@ class EmpresaController extends Controller
     public function agendatore(Request $request)
     {
 
+       
         // Validação dos dados recebidos do formulário
         $validatedData = $request->validate([
             'aluno_id' => 'required|numeric',
@@ -596,7 +597,7 @@ class EmpresaController extends Controller
             'professor_id' => 'required|numeric',
             'data_da_aula' => 'required|date_format:d/m/Y', // Ajusta a validação para o formato recebido
             'valor_aula' => 'required|numeric',
-            'horario' => 'required'
+            'horario_aula' => 'required'
         ]);
 
         // Converte a data para o formato do MySQL (Y-m-d)
