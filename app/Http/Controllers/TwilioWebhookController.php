@@ -35,23 +35,27 @@ class TwilioWebhookController extends Controller
     }
 
     private function getDeepSeekResponse(string $question): string
-    {
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . env('DEEP_SEEK_API_KEY'),
-            'Content-Type' => 'application/json',
-        ])->post('https://api.deepseek.com/v1/chat/completions', [
-            'model' => 'deepseek-chat',
-            'messages' => [
-                ['role' => 'user', 'content' => $question]
-            ],
-            'temperature' => 0.7,
-            'max_tokens' => 150
-        ]);
+{
+    // Força o modelo a responder em português
+    $prompt = "Responda em português: " . $question;
 
-        if ($response->successful()) {
-            return $response->json()['choices'][0]['message']['content'] ?? 'Sem resposta';
-        } else {
-            return 'Erro: ' . $response->body();
-        }
+    $response = Http::withHeaders([
+        'Authorization' => 'Bearer ' . env('DEEP_SEEK_API_KEY'),
+        'Content-Type' => 'application/json',
+    ])->post('https://api.deepseek.com/v1/chat/completions', [
+        'model' => 'deepseek-chat',
+        'messages' => [
+            ['role' => 'user', 'content' => $prompt]
+        ],
+        'temperature' => 0.7,
+        'max_tokens' => 150
+    ]);
+
+    if ($response->successful()) {
+        return $response->json()['choices'][0]['message']['content'] ?? 'Sem resposta';
+    } else {
+        return 'Erro: ' . $response->body();
     }
+}
+
 }
