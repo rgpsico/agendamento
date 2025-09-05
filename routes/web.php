@@ -19,6 +19,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\Api\AsaasController;
 use App\Http\Controllers\BoletoController;
+use App\Http\Controllers\BotController;
 use App\Http\Controllers\ProfessoresAsaasController;
 use App\Http\Controllers\PagamentoController;
 use App\Http\Controllers\SiteDepoimentoController;
@@ -204,7 +205,12 @@ Route::get('/logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
 Route::get('/viacep/{cep}', [ViaCepController::class, 'getCep']);
 
 
+Route::prefix('admin/bot')->name('admin.bot.')->middleware('auth')->group(function () {
+    Route::get('dashboard', [BotController::class, 'dashboard'])->name('dashboard');
+    Route::get('/', [BotController::class, 'index'])->name('index');
+    Route::get('create', [BotController::class, 'create'])->name('create');
+    Route::post('store', [BotController::class, 'store'])->name('store');
+    Route::get('tokens', [BotController::class, 'tokens'])->name('tokens');
+    Route::get('logs', [BotController::class, 'logs'])->name('logs');
+});
 
-use App\Http\Controllers\TwilioWebhookController;
-
-Route::post('/webhook/twilio', [TwilioWebhookController::class, 'inbound']);

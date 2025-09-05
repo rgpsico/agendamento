@@ -51,6 +51,22 @@
                         </li>
                     @endisset
 
+                      <li class="submenu">
+    <a href="#">
+        <i class="fas fa-robot" style="font-size: 18px;"></i>
+        <span>Bot / IA</span>
+        <span class="menu-arrow"></span>
+    </a>
+    <ul>
+        <li><a href="{{ route('admin.bot.dashboard') }}">Dashboard</a></li>
+        <li><a href="{{ route('admin.bot.index') }}">Lista de Bots</a></li>
+        <li><a href="{{ route('admin.bot.create') }}">Criar Bot</a></li>
+        <li><a href="{{ route('admin.bot.tokens') }}">Tokens / Consumo</a></li>
+        <li><a href="{{ route('admin.bot.logs') }}">Histórico / Logs</a></li>
+    </ul>
+</li>
+
+
 
                     @isset(Auth::user()->empresa->user_id)
                         <li class="submenu">
