@@ -10,6 +10,7 @@ class TwilioWebhookController extends Controller
 {
     public function inbound(Request $request)
     {
+       
         // Validação da assinatura (recomendada). Twilio passa X-Twilio-Signature. :contentReference[oaicite:3]{index=3}
         $validator = new RequestValidator(env('TWILIO_TOKEN'));
         $signature = $request->header('X-Twilio-Signature');
