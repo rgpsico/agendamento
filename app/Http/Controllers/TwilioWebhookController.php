@@ -47,13 +47,13 @@ class TwilioWebhookController extends Controller
     
        
         // Salva a mensagem no DB
-      Message::create([
-        'from' =>  $request->input('from'), // pega o nome certo do input
-        'to' =>  $request->input('to'),
-        'role' =>  $request->input('role'),
-        'body' => $request->input('body'),
-        'twilio_sid' => $request->input('twilio_sid'),
-    ]);
+        Message::create([
+            'from' => $request->input('From'),
+            'to' => $request->input('To'),
+            'role' => 'user', // Defina um valor padrão, pois o Twilio não envia isso
+            'body' => $request->input('Body'),
+            'twilio_sid' => $request->input('MessageSid'),
+        ]);
         // Enfileira Job assíncrono para processar e responder
        // ProcessIncomingMessage::dispatch($msg->id);
    
