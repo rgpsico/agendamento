@@ -202,3 +202,9 @@ Route::get('/treino', [AgendaController::class, 'treino'])->name('treino');
 Route::get('/logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
 
 Route::get('/viacep/{cep}', [ViaCepController::class, 'getCep']);
+
+
+
+use App\Http\Controllers\TwilioWebhookController;
+
+Route::post('/webhook/twilio', [TwilioWebhookController::class, 'inbound']);

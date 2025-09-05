@@ -217,6 +217,8 @@ private function verificarDnsSsl($dominio)
         return $slug;
     }
 
+    
+
 
     public function store(Request $request)
 {

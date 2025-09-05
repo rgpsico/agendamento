@@ -15,9 +15,9 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
 
-          $this->call([
-            LocalizacaoSeeder::class,
-        ]);
+        //   $this->call([
+        //     LocalizacaoSeeder::class,
+        // ]);
 
         
            $this->call([
@@ -28,10 +28,10 @@ class DatabaseSeeder extends Seeder
          $this->call(FeriadosSeeder::class);
    
 
-        $this->call(SiteTemplateSeeder::class);
+        // $this->call(SiteTemplateSeeder::class);
 
 
-         $this->call(RolesAndPermissionsSeeder::class);
+        //  $this->call(RolesAndPermissionsSeeder::class);
 
 
         //$this->call(MigrateRolesSeeder::class);

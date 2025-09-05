@@ -267,3 +267,9 @@ Route::post('/visualizacao', [SiteVisualizacaoController::class, 'store']);
 
 
 Route::post('/visitante', [SiteVisitanteController::class, 'store']);
+
+
+
+use App\Http\Controllers\TwilioWebhookController;
+
+Route::post('/webhook/twilio', [TwilioWebhookController::class, 'inbound']);
