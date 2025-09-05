@@ -14,6 +14,7 @@
                     <div class="card-header">
                         <h5 class="card-title mb-0">Dados do Bot</h5>
                     </div>
+                       <input type="hidden" id="empresa_id" name="empresa_id" class="form-control" value="{{ Auth::user()->empresa->id}}" required>
                     <div class="card-body">
                         <div class="mb-3">
                             <label for="nome" class="form-label">Nome do Bot</label>

@@ -190,6 +190,7 @@ Route::prefix('empresa/pagamento')->group(function () {
 
 
 use App\Http\Controllers\Api\SiteDepoimentoControllerApi;
+use App\Http\Controllers\BotController;
 
 Route::middleware('auth:sanctum')->prefix('site')->group(function () {
     Route::get('depoimentos', [SiteDepoimentoControllerApi::class, 'index']);
@@ -275,3 +276,6 @@ use App\Http\Controllers\TwilioWebhookController;
 Route::post('/webhook/twilio', [TwilioWebhookController::class, 'inbound']);
 Route::post('/webhook/openai', [TwilioWebhookController::class, 'testOpenAI']);
 Route::post('/webhook/deepseek', [TwilioWebhookController::class, 'askDeepSeek']);
+
+
+Route::post('bot/{botId}/interact', [BotController::class, 'interact'])->name('bot.interact');

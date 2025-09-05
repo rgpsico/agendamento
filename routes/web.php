@@ -210,7 +210,11 @@ Route::prefix('admin/bot')->name('admin.bot.')->middleware('auth')->group(functi
     Route::get('/', [BotController::class, 'index'])->name('index');
     Route::get('create', [BotController::class, 'create'])->name('create');
     Route::post('store', [BotController::class, 'store'])->name('store');
+    Route::put('update/{id}', [BotController::class, 'update'])->name('update');
+    Route::get('edit/{id}', [BotController::class, 'edit'])->name('edit');
+    Route::post('destroy', [BotController::class, 'destroy'])->name('destroy');;
     Route::get('tokens', [BotController::class, 'tokens'])->name('tokens');
     Route::get('logs', [BotController::class, 'logs'])->name('logs');
+    Route::get('show', [BotController::class, 'show'])->name('show');
 });
 

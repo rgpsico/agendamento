@@ -21,4 +21,9 @@ class BotService extends Model
     {
         return $this->belongsTo(Bot::class);
     }
+
+    public function servico()
+    {
+        return $this->belongsTo(Servicos::class, 'servico_id'); // Assumindo 'servico_id' no pivot
+    }
 }
