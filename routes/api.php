@@ -273,3 +273,5 @@ Route::post('/visitante', [SiteVisitanteController::class, 'store']);
 use App\Http\Controllers\TwilioWebhookController;
 
 Route::post('/webhook/twilio', [TwilioWebhookController::class, 'inbound']);
+Route::post('/webhook/openai', [TwilioWebhookController::class, 'testOpenAI']);
+Route::post('/webhook/deepseek', [TwilioWebhookController::class, 'askDeepSeek']);

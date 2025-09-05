@@ -3,60 +3,55 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Message;
-use App\Jobs\ProcessIncomingMessage;
-use Twilio\Security\RequestValidator;
+use Illuminate\Support\Facades\Http;
+use Twilio\Rest\Client;
 
 class TwilioWebhookController extends Controller
 {
     public function inbound(Request $request)
     {
-        // Loga todos os dados recebidos do Twilio para inspeção
-        $allParams = $request->all();
-        \Log::info('Webhook recebido do Twilio', [
-            'url' => $request->fullUrl(),
-            'headers' => $request->header(),
-            'params' => $allParams,
-        ]);
+        $from = $request->input('From');   // número do usuário
+        $to   = $request->input('To');     // número do bot
+        $body = trim($request->input('Body') ?? ''); // mensagem do usuário
 
-        // Validação da assinatura (recomendada). Twilio passa X-Twilio-Signature.
-        // $validator = new RequestValidator(env('TWILIO_TOKEN'));
-        $signature = $request->header('X-Twilio-Signature');
+        // Chama DeepSeek para gerar resposta
+        $reply = $this->getDeepSeekResponse($body);
 
-        $url = $request->fullUrl(); // importante: use a URL exata cadastrada no Twilio
-        $params = $request->all();
+        // Envia resposta de volta via Twilio WhatsApp
+        $twilioSid   = env('TWILIO_SID');
+        $twilioToken = env('TWILIO_TOKEN');
+        $twilioFrom  = $to;
 
-        // if (!$validator->validate($signature, $url, $params)) {
-        //     \Log::warning('Invalid Twilio signature', ['url' => $url, 'sig' => $signature, 'params' => $params]);
-        //     return response('Forbidden', 403);
-        // }
+        $client = new Client($twilioSid, $twilioToken);
+        $client->messages->create(
+            $from,
+            [
+                'from' => $twilioFrom,
+                'body' => $reply
+            ]
+        );
 
-        // Extrai os dados específicos da mensagem
-        $from = $request->input('From');   // ex: whatsapp:+55...
-        $to   = $request->input('To');
-        $body = trim($request->input('Body') ?? '');
-
-        // Loga os dados específicos da mensagem
-        \Log::info('Dados da mensagem recebida', [
-            'from' => $from,
-            'to' => $to,
-            'body' => $body,
-            'message_sid' => $request->input('MessageSid'),
-        ]);
-
-    
-       
-        // Salva a mensagem no DB
-        Message::create([
-            'from' => $request->input('From'),
-            'to' => $request->input('To'),
-            'role' => 'user', // Defina um valor padrão, pois o Twilio não envia isso
-            'body' => $request->input('Body'),
-            'twilio_sid' => $request->input('MessageSid'),
-        ]);
-        // Enfileira Job assíncrono para processar e responder
-       // ProcessIncomingMessage::dispatch($msg->id);
-   
         return response('OK', 200);
+    }
+
+    private function getDeepSeekResponse(string $question): string
+    {
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . env('DEEP_SEEK_API_KEY'),
+            'Content-Type' => 'application/json',
+        ])->post('https://api.deepseek.com/v1/chat/completions', [
+            'model' => 'deepseek-chat',
+            'messages' => [
+                ['role' => 'user', 'content' => $question]
+            ],
+            'temperature' => 0.7,
+            'max_tokens' => 150
+        ]);
+
+        if ($response->successful()) {
+            return $response->json()['choices'][0]['message']['content'] ?? 'Sem resposta';
+        } else {
+            return 'Erro: ' . $response->body();
+        }
     }
 }
