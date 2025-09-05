@@ -15,10 +15,10 @@ class DeepSeekService
      * @param string $question The user's question
      * @return string The response from DeepSeek or an error message
      */
-    public function getDeepSeekResponse(Bot $bot, string $question): string
+    public function getDeepSeekResponse(Bot $bot, string $question, int $empresa_id): string
     {
         // Carrega os serviços associados ao bot com detalhes completos
-        $services = Servicos::get(); // Ajuste 'servico' se o relacionamento for diferente
+        $services = Servicos::where('empresa_id',$empresa_id)->get(); // Ajuste 'servico' se o relacionamento for diferente
      
         // Constrói o system prompt com detalhes dos serviços
         $systemPrompt = "Você é um assistente especializado em serviços de praia, como aulas de surf e bodyboard. ";

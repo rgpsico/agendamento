@@ -146,12 +146,13 @@ class BotController extends Controller
     {
         $bot = Bot::findOrFail($botId);
         $question = $request->input('question');
+        $empresa_id = $request->empresa_id;
     
         if (!$bot->status) {
             return response()->json(['error' => 'Bot está inativo'], 403);
         }
 
-        $response = $this->deepSeekService->getDeepSeekResponse($bot, $question);
+        $response = $this->deepSeekService->getDeepSeekResponse($bot, $question, $empresa_id);
 
         return response()->json(['response' => $response]);
     }
