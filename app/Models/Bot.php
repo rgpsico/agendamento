@@ -37,4 +37,5 @@ class Bot extends Model
     {
         return $this->hasMany(BotService::class);
     }
+    
 }

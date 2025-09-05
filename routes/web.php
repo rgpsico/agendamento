@@ -215,6 +215,10 @@ Route::prefix('admin/bot')->name('admin.bot.')->middleware('auth')->group(functi
     Route::post('destroy', [BotController::class, 'destroy'])->name('destroy');;
     Route::get('tokens', [BotController::class, 'tokens'])->name('tokens');
     Route::get('logs', [BotController::class, 'logs'])->name('logs');
-    Route::get('show', [BotController::class, 'show'])->name('show');
+    
+Route::get('/{bot}', [BotController::class, 'show'])->name('show');
+
+   
 });
 
+Route::post('/admin/bot/{bot}/chat', [BotController::class, 'chat'])->name('admin.bot.chat');

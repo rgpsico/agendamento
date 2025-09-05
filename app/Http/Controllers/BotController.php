@@ -86,13 +86,21 @@ class BotController extends Controller
             return view('admin.bot.logs', compact('logs'));
         }
 
-    // Mostrar formulário de edição
+
+          // Mostrar formulário de edição
     public function edit($id)
     {
         $bot = Bot::with('services')->findOrFail($id);
         $services = Servicos::all();
         return view('admin.bot.edit', compact('bot', 'services'));
     }
+
+    // Mostrar formulário de edição
+        public function show(Bot $bot)
+        {
+            return view('admin.bot.show', compact('bot'));
+        }
+
 
     // Atualizar bot
     public function update(Request $request, $id)
@@ -156,6 +164,32 @@ class BotController extends Controller
 
         return response()->json(['response' => $response]);
     }
+
+   public function chat(Request $request, Bot $bot)
+{
+    $request->validate([
+        'message' => 'required|string',
+        'empresa_id' => 'required|integer'
+    ]);
+
+    $empresa_id = $request->input('empresa_id');
+    $userMessage = $request->input('message');
+
+    try {
+        $reply = $this->deepSeekService->getDeepSeekResponse($bot, $userMessage, $empresa_id);
+
+        return response()->json([
+            'reply' => $reply
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'reply' => '⚠️ Erro ao processar resposta do bot: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
+
+
 
 }
 

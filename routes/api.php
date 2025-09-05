@@ -279,3 +279,4 @@ Route::post('/webhook/deepseek', [TwilioWebhookController::class, 'askDeepSeek']
 
 
 Route::post('bot/{botId}/interact', [BotController::class, 'interact'])->name('bot.interact');
+Route::post('/bots/{bot}/chat', [BotController::class, 'chat']);
