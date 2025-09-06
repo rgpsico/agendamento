@@ -20,8 +20,8 @@ class Message extends Model
         'conversation_id'
     ];
 
-    public function conversation()
-{
-    return $this->belongsTo(Conversation::class);
-}
+        public function conversation()
+    {
+        return $this->belongsTo(Conversation::class);
+    }
 }

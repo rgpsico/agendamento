@@ -23,10 +23,10 @@ class Conversation extends Model
         return $this->belongsTo(Empresa::class);
     }
 
-      public function messages()
-    {
-        return $this->hasMany(Message::class);
-    }
+ public function messages()
+{
+    return $this->hasMany(Message::class, 'conversation_id', 'id');
+}
 
 
     public function bot()
@@ -34,8 +34,9 @@ class Conversation extends Model
         return $this->belongsTo(Bot::class);
     }
 
-    public function user()
+    public function user()  // renomeei de usuario() para user() para ficar consistente
     {
-        return $this->belongsTo(Usuario::class);
+        return $this->belongsTo(Usuario::class, 'user_id', 'id');
     }
+
 }

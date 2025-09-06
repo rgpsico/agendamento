@@ -37,57 +37,59 @@ class ChatController extends Controller
         // Define o ID do usuário (ou null se não estiver autenticado)
         $userId = auth()->check() ? auth()->id() : null;
 
-        // Se existe conversa, busca ela; se não, cria uma nova
+        // Busca ou cria a conversa
         if ($request->conversation_id) {
             $conversation = Conversation::find($request->conversation_id);
         } else {
+            $bot = Bot::where('nome', 'Manicure')->first();
             $conversation = Conversation::create([
                 'empresa_id' => 1,
-                'bot_id' => Bot::where('nome', 'Manicure')->first()->id ?? null,
+                'bot_id' => $bot->id ?? null,
                 'user_id' => $userId,
-                'mensagem' =>   'ssss',
+                'mensagem' => 'Início da conversa',
                 'telefone' => $request->phone,
             ]);
         }
-      
-        // Cria a mensagem do usuário
+$cleanUserMessage = $this->sanitizeMessage($request->mensagem);
+        // Salva a mensagem do usuário
         $userMessage = Message::create([
             'from' => 'user',
             'to' => 'bot',
             'conversation_id' => $conversation->id,
             'role' => 'user',
-            'body' => $request->mensagem,
+            'body' => $cleanUserMessage 
         ]);
 
-        // Gera resposta do bot via DeepSeekService
-        $botResponseText = $this->deepSeekService->generateResponse([
-            'message' => $request->mensagem,
-            'context' => [
-                'professor_id' => $request->professor_id,
-                'user_id' => $conversation->user_id,
-                'services' => $request->professor_id
-                    ? Servicos::where('empresa_id', 1)->get()->toArray()
-                    : [],
-            ],
-        ]);
+        // Gera resposta do bot
+        $botResponseText = $this->deepSeekService->getDeepSeekResponse(
+            $conversation->bot,
+            $request->mensagem,
+            $conversation->empresa_id
+        );
 
-      
 
+
+        $respostaboot = $this->sanitizeMessage($botResponseText);
         // Salva a resposta do bot
         $botMessage = Message::create([
             'from' => 'bot',
             'to' => 'user',
             'conversation_id' => $conversation->id,
-            'role' => 'user',
-            'body' => $botResponseText,
+              'role' => 'assistant',
+            'body' =>  $respostaboot
         ]);
 
-        // Retorna a conversa e resposta do bot
+
         return response()->json([
             'conversation_id' => $conversation->id,
-            'bot_response' => $botResponseText,
+            'bot_response' =>  $respostaboot,
         ]);
     }
+
+    public function sanitizeMessage(string $message): string {
+    // Mantém letras, números, pontuação básica e espaços
+    return preg_replace('/[^\p{L}\p{N}\p{P}\p{Z}]/u', '', $message);
+}
 
 
 }
