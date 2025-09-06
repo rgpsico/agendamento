@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\ConversationController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\HomeController;
@@ -219,6 +220,11 @@ Route::prefix('admin/bot')->name('admin.bot.')->middleware('auth')->group(functi
 Route::get('/{bot}', [BotController::class, 'show'])->name('show');
 
    
+});
+
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('conversas', [ConversationController::class, 'index'])->name('conversations.index');
+    Route::get('conversas/{id}', [ConversationController::class, 'show'])->name('conversations.show');
 });
 
 Route::post('/admin/bot/{bot}/chat', [BotController::class, 'chat'])->name('admin.bot.chat');
