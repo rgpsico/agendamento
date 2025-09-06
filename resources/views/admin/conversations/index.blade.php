@@ -198,7 +198,7 @@
             </div>
 
             <!-- Quick Preview Modal -->
-            <div class="modal fade" id="quickPreviewModal" tabindex="-1">
+             <div class="modal fade" id="quickPreviewModal" tabindex="-1">
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -210,6 +210,7 @@
                         <div class="modal-body" id="quickPreviewContent">
                             <div class="text-center py-4">
                                 <i class="fas fa-spinner fa-spin fa-2x"></i>
+                                <p class="mt-2">Carregando conversa...</p>
                             </div>
                         </div>
                     </div>
@@ -775,107 +776,44 @@
         });
 
         // Quick Preview Modal
-        function quickPreview(conversationId) {
-        const modal = new bootstrap.Modal(document.getElementById('quickPreviewModal'));
-        const previewContent = document.getElementById('quickPreviewContent');
-        
-        // Exibir loading
-        previewContent.innerHTML = `
-            <div class="text-center py-4">
+          function quickPreview(conversationId) {
+            const modal = new bootstrap.Modal(document.getElementById('quickPreviewModal'));
+            const previewContent = document.getElementById('quickPreviewContent');
+
+            // Exibir loading
+            previewContent.innerHTML = `<div class="text-center py-4">
                 <i class="fas fa-spinner fa-spin fa-2x text-primary"></i>
                 <p class="mt-2">Carregando conversa...</p>
-            </div>
-        `;
-        modal.show();
+            </div>`;
+            modal.show();
 
-        // Fazer chamada AJAX para a rota API
-        fetch(`/api/conversations/${conversationId}`, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-                // Adicione o token CSRF se necessário
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-            }
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Erro ao carregar a conversa');
-            }
-            return response.json();
-        })
-        .then(data => {
-            // Renderizar o conteúdo do modal
-            let messagesHtml = '';
-            data.messages.forEach(message => {
-                const isUser = message.role === 'user';
-                messagesHtml += `
-                    <div class="preview-message ${isUser ? 'user-message' : 'bot-message'}">
-                        <div class="message-header">
-                            <div class="message-sender">
-                                <div class="sender-avatar ${isUser ? 'user-avatar' : 'bot-avatar'}">
-                                    <i class="fas ${isUser ? 'fa-user' : 'fa-robot'}"></i>
-                                </div>
-                                <span>${isUser ? 'Usuário' : 'Bot'}</span>
-                            </div>
-                            <span class="message-time">${new Date(message.created_at).toLocaleString('pt-BR')}</span>
+            fetch(`/api/conversations/${conversationId}`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                let messagesHtml = '';
+                data.messages.forEach(msg => {
+                    const isUser = msg.role === 'user';
+                    messagesHtml += `
+                        <div class="mb-2 p-2 rounded ${isUser ? 'bg-light text-dark text-end' : 'bg-primary text-white text-start'}">
+                            <strong>${isUser ? data.user?.name ?? data.user?.email ?? 'Cliente' : data.bot?.nome ?? 'Bot'}</strong>
+                            <div>${msg.body}</div>
+                            <small class="text-muted">${new Date(msg.created_at).toLocaleString('pt-BR')}</small>
                         </div>
-                        <div class="message-body">${message.body}</div>
-                    </div>
-                `;
+                    `;
+                });
+
+                previewContent.innerHTML = `<div style="max-height:400px; overflow-y:auto;">${messagesHtml}</div>`;
+            })
+            .catch(err => {
+                previewContent.innerHTML = `<div class="alert alert-danger">Erro ao carregar conversa</div>`;
             });
-
-            previewContent.innerHTML = `
-                <div class="conversation-preview">
-                    <div class="preview-header">
-                        <div class="conversation-avatar">
-                            <i class="fas fa-comments"></i>
-                        </div>
-                        <h4>Conversa #${data.id}</h4>
-                        <div class="conversation-stats">
-                            <div class="stat-item">
-                                <div class="stat-value">${data.user ? data.user.name || data.user.email : 'Anônimo'}</div>
-                                <small>Usuário</small>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-value">${data.bot ? data.bot.nome : 'N/A'}</div>
-                                <small>Bot</small>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-value">${data.messages.length}</div>
-                                <small>Mensagens</small>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="preview-messages">
-                        ${messagesHtml}
-                    </div>
-                    <div class="preview-footer">
-                        <a href="${'{{ route("admin.conversations.show", ":id") }}'.replace(':id', data.id)}" 
-                           class="btn btn-primary">
-                            <i class="fas fa-eye me-1"></i> Ver Detalhes
-                        </a>
-                    </div>
-                </div>
-            `;
-
-            // Animar as mensagens
-            gsap.from('.preview-message', {
-                duration: 0.4,
-                y: 20,
-                opacity: 0,
-                stagger: 0.05,
-                ease: 'power2.out'
-            });
-        })
-        .catch(error => {
-            previewContent.innerHTML = `
-                <div class="alert alert-danger">
-                    <i class="fas fa-exclamation-circle me-2"></i>
-                    ${error.message || 'Erro ao carregar a conversa. Tente novamente.'}
-                </div>
-            `;
-        });
-    }
+        }
 </script>
 </x-admin.layout>
