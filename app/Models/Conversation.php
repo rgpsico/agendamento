@@ -15,12 +15,19 @@ class Conversation extends Model
         'user_id',
         'mensagem',
         'tipo'
+    
     ];
 
     public function empresa()
     {
         return $this->belongsTo(Empresa::class);
     }
+
+      public function messages()
+    {
+        return $this->hasMany(Message::class);
+    }
+
 
     public function bot()
     {

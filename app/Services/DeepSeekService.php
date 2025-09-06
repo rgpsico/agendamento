@@ -86,11 +86,19 @@ class DeepSeekService
         $prompt = "Você é um assistente de agendamento. O usuário disse: '$message'. Contexto: usuário está agendando com o professor ID {$context['professor_id']}. Disponibilize informações sobre serviços: " . json_encode($context['services']) . ". Responda de forma útil e amigável.";
 
         // Call your AI service (e.g., via HTTP request to an API)
-        $response = Http::post('https://api.deepseek.com/v1/chat', [
-            'prompt' => $prompt,
-            'max_tokens' => 150,
+  $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . (env('DEEP_SEEK_API_KEY')),
+            'Content-Type' => 'application/json',
+        ])->post('https://api.deepseek.com/v1/chat/completions', [
+            'model' => 'deepseek-chat',
+            'messages' => [
+                ['role' => 'system', 'content' => $prompt],
+                ['role' => 'user', 'content' => $prompt],
+            ],
             'temperature' => 0.7,
+            'max_tokens' =>  100, // Aumentado para respostas mais detalhadas
         ]);
+
 
         return $response->json()['response'] ?? 'Desculpe, não entendi. Pode explicar melhor?';
     }

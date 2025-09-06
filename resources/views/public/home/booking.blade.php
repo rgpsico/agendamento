@@ -357,30 +357,25 @@
 
                 // Send message to backend
                 $.ajax({
-                    url: '{{ route("chat.store") }}',
-                    method: 'POST',
-                    data: {
-                        mensagem: message,
-                        conversation_id: conversationId,
-                        professor_id: $('#professor_id').val(),
-                        phone: phone, // Include phone if provided
-                        _token: '{{ csrf_token() }}'
-                    },
-                    success: function(response) {
-                        // Update conversation ID
-                        conversationId = response.conversation_id;
+    url: '{{ route("chat.store") }}',
+    method: 'POST',
+    data: {
+        mensagem: message,
+        conversation_id: conversationId,
+        professor_id: $('#professor_id').val(),
+        phone: phone,
+        _token: '{{ csrf_token() }}'
+    },
+    success: function(response) {
+        conversationId = response.conversation_id;
+        appendMessage('bot-message', response.bot_response || 'Entendido! Como posso ajudar mais?');
+        $('#chatbot-input').val('');
+        @if (!Auth::check())
+            $('#chatbot-phone').prop('disabled', true);
+        @endif
+    }
+});
 
-                        // Display bot response
-                        appendMessage('bot-message', response.bot_response || 'Entendido! Como posso ajudar mais?');
-                        $('#chatbot-input').val(''); // Clear input
-                        @if (!Auth::check())
-                            $('#chatbot-phone').prop('disabled', true); // Disable phone input after first message
-                        @endif
-                    },
-                    error: function() {
-                        appendMessage('bot-message', 'Desculpe, algo deu errado. Tente novamente.');
-                    }
-                });
             }
 
             function appendMessage(type, text) {

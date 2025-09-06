@@ -17,5 +17,11 @@ class Message extends Model
         'role',
         'body',
         'twilio_sid',
+        'conversation_id'
     ];
+
+    public function conversation()
+{
+    return $this->belongsTo(Conversation::class);
+}
 }
