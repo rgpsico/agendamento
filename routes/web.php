@@ -21,6 +21,7 @@ use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\Api\AsaasController;
 use App\Http\Controllers\BoletoController;
 use App\Http\Controllers\BotController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ProfessoresAsaasController;
 use App\Http\Controllers\PagamentoController;
 use App\Http\Controllers\SiteDepoimentoController;
@@ -228,3 +229,5 @@ Route::prefix('admin')->name('admin.')->group(function () {
 });
 
 Route::post('/admin/bot/{bot}/chat', [BotController::class, 'chat'])->name('admin.bot.chat');
+
+Route::post('/chat/store', [ChatController::class, 'store'])->name('chat.store')->middleware('auth');

@@ -77,4 +77,22 @@ class DeepSeekService
         return 'Erro: ' . $response->body();
     }
 
+    public function generateResponse(array $input)
+    {
+        $message = $input['message'];
+        $context = $input['context'];
+
+        // Example: Construct a prompt for the AI
+        $prompt = "Você é um assistente de agendamento. O usuário disse: '$message'. Contexto: usuário está agendando com o professor ID {$context['professor_id']}. Disponibilize informações sobre serviços: " . json_encode($context['services']) . ". Responda de forma útil e amigável.";
+
+        // Call your AI service (e.g., via HTTP request to an API)
+        $response = Http::post('https://api.deepseek.com/v1/chat', [
+            'prompt' => $prompt,
+            'max_tokens' => 150,
+            'temperature' => 0.7,
+        ]);
+
+        return $response->json()['response'] ?? 'Desculpe, não entendi. Pode explicar melhor?';
+    }
+
 }
