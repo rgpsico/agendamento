@@ -10,11 +10,17 @@ class Conversation extends Model
     use HasFactory;
 
     protected $fillable = [
+        'empresa_id',
         'bot_id',
         'user_id',
         'mensagem',
         'tipo'
     ];
+
+    public function empresa()
+    {
+        return $this->belongsTo(Empresa::class);
+    }
 
     public function bot()
     {
