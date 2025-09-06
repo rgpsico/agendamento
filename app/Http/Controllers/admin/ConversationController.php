@@ -27,5 +27,41 @@ class ConversationController extends Controller
     }
 
 
+    public function showapi($conversation_id)
+{
+    // Carrega a conversa com mensagens, usuário e bot relacionados
+    $conversa = Conversation::with('messages', 'user', 'bot')
+        ->findOrFail($conversation_id);
+
+    // Retorna em JSON
+    return response()->json([
+        'id' => $conversa->id,
+        'empresa_id' => $conversa->empresa_id,
+        'user' => $conversa->user ? [
+            'id' => $conversa->user->id,
+            'name' => $conversa->user->name,
+            'email' => $conversa->user->email,
+        ] : null,
+        'bot' => $conversa->bot ? [
+            'id' => $conversa->bot->id,
+            'nome' => $conversa->bot->nome,
+        ] : null,
+        'messages' => $conversa->messages->map(function($msg) {
+            return [
+                'id' => $msg->id,
+                'from' => $msg->from,
+                'to' => $msg->to,
+                'role' => $msg->role,
+                'body' => $msg->body,
+                'created_at' => $msg->created_at->toDateTimeString(),
+            ];
+        }),
+        'created_at' => $conversa->created_at->toDateTimeString(),
+        'updated_at' => $conversa->updated_at->toDateTimeString(),
+    ]);
+}
+
+
+
 
 }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\ConversationController;
 use App\Http\Controllers\AlunosController;
 use App\Http\Controllers\Api\AgendamentoControllerApi;
 use App\Http\Controllers\Api\AlunosControllerApi;
@@ -280,3 +281,6 @@ Route::post('/webhook/deepseek', [TwilioWebhookController::class, 'askDeepSeek']
 
 Route::post('bot/{botId}/interact', [BotController::class, 'interact'])->name('bot.interact');
 Route::post('/bots/{bot}/chat', [BotController::class, 'chat']);
+
+
+Route::get('/conversations/{id}', [ConversationController::class, 'showapi']);
