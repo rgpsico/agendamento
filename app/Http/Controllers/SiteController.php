@@ -415,6 +415,15 @@ private function verificarDnsSsl($dominio)
 }
 
 
+protected function sanitizeDomain($dominio)
+{
+    $dominio = strtolower(trim($dominio));
+    $dominio = preg_replace('/^https?:\/\//', '', $dominio); // remove http:// ou https://
+    $dominio = preg_replace('/\/.*$/', '', $dominio); // remove paths (ex: /index.php)
+    return $dominio;
+}
+
+
 
     /**
      * Salva as configurações atualizadas do site
@@ -625,9 +634,10 @@ private function verificarDnsSsl($dominio)
 
 
 
-    protected function criarOuAtualizarVirtualHost($dominio)
+   protected function criarOuAtualizarVirtualHost($dominio)
     {
-        // Validar domínio
+        $dominio = $this->sanitizeDomain($dominio);
+
         if (!filter_var('http://' . $dominio, FILTER_VALIDATE_URL)) {
             throw new \Exception('Domínio inválido.');
         }
