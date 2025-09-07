@@ -637,14 +637,16 @@ protected function sanitizeDomain($dominio)
 
    protected function criarOuAtualizarVirtualHost($dominio)
     {
+        $dominio = trim($dominio);
         $dominio = $this->sanitizeDomain($dominio);
+         
 
         if (!filter_var('http://' . $dominio, FILTER_VALIDATE_URL)) {
             throw new \Exception('Domínio inválido.');
         }
 
         $scriptPath = '/usr/local/bin/criar-vhost.sh';
-        
+
         $process = new Process(["sudo", $scriptPath, $dominio]);
         $process->run();
 
