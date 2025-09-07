@@ -612,6 +612,14 @@ private function verificarDnsSsl($dominio)
         }
     }
 
+        if (!empty($request->dominio_personalizado) && $request->gerar_vhost) {
+            try {
+                $this->criarOuAtualizarVirtualHost($request->dominio_personalizado);
+            } catch (\Exception $e) {
+                return redirect()->back()->withErrors(['erro' => 'Erro ao criar Virtual Host: ' . $e->getMessage()]);
+            }
+        }
+
     return redirect()->back()->with('success', 'Configurações do site atualizadas com sucesso!');
 }
 
