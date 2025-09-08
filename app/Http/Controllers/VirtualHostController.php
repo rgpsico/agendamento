@@ -77,7 +77,7 @@ class VirtualHostController extends Controller
     exec("sudo a2ensite " . escapeshellarg($fileName));
     exec("sudo systemctl reload apache2");
 
-    return redirect()->route('admin.virtualhosts.index')
+    return redirect()->route('virtualhosts.index')
         ->with('success', "Virtual Host {$fileName} criado com sucesso!");
 }
 
