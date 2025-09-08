@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\AtualizarConfiguracoesJob;
 use App\Models\EmpresaSite;
 use App\Models\SiteContato;
 use App\Models\SiteDepoimento;
@@ -505,7 +506,7 @@ private function verificarDnsSsl($dominio)
 
     // Atualiza dados do site
     $site->update($data);
-     $this->atualizarConfiguracoes($request, $site);
+     AtualizarConfiguracoesJob::dispatch($data, $site);
     // --- Serviços ---
     if ($request->filled('servicos')) {
         foreach ($request->servicos as $servicoInput) {
