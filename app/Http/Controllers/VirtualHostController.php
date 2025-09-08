@@ -10,29 +10,43 @@ class VirtualHostController extends Controller
     protected $path = '/etc/apache2/sites-available';
 
     public function index()
-    {
-        // Lista todos os arquivos .conf
-        $files = File::files($this->path);
+{
+    $files = File::files($this->path);
 
-        return view('admin.virtualhosts.index', compact('files'));
-    }
+    $vhosts = collect($files)->map(function($file) {
+        $content = File::get($file->getPathname());
+        preg_match('/ServerName\s+(.+)/', $content, $matches);
+        return [
+            'file' => $file->getFilename(),
+            'servername' => $matches[1] ?? 'N/A',
+        ];
+    });
 
-    public function destroy($file)
+    return view('admin.virtualhosts.index', compact('vhosts'));
+}
+
+public function create()
+{
+    return view('admin.virtualhosts.create');
+}
+
+public function edit($file)
 {
     $fullPath = $this->path . '/' . $file;
-
-    if (File::exists($fullPath)) {
-        // Desabilita antes de apagar
-        exec("sudo a2dissite " . escapeshellarg($file));
-
-        // Apaga usando sudo rm
-        exec("sudo rm " . escapeshellarg($fullPath));
-
-        // Reinicia Apache
-        exec("sudo systemctl restart apache2");
+    if (!File::exists($fullPath)) {
+        abort(404);
     }
-
-    return redirect()->route('virtualhosts.index')->with('success', "Arquivo $file excluído com sucesso!");
+    $content = File::get($fullPath);
+    return view('admin.virtualhosts.edit', compact('file', 'content'));
 }
+
+public function update(Request $request, $file)
+{
+    $fullPath = $this->path . '/' . $file;
+    File::put($fullPath, $request->input('content'));
+    exec("sudo systemctl reload apache2");
+    return redirect()->route('admin,virtualhosts.index')->with('success', 'Virtual Host atualizado com sucesso!');
+}
+
 
 }

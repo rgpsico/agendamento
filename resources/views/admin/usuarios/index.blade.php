@@ -1,26 +1,27 @@
-<x-admin.layout title="Listar Usuários">
+<x-admin.layout title="Virtual Hosts">
     <x-modal-delete />
-    <x-modal-editar-usuario />
+    <x-modal-editar-vhost />
     <div class="page-wrapper">
         <div class="content container-fluid">
-           <div class="page-header">
-            <div class="row">
-                <div class="col-sm-6">
-                    <h3 class="page-title">Listar Usuários</h3>
-                    <ul class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="">Admin</a></li>
-                        <li class="breadcrumb-item active">Listar Usuários</li>
-                    </ul>
-                </div>
-                <div class="col-sm-6 text-end">
-                    <a href="{{ route('admin.usuarios.create') }}" class="btn btn-success">
-                        <i class="fe fe-plus"></i> Criar Usuário
-                    </a>
+
+            <div class="page-header">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h3 class="page-title">Gerenciar Virtual Hosts</h3>
+                        <ul class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="">Admin</a></li>
+                            <li class="breadcrumb-item active">Virtual Hosts</li>
+                        </ul>
+                    </div>
+                    <div class="col-sm-6 text-end">
+                        <a href="{{ route('virtualhosts.create') }}" class="btn btn-success">
+                            <i class="fe fe-plus"></i> Criar Virtual Host
+                        </a>
+                    </div>
                 </div>
             </div>
-         </div>
-      <x-alert-messages />
 
+            <x-alert-messages />
 
             <div class="row">
                 <div class="col-12">
@@ -30,31 +31,24 @@
                                 <table class="datatable table table-hover table-center mb-0">
                                     <thead>
                                         <tr>
-                                            <th>ID</th>
-                                            <th>Nome</th>
-                                            <th>Email</th>
-                                            <th>Papéis</th>
-                                            <th>Permissões Diretas</th>
-                                            <th>Perfis</th>
+                                            <th>Arquivo</th>
+                                            <th>ServerName</th>
                                             <th class="text-center">Ação</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($usuarios as $usuario)
-                                            <tr class="linha_{{$usuario->id}}">
-                                                <td>{{ $usuario->id }}</td>
-                                                <td>{{ $usuario->nome }}</td>
-                                                <td>{{ $usuario->email }}</td>
-                                                <td>{{ $usuario->roles->pluck('name')->implode(', ') }}</td>
-                                                <td>{{ $usuario->permissions->pluck('name')->implode(', ') }}</td>
-                                                <td>{{ $usuario->perfis->pluck('nome')->implode(', ') }}</td> <!-- perfis -->
-                                                
+                                        @foreach ($vhosts as $vhost)
+                                            <tr class="linha_{{ $loop->index }}">
+                                                <td>{{ $vhost['file'] }}</td>
+                                                <td>{{ $vhost['servername'] }}</td>
                                                 <td class="text-center">
                                                     <div class="actions">
-                                                        <a class="btn btn-sm bg-info-light" href="{{ route('admin.usuarios.edit', $usuario->id) }}">
+                                                        <a class="btn btn-sm bg-info-light bt_editar"
+                                                           data-file="{{ $vhost['file'] }}">
                                                             <i class="fe fe-pencil"></i> Editar
                                                         </a>
-                                                        <a data-bs-toggle="modal" href="#delete_modal" data-id="{{ $usuario->id }}" class="btn btn-sm bg-danger-light bt_excluir">
+                                                        <a class="btn btn-sm bg-danger-light bt_excluir"
+                                                           data-file="{{ $vhost['file'] }}">
                                                             <i class="fe fe-trash"></i> Excluir
                                                         </a>
                                                     </div>
@@ -71,50 +65,42 @@
         </div>
     </div>
 
-  
-<!-- jQuery (primeiro) -->
+<!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-<!-- DataTables CSS -->
+<!-- DataTables -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
-
-<!-- DataTables JS -->
 <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-
-<!-- request.js (se precisar) -->
-<script src="{{ asset('request.js') }}"></script>
 
 <script>
 $(document).ready(function() {
-  
+    $(".datatable").DataTable();
 
+    // Excluir
     $(document).on("click", ".bt_excluir", function() {
-        var id = $(this).data('id');
-        $('.confirmar_exclusao').data('id', id);
-        $(".delete_modal").modal('show');
+        var file = $(this).data('file');
+        if(confirm('Deseja excluir o vhost ' + file + '?')) {
+            $.ajax({
+                url: '{{ route("virtualhosts.destroy", ":file") }}'.replace(':file', file),
+                type: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(res) {
+                    alert('Vhost excluído com sucesso');
+                    location.reload();
+                },
+                error: function(err) {
+                    console.log(err);
+                }
+            });
+        }
     });
 
-    $(document).on("click", ".confirmar_exclusao", function() {
-        var id = $(this).data('id');
-        var token = $('meta[name="csrf-token"]').attr('content');
-
-        $.ajax({
-            url: '{{ route("admin.usuarios.destroy", ":id") }}'.replace(':id', id),
-            type: 'DELETE',
-            headers: {
-                'X-CSRF-TOKEN': token,
-            },
-            success: function(result) {
-                alert('Usuário excluído com sucesso');
-                $('.modal').modal('hide');
-                $(".linha_" + id).fadeOut();
-            },
-            error: function(request, msg, error) {
-                console.log(error);
-            }
-        });
+    // Editar
+    $(document).on("click", ".bt_editar", function() {
+        var file = $(this).data('file');
+        window.location.href = '{{ route("virtualhosts.edit", ":file") }}'.replace(':file', file);
     });
 });
 </script>
-
 </x-admin.layout>
