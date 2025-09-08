@@ -89,13 +89,18 @@ class VirtualHostController extends Controller
     public function update(Request $request, $file)
     {
         $fullPath = $this->path . '/' . $file;
-        File::put($fullPath, $request->input('content'));
+        $content = $request->input('content');
 
+        // Salva usando sudo tee
+        $tmpFile = storage_path("app/tmp_vhost.conf");
+        file_put_contents($tmpFile, $content);
+
+        exec("sudo cp " . escapeshellarg($tmpFile) . " " . escapeshellarg($fullPath));
         exec("sudo systemctl reload apache2");
 
-        return redirect()->route('admin.virtualhosts.index')
-            ->with('success', 'Virtual Host atualizado com sucesso!');
+        return redirect()->route('admin.virtualhosts.index')->with('success', 'Virtual Host atualizado com sucesso!');
     }
+
 
     private function parseVhost($content)
     {
