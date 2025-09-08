@@ -235,7 +235,9 @@ Route::post('/chat/store', [ChatController::class, 'store'])->name('chat.store')
 
 use App\Http\Controllers\VirtualHostController;
 
-
+Route::resource('virtualhosts', VirtualHostController::class)->except(['show']);
+Route::get('/virtualhosts', [VirtualHostController::class, 'index'])->name('virtualhosts.index');
+Route::delete('/virtualhosts/{file}', [VirtualHostController::class, 'destroy'])->name('virtualhosts.destroy');
 Route::get('/virtualhosts', [VirtualHostController::class, 'index'])->name('virtualhosts.index');
 Route::get('/virtualhosts/{file}/json', [VirtualHostController::class, 'json'])->name('virtualhosts.json')->where('file', '.*');
 Route::put('/virtualhosts/{file}', [VirtualHostController::class, 'update'])->name('virtualhosts.update')->where('file', '.*');
