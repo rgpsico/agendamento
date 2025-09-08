@@ -18,20 +18,21 @@ class VirtualHostController extends Controller
     }
 
     public function destroy($file)
-    {
-        $fullPath = $this->path . '/' . $file;
+{
+    $fullPath = $this->path . '/' . $file;
 
-        if (File::exists($fullPath)) {
-            // Desabilita antes de apagar
-            exec("sudo a2dissite " . escapeshellarg($file));
+    if (File::exists($fullPath)) {
+        // Desabilita antes de apagar
+        exec("sudo a2dissite " . escapeshellarg($file));
 
-            // Apaga o arquivo
-            File::delete($fullPath);
+        // Apaga usando sudo rm
+        exec("sudo rm " . escapeshellarg($fullPath));
 
-            // Reinicia Apache
-            exec("sudo systemctl restart apache2");
-        }
-
-        return redirect()->route('virtualhosts.index')->with('success', "Arquivo $file excluído com sucesso!");
+        // Reinicia Apache
+        exec("sudo systemctl restart apache2");
     }
+
+    return redirect()->route('virtualhosts.index')->with('success', "Arquivo $file excluído com sucesso!");
+}
+
 }
