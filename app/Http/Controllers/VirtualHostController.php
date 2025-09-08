@@ -98,7 +98,7 @@ class VirtualHostController extends Controller
         exec("sudo cp " . escapeshellarg($tmpFile) . " " . escapeshellarg($fullPath));
         exec("sudo systemctl reload apache2");
 
-        return redirect()->route('virtualhosts.index')->with('success', 'Virtual Host atualizado com sucesso!');
+        return redirect()->back()->with('success', 'Virtual Host atualizado com sucesso!');
     }
 
 
