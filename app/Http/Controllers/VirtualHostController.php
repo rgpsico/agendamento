@@ -60,17 +60,27 @@ class VirtualHostController extends Controller
         return view('admin.virtualhosts.create');
     }
 
-    public function store(Request $request)
-    {
-        $fileName = $request->input('filename') . '.conf';
-        $fullPath = $this->path . '/' . $fileName;
+ public function store(Request $request)
+{
+    $fileName = $request->input('filename') . '.conf';
+    $fullPath = $this->path . '/' . $fileName;
+    $content = $request->input('content');
 
-        File::put($fullPath, $request->input('content'));
-        exec("sudo a2ensite $fileName && sudo systemctl reload apache2");
+    // Cria arquivo temporário no storage do Laravel
+    $tmpFile = storage_path("app/tmp_$fileName");
+    file_put_contents($tmpFile, $content);
 
-        return redirect()->route('admin.virtualhosts.index')
-            ->with('success', 'Virtual Host criado com sucesso!');
-    }
+    // Copia com sudo para /etc/apache2/sites-available/
+    exec("sudo cp " . escapeshellarg($tmpFile) . " " . escapeshellarg($fullPath));
+
+    // Habilita o site e recarrega o Apache
+    exec("sudo a2ensite " . escapeshellarg($fileName));
+    exec("sudo systemctl reload apache2");
+
+    return redirect()->route('admin.virtualhosts.index')
+        ->with('success', "Virtual Host {$fileName} criado com sucesso!");
+}
+
 
     public function edit($file)
     {
