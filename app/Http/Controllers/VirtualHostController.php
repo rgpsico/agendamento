@@ -9,7 +9,7 @@ class VirtualHostController extends Controller
 {
     protected $path = '/etc/apache2/sites-available';
 
-    public function index()
+public function index()
 {
     $files = File::files($this->path);
 
