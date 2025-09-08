@@ -80,7 +80,10 @@ class VirtualHostController extends Controller
         }
 
         $content = File::get($fullPath);
-        return view('admin.virtualhosts.edit', compact('file', 'content'));
+       return view('admin.virtualhosts.edit', [
+        'fileName' => $file,
+        'content' => $content
+    ]);
     }
 
     public function update(Request $request, $file)
