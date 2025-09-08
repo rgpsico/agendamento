@@ -122,4 +122,22 @@ class VirtualHostController extends Controller
             'ServerAlias' => $serverAlias,
         ];
     }
+
+        public function destroy($file)
+    {
+        $fullPath = $this->path . '/' . $file;
+
+        if (File::exists($fullPath)) {
+            // Desabilita antes de apagar
+            exec("sudo a2dissite " . escapeshellarg($file));
+
+            // Apaga usando sudo rm
+            exec("sudo rm " . escapeshellarg($fullPath));
+
+            // Reinicia Apache
+            exec("sudo systemctl restart apache2");
+        }
+
+        return redirect()->route('virtualhosts.index')->with('success', "Arquivo $file excluído com sucesso!");
+    }
 }
