@@ -9,20 +9,18 @@ class VirtualHostController extends Controller
 {
     protected $path = '/etc/apache2/sites-available';
 
-
-  public function index()
+    public function index()
     {
-        // Garante que a pasta existe
         if (!File::exists($this->path)) {
             return view('admin.virtualhosts.index', ['files' => []]);
         }
 
-        // Lista somente arquivos .conf
         $files = collect(File::files($this->path))
-                    ->filter(fn($file) => str_ends_with($file->getFilename(), '.conf'));
+            ->filter(fn($file) => str_ends_with($file->getFilename(), '.conf'));
 
         return view('admin.virtualhosts.index', compact('files'));
     }
+
     public function json($file)
     {
         $fullPath = $this->path . '/' . $file;
@@ -41,28 +39,63 @@ class VirtualHostController extends Controller
         ]);
     }
 
-public function create()
-{
-    return view('admin.virtualhosts.create');
-}
-
-public function edit($file)
-{
-    $fullPath = $this->path . '/' . $file;
-    if (!File::exists($fullPath)) {
-        abort(404);
+    public function create()
+    {
+        return view('admin.virtualhosts.create');
     }
-    $content = File::get($fullPath);
-    return view('admin.virtualhosts.edit', compact('file', 'content'));
-}
 
-public function update(Request $request, $file)
-{
-    $fullPath = $this->path . '/' . $file;
-    File::put($fullPath, $request->input('content'));
-    exec("sudo systemctl reload apache2");
-    return redirect()->route('admin,virtualhosts.index')->with('success', 'Virtual Host atualizado com sucesso!');
-}
+    public function store(Request $request)
+    {
+        $fileName = $request->input('filename') . '.conf';
+        $fullPath = $this->path . '/' . $fileName;
 
+        File::put($fullPath, $request->input('content'));
+        exec("sudo a2ensite $fileName && sudo systemctl reload apache2");
 
+        return redirect()->route('admin.virtualhosts.index')
+            ->with('success', 'Virtual Host criado com sucesso!');
+    }
+
+    public function edit($file)
+    {
+        $fullPath = $this->path . '/' . $file;
+        if (!File::exists($fullPath)) {
+            abort(404);
+        }
+
+        $content = File::get($fullPath);
+        return view('admin.virtualhosts.edit', compact('file', 'content'));
+    }
+
+    public function update(Request $request, $file)
+    {
+        $fullPath = $this->path . '/' . $file;
+        File::put($fullPath, $request->input('content'));
+
+        exec("sudo systemctl reload apache2");
+
+        return redirect()->route('admin.virtualhosts.index')
+            ->with('success', 'Virtual Host atualizado com sucesso!');
+    }
+
+    private function parseVhost($content)
+    {
+        preg_match('/<VirtualHost\s+(.+)>/', $content, $matches);
+        $serverName = null;
+        $serverAlias = [];
+
+        if (preg_match('/ServerName\s+([^\s]+)/', $content, $sn)) {
+            $serverName = $sn[1];
+        }
+
+        if (preg_match_all('/ServerAlias\s+([^\s]+)/', $content, $sa)) {
+            $serverAlias = $sa[1];
+        }
+
+        return [
+            'VirtualHost' => $matches[1] ?? null,
+            'ServerName'  => $serverName,
+            'ServerAlias' => $serverAlias,
+        ];
+    }
 }
