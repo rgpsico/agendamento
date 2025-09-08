@@ -14,6 +14,7 @@ class StoreSiteRequest extends FormRequest
 
     public function rules(): array
     {
+        dd($this->all());
         return [
             'template_id' => 'required|exists:site_templates,id',
             'titulo' => 'required|string|max:255',
