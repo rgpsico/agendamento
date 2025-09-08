@@ -225,10 +225,11 @@ private function verificarDnsSsl($dominio)
  public function store(StoreSiteRequest $request)
 
 {
+      dd($request->all());
     // Todos os dados já estão validados aqui
     $validated = $request->validated();
    
-
+  
     $slug = Str::slug($validated['titulo']);
 
     // Ensure the slug is unique (optional, if uniqueness is required)
