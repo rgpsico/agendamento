@@ -8,7 +8,22 @@ use Illuminate\Support\Facades\File;
 class VirtualHostController extends Controller
 {
     protected $path = '/etc/apache2/sites-available';
- public function json($file)
+
+
+  public function index()
+    {
+        // Garante que a pasta existe
+        if (!File::exists($this->path)) {
+            return view('admin.virtualhosts.index', ['files' => []]);
+        }
+
+        // Lista somente arquivos .conf
+        $files = collect(File::files($this->path))
+                    ->filter(fn($file) => str_ends_with($file->getFilename(), '.conf'));
+
+        return view('admin.virtualhosts.index', compact('files'));
+    }
+    public function json($file)
     {
         $fullPath = $this->path . '/' . $file;
 
