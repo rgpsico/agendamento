@@ -215,7 +215,7 @@
 
                                 <!-- Seção 7: Domínio e Virtual Host -->
                                 <div class="form-section mb-4">
-                                    <h5 class="mb-3">Domínio Personalizado e Virtual Host</h5>
+                                    <h5 class="mb-3">Domínio Personalizado e Virtual Hosssst</h5>
                                     <div class="form-group">
                                         <label for="dominio_personalizado">Domínio Personalizado (ex: meusite.com.br)</label>
                                         <input type="text" name="dominio_personalizado" value="{{ old('dominio_personalizado') }}" class="form-control" placeholder="dominio.com.br">

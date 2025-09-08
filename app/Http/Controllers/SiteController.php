@@ -415,15 +415,6 @@ private function verificarDnsSsl($dominio)
 }
 
 
-protected function sanitizeDomain($dominio)
-{
-    $dominio = strtolower(trim($dominio));
-    $dominio = preg_replace('/^https?:\/\//', '', $dominio); // remove http:// ou https://
-    $dominio = preg_replace('/\/.*$/', '', $dominio); // remove paths (ex: /index.php)
-    return $dominio;
-}
-
-
 
     /**
      * Salva as configurações atualizadas do site
@@ -470,6 +461,8 @@ protected function sanitizeDomain($dominio)
         'tracking_codes.*.status' => 'boolean',
     ]);
 
+   
+
     // Dados principais do site
     $data = [
         'titulo' => $request->titulo,
@@ -512,7 +505,7 @@ protected function sanitizeDomain($dominio)
 
     // Atualiza dados do site
     $site->update($data);
-
+     $this->atualizarConfiguracoes($request, $site);
     // --- Serviços ---
     if ($request->filled('servicos')) {
         foreach ($request->servicos as $servicoInput) {
@@ -621,26 +614,14 @@ protected function sanitizeDomain($dominio)
         }
     }
 
-        if (!empty($request->dominio_personalizado) && $request->gerar_vhost) {
-            try {
-            
-                $this->criarOuAtualizarVirtualHost($request->dominio_personalizado);
-            } catch (\Exception $e) {
-                return redirect()->back()->withErrors(['erro' => 'Erro ao criar Virtual Host: ' . $e->getMessage()]);
-            }
-        }
-
     return redirect()->back()->with('success', 'Configurações do site atualizadas com sucesso!');
 }
 
 
 
-   protected function criarOuAtualizarVirtualHost($dominio)
+    protected function criarOuAtualizarVirtualHost($dominio)
     {
-        $dominio = trim($dominio);
-        $dominio = $this->sanitizeDomain($dominio);
-         
-
+        // Validar domínio
         if (!filter_var('http://' . $dominio, FILTER_VALIDATE_URL)) {
             throw new \Exception('Domínio inválido.');
         }
