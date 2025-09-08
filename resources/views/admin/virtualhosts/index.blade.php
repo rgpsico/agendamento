@@ -63,7 +63,7 @@ $(document).ready(function() {
             url: '{{ route("virtualhosts.destroy", ":file") }}'.replace(':file', file),
             type: 'POST',
             data: {
-                _method: 'POST',
+                _method: 'DELETE',
                 _token: $('meta[name="csrf-token"]').attr('content')
             },
             success: function(res) {
