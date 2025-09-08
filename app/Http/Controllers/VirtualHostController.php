@@ -9,17 +9,33 @@ class VirtualHostController extends Controller
 {
     protected $path = '/etc/apache2/sites-available';
 
-    public function index()
-    {
-        if (!File::exists($this->path)) {
-            return view('admin.virtualhosts.index', ['files' => []]);
+  public function index()
+{
+    if (!File::exists($this->path)) {
+        return view('admin.virtualhosts.index', ['vhosts' => []]);
+    }
+
+    $files = collect(File::files($this->path))
+        ->filter(fn($file) => str_ends_with($file->getFilename(), '.conf'));
+
+    $vhosts = $files->map(function ($file) {
+        $content = File::get($file->getRealPath());
+
+        // Pega o ServerName
+        $servername = null;
+        if (preg_match('/ServerName\s+([^\s]+)/', $content, $match)) {
+            $servername = $match[1];
         }
 
-        $files = collect(File::files($this->path))
-            ->filter(fn($file) => str_ends_with($file->getFilename(), '.conf'));
+        return [
+            'file'       => $file->getFilename(),
+            'servername' => $servername ?? '(não definido)',
+        ];
+    });
 
-        return view('admin.virtualhosts.index', compact('files'));
-    }
+    return view('admin.virtualhosts.index', compact('vhosts'));
+}
+
 
     public function json($file)
     {
