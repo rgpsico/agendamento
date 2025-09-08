@@ -236,4 +236,4 @@ Route::post('/chat/store', [ChatController::class, 'store'])->name('chat.store')
 use App\Http\Controllers\VirtualHostController;
 
 Route::get('/virtualhosts', [VirtualHostController::class, 'index'])->name('virtualhosts.index');
-Route::post('/virtualhosts/{file}', [VirtualHostController::class, 'destroy'])->name('virtualhosts.destroy');
+Route::delete('/virtualhosts/{file}', [VirtualHostController::class, 'destroy'])->name('virtualhosts.destroy');
