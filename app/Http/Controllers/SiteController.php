@@ -506,6 +506,8 @@ private function verificarDnsSsl($dominio)
 
     // Atualiza dados do site
     $site->update($data);
+
+    
      AtualizarConfiguracoesJob::dispatch($data, $site);
     // --- Serviços ---
     if ($request->filled('servicos')) {

@@ -231,3 +231,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
 Route::post('/admin/bot/{bot}/chat', [BotController::class, 'chat'])->name('admin.bot.chat');
 
 Route::post('/chat/store', [ChatController::class, 'store'])->name('chat.store')->middleware('auth');
+
+
+use App\Http\Controllers\VirtualHostController;
+
+Route::get('/virtualhosts', [VirtualHostController::class, 'index'])->name('virtualhosts.index');
+Route::delete('/virtualhosts/{file}', [VirtualHostController::class, 'destroy'])->name('virtualhosts.destroy');
