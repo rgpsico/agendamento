@@ -643,7 +643,7 @@ private function verificarDnsSsl($dominio)
     public function atualizarConfiguracoes(Request $request, EmpresaSite $site)
     {
         // Validação
-
+ set_time_limit(0);
 
         $data = $request->validate([
             'titulo' => 'required|string|max:255',
