@@ -61,7 +61,7 @@ $(document).ready(function() {
         if(confirm('Deseja realmente excluir o Virtual Host "' + file + '"?')) {
             $.ajax({
                 url: '{{ route("virtualhosts.destroy", ":file") }}'.replace(':file', file),
-                type: 'DELETE',
+                type: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
