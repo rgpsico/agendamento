@@ -46,7 +46,8 @@ class StoreSiteRequest extends FormRequest
             'tracking_codes.*.script' => 'nullable|string',
             'tracking_codes.*.status' => 'boolean',
             'dominio_personalizado' => 'nullable|string|max:255',
-            'gerar_vhost' => 'boolean',
+            'gerar_vhost' => 'sometimes|accepted',
+
         ];
     }
 }
