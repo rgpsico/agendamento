@@ -52,7 +52,7 @@
 
 <script>
 $(document).ready(function() {
-    $('.datatable').DataTable();
+  
 
     $(document).on("click", ".bt_excluir", function() {
         let file = $(this).data('file');
