@@ -223,6 +223,8 @@ private function verificarDnsSsl($dominio)
 
     public function store(Request $request)
 {
+
+    
     $validated = $request->validate([
         'template_id' => 'required|exists:site_templates,id',
         'titulo' => 'required|string|max:255',
