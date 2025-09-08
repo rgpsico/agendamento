@@ -241,4 +241,4 @@ Route::delete('/virtualhosts/{file}', [VirtualHostController::class, 'destroy'])
 Route::get('/virtualhosts', [VirtualHostController::class, 'index'])->name('virtualhosts.index');
 Route::get('/virtualhosts/{file}/json', [VirtualHostController::class, 'json'])->name('virtualhosts.json')->where('file', '.*');
 Route::put('/virtualhosts/{file}', [VirtualHostController::class, 'update'])->name('virtualhosts.update')->where('file', '.*');
-Route::delete('/virtualhosts/{file}', [VirtualHostController::class, 'destroy'])->name('virtualhosts.destroy')->where('file', '.*');
+Route::delete('/virtualhosts/{file}', [VirtualHostController::class, 'destroy'])->name('virtualhosts.destroy');
