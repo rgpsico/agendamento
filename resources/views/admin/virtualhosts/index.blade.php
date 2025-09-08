@@ -73,7 +73,7 @@
 
 <script>
 $(document).ready(function() {
-    $(".datatable").DataTable();
+  
 
     // Excluir
     $(document).on("click", ".bt_excluir", function() {
