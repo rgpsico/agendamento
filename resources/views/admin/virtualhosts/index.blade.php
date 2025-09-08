@@ -59,19 +59,18 @@ $(document).ready(function() {
         let row = $(this).closest('tr');
 
         if(confirm('Deseja realmente excluir o Virtual Host "' + file + '"?')) {
-            $.ajax({
+        $.ajax({
                 url: '{{ route("virtualhosts.destroy", ":file") }}'.replace(':file', file),
                 type: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                data: {
+                    _method: 'DELETE',
+                    _token: $('meta[name="csrf-token"]').attr('content')
                 },
                 success: function(res) {
-                    if(res.success) {
-                        // animação de saída com GSAP
-                        gsap.to(row, {opacity:0, y:-20, duration:0.5, onComplete:()=>row.remove()});
-                    }
+                    gsap.to(row, { opacity: 0, y: -20, duration: 0.5, onComplete: () => row.remove() });
                 }
             });
+
         }
     });
 
