@@ -225,7 +225,7 @@ private function verificarDnsSsl($dominio)
  public function store(StoreSiteRequest $request)
 
 {
-      dd($request->all());
+    
     // Todos os dados já estão validados aqui
     $validated = $request->validated();
    
