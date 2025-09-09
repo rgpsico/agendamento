@@ -45,7 +45,15 @@
 
     <!-- Contact Section -->
    <x-site.contact-section :site="$site" />
-<x-batepapo />
+
+   @if($site->atendimento_com_ia)
+    <x-batepapo />
+    @endif
+
+
+       @if($site->atendimento_com_whatsapp)
+            <x-atendimento-whatsapp :numero="$site->whatsapp" mensagem="Olá! Gostaria de atendimento." />
+       @endif
 
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="{{ asset('js/site-metrics.js') }}"></script>

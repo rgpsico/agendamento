@@ -701,6 +701,15 @@
         </div>
     </section>
 
+      @if($site->atendimento_com_ia)
+    <x-batepapo />
+    @endif
+
+
+       @if($site->atendimento_com_whatsapp)
+            <x-atendimento-whatsapp :numero="$site->whatsapp" mensagem="Olá! Gostaria de atendimento." />
+       @endif
+
     <!-- Footer -->
     <footer class="bg-gray-900 text-white py-12">
         <div class="container mx-auto px-6">
