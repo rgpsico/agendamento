@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('empresa', function (Blueprint $table) {
-            //
+        Schema::table('empresa_site', function (Blueprint $table) {
+               $table->boolean('atendimento_com_ia')->default(false)->after('vhost_criado');
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('empresa', function (Blueprint $table) {
-            //
+        Schema::table('empresa_site', function (Blueprint $table) {
+                $table->boolean('atendimento_com_ia')->default(false)->after('vhost_criado');
         });
     }
 };
