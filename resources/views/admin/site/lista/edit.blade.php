@@ -121,18 +121,28 @@
                                     </div>
 
                                     <!-- NOVO: Autoatendimento com IA -->
-                              
-                                    <div class="form-group">
-                                        <div class="modern-checkbox">
-                                           <input type="checkbox" name="atendimento_com_ia" id="atendimento_com_ia" class="form-check-input"
-                                            {{ old('atendimento_com_ia', $site->atendimento_com_ia ?? 0) == 1 ? 'checked' : '' }}>
+                              <div class="form-group">
+                                <div class="modern-checkbox">
+                                    <input type="checkbox" name="atendimento_com_whatsapp" id="atendimento_com_whatsapp" class="form-check-input"
+                                        {{ old('atendimento_com_whatsapp', $site->atendimento_com_whatsapp ?? 0) == 1 ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="atendimento_com_whatsapp">
+                                        <i class="fab fa-whatsapp me-2 text-success"></i>
+                                        Ativar Atendimento com WhatsApp
+                                    </label>
+                                </div>
+                            </div>
 
-                                            <label class="form-check-label" for="atendimento_com_ia">
-                                                <i class="fas fa-robot me-2"></i>
-                                                Ativar Autoatendimento com IA
-                                            </label>
-                                        </div>
-                                    </div>
+                            <div class="form-group">
+                                <div class="modern-checkbox">
+                                    <input type="checkbox" name="atendimento_com_ia" id="atendimento_com_ia" class="form-check-input"
+                                        {{ old('atendimento_com_ia', $site->atendimento_com_ia ?? 0) == 1 ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="atendimento_com_ia">
+                                        <i class="fas fa-robot me-2 text-primary"></i>
+                                        Ativar Atendimento com IA
+                                    </label>
+                                </div>
+                            </div>
+
                                 </div>
 
                                 <!-- Seção 2: Cores -->

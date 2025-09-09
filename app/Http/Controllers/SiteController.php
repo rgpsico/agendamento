@@ -410,6 +410,7 @@ private function verificarDnsSsl($dominio)
         'whatsapp' => 'nullable|string|max:20',
         'template_id' => 'required|exists:site_templates,id',
         'atendimento_com_ia' => 'nullable|in:on,off',
+        'atendimento_com_whatsapp' => 'nullable|in:on,off',
 
         // Novos campos
         'servicos' => 'nullable|array',
