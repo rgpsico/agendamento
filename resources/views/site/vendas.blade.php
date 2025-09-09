@@ -712,7 +712,9 @@
         </div>
     </section>
 
+    @if($site->atendimento_com_ia)
     <x-batepapo />
+    @endif
     <script>
         // Verificar se GSAP carregou corretamente
         if (typeof gsap !== 'undefined') {

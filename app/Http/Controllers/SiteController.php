@@ -95,7 +95,7 @@ class SiteController extends Controller
         $read = @stream_socket_client("ssl://{$site->dominio_personalizado}:443", $errno, $errstr, 30, STREAM_CLIENT_CONNECT, $stream);
         $sslStatus = $read !== false;
     }
-
+  
     return view('admin.site.lista.edit', compact('site', 'templates', 'dnsStatus', 'sslStatus', 'ipServidor'));
 }
 
@@ -409,6 +409,7 @@ private function verificarDnsSsl($dominio)
         'sobre_itens.*.descricao' => 'nullable|string',
         'whatsapp' => 'nullable|string|max:20',
         'template_id' => 'required|exists:site_templates,id',
+        'atendimento_com_ia' => 'nullable|in:on,off',
 
         // Novos campos
         'servicos' => 'nullable|array',
@@ -448,9 +449,10 @@ private function verificarDnsSsl($dominio)
         'sobre_descricao' => $request->sobre_descricao,
         'sobre_itens' => $request->input('sobre_itens', []),
         'whatsapp' => $request->whatsapp,
-        'autoatendimento_ia' => $request->has('autoatendimento_ia'),
+        'atendimento_com_ia' => $request->input('atendimento_com_ia') == 'on' ? 1 : 0,
     ];
-
+   
+    
     // Upload logo
     if ($request->hasFile('logo')) {
         if ($site->logo && Storage::disk('public')->exists($site->logo)) {
@@ -530,6 +532,7 @@ private function verificarDnsSsl($dominio)
             }
 
             $fotoPath = null;
+           
             if (!empty($depoimentoInput['foto'])) {
                 $fotoPath = $depoimentoInput['foto']->store('sites/depoimentos', 'public');
             }

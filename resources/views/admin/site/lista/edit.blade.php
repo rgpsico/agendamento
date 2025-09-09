@@ -121,11 +121,13 @@
                                     </div>
 
                                     <!-- NOVO: Autoatendimento com IA -->
+                              
                                     <div class="form-group">
                                         <div class="modern-checkbox">
-                                            <input type="checkbox" name="autoatendimento_ia" id="autoatendimento_ia" class="form-check-input" 
-                                            {{ old('autoatendimento_ia', $site->autoatendimento_ia ?? false) ? 'checked' : '' }}>
-                                            <label class="form-check-label" for="autoatendimento_ia">
+                                           <input type="checkbox" name="atendimento_com_ia" id="atendimento_com_ia" class="form-check-input"
+                                            {{ old('atendimento_com_ia', $site->atendimento_com_ia ?? 0) == 1 ? 'checked' : '' }}>
+
+                                            <label class="form-check-label" for="atendimento_com_ia">
                                                 <i class="fas fa-robot me-2"></i>
                                                 Ativar Autoatendimento com IA
                                             </label>
