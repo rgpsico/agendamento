@@ -718,7 +718,7 @@
 
 
        @if($site->atendimento_com_whatsapp)
-            <x-atendimento-whatsapp :numero="$site->whatsapp" mensagem="Olá! Gostaria de atendimento." />
+            {{-- <x-atendimento-whatsapp :numero="$site->whatsapp" mensagem="Olá! Gostaria de atendimento." /> --}}
        @endif
 
 
