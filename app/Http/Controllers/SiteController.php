@@ -392,7 +392,7 @@ private function verificarDnsSsl($dominio)
      */
    public function update(Request $request, EmpresaSite $site)
 {
-     set_time_limit(900);
+     
     // Validação
     $validated = $request->validate([
         'titulo' => 'required|string|max:255',
@@ -607,6 +607,7 @@ private function verificarDnsSsl($dominio)
         if (!$process->isSuccessful()) {
             throw new ProcessFailedException($process);
         }
+        dd('aaa');
 
         return true;
     }
