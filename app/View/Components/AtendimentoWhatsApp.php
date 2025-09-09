@@ -23,6 +23,6 @@ class AtendimentoWhatsApp extends Component
      */
     public function render()
     {
-        return view('components.atendimento-whats-app');
+        return view('components.atendimentowhatsapp');
     }
 }
