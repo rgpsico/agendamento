@@ -11,14 +11,14 @@ return new class extends Migration
      */
       public function up(): void
     {
-        Schema::table('empresas', function (Blueprint $table) {
-            $table->boolean('atendimento_com_ia')->default(false)->after('coluna_existente');
+        Schema::table('empresa_site', function (Blueprint $table) {
+            $table->boolean('atendimento_com_ia')->default(false)->after('vhost_criado');
         });
     }
 
     public function down(): void
     {
-        Schema::table('empresas', function (Blueprint $table) {
+        Schema::table('empresa_site', function (Blueprint $table) {
             $table->dropColumn('atendimento_com_ia');
         });
     }

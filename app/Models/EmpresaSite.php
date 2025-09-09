@@ -27,7 +27,8 @@ class EmpresaSite extends Model
         'sobre_imagem',
         'sobre_itens',
         'whatsapp',
-        'vhost_criado'
+        'vhost_criado',
+        'atendimento_com_ia'
     ];
 
     protected $casts = [

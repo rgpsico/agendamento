@@ -392,6 +392,7 @@ private function verificarDnsSsl($dominio)
      */
    public function update(Request $request, EmpresaSite $site)
 {
+ 
      
     // Validação
     $validated = $request->validate([
