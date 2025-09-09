@@ -612,7 +612,6 @@ private function verificarDnsSsl($dominio)
         if (!$process->isSuccessful()) {
             throw new ProcessFailedException($process);
         }
-        dd('aaa');
 
         return true;
     }

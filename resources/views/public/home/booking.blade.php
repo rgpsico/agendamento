@@ -247,7 +247,7 @@
             </div>
         </div>
     </div>
-
+{{-- 
   <div class="chatbot-container">
         <div class="chatbot-header">
             <h5>Chat com Assistente</h5>
@@ -264,11 +264,13 @@
             <input type="text" id="chatbot-input" placeholder="Digite sua mensagem..." />
             <button id="chatbot-send"><i class="fas fa-paper-plane"></i></button>
         </div>
-    </div>
+    </div> --}}
     
+    <x-batepapo />
 
     <script src="{{ asset('admin/js/jquery-3.6.3.min.js') }}"></script>
     <script src="{{ asset('js/booking.js') }}"></script>
+  
     <script>
         $(document).ready(function() {
             // Handle image errors
@@ -319,70 +321,6 @@
     </script>
 
     <script>
-        $(document).ready(function() {
-            // Existing JavaScript code...
-
-            // Chatbot functionality
-            let conversationId = null; // Store conversation ID
-
-            // Toggle chatbot visibility
-            $('.chatbot-toggle').on('click', function() {
-                $('.chatbot-container').toggleClass('minimized');
-            });
-
-            // Send message
-            $('#chatbot-send').on('click', sendMessage);
-            $('#chatbot-input').on('keypress', function(e) {
-                if (e.which === 13) { // Enter key
-                    sendMessage();
-                }
-            });
-
-            function sendMessage() {
-                const message = $('#chatbot-input').val().trim();
-                if (!message) return;
-
-                // Check if phone is required (user not authenticated)
-                let phone = null;
-                @if (!Auth::check())
-                    phone = $('#chatbot-phone').val().trim();
-                    if (!phone) {
-                        appendMessage('bot-message', 'Por favor, informe seu número de telefone.');
-                        return;
-                    }
-                @endif
-
-                // Display user message
-                appendMessage('user-message', message);
-
-                // Send message to backend
-                $.ajax({
-    url: '{{ route("chat.store") }}',
-    method: 'POST',
-    data: {
-        mensagem: message,
-        conversation_id: conversationId,
-        professor_id: $('#professor_id').val(),
-        phone: phone,
-        _token: '{{ csrf_token() }}'
-    },
-    success: function(response) {
-        conversationId = response.conversation_id;
-        appendMessage('bot-message', response.bot_response || 'Entendido! Como posso ajudar mais?');
-        $('#chatbot-input').val('');
-        @if (!Auth::check())
-            $('#chatbot-phone').prop('disabled', true);
-        @endif
-    }
-});
-
-            }
-
-            function appendMessage(type, text) {
-                const messageHtml = `<div class="message ${type}">${text}</div>`;
-                $('#chatbot-messages').append(messageHtml);
-                $('#chatbot-messages').scrollTop($('#chatbot-messages')[0].scrollHeight); // Auto-scroll
-            }
-        });
+       
     </script>
 </x-public.layout>

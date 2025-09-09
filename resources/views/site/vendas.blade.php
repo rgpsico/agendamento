@@ -712,6 +712,7 @@
         </div>
     </section>
 
+    <x-batepapo />
     <script>
         // Verificar se GSAP carregou corretamente
         if (typeof gsap !== 'undefined') {

@@ -45,7 +45,7 @@
 
     <!-- Contact Section -->
    <x-site.contact-section :site="$site" />
-
+<x-batepapo />
 
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="{{ asset('js/site-metrics.js') }}"></script>
