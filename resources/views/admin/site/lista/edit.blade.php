@@ -31,24 +31,46 @@
                         <div class="card-body">
                             <x-alert/>
 
-                           <form action="{{ route('admin.site.configuracoes.update', $site->id) }}" method="POST" enctype="multipart/form-data">
+                            <!-- Campo para inserir o prompt da IA -->
+
+                             <div id="loading-spinner" style="display: none; text-align: center; margin: 20px;">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Carregando...</span>
+                                    </div>
+                                    <p>Gerando com IA, aguarde...</p>
+                                </div>
+
+                            <div class="form-group mb-4">
+                                <label for="ai_prompt" class="form-label">
+                                    <i class="fas fa-robot me-2"></i>Preenchimento Automático com IA
+                                </label>
+                                <div class="input-group">
+                                    <input type="text" id="ai_prompt" class="form-control modern-input" placeholder="Digite o tema ou descrição do site (ex: 'Site para uma cafeteria artesanal')">
+                                    <button type="button" class="btn btn-primary modern-btn" onclick="fillFieldsWithAI()">
+                                        <i class="fas fa-magic me-1"></i>Gerar com IA
+                                    </button>
+                                </div>
+                                <small class="form-text text-muted">Insira um tema ou descrição para gerar automaticamente os campos do site.</small>
+                            </div>
+
+                            <form id="site-config-form" action="{{ route('admin.site.configuracoes.update', $site->id) }}" method="POST" enctype="multipart/form-data">
                                 @method('PUT')                      
                                 @csrf
 
-                            <!-- Template Selection -->
-                            <div class="form-group mb-4">
-                                <label for="template_id" class="form-label">
-                                    <i class="fas fa-layout me-2"></i>Template do Site
-                                </label>
-                                <select name="template_id" id="template_id" class="form-control modern-select">
-                                    <option value="">-- Selecione um template --</option>
-                                    @foreach($templates as $template)
-                                        <option value="{{ $template->id }}" {{ old('template_id', $site->template_id) == $template->id ? 'selected' : '' }}>
-                                            {{ $template->titulo }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
+                                <!-- Template Selection -->
+                                <div class="form-group mb-4">
+                                    <label for="template_id" class="form-label">
+                                        <i class="fas fa-layout me-2"></i>Template do Site
+                                    </label>
+                                    <select name="template_id" id="template_id" class="form-control modern-select">
+                                        <option value="">-- Selecione um template --</option>
+                                        @foreach($templates as $template)
+                                            <option value="{{ $template->id }}" {{ old('template_id', $site->template_id) == $template->id ? 'selected' : '' }}>
+                                                {{ $template->titulo }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
 
                                 <!-- Seção 1: Informações gerais -->
                                 <div class="form-section modern-section">
@@ -65,7 +87,7 @@
                                                 <label for="titulo" class="form-label">
                                                     <i class="fas fa-heading me-1"></i>Título do Site
                                                 </label>
-                                                <input type="text" name="titulo" value="{{ old('titulo', $site->titulo ?? '') }}" class="form-control modern-input">
+                                                <input type="text" name="titulo" id="titulo" value="{{ old('titulo', $site->titulo ?? '') }}" class="form-control modern-input">
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -73,7 +95,7 @@
                                                 <label for="whatsapp" class="form-label">
                                                     <i class="fab fa-whatsapp me-1"></i>Número do WhatsApp
                                                 </label>
-                                                <input type="tel" name="whatsapp" value="{{ old('whatsapp', $site->whatsapp ?? '') }}" class="form-control modern-input" placeholder="+55 21 99999-9999">
+                                                <input type="tel" name="whatsapp" id="whatsapp" value="{{ old('whatsapp', $site->whatsapp ?? '') }}" class="form-control modern-input" placeholder="+55 21 99999-9999">
                                             </div>
                                         </div>
                                     </div>
@@ -82,7 +104,7 @@
                                         <label for="descricao" class="form-label">
                                             <i class="fas fa-align-left me-1"></i>Descrição
                                         </label>
-                                        <textarea name="descricao" class="form-control modern-textarea" rows="4">{{ old('descricao', $site->descricao ?? '') }}</textarea>
+                                        <textarea name="descricao" id="descricao" class="form-control modern-textarea" rows="4">{{ old('descricao', $site->descricao ?? '') }}</textarea>
                                     </div>
 
                                     <div class="row">
@@ -120,29 +142,25 @@
                                         </div>
                                     </div>
 
-                                    <!-- NOVO: Autoatendimento com IA -->
-                              <div class="form-group">
-                                <div class="modern-checkbox">
-                                    <input type="checkbox" name="atendimento_com_whatsapp" id="atendimento_com_whatsapp" class="form-check-input"
-                                        {{ old('atendimento_com_whatsapp', $site->atendimento_com_whatsapp ?? 0) == 1 ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="atendimento_com_whatsapp">
-                                        <i class="fab fa-whatsapp me-2 text-success"></i>
-                                        Ativar Atendimento com WhatsApp
-                                    </label>
-                                </div>
-                            </div>
+                                    <div class="form-group">
+                                        <div class="modern-checkbox">
+                                            <input type="checkbox" name="atendimento_com_whatsapp" id="atendimento_com_whatsapp" class="form-check-input" {{ old('atendimento_com_whatsapp', $site->atendimento_com_whatsapp ?? 0) == 1 ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="atendimento_com_whatsapp">
+                                                <i class="fab fa-whatsapp me-2 text-success"></i>
+                                                Ativar Atendimento com WhatsApp
+                                            </label>
+                                        </div>
+                                    </div>
 
-                            <div class="form-group">
-                                <div class="modern-checkbox">
-                                    <input type="checkbox" name="atendimento_com_ia" id="atendimento_com_ia" class="form-check-input"
-                                        {{ old('atendimento_com_ia', $site->atendimento_com_ia ?? 0) == 1 ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="atendimento_com_ia">
-                                        <i class="fas fa-robot me-2 text-primary"></i>
-                                        Ativar Atendimento com IA
-                                    </label>
-                                </div>
-                            </div>
-
+                                    <div class="form-group">
+                                        <div class="modern-checkbox">
+                                            <input type="checkbox" name="atendimento_com_ia" id="atendimento_com_ia" class="form-check-input" {{ old('atendimento_com_ia', $site->atendimento_com_ia ?? 0) == 1 ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="atendimento_com_ia">
+                                                <i class="fas fa-robot me-2 text-primary"></i>
+                                                Ativar Atendimento com IA
+                                            </label>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <!-- Seção 2: Cores -->
@@ -162,7 +180,7 @@
                                                     Cor Primária
                                                 </label>
                                                 <div class="color-wrapper">
-                                                    <input type="color" name="cores[primaria]" value="{{ old('cores.primaria', $site->cores['primaria'] ?? '#0ea5e9') }}" class="form-control form-control-color modern-color">
+                                                    <input type="color" name="cores[primaria]" id="cores_primaria" value="{{ old('cores.primaria', $site->cores['primaria'] ?? '#0ea5e9') }}" class="form-control form-control-color modern-color">
                                                     <span class="color-value">{{ old('cores.primaria', $site->cores['primaria'] ?? '#0ea5e9') }}</span>
                                                 </div>
                                             </div>
@@ -174,7 +192,7 @@
                                                     Cor Secundária
                                                 </label>
                                                 <div class="color-wrapper">
-                                                    <input type="color" name="cores[secundaria]" value="{{ old('cores.secundaria', $site->cores['secundaria'] ?? '#38b2ac') }}" class="form-control form-control-color modern-color">
+                                                    <input type="color" name="cores[secundaria]" id="cores_secundaria" value="{{ old('cores.secundaria', $site->cores['secundaria'] ?? '#38b2ac') }}" class="form-control form-control-color modern-color">
                                                     <span class="color-value">{{ old('cores.secundaria', $site->cores['secundaria'] ?? '#38b2ac') }}</span>
                                                 </div>
                                             </div>
@@ -195,14 +213,14 @@
                                         <label for="sobre_titulo" class="form-label">
                                             <i class="fas fa-heading me-1"></i>Título
                                         </label>
-                                        <input type="text" name="sobre_titulo" value="{{ old('sobre_titulo', $site->sobre_titulo ?? '') }}" class="form-control modern-input">
+                                        <input type="text" name="sobre_titulo" id="sobre_titulo" value="{{ old('sobre_titulo', $site->sobre_titulo ?? '') }}" class="form-control modern-input">
                                     </div>
 
                                     <div class="form-group">
                                         <label for="sobre_descricao" class="form-label">
                                             <i class="fas fa-align-left me-1"></i>Descrição
                                         </label>
-                                        <textarea name="sobre_descricao" class="form-control modern-textarea" style="min-height: 300px;">{{ old('sobre_descricao', $site->sobre_descricao ?? '') }}</textarea>
+                                        <textarea name="sobre_descricao" id="sobre_descricao" class="form-control modern-textarea" style="min-height: 300px;">{{ old('sobre_descricao', $site->sobre_descricao ?? '') }}</textarea>
                                     </div>
 
                                     <div class="form-group upload-group">
@@ -322,7 +340,7 @@
 
                                         @foreach($depoimentos as $index => $depoimento)
                                         <div class="dynamic-item">
-                                             <input type="hidden" name="depoimentos[{{ $index }}][id]" value="{{ $depoimento->id }}">
+                                            <input type="hidden" name="depoimentos[{{ $index }}][id]" value="{{ $depoimento->id }}">
                                             <div class="item-header">
                                                 <span class="item-number">{{ $index + 1 }}</span>
                                                 <button type="button" class="btn btn-danger btn-sm remove-btn" id="depoimentoremover" data-iddepoimento="{{ $depoimento->id }}">
@@ -444,9 +462,8 @@
                                                 <i class="fas fa-question-circle text-info"></i>
                                             </button>
                                         </label>
-                                        <input type="text" name="dominio_personalizado" value="{{ old('dominio_personalizado', $site->dominio_personalizado ?? '') }}" class="form-control modern-input" placeholder="dominio.com.br">
+                                        <input type="text" name="dominio_personalizado" id="dominio_personalizado" value="{{ old('dominio_personalizado', $site->dominio_personalizado ?? '') }}" class="form-control modern-input" placeholder="dominio.com.br">
                                         
-                                        <!-- Help Box -->
                                         <div id="dominio-help" class="help-box mt-3" style="display: none;">
                                             <div class="help-content">
                                                 <h6><i class="fas fa-info-circle me-2"></i>Como configurar seu domínio:</h6>
@@ -486,8 +503,7 @@
                                     </div>
 
                                     <div class="modern-checkbox">
-                                        <input type="checkbox" name="gerar_vhost" id="gerar_vhost" class="form-check-input"
-                                        {{ old('gerar_vhost', $site->gerar_vhost ?? false) ? 'checked' : '' }}>
+                                        <input type="checkbox" name="gerar_vhost" id="gerar_vhost" class="form-check-input" {{ old('gerar_vhost', $site->gerar_vhost ?? false) ? 'checked' : '' }}>
                                         <label class="form-check-label" for="gerar_vhost">
                                             <i class="fas fa-server me-2"></i>
                                             Gerar Virtual Host para este site
@@ -503,7 +519,6 @@
                                         </div>
                                     @endif
 
-                                    {{-- Mensagem caso o VHost já esteja criado --}}
                                     @if(!empty($site->dominio_personalizado) && $site->vhost_criado)
                                         <div class="alert alert-success modern-alert mt-3">
                                             <i class="fas fa-check-circle me-2"></i>
@@ -533,7 +548,6 @@
                                         </h5>
                                     </div>
                                     <div class="card-body d-flex align-items-center justify-content-between">
-                                        {{-- Exibe status atual --}}
                                         @if($sslStatus === true)
                                             <div class="alert alert-success modern-alert mb-0 flex-grow-1 me-3">
                                                 <i class="fas fa-check-circle me-2"></i>
@@ -546,7 +560,6 @@
                                             </div>
                                         @endif
 
-                                        {{-- Botão de gerar SSL aparece só se DNS ok e SSL ainda não criado --}}
                                         @if($dnsStatus === true && $sslStatus === false)
                                             <form action="{{ route('admin.gerarSSL') }}" method="POST" class="ms-3">
                                                 @csrf
@@ -567,6 +580,8 @@
         </div>
     </div>
 
+   
+
     <!-- Scripts JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -579,22 +594,18 @@
                 return new bootstrap.Tooltip(tooltipTriggerEl)
             })
 
-            // Remove depoimento ao clicar no botão
+            // Remove depoimento
             $(document).on('click', '#depoimentoremover', function() {
                 const id = $(this).data('iddepoimento');
-
                 if (!id) {
                     alert('ID do depoimento não encontrado!');
                     return;
                 }
-
                 if (confirm('Tem certeza que deseja remover este depoimento?')) {
                     $.ajax({
                         url: '/admin/site/depoimentos/' + id + '/destroy',
                         type: 'POST',
-                        data: {
-                            _token: $('meta[name="csrf-token"]').attr('content')
-                        },
+                        data: { _token: $('meta[name="csrf-token"]').attr('content') },
                         success: function(response) {
                             alert('Depoimento removido com sucesso!');
                             location.reload();
@@ -606,21 +617,18 @@
                 }
             });
 
+            // Remove serviço
             $(document).on('click', '#servicoRemover', function() {
                 const id = $(this).data('idservico');
-
                 if (!id) {
                     alert('ID do serviço não encontrado!');
                     return;
                 }
-
                 if (confirm('Tem certeza que deseja remover este serviço?')) {
                     $.ajax({
                         url: '/admin/site/servicos/' + id + '/destroy',
                         type: 'POST',
-                        data: {
-                            _token: $('meta[name="csrf-token"]').attr('content')
-                        },
+                        data: { _token: $('meta[name="csrf-token"]').attr('content') },
                         success: function(response) {
                             alert('Serviço removido com sucesso!');
                             location.reload();
@@ -632,15 +640,15 @@
                 }
             });
 
+            // Remove tracking
             $(document).on('click', '#trackingRemover', function() {
                 const id = $(this).data('idtracking');
                 if (!id) return alert('ID do tracking não encontrado!');
-
                 if (confirm('Tem certeza que deseja remover este código?')) {
                     $.ajax({
                         url: '/admin/tracking/' + id + '/destroy',
                         type: 'POST',
-                        data: {_token: $('meta[name="csrf-token"]').attr('content')},
+                        data: { _token: $('meta[name="csrf-token"]').attr('content') },
                         success: function(response) {
                             alert(response.message);
                             location.reload();
@@ -656,11 +664,7 @@
         // Toggle help box for domain configuration
         function toggleDominioHelp() {
             const helpBox = document.getElementById('dominio-help');
-            if (helpBox.style.display === 'none') {
-                helpBox.style.display = 'block';
-            } else {
-                helpBox.style.display = 'none';
-            }
+            helpBox.style.display = helpBox.style.display === 'none' ? 'block' : 'none';
         }
 
         let depoimentoIndex = {{ count($depoimentos) }};
@@ -813,6 +817,193 @@
                 }
             });
         });
+
+        // Função para preencher os campos com a resposta da IA
+        function fillFieldsWithAI() {
+            const prompt = document.getElementById('ai_prompt').value;
+            if (!prompt) {
+                alert('Por favor, insira um prompt para gerar os dados.');
+                return;
+            }
+
+            $('#loading-spinner').show();
+
+            $.ajax({
+                url: '/api/fill-site-fields', // Ajuste para a rota correta
+                type: 'POST',
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content'),
+                    prompt: prompt
+                },
+                success: function(response) {
+                    $('#loading-spinner').hide();
+                    // Limpar campos dinâmicos existentes
+                    $('#itens-container').empty();
+                    $('#servicos-container').empty();
+                    $('#depoimentos-container').empty();
+                    $('#tracking-container').empty();
+                    itemIndex = 0;
+                    servicoIndex = 0;
+                    depoimentoIndex = 0;
+                    trackingIndex = 0;
+
+                    // Preencher campos simples
+                    $('#titulo').val(response.titulo);
+                    $('#whatsapp').val(response.whatsapp);
+                    $('#descricao').val(response.descricao);
+                    $('#atendimento_com_whatsapp').prop('checked', response.atendimento_com_whatsapp === 1);
+                    $('#atendimento_com_ia').prop('checked', response.atendimento_com_ia === 1);
+                    $('#cores_primaria').val(response.cores.primaria).trigger('input');
+                    $('#cores_secundaria').val(response.cores.secundaria).trigger('input');
+                    $('#sobre_titulo').val(response.sobre_titulo);
+                    $('#sobre_descricao').val(response.sobre_descricao);
+                    $('#dominio_personalizado').val(response.dominio_personalizado);
+
+                    // Preencher itens do Sobre Nós
+                    response.sobre_itens.forEach(item => {
+                        const container = document.getElementById('itens-container');
+                        const div = document.createElement('div');
+                        div.classList.add('dynamic-item');
+                        div.innerHTML = `
+                            <div class="item-header">
+                                <span class="item-number">${itemIndex + 1}</span>
+                                <button type="button" class="btn btn-danger btn-sm remove-btn" onclick="this.parentElement.parentElement.remove()">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                            <input type="text" name="sobre_itens[${itemIndex}][icone]" class="form-control mb-2 modern-input" placeholder="Classe do Ícone (ex: fas fa-heart)" value="${item.icone}">
+                            <input type="text" name="sobre_itens[${itemIndex}][titulo]" class="form-control mb-2 modern-input" placeholder="Título" value="${item.titulo}">
+                            <textarea name="sobre_itens[${itemIndex}][descricao]" class="form-control modern-textarea" placeholder="Descrição">${item.descricao}</textarea>
+                        `;
+                        container.appendChild(div);
+                        itemIndex++;
+                    });
+
+                    // Preencher serviços
+                    response.servicos.forEach(servico => {
+                        const container = document.getElementById('servicos-container');
+                        const div = document.createElement('div');
+                        div.classList.add('dynamic-item');
+                        div.innerHTML = `
+                            <div class="item-header">
+                                <span class="item-number">${servicoIndex + 1}</span>
+                                <button type="button" class="btn btn-danger btn-sm remove-btn" onclick="this.parentElement.parentElement.remove()">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <input type="text" name="servicos[${servicoIndex}][titulo]" class="form-control mb-2 modern-input" placeholder="Título do Serviço" value="${servico.titulo}">
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="input-group">
+                                        <span class="input-group-text">R$</span>
+                                        <input type="number" step="0.01" name="servicos[${servicoIndex}][preco]" class="form-control modern-input" placeholder="Preço" value="${servico.preco}">
+                                    </div>
+                                </div>
+                            </div>
+                            <textarea name="servicos[${servicoIndex}][descricao]" class="form-control mb-2 modern-textarea" placeholder="Descrição do Serviço">${servico.descricao}</textarea>
+                            <div class="upload-wrapper">
+                                <input type="file" name="servicos[${servicoIndex}][imagem]" class="form-control modern-file">
+                            </div>
+                        `;
+                        container.appendChild(div);
+                        servicoIndex++;
+                    });
+
+                    // Preencher depoimentos
+                    response.depoimentos.forEach(depoimento => {
+                        const container = document.getElementById('depoimentos-container');
+                        const div = document.createElement('div');
+                        div.classList.add('dynamic-item');
+                        div.innerHTML = `
+                            <div class="item-header">
+                                <span class="item-number">${depoimentoIndex + 1}</span>
+                                <button type="button" class="btn btn-danger btn-sm remove-btn" onclick="this.parentElement.parentElement.remove()">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <input type="text" name="depoimentos[${depoimentoIndex}][nome]" class="form-control mb-2 modern-input" placeholder="Nome" value="${depoimento.nome}">
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="rating-input">
+                                        <label class="small-label">Nota (0 a 5)</label>
+                                        <input type="number" name="depoimentos[${depoimentoIndex}][nota]" class="form-control modern-input" placeholder="Nota" min="0" max="5" value="${depoimento.nota}">
+                                    </div>
+                                </div>
+                            </div>
+                            <textarea name="depoimentos[${depoimentoIndex}][comentario]" class="form-control mb-2 modern-textarea" placeholder="Comentário">${depoimento.comentario}</textarea>
+                            <div class="upload-wrapper">
+                                <input type="file" name="depoimentos[${depoimentoIndex}][foto]" class="form-control modern-file">
+                            </div>
+                        `;
+                        container.appendChild(div);
+                        depoimentoIndex++;
+                    });
+
+                    // Preencher códigos de rastreamento
+                    response.tracking_codes.forEach(tracking => {
+                        const container = document.getElementById('tracking-container');
+                        const div = document.createElement('div');
+                        div.classList.add('dynamic-item');
+                        div.innerHTML = `
+                            <div class="item-header">
+                                <span class="item-number">${trackingIndex + 1}</span>
+                                <button type="button" class="btn btn-danger btn-sm remove-btn" onclick="this.parentElement.parentElement.remove()">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-2">
+                                    <label class="form-label">Nome</label>
+                                    <input type="text" name="tracking_codes[${trackingIndex}][name]" class="form-control modern-input" placeholder="Ex: Google Analytics" value="${tracking.name}">
+                                </div>
+                                <div class="col-md-6 mb-2">
+                                    <label class="form-label">Provedor</label>
+                                    <input type="text" name="tracking_codes[${trackingIndex}][provider]" class="form-control modern-input" placeholder="Ex: Google, Meta" value="${tracking.provider}">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-2">
+                                    <label class="form-label">Código</label>
+                                    <input type="text" name="tracking_codes[${trackingIndex}][code]" class="form-control modern-input" placeholder="Ex: G-XXXXXX" value="${tracking.code}">
+                                </div>
+                                <div class="col-md-6 mb-2">
+                                    <label class="form-label">Tipo</label>
+                                    <select name="tracking_codes[${trackingIndex}][type]" class="form-control modern-select">
+                                        <option value="analytics" ${tracking.type === 'analytics' ? 'selected' : ''}>Analytics</option>
+                                        <option value="ads" ${tracking.type === 'ads' ? 'selected' : ''}>Anúncios</option>
+                                        <option value="pixel" ${tracking.type === 'pixel' ? 'selected' : ''}>Pixel</option>
+                                        <option value="other" ${tracking.type === 'other' ? 'selected' : ''}>Outro</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">Script (opcional)</label>
+                                <textarea name="tracking_codes[${trackingIndex}][script]" class="form-control modern-textarea" rows="3" placeholder="Cole aqui o script de rastreamento se necessário">${tracking.script}</textarea>
+                            </div>
+                            <div class="modern-checkbox">
+                                <input type="checkbox" name="tracking_codes[${trackingIndex}][status]" class="form-check-input" value="1" ${tracking.status === 1 ? 'checked' : ''}>
+                                <label class="form-check-label">Ativo</label>
+                            </div>
+                        `;
+                        container.appendChild(div);
+                        trackingIndex++;
+                    });
+
+                    alert('Campos preenchidos com sucesso pela IA!');
+                },
+                error: function(xhr) {
+                    alert('Erro ao preencher campos: ' + xhr.responseJSON?.error || 'Erro desconhecido');
+                },
+                complete: function() {
+            
+            $('#loading-spinner').hide();
+        }
+            });
+        }
     </script>
 
     <style>
