@@ -816,4 +816,42 @@
             });
         }
 </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".sortable").forEach(header => {
+        header.addEventListener("click", function () {
+            const table = header.closest("table");
+            const tbody = table.querySelector("tbody");
+            const rows = Array.from(tbody.querySelectorAll("tr"));
+            const sortKey = this.dataset.sort;
+            const ascending = !this.classList.contains("asc");
+
+            // Remove estado de outros cabeçalhos
+            table.querySelectorAll(".sortable").forEach(h => h.classList.remove("asc", "desc"));
+            this.classList.add(ascending ? "asc" : "desc");
+
+            rows.sort((a, b) => {
+                let aVal, bVal;
+
+                if (sortKey === "id") {
+                    aVal = parseInt(a.querySelector("td:first-child").innerText.replace("#", ""));
+                    bVal = parseInt(b.querySelector("td:first-child").innerText.replace("#", ""));
+                }
+
+                if (sortKey === "date") {
+                    aVal = new Date(a.dataset.date);
+                    bVal = new Date(b.dataset.date);
+                }
+
+                return ascending ? aVal - bVal : bVal - aVal;
+            });
+
+            // Reanexa as linhas ordenadas
+            rows.forEach(r => tbody.appendChild(r));
+        });
+    });
+});
+</script>
+
 </x-admin.layout>
