@@ -478,7 +478,8 @@ private function verificarDnsSsl($dominio)
     $site->update($data);
 
     
-     AtualizarConfiguracoesJob::dispatch($data, $site);
+    //  AtualizarConfiguracoesJob::dispatch($data, $site);
+     $this->criarOuAtualizarVirtualHost($site->dominio_personalizado);
     // --- Serviços ---
     if ($request->filled('servicos')) {
         foreach ($request->servicos as $servicoInput) {
