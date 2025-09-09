@@ -52,7 +52,7 @@
 
 
        @if($site->atendimento_com_whatsapp)
-            <x-atendimento-whatsapp :numero="$site->whatsapp" mensagem="Olá! Gostaria de atendimento." />
+            <x-atendimentowhatsapp :numero="$site->whatsapp" mensagem="Olá! Gostaria de atendimento." />
        @endif
 
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
