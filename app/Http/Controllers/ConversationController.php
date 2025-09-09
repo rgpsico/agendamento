@@ -11,7 +11,7 @@ class ConversationController extends Controller
     public function index()
     {
         $conversas = Conversation::with('bot', 'user')
-            ->orderBy('created_at', 'desc')
+            ->orderBy('id', 'desc')
             ->paginate(15);
 
         return view('admin.conversations.index', compact('conversas'));
