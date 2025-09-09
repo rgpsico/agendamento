@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('empresa_site', function (Blueprint $table) {
-               $table->boolean('atendimento_com_ia')->default(false)->after('vhost_criado');
+               $table->boolean('atendimento_com_whatsapp')->default(false)->after('atendimento_com_ia');
         });
     }
 
@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('empresa_site', function (Blueprint $table) {
-                $table->boolean('atendimento_com_ia')->default(false)->after('vhost_criado');
+                $table->boolean('atendimento_com_whatsapp')->default(false)->after('atendimento_com_ia');
         });
     }
 };
