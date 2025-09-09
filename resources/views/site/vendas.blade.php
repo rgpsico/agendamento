@@ -715,6 +715,14 @@
     @if($site->atendimento_com_ia)
     <x-batepapo />
     @endif
+
+
+       @if($site->atendimento_com_whatsapp)
+            <x-atendimento-whatsapp :numero="$site->whatsapp" mensagem="Olá! Gostaria de atendimento." />
+       @endif
+
+
+
     <script>
         // Verificar se GSAP carregou corretamente
         if (typeof gsap !== 'undefined') {

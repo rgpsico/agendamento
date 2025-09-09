@@ -451,6 +451,7 @@ private function verificarDnsSsl($dominio)
         'sobre_itens' => $request->input('sobre_itens', []),
         'whatsapp' => $request->whatsapp,
         'atendimento_com_ia' => $request->input('atendimento_com_ia') == 'on' ? 1 : 0,
+        'atendimento_com_whatsapp' => $request->input('atendimento_com_whatsapp') == 'on' ? 1 : 0,
     ];
    
     
