@@ -521,8 +521,8 @@
                         @forelse ($site->siteServicos as $index => $siteServico)
                              
                               <img 
-                        src="{{ Storage::url($servico->imagem) }}" 
-                        alt="{{ $servico->titulo }}" 
+                        src="{{ Storage::url($siteServico->imagem) }}" 
+                        alt="{{ $siteServico->titulo }}" 
                         class="preview-img-small"
                     />
 
