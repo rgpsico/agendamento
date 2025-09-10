@@ -652,7 +652,7 @@
         <div class="boxing-gloves">
             <i class="fas fa-fist-raised text-6xl text-white"></i>
         </div>
-        <p class="loading-text">Preparando o treino...</p>
+        <p class="loading-text">Preparando...</p>
     </div>
 
     <!-- WhatsApp Button -->
@@ -747,7 +747,7 @@
     </section>
 
     <!-- Services Section -->
-    @if($site->siteServicos->count() > 0 || $site->servicos->count() > 0)
+    @if($site->siteServicos->count() > 0 || $site->siteServicos->count() > 0)
     <section id="services" class="services-section py-20">
         <div class="container mx-auto px-6 max-w-7xl">
             <div class="section-header text-center mb-16">
