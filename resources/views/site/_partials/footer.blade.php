@@ -9,7 +9,7 @@
                         </div>
                         <span class="text-2xl font-bold">{{ $site->titulo }}</span>
                     </div>
-                    <p class="mb-4 opacity-90">{{ $site->footer_descricao ?? 'Transformando vidas através do surf há mais de 15 anos.' }}</p>
+                    <p class="mb-4 opacity-90">{{ $site->descricao ?? 'Transformando vidas através do surf há mais de 15 anos.' }}</p>
                     <div class="flex space-x-4">
                         @foreach($site->redes_sociais ?? [
                             ['icone' => 'fa-facebook-f', 'url' => '#'],
@@ -27,7 +27,7 @@
                 <div>
                     <h3 class="text-lg font-semibold mb-4">Serviços</h3>
                     <ul class="space-y-2 opacity-90">
-                        @foreach($site->servicos as $servico)
+                        @foreach($site->siteServicos as $servico)
                             <li><a href="#services" class="hover:text-gray-200 transition-colors">{{ $servico->titulo }}</a></li>
                         @endforeach
                     </ul>

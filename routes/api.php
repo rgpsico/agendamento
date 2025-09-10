@@ -191,6 +191,8 @@ Route::prefix('empresa/pagamento')->group(function () {
 
 
 use App\Http\Controllers\Api\SiteDepoimentoControllerApi;
+use App\Http\Controllers\Api\SiteServicoController;
+use App\Http\Controllers\Api\SiteServicoControllerApi;
 use App\Http\Controllers\BotController;
 
 Route::middleware('auth:sanctum')->prefix('site')->group(function () {
@@ -286,3 +288,8 @@ Route::post('/bots/{bot}/chat', [BotController::class, 'chat']);
 // Route::get('/conversations/{id}', [ConversationController::class, 'showapi']);
 
 Route::post('/fill-site-fields', [BotController::class, 'fillSiteFields'])->name('fill.site.fields');
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::apiResource('siteservicos', SiteServicoControllerApi::class);
+    Route::post('siteservicos/store', [SiteServicoControllerApi::class, 'store']);
+});
