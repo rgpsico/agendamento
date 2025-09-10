@@ -144,7 +144,7 @@ private function verificarDnsSsl($dominio)
                 'trackingCodes' // Carrega os tracking codes ativos
             ])
             ->firstOrFail();
-                
+              
            $view_template = $site->template->path_view ?? 'site.publico';
         return view($view_template, compact('site'));
     }
@@ -154,7 +154,7 @@ private function verificarDnsSsl($dominio)
     public function mostrarDominio(Request $request)
     {
         $host = $request->getHost();
-
+  
         // Domínio padrão do sistema
         $dominioPrincipal = 'agendamento.rjpasseios.com.br';
 
@@ -168,7 +168,7 @@ private function verificarDnsSsl($dominio)
             ->firstOrFail();
 
         $view_template = $site->template->path_view ?? 'site.publico';
-
+      
         return view($view_template , compact('site'));
     }
 
