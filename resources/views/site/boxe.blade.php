@@ -455,7 +455,7 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                @forelse ($site->servicos as $servico)
+                @forelse ($site->siteServicos as $servico)
                     <div class="card-hover bg-white rounded-2xl overflow-hidden shadow-lg relative">
                         @if ($servico->destaque)
                             <div class="absolute top-4 left-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-sm font-semibold z-10">
