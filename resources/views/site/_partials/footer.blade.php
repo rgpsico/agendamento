@@ -61,6 +61,11 @@
         </div>
     </footer>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/TextPlugin.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
+
     <script>
 
         
@@ -116,7 +121,7 @@
             function typeWord() {
                gsap.fromTo('.typing-text', 
                     { text: "" }, 
-                    { text: "Passeios Rio de Janeiro", duration: 3, ease: "none" }
+                    { text: "{{ $site->titulo }}", duration: 3, ease: "none" }
                 );
             }
             typeWord();

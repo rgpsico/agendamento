@@ -1,5 +1,22 @@
+<style>
+    .chatbot-float-btn {
+    position: fixed;
+    bottom: 100px; /* antes era 20px */
+    right: 20px;
+    /* resto igual */
+}
+
+.chatbot-container {
+    position: fixed;
+    bottom: 100px; /* antes era 20px */
+    right: 90px;
+    /* resto igual */
+}
+
+</style>
+
 <!-- Chatbot Float Button -->
-<div class="chatbot-float-btn" id="chatbot-float-btn">
+<div class="chatbot-float-btn" id="chatbot-float-btn" style="margin-right:7em;">
     <div class="chat-icon">
         <i class="fas fa-comments"></i>
     </div>
