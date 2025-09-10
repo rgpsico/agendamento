@@ -463,8 +463,14 @@
                             </div>
                         @endif
                         <div class="h-48 relative overflow-hidden">
-                            <img src="{{ asset('servico/' . ($servico->imagem ?? 'default-servico.jpg')) }}" alt="{{ $servico->titulo }}" class="w-full h-full object-cover">
-                            <div class="absolute inset-0 bg-black bg-opacity-20"></div>
+                       
+                              <img 
+                        src="{{ Storage::url($servico->imagem) }}" 
+                        alt="{{ $servico->titulo }}" 
+                        class="preview-img-small"
+                    />
+
+                            
                             <div class="absolute top-4 right-4 bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg rounded-full p-3">
                                 <i class="fas {{ $servico->icone ?? 'fa-user' }} text-white text-xl"></i>
                             </div>
