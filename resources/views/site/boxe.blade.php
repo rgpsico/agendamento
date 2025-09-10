@@ -519,10 +519,13 @@
                 <div class="about-image">
                     <div class="grid grid-cols-2 gap-4">
                         @forelse ($site->siteServicos as $index => $siteServico)
-                            <img 
-                                src="{{ asset('storage/sites/servicos/' . ($siteServico->imagem ?? 'default-servico.jpg')) }}" 
-                                alt="{{ $siteServico->titulo }}" 
-                                class="rounded-lg shadow-lg about-image-item {{ $index % 2 == 1 ? 'mt-8' : ($index == 2 ? 'mt-16' : '') }}">
+                             
+                              <img 
+                        src="{{ Storage::url($servico->imagem) }}" 
+                        alt="{{ $servico->titulo }}" 
+                        class="preview-img-small"
+                    />
+
                         @empty
                             <img 
                                 src="{{ asset('storage/' . ($site->sobre_imagem ?? 'default-sobre.jpg')) }}" 
