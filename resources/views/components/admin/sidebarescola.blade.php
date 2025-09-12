@@ -69,6 +69,54 @@
                 </li>
 
 
+              
+                    <li class="submenu">
+                    <a href="#">
+                        <i class="fas fa-dollar-sign" style="font-size: 18px;"></i>
+                        <span>Financeiro</span>
+                        <span class="menu-arrow"></span>
+                    </a>
+                    <ul>
+                        <!-- Visão geral -->
+                        {{-- <li><a href="{{ route('financeiro.dashboard') }}">📊 Dashboard</a></li> --}}
+
+                        <!-- Contas a receber -->
+                        <li class="submenu">
+                            <a href="#">💳 Receitas<span class="menu-arrow"></span></a>
+                            <ul>
+                                <li><a href="{{ route('financeiro.receitas.index') }}">Listar Receitas</a></li>
+                                <li><a href="{{ route('financeiro.receitas.create') }}">Lançar Receita</a></li>
+                            </ul>
+                        </li>
+
+                        <!-- Contas a pagar -->
+                        {{-- <li class="submenu">
+                            <a href="#">💸 Despesas<span class="menu-arrow"></span></a>
+                            <ul>
+                                <li><a href="{{ route('financeiro.despesas.index') }}">Listar Despesas</a></li>
+                                <li><a href="{{ route('financeiro.despesas.create') }}">Cadastrar Despesa</a></li>
+                            </ul>
+                        </li>
+
+                        <!-- Pagamentos dos clientes -->
+                        <li class="submenu">
+                            <a href="#">🧾 Pagamentos<span class="menu-arrow"></span></a>
+                            <ul>
+                                <li><a href="{{ route('financeiro.pagamentos.index') }}">Histórico</a></li>
+                                <li><a href="{{ route('financeiro.pagamentos.estornos') }}">Estornos</a></li>
+                                <li><a href="{{ route('financeiro.pagamentos.pendentes') }}">Pendentes</a></li>
+                            </ul>
+                        </li>
+
+                        <!-- Relatórios -->
+                        <li><a href="{{ route('financeiro.relatorios') }}">📑 Relatórios</a></li>
+
+                        <!-- Configurações -->
+                        <li><a href="{{ route('financeiro.configuracoes') }}">⚙️ Configurações</a></li> --}}
+                    </ul>
+                </li>
+
+                
 
 
                     @isset(Auth::user()->empresa->user_id)

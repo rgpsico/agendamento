@@ -22,13 +22,18 @@ use App\Http\Controllers\Api\AsaasController;
 use App\Http\Controllers\BoletoController;
 use App\Http\Controllers\BotController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\ConfigController;
+use App\Http\Controllers\DashBoardController;
 use App\Http\Controllers\ProfessoresAsaasController;
 use App\Http\Controllers\PagamentoController;
 use App\Http\Controllers\SiteDepoimentoController;
 use App\Http\Controllers\ViaCepController;
 use App\Http\Controllers\EmailController;
+use App\Http\Controllers\FinanceiroController;
 use App\Http\Controllers\SiteCliqueWhatsappController;
 use App\Http\Controllers\ProfessoresController;
+use App\Http\Controllers\ReceitaController;
+use App\Http\Controllers\RelatorioController;
 use App\Http\Controllers\RoleController;
 
 //   Route::get('/', [UserManagementController::class, 'index'])->name('register.aluno');
@@ -242,3 +247,38 @@ Route::get('/virtualhosts', [VirtualHostController::class, 'index'])->name('virt
 Route::get('/virtualhosts/{file}/json', [VirtualHostController::class, 'json'])->name('virtualhosts.json')->where('file', '.*');
 Route::put('/virtualhosts/{file}', [VirtualHostController::class, 'update'])->name('virtualhosts.update')->where('file', '.*');
 Route::delete('/virtualhosts/{file}', [VirtualHostController::class, 'destroy'])->name('virtualhosts.destroy');
+
+
+Route::prefix('financeiro')->middleware(['auth'])->group(function() {
+    
+    // Dashboard financeiro
+  
+    
+    // Receitas (Contas a Receber)
+    Route::get('/receitas', [ReceitaController::class, 'index'])->name('financeiro.receitas.index');
+    Route::get('/receitas/create', [ReceitaController::class, 'create'])->name('financeiro.receitas.create');
+    Route::post('/receitas', [ReceitaController::class, 'store'])->name('financeiro.receitas.store');
+    Route::get('/receitas/{id}/edit', [ReceitaController::class, 'edit'])->name('financeiro.receitas.edit');
+    Route::put('/receitas/{id}', [ReceitaController::class, 'update'])->name('financeiro.receitas.update');
+    Route::delete('/receitas/{id}', [ReceitaController::class, 'destroy'])->name('financeiro.receitas.destroy');
+
+
+     // Route::get('/', [FinanceiroController::class, 'index'])->name('financeiro.index');
+    // Despesas (Contas a Pagar)
+    // Route::get('/despesas', [DespesaController::class, 'index'])->name('financeiro.despesas.index');
+    // Route::get('/despesas/create', [DespesaController::class, 'create'])->name('financeiro.despesas.create');
+    // Route::post('/despesas', [DespesaController::class, 'store'])->name('financeiro.despesas.store');
+    // Route::get('/despesas/{id}/edit', [DespesaController::class, 'edit'])->name('financeiro.despesas.edit');
+    // Route::put('/despesas/{id}', [DespesaController::class, 'update'])->name('financeiro.despesas.update');
+    // Route::delete('/despesas/{id}', [DespesaController::class, 'destroy'])->name('financeiro.despesas.destroy');
+
+    // // Fluxo de Caixa
+    // Route::get('/fluxo', [FluxoCaixaController::class, 'index'])->name('financeiro.fluxo.index');
+
+    // // Relatórios
+    // Route::get('/relatorios', [RelatorioFinanceiroController::class, 'index'])->name('financeiro.relatorios.index');
+
+    // // Configurações
+    // Route::get('/config', [FinanceiroConfigController::class, 'index'])->name('financeiro.config.index');
+    // Route::post('/config', [FinanceiroConfigController::class, 'store'])->name('financeiro.config.store');
+});
