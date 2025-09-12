@@ -90,19 +90,17 @@
                         </li>
 
                         <!-- Contas a pagar -->
-                         <li class="submenu">
+                        <li class="submenu">
                             <a href="#">💸 Despesas<span class="menu-arrow"></span></a>
                             <ul>
                                 <li><a href="{{ route('financeiro.despesas.index') }}">Listar Despesas</a></li>
                                 <li><a href="{{ route('financeiro.despesas.create') }}">Cadastrar Despesa</a></li>
+                                <li><a href="{{ route('despesas_categorias.index') }}">Categorias de Despesas</a></li> <!-- Novo item -->
                             </ul>
                         </li>
-
-                        <!-- Pagamentos dos clientes
-                        
-                    --->
                     </ul>
                 </li>
+
 
                 
 

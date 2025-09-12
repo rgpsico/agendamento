@@ -38,7 +38,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\DespesaController;
 //   Route::get('/', [UserManagementController::class, 'index'])->name('register.aluno');
 
-
+use App\Http\Controllers\DespesaCategoriaController;
 
 
 Route::get('/create', [UserManagementController::class, 'create'])->name('register.professor');
@@ -284,3 +284,7 @@ Route::prefix('financeiro')->middleware(['auth'])->group(function() {
     // Route::get('/config', [FinanceiroConfigController::class, 'index'])->name('financeiro.config.index');
     // Route::post('/config', [FinanceiroConfigController::class, 'store'])->name('financeiro.config.store');
 });
+
+
+
+Route::resource('despesas_categorias', DespesaCategoriaController::class);

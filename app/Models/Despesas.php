@@ -14,19 +14,24 @@ class Despesas extends Model
     protected $fillable = [
         'descricao',
         'valor',
-        'categoria',
-        'status',
+            'status',
         'data_vencimento',
         'empresa_id',  // Adicionado
         'usuario_id',  // Adicionado
+        'categoria_id',   // Substituindo 'categoria'
     ];
 
- protected function casts(): array
+     protected function casts(): array
     {
         return [
             'valor' => 'decimal:2',  // Isso força float com 2 casas decimais
             'data_vencimento' => 'date',
         ];
+    }
+
+    public function categoria(): BelongsTo
+    {
+        return $this->belongsTo(DespesaCategoria::class, 'categoria_id');
     }
 
     // Relacionamentos
