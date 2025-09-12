@@ -36,9 +36,10 @@ use App\Http\Controllers\ReceitaController;
 use App\Http\Controllers\RelatorioController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\DespesaController;
+use App\Http\Controllers\DespesasRecorrenteController;
 //   Route::get('/', [UserManagementController::class, 'index'])->name('register.aluno');
 
-use App\Http\Controllers\DespesaCategoriaController;
+
 
 
 Route::get('/create', [UserManagementController::class, 'create'])->name('register.professor');
@@ -285,6 +286,35 @@ Route::prefix('financeiro')->middleware(['auth'])->group(function() {
     // Route::post('/config', [FinanceiroConfigController::class, 'store'])->name('financeiro.config.store');
 });
 
-
+use App\Http\Controllers\DespesaCategoriaController;
 
 Route::resource('despesas_categorias', DespesaCategoriaController::class);
+
+
+Route::get('/financeiro/despesas_recorrentes/index', [DespesasRecorrenteController::class, 'index'])->name('financeiro.despesas_recorrentes.index');
+
+
+
+// Listar todas as despesas recorrentes
+Route::get('financeiro/despesas_recorrentes', [DespesasRecorrenteController::class, 'index'])
+    ->name('financeiro.despesas_recorrentes.index');
+
+// Mostrar formulário para criar nova despesa recorrente
+Route::get('financeiro/despesas_recorrentes/create', [DespesasRecorrenteController::class, 'create'])
+    ->name('financeiro.despesas_recorrentes.create');
+
+// Salvar nova despesa recorrente
+Route::post('financeiro/despesas_recorrentes', [DespesasRecorrenteController::class, 'store'])
+    ->name('financeiro.despesas_recorrentes.store');
+
+// Mostrar formulário para editar despesa recorrente existente
+Route::get('financeiro/despesas_recorrentes/{despesaRecorrente}/edit', [DespesasRecorrenteController::class, 'edit'])
+    ->name('financeiro.despesas_recorrentes.edit');
+
+// Atualizar despesa recorrente existente
+Route::put('financeiro/despesas_recorrentes/{despesaRecorrente}', [DespesasRecorrenteController::class, 'update'])
+    ->name('financeiro.despesas_recorrentes.update');
+
+// Deletar despesa recorrente
+Route::delete('financeiro/despesas_recorrentes/{despesaRecorrente}', [DespesasRecorrenteController::class, 'destroy'])
+    ->name('financeiro.despesas_recorrentes.destroy');

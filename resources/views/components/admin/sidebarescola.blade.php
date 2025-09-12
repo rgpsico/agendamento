@@ -86,6 +86,7 @@
                             <ul>
                                 <li><a href="{{ route('financeiro.receitas.index') }}">Listar Receitas</a></li>
                                 <li><a href="{{ route('financeiro.receitas.create') }}">Lançar Receita</a></li>
+                                {{-- <li><a href="{{ route('financeiro.receitas_recorrentes.index') }}">Receitas Recorrentes</a></li> --}}
                             </ul>
                         </li>
 
@@ -95,7 +96,8 @@
                             <ul>
                                 <li><a href="{{ route('financeiro.despesas.index') }}">Listar Despesas</a></li>
                                 <li><a href="{{ route('financeiro.despesas.create') }}">Cadastrar Despesa</a></li>
-                                <li><a href="{{ route('despesas_categorias.index') }}">Categorias de Despesas</a></li> <!-- Novo item -->
+                                <li><a href="{{ route('despesas_categorias.index') }}">Categorias de Despesas</a></li>
+                                 <li><a href="{{ route('financeiro.despesas_recorrentes.index') }}">Despesas Recorrentes</a></li> 
                             </ul>
                         </li>
                     </ul>
