@@ -35,7 +35,7 @@ use App\Http\Controllers\ProfessoresController;
 use App\Http\Controllers\ReceitaController;
 use App\Http\Controllers\RelatorioController;
 use App\Http\Controllers\RoleController;
-
+use App\Http\Controllers\DespesaController;
 //   Route::get('/', [UserManagementController::class, 'index'])->name('register.aluno');
 
 
@@ -263,14 +263,16 @@ Route::prefix('financeiro')->middleware(['auth'])->group(function() {
     Route::delete('/receitas/{id}', [ReceitaController::class, 'destroy'])->name('financeiro.receitas.destroy');
 
 
-     // Route::get('/', [FinanceiroController::class, 'index'])->name('financeiro.index');
-    // Despesas (Contas a Pagar)
-    // Route::get('/despesas', [DespesaController::class, 'index'])->name('financeiro.despesas.index');
-    // Route::get('/despesas/create', [DespesaController::class, 'create'])->name('financeiro.despesas.create');
-    // Route::post('/despesas', [DespesaController::class, 'store'])->name('financeiro.despesas.store');
-    // Route::get('/despesas/{id}/edit', [DespesaController::class, 'edit'])->name('financeiro.despesas.edit');
-    // Route::put('/despesas/{id}', [DespesaController::class, 'update'])->name('financeiro.despesas.update');
-    // Route::delete('/despesas/{id}', [DespesaController::class, 'destroy'])->name('financeiro.despesas.destroy');
+    // Route::get('/', [FinanceiroController::class, 'index'])->name('financeiro.index');
+   //  Despesas (Contas a Pagar)
+
+
+    Route::get('/despesas', [DespesaController::class, 'index'])->name('financeiro.despesas.index');
+    Route::get('/despesas/create', [DespesaController::class, 'create'])->name('financeiro.despesas.create');
+    Route::post('/despesas', [DespesaController::class, 'store'])->name('financeiro.despesas.store');
+    Route::get('/despesas/{id}/edit', [DespesaController::class, 'edit'])->name('financeiro.despesas.edit');
+    Route::put('/despesas/{id}', [DespesaController::class, 'update'])->name('financeiro.despesas.update');
+    Route::delete('/despesas/{id}', [DespesaController::class, 'destroy'])->name('financeiro.despesas.destroy');
 
     // // Fluxo de Caixa
     // Route::get('/fluxo', [FluxoCaixaController::class, 'index'])->name('financeiro.fluxo.index');

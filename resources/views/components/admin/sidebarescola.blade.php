@@ -90,7 +90,7 @@
                         </li>
 
                         <!-- Contas a pagar -->
-                        {{-- <li class="submenu">
+                         <li class="submenu">
                             <a href="#">💸 Despesas<span class="menu-arrow"></span></a>
                             <ul>
                                 <li><a href="{{ route('financeiro.despesas.index') }}">Listar Despesas</a></li>
@@ -98,21 +98,9 @@
                             </ul>
                         </li>
 
-                        <!-- Pagamentos dos clientes -->
-                        <li class="submenu">
-                            <a href="#">🧾 Pagamentos<span class="menu-arrow"></span></a>
-                            <ul>
-                                <li><a href="{{ route('financeiro.pagamentos.index') }}">Histórico</a></li>
-                                <li><a href="{{ route('financeiro.pagamentos.estornos') }}">Estornos</a></li>
-                                <li><a href="{{ route('financeiro.pagamentos.pendentes') }}">Pendentes</a></li>
-                            </ul>
-                        </li>
-
-                        <!-- Relatórios -->
-                        <li><a href="{{ route('financeiro.relatorios') }}">📑 Relatórios</a></li>
-
-                        <!-- Configurações -->
-                        <li><a href="{{ route('financeiro.configuracoes') }}">⚙️ Configurações</a></li> --}}
+                        <!-- Pagamentos dos clientes
+                        
+                    --->
                     </ul>
                 </li>
 
