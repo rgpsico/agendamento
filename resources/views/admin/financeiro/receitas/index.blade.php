@@ -9,54 +9,65 @@
             <x-alert/>
 
             <div class="mb-4 text-end">
-                <a href="{{ route('financeiro.receitas.create') }}" class="btn btn-primary">Lançar Receita</a>
+                <a href="{{ route('financeiro.receitas.create') }}" class="btn btn-primary">
+                    Lançar Receita
+                </a>
             </div>
 
             <div class="card shadow">
                 <div class="card-body">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Aluno</th>
-                                <th>Serviço/Agendamento</th>
-                                <th>Valor</th>
-                                <th>Status</th>
-                                <th>Método</th>
-                                <th>Data</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($receitas as $receita)
+                    <!-- Tabela responsiva -->
+                    <div class="table-responsive">
+                        <table class="table table-striped align-middle">
+                            <thead class="table-light">
                                 <tr>
-                                    <td>{{ $receita->aluno->usuario->nome ?? '-' }}</td>
-                                    <td>{{ $receita->agendamento->modalidade->nome ?? '-' }}</td>
-                                    <td>R$ {{ number_format($receita->valor, 2, ',', '.') }}</td>
-                                    <td>
-                                        @if($receita->status === 'RECEIVED')
-                                            <span class="badge bg-success">Recebido</span>
-                                        @else
-                                            <span class="badge bg-warning">Pendente</span>
-                                        @endif
-                                    </td>
-                                    <td>{{ $receita->metodo_pagamento }}</td>
-                                    <td>{{ $receita->created_at->format('d/m/Y H:i') }}</td>
-                                    <td>
-                                        <a href="{{ route('financeiro.receitas.edit', $receita->id) }}" class="btn btn-warning btn-sm">Editar</a>
-                                        <form action="{{ route('financeiro.receitas.destroy', $receita->id) }}" method="POST" style="display:inline-block;">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Excluir esta receita?')">Excluir</button>
-                                        </form>
-                                    </td>
+                                    <th>Aluno</th>
+                                    <th>Serviço/Agendamento</th>
+                                    <th>Valor</th>
+                                    <th>Status</th>
+                                    <th>Método</th>
+                                    <th>Data</th>
+                                    <th class="text-center">Ações</th>
                                 </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="7" class="text-center">Nenhuma receita encontrada.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @forelse($receitas as $receita)
+                                    <tr>
+                                        <td>{{ $receita->aluno->usuario->nome ?? '-' }}</td>
+                                        <td>{{ $receita->agendamento->modalidade->nome ?? '-' }}</td>
+                                        <td>R$ {{ number_format($receita->valor, 2, ',', '.') }}</td>
+                                        <td>
+                                            @if($receita->status === 'RECEIVED')
+                                                <span class="badge bg-success">Recebido</span>
+                                            @else
+                                                <span class="badge bg-warning">Pendente</span>
+                                            @endif
+                                        </td>
+                                        <td>{{ $receita->metodo_pagamento }}</td>
+                                        <td>{{ $receita->created_at->format('d/m/Y H:i') }}</td>
+                                        <td class="text-center">
+                                            <div class="d-flex flex-wrap gap-2 justify-content-center">
+                                                <a href="{{ route('financeiro.receitas.edit', $receita->id) }}" class="btn btn-warning btn-sm">
+                                                    Editar
+                                                </a>
+                                                <form action="{{ route('financeiro.receitas.destroy', $receita->id) }}" method="POST" onsubmit="return confirm('Excluir esta receita?')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-danger btn-sm">
+                                                        Excluir
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="7" class="text-center">Nenhuma receita encontrada.</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
 
                     <div class="mt-3">
                         {{ $receitas->links() }}

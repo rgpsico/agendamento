@@ -10,37 +10,49 @@
 
             <div class="card shadow">
                 <div class="card-body">
-                    <a href="{{ route('financeiro.categorias.create') }}" class="btn btn-primary mb-3">Nova Categoria</a>
+                    <a href="{{ route('financeiro.categorias.create') }}" class="btn btn-primary mb-3">
+                        Nova Categoria
+                    </a>
 
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Nome</th>
-                                <th>Descrição</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($categorias as $categoria)
+                    <!-- Tabela responsiva -->
+                    <div class="table-responsive">
+                        <table class="table table-bordered align-middle">
+                            <thead class="table-light">
                                 <tr>
-                                    <td>{{ $categoria->nome }}</td>
-                                    <td>{{ $categoria->descricao }}</td>
-                                    <td>
-                                        <a href="{{ route('financeiro.categorias.edit', $categoria->id) }}" class="btn btn-sm btn-warning">Editar</a>
-                                        <form action="{{ route('financeiro.categorias.destroy', $categoria->id) }}" method="POST" style="display:inline-block;">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button class="btn btn-sm btn-danger" onclick="return confirm('Tem certeza que deseja excluir?')">Excluir</button>
-                                        </form>
-                                    </td>
+                                    <th>Nome</th>
+                                    <th>Descrição</th>
+                                    <th class="text-center">Ações</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @forelse($categorias as $categoria)
+                                    <tr>
+                                        <td>{{ $categoria->nome }}</td>
+                                        <td>{{ $categoria->descricao }}</td>
+                                        <td class="text-center">
+                                            <div class="d-flex flex-wrap gap-2 justify-content-center">
+                                                <a href="{{ route('financeiro.categorias.edit', $categoria->id) }}" class="btn btn-sm btn-warning">
+                                                    Editar
+                                                </a>
+                                                <form action="{{ route('financeiro.categorias.destroy', $categoria->id) }}" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir?')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button class="btn btn-sm btn-danger">
+                                                        Excluir
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="3" class="text-center">Nenhuma categoria cadastrada.</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
 
-                    @if($categorias->isEmpty())
-                        <p class="text-center mt-3">Nenhuma categoria cadastrada.</p>
-                    @endif
                 </div>
             </div>
 
