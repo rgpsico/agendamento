@@ -1,65 +1,67 @@
-<?php
+<?php 
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
+use App\Models\DespesaCategoria;
+use App\Models\FinanceiroCategoria;
+use App\Models\ReceitaRecorrente;
 use Illuminate\Http\Request;
 
 class ReceitaRecorrenteController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
+    public function index() {
+        $receitas = ReceitaRecorrente::all();
+        return view('admin.financeiro.receitas_recorrentes.index', compact('receitas'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+    public function create() {
+        $categorias = FinanceiroCategoria::all();
+
+        return view('admin.financeiro.receitas_recorrentes.create', compact('categorias'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
+    public function store(Request $request) {
+        $request->validate([
+            'descricao' => 'required|string|max:255',
+            'valor' => 'required|numeric',
+           'frequencia' => 'required|in:DIARIA,SEMANAL,MENSAL,ANUAL',
+            'data_inicio' => 'required|date',
+            'empresa_id' => 'required|exists:empresa,id',
+            'usuario_id' => 'required|exists:usuarios,id',
+        ]);
+
+        ReceitaRecorrente::create($request->all());
+
+        return redirect()->route('financeiro.receitas_recorrentes.index')
+            ->with('success', 'Receita recorrente criada com sucesso!');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
+   public function edit(ReceitaRecorrente $receitaRecorrente) {
+       $categorias = FinanceiroCategoria::all();
+    return view('admin.financeiro.receitas_recorrentes.edit', compact('receitaRecorrente', 'categorias'));
+}
+
+
+    public function update(Request $request, ReceitaRecorrente $receitaRecorrente) {
+
+      
+        $request->validate([
+            'descricao' => 'required|string|max:255',
+            'valor' => 'required|numeric',
+            'frequencia' => 'required|in:DIARIA,SEMANAL,MENSAL,ANUAL',
+            'data_inicio' => 'required|date',
+        ]);
+
+        $receitaRecorrente->update($request->all());
+
+        return redirect()->route('financeiro.receitas_recorrentes.index')
+            ->with('success', 'Receita recorrente atualizada com sucesso!');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
+    public function destroy(ReceitaRecorrente $receitaRecorrente) {
+        $receitaRecorrente->delete();
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return redirect()->route('financeiro.receitas_recorrentes.index')
+            ->with('success', 'Receita recorrente excluída com sucesso!');
     }
 }

@@ -1,13 +1,13 @@
-<x-admin.layout title="Nova Categoria de Despesa">
+<x-admin.layout title="Nova Categoria Financeira">
     <div class="page-wrapper">
         <div class="content container-fluid" style="padding: 5%">
 
-            <x-header.titulo pageTitle="Nova Categoria de Despesa"/>
+            <x-header.titulo pageTitle="Nova Categoria Financeira"/>
             <x-alert/>
 
             <div class="card shadow">
                 <div class="card-body">
-                    <form action="{{ route('despesas_categorias.store') }}" method="POST">
+                    <form action="{{ route('financeiro.categorias.store') }}" method="POST">
                         @csrf
 
                         <div class="mb-3">
@@ -26,8 +26,20 @@
                             @enderror
                         </div>
 
+                        <div class="mb-3">
+                            <label for="tipo" class="form-label">Tipo</label>
+                            <select class="form-control" id="tipo" name="tipo" required>
+                                <option value="">Selecione</option>
+                                <option value="DESPESA" {{ old('tipo') == 'DESPESA' ? 'selected' : '' }}>Despesa</option>
+                                <option value="RECEITA" {{ old('tipo') == 'RECEITA' ? 'selected' : '' }}>Receita</option>
+                            </select>
+                            @error('tipo')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
+
                         <div class="text-end">
-                            <a href="{{ route('despesas_categorias.index') }}" class="btn btn-secondary">Cancelar</a>
+                            <a href="{{ route('financeiro.categorias.index') }}" class="btn btn-secondary">Cancelar</a>
                             <button type="submit" class="btn btn-primary">Salvar</button>
                         </div>
                     </form>

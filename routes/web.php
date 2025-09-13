@@ -286,9 +286,11 @@ Route::prefix('financeiro')->middleware(['auth'])->group(function() {
     // Route::post('/config', [FinanceiroConfigController::class, 'store'])->name('financeiro.config.store');
 });
 
-use App\Http\Controllers\DespesaCategoriaController;
+use App\Http\Controllers\FinanceiroCategoriaController;
+use App\Http\Controllers\ReceitaRecorrenteController;
 
-Route::resource('despesas_categorias', DespesaCategoriaController::class);
+Route::resource('financeiro/categorias', FinanceiroCategoriaController::class);
+
 
 
 Route::get('/financeiro/despesas_recorrentes/index', [DespesasRecorrenteController::class, 'index'])->name('financeiro.despesas_recorrentes.index');
@@ -318,3 +320,13 @@ Route::put('financeiro/despesas_recorrentes/{despesaRecorrente}', [DespesasRecor
 // Deletar despesa recorrente
 Route::delete('financeiro/despesas_recorrentes/{despesaRecorrente}', [DespesasRecorrenteController::class, 'destroy'])
     ->name('financeiro.despesas_recorrentes.destroy');
+
+
+    Route::prefix('financeiro')->name('financeiro.')->group(function () {
+    Route::get('receitas_recorrentes', [ReceitaRecorrenteController::class, 'index'])->name('receitas_recorrentes.index');
+    Route::get('receitas_recorrentes/create', [ReceitaRecorrenteController::class, 'create'])->name('receitas_recorrentes.create');
+    Route::post('receitas_recorrentes', [ReceitaRecorrenteController::class, 'store'])->name('receitas_recorrentes.store');
+    Route::get('receitas_recorrentes/{receitaRecorrente}/edit', [ReceitaRecorrenteController::class, 'edit'])->name('receitas_recorrentes.edit');
+    Route::put('receitas_recorrentes/{receitaRecorrente}', [ReceitaRecorrenteController::class, 'update'])->name('receitas_recorrentes.update');
+    Route::delete('receitas_recorrentes/{receitaRecorrente}', [ReceitaRecorrenteController::class, 'destroy'])->name('receitas_recorrentes.destroy');
+});
