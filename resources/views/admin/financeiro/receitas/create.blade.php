@@ -12,7 +12,8 @@
                         <h5 class="card-title mb-0">Dados da Receita</h5>
                     </div>
                     <div class="card-body">
-
+                     <input type="text" id="empresa_id" name="empresa_id" class="form-control" value="{{ Auth::user()->empresa->id }}"    >
+              
                         <!-- Aluno -->
                         <div class="mb-3">
                             <label for="aluno_id" class="form-label">Aluno</label>
@@ -44,6 +45,21 @@
                             <input type="number" step="0.01" id="valor" name="valor" class="form-control" required>
                         </div>
 
+                                            <!-- Categoria -->
+                    <div class="mb-3">
+                        <label for="categoria_id" class="form-label">Categoria</label>
+                        <select id="categoria_id" name="categoria_id" class="form-control">
+                            <option value="">Selecione uma categoria</option>
+                            @foreach($categorias as $categoria)
+                                <option value="{{ $categoria->id }}" 
+                                    {{ old('categoria_id') == $categoria->id ? 'selected' : '' }}>
+                                    {{ $categoria->nome }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+
                         <!-- Método de pagamento -->
                         <div class="mb-3">
                             <label for="metodo_pagamento" class="form-label">Método de Pagamento</label>
@@ -59,8 +75,8 @@
                         <div class="mb-3">
                             <label for="status" class="form-label">Status</label>
                             <select id="status" name="status" class="form-control" required>
-                                <option value="PENDING">Pendente</option>
-                                <option value="RECEIVED">Recebido</option>
+                                <option value="PENDENTE">Pendente</option>
+                                <option value="RECEBIDA">Recebido</option>
                             </select>
                         </div>
 

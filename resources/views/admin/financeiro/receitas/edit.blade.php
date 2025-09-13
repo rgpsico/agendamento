@@ -17,6 +17,9 @@
                         <h5 class="card-title mb-0">Dados da Receita</h5>
                     </div>
 
+                       <input type="hidden" id="empresa_id" name="empresa_id" class="form-control" 
+                                   value="{{ old('empresa_id', $receita->empresa_id) }}" required>
+
                     <div class="card-body">
                         <div class="mb-3">
                             <label for="descricao" class="form-label">Descrição</label>
@@ -25,10 +28,26 @@
                         </div>
 
                         <div class="mb-3">
+                        <label for="categoria_id" class="form-label">Categoria</label>
+                        <select id="categoria_id" name="categoria_id" class="form-control">
+                            <option value="">Selecione uma categoria</option>
+                            @foreach($categorias as $categoria)
+                                <option value="{{ $categoria->id }}" 
+                                    {{ old('categoria_id', $receita->categoria_id) == $categoria->id ? 'selected' : '' }}>
+                                    {{ $categoria->nome }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+
+                        <div class="mb-3">
                             <label for="valor" class="form-label">Valor</label>
                             <input type="number" step="0.01" id="valor" name="valor" class="form-control" 
                                    value="{{ old('valor', $receita->valor) }}" required>
                         </div>
+
+
 
                         <div class="mb-3">
                             <label for="data_vencimento" class="form-label">Data de Vencimento</label>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Agendamento;
+use App\Models\FinanceiroCategoria;
 use App\Models\Pagamento;
 use App\Models\Receita;
 use App\Services\FinanceiroReceitaService;
@@ -59,7 +60,7 @@ class ReceitaController extends Controller
     public function create()
     {
         $professor = Auth::user()->professor;
-
+        $categorias = FinanceiroCategoria::where('tipo', 'receita')->get();
         if (!$professor) {
             auth()->logout();
             return redirect()->back()->with('error', 'Professor não encontrado.');
@@ -71,7 +72,7 @@ class ReceitaController extends Controller
             ->whereIn('aluno_id', $alunos->pluck('id'))
             ->get();
 
-        return view('admin.financeiro.receitas.create', compact('alunos', 'agendamentos'));
+        return view('admin.financeiro.receitas.create', compact('alunos', 'agendamentos','categorias'));
     }
 
     /**
@@ -86,6 +87,7 @@ class ReceitaController extends Controller
             'metodo_pagamento'  => 'required|string',
             'status'            => 'required|in:PENDENTE,RECEBIDA',
             'data_vencimento'   => 'nullable|date',
+            'empresa_id'        => 'required|exists:empresa,id',
         ]);
 
    
@@ -101,6 +103,8 @@ class ReceitaController extends Controller
             'agendamento_id' => $request->agendamento_id,
             'aluno_id'       => $request->aluno_id,
             'metodo_pagamento' => $request->metodo_pagamento,
+            'pagamento_id'   => null, // ou vincule a um pagamento existente, se aplicável
+            'empresa_id'     => $request->empresa_id
         ];
 
         $this->receitaService->lancarReceitaManual($dadosReceita);
@@ -115,10 +119,11 @@ class ReceitaController extends Controller
      */
     public function edit($id)
     {
+           $categorias = FinanceiroCategoria::where('tipo', 'receita')->get();
         $receita = $this->receitaService->buscarReceita($id);
         $agendamentos = Agendamento::with('aluno')->get();
 
-        return view('admin.financeiro.receitas.edit', compact('receita', 'agendamentos'));
+        return view('admin.financeiro.receitas.edit', compact('receita', 'agendamentos','categorias'));
     }
 
     /**
@@ -131,9 +136,12 @@ class ReceitaController extends Controller
             'valor' => 'required|numeric|min:0',
             'status' => 'required|in:PENDENTE,RECEBIDA',
             'metodo_pagamento' => 'required|string',
+            'data_vencimento' => 'nullable|date',
+            'empresa_id'        => 'required|exists:empresa,id',
+            'categoria_id' => 'nullable|exists:financeiro_categorias,id'
         ]);
 
-        $this->receitaService->atualizarReceita($id, $request->only(['valor', 'status', 'metodo_pagamento', 'data_vencimento']));
+        $this->receitaService->atualizarReceita($id, $request->only(['valor', 'status', 'metodo_pagamento', 'data_vencimento', 'categoria_id','empresa_id']));
 
         return redirect()->route('financeiro.receitas.index')
             ->with('success', 'Receita atualizada com sucesso!');

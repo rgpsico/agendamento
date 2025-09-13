@@ -14,7 +14,7 @@ class FinanceiroReceitaService
     {
         return DB::transaction(function () use ($dados) {
             return Receita::create([
-                'pagamento_id' => $dados['pagamento_id'],
+                'pagamento_id' => $dados['pagamento_id'] ?? null,
                 'descricao'     => $dados['descricao'] ?? 'Receita automática',
                 'valor'         => $dados['valor'],
                 'data_recebimento'          => $dados['data'] ?? now(),
