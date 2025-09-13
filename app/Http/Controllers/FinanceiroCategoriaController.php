@@ -27,7 +27,7 @@ class FinanceiroCategoriaController extends Controller
 
         FinanceiroCategoria::create($request->all());
 
-        return redirect()->route('categorias.index')
+        return redirect()->route('financeiro.categorias.index')
                          ->with('success', 'Categoria criada com sucesso!');
     }
 
@@ -45,7 +45,7 @@ class FinanceiroCategoriaController extends Controller
 
         $categoria->update($request->only(['nome', 'descricao', 'tipo']));
 
-        return redirect()->route('categorias.index')
+        return redirect()->route('financeiro.categorias.index')
                          ->with('success', 'Categoria atualizada com sucesso!');
     }
 

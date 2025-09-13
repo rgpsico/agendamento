@@ -103,7 +103,7 @@
             <li class="submenu">
                 <a href="#">🏷️ Categoria<span class="menu-arrow"></span></a>
                 <ul>                      
-                    <li><a href="{{ route('categorias.index') }}">Categorias Financeiras</a></li>
+                    <li><a href="{{ route('financeiro.categorias.index') }}">Categorias Financeiras</a></li>
                 </ul>
             </li>
 

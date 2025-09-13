@@ -7,7 +7,7 @@
 
             <div class="card shadow">
                 <div class="card-body">
-                    <form action="{{ route('categorias.update', $categoria->id) }}" method="POST">
+                    <form action="{{ route('financeiro.categorias.update', $categoria->id) }}" method="POST">
                         @csrf
                         @method('PUT')
 
@@ -40,7 +40,7 @@
                         </div>
 
                         <div class="text-end">
-                            <a href="{{ route('categorias.index') }}" class="btn btn-secondary">Cancelar</a>
+                            <a href="{{ route('financeiro.categorias.index') }}" class="btn btn-secondary">Cancelar</a>
                             <button type="submit" class="btn btn-primary">Atualizar</button>
                         </div>
                     </form>

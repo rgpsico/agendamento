@@ -10,7 +10,7 @@
 
             <div class="card shadow">
                 <div class="card-body">
-                    <a href="{{ route('categorias.create') }}" class="btn btn-primary mb-3">Nova Categoria</a>
+                    <a href="{{ route('financeiro.categorias.create') }}" class="btn btn-primary mb-3">Nova Categoria</a>
 
                     <table class="table table-bordered">
                         <thead>
@@ -26,8 +26,8 @@
                                     <td>{{ $categoria->nome }}</td>
                                     <td>{{ $categoria->descricao }}</td>
                                     <td>
-                                        <a href="{{ route('categorias.edit', $categoria->id) }}" class="btn btn-sm btn-warning">Editar</a>
-                                        <form action="{{ route('categorias.destroy', $categoria->id) }}" method="POST" style="display:inline-block;">
+                                        <a href="{{ route('financeiro.categorias.edit', $categoria->id) }}" class="btn btn-sm btn-warning">Editar</a>
+                                        <form action="{{ route('financeiro.categorias.destroy', $categoria->id) }}" method="POST" style="display:inline-block;">
                                             @csrf
                                             @method('DELETE')
                                             <button class="btn btn-sm btn-danger" onclick="return confirm('Tem certeza que deseja excluir?')">Excluir</button>

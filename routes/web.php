@@ -289,7 +289,9 @@ Route::prefix('financeiro')->middleware(['auth'])->group(function() {
 use App\Http\Controllers\FinanceiroCategoriaController;
 use App\Http\Controllers\ReceitaRecorrenteController;
 
-Route::resource('financeiro/categorias', FinanceiroCategoriaController::class);
+Route::prefix('financeiro')->name('financeiro.')->group(function () {
+    Route::resource('categorias', FinanceiroCategoriaController::class);
+});
 
 
 
