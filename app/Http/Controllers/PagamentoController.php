@@ -425,7 +425,7 @@ class PagamentoController extends Controller
             $cliente = $asaasService->createCustomer($clienteData, $gateway->api_key, $gateway->mode);
             $customerId = $cliente['id'];
 
-            \Log::info('Cliente Asaas criado com sucesso: ' . json_encode($cliente));
+           Log::info('Cliente Asaas criado com sucesso: ' . json_encode($cliente));
 
             // Tentar obter o walletId com algumas tentativas, com intervalos entre elas
             $wallet = $this->getCustomerWallet($customerId);
@@ -434,18 +434,18 @@ class PagamentoController extends Controller
 
             // Se ainda não tiver walletId, tentar criar um manualmente (se houver endpoint para isso)
             if (!$walletId && method_exists($asaasService, 'createCustomerWallet')) {
-                \Log::info("Tentando criar wallet manualmente para o cliente: $customerId");
+               Log::info("Tentando criar wallet manualmente para o cliente: $customerId");
                 try {
                     $wallet = $asaasService->createCustomerWallet($customerId, $gateway->api_key, $gateway->mode);
                     $walletId = $wallet['walletId'] ?? null;
                 } catch (\Exception $e) {
-                    \Log::warning("Erro ao tentar criar wallet manualmente: " . $e->getMessage());
+                   Log::warning("Erro ao tentar criar wallet manualmente: " . $e->getMessage());
                 }
             }
 
             // Verificar se o walletId foi gerado
             if (!$walletId) {
-                \Log::warning('Wallet ID não encontrado após múltiplas tentativas para o cliente: ' . $customerId);
+               Log::warning('Wallet ID não encontrado após múltiplas tentativas para o cliente: ' . $customerId);
 
                 // Salvar o customerId mesmo sem walletId
                 $professor->update([
@@ -483,7 +483,7 @@ class PagamentoController extends Controller
                 'message' => 'Integração com Asaas concluída com sucesso!'
             ]);
         } catch (\Exception $e) {
-            \Log::error('Erro ao integrar com Asaas: ' . $e->getMessage());
+           Log::error('Erro ao integrar com Asaas: ' . $e->getMessage());
             $errorMessage = $e->getMessage();
 
             // Verificar se o erro é relacionado ao CPF/CNPJ já existente
@@ -520,7 +520,7 @@ class PagamentoController extends Controller
                         ]);
                     }
                 } catch (\Exception $ex) {
-                    \Log::error('Erro ao buscar cliente existente: ' . $ex->getMessage());
+                   Log::error('Erro ao buscar cliente existente: ' . $ex->getMessage());
                 }
             }
 
@@ -1019,7 +1019,7 @@ class PagamentoController extends Controller
             ]);
 
             $result = $this->tratarResposta($response->getStatusCode(), json_decode($response->getBody(), true));
-            \Log::info('Resposta da busca de cliente por CPF/CNPJ: ' . json_encode($result));
+           Log::info('Resposta da busca de cliente por CPF/CNPJ: ' . json_encode($result));
 
             // Verificar se existe algum cliente na resposta
             if (isset($result['data']) && is_array($result['data']) && count($result['data']) > 0) {
@@ -1028,7 +1028,7 @@ class PagamentoController extends Controller
 
             return null;
         } catch (\Exception $e) {
-            \Log::error('Erro ao buscar cliente por CPF/CNPJ: ' . $e->getMessage());
+           Log::error('Erro ao buscar cliente por CPF/CNPJ: ' . $e->getMessage());
             throw $e;
         }
     }
@@ -1040,7 +1040,7 @@ class PagamentoController extends Controller
     {
         $client = new Client();
         // Verifique na documentação do Asaas se existe um endpoint específico para criar carteiras
-        $url = rtrim($this->url, '/') . "/api/v3/customers/{$customerId}/wallet";
+        $url = rtrim($this->baseUri, '/') . "/api/v3/customers/{$customerId}/wallet";
 
         try {
             $response = $client->request('POST', $url, [
@@ -1052,11 +1052,11 @@ class PagamentoController extends Controller
             ]);
 
             $wallet = $this->tratarResposta($response->getStatusCode(), json_decode($response->getBody(), true));
-            \Log::info('Resposta da criação de wallet: ' . json_encode($wallet));
+            Log::info('Resposta da criação de wallet: ' . json_encode($wallet));
 
             return $wallet;
         } catch (\Exception $e) {
-            \Log::error('Erro ao criar wallet: ' . $e->getMessage());
+            Log::error('Erro ao criar wallet: ' . $e->getMessage());
             throw $e;
         }
     }
@@ -1076,7 +1076,7 @@ class PagamentoController extends Controller
             $client->request('DELETE', $url . '/' . $payment['id'], [
                 'headers' => array_merge($this->headers, ['access_token' => $apiKey]),
             ]);
-            \Log::info('Cobrança excluída: ' . $payment['id']);
+            Log::info('Cobrança excluída: ' . $payment['id']);
         }
     }
 
