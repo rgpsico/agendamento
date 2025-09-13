@@ -26,7 +26,6 @@ use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\PagamentoComCartaoRequest;
 use App\Services\AgendamentoService;
 use App\Http\Requests\CriarPagamentoPresencialRequest;
-use App\Services\TwilioService;
 use App\Services\NotificationService;
 class PagamentoController extends Controller
 {
@@ -674,6 +673,8 @@ class PagamentoController extends Controller
 
     public function criarPagamentoPresencial(CriarPagamentoPresencialRequest $request)
     {
+
+      
         $tipo_de_horario = Servicos::where('id', $request->servico_id)->value('tipo_agendamento');
 
         // Verificar disponibilidade do professor
@@ -713,6 +714,19 @@ class PagamentoController extends Controller
         $notificationService->enviarAgendamento($agendamento, $pagamento, $canais);
 
         // Redirecionar para a página de confirmação
+        $empresaId = $professor->empresa->id;
+
+        // Lançar receita como pendente
+        app(\App\Services\FinanceiroReceitaService::class)->lancarReceita([
+            'descricao' => 'Receita pendente do agendamento do aluno #'.$agendamento->id,
+            'valor' => $pagamento->valor,
+            'data'  => now(),
+            'categoria_id' => $request->input('categoria_id') ?? null,
+            'usuario_id' => $request->input('aluno_id'),
+            'status' => 'pendente', // 👈 marca como pendente
+            'empresa_id' => $empresaId,
+        ]);
+
         return redirect()->route('home.checkoutsucesso', ['id' => $professorId])
             ->with('success', 'Agendamento e pagamento presencial registrados com sucesso');
     }
