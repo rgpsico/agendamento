@@ -49,8 +49,9 @@
                         <div class="mb-3">
                             <label for="status" class="form-label">Status</label>
                             <select id="status" name="status" class="form-control" required>
-                                <option value="PENDING" {{ old('status', $receita->status) == 'PENDING' ? 'selected' : '' }}>Pendente</option>
-                                <option value="RECEIVED" {{ old('status', $receita->status) == 'RECEIVED' ? 'selected' : '' }}>Recebido</option>
+                                <option value="PENDENTE" {{ old('status', $receita->status) == 'PENDENTE' ? 'selected' : '' }}>Pendente</option>
+                                <option value="RECEBIDA" {{ old('status', $receita->status) == 'RECEBIDA' ? 'selected' : '' }}>Recebido</option>
+                                
                             </select>
                         </div>
                     </div>

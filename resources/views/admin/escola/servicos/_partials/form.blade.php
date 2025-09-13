@@ -33,6 +33,21 @@
 
 <x-text-input name="tempo_de_aula" size="30" label="Tempo de Aula" :value="$model->tempo_de_aula ?? ''" />
 
+    <!-- Categoria Financeira -->
+<div class="form-group">
+    <label for="categoria_id">Categoria Financeira</label>
+    <select name="categoria_id" id="categoria_id" class="form-control">
+        <option value="">Selecione uma categoria</option>
+        @foreach($categorias as $categoria)
+            <option value="{{ $categoria->id }}"
+                {{ isset($model) && $model->categoria_id == $categoria->id ? 'selected' : '' }}>
+                {{ $categoria->nome }}
+            </option>
+        @endforeach
+    </select>
+</div>
+
+
 <div class="form-group" id="vagas_container" style="display: none;">
     <label for="vagas">Número de Vagas </label>
     <input type="number" name="vagas" id="vagas" class="form-control" min="1"

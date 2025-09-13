@@ -14,6 +14,35 @@
                 </a>
             </div>
 
+            <form action="{{ route('financeiro.receitas.index') }}" method="GET" class="mb-3 row g-2">
+            <div class="col-md-3">
+                <input type="text" name="aluno" class="form-control" placeholder="Nome do Aluno" value="{{ request('aluno') }}">
+            </div>
+            <div class="col-md-3">
+                <input type="text" name="descricao" class="form-control" placeholder="Descrição" value="{{ request('descricao') }}">
+            </div>
+            <div class="col-md-2">
+                <select name="status" class="form-control">
+                    <option value="">Todos Status</option>
+                    <option value="RECEBIDA" {{ request('status') === 'RECEBIDA' ? 'selected' : '' }}>Recebido</option>
+                    <option value="PENDENTE" {{ request('status') === 'PENDENTE' ? 'selected' : '' }}>Pendente</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="metodo_pagamento" class="form-control">
+                    <option value="">Todos Métodos</option>
+                    <option value="PRESENCIAL" {{ request('metodo_pagamento') === 'PRESENCIAL' ? 'selected' : '' }}>Presencial</option>
+                    <option value="PIX" {{ request('metodo_pagamento') === 'PIX' ? 'selected' : '' }}>Pix</option>
+                    <option value="DINHEIRO" {{ request('metodo_pagamento') === 'DINHEIRO' ? 'selected' : '' }}>Dinheiro</option>
+                    <option value="CARTAO" {{ request('metodo_pagamento') === 'CARTAO' ? 'selected' : '' }}>Cartão</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-grid">
+                <button type="submit" class="btn btn-primary">Filtrar</button>
+            </div>
+        </form>
+
+
             <div class="card shadow">
                 <div class="card-body">
                     <!-- Tabela responsiva -->
@@ -22,6 +51,7 @@
                             <thead class="table-light">
                                 <tr>
                                     <th>Aluno</th>
+                                    <th>Descrição</th>
                                     <th>Serviço/Agendamento</th>
                                     <th>Categoria</th>
                                     <th>Valor</th>
@@ -36,12 +66,13 @@
                                     <tr>
                                         {{-- Aluno: Priorize via pagamento.aluno.usuario, fallback para usuario direto --}}
                                         <td>{{ $receita->usuario->nome }}</td>
+                                            <td>{{ $receita->descricao }}</td>
                                         {{-- Serviço: Via pagamento.agendamento.modalidade --}}
                                         <td>{{ $receita->pagamento->agendamento->modalidade->nome ?? '-' }}</td>
                                         <td>{{ $receita->categoria->nome ?? '-' }}</td>
                                         <td>R$ {{ number_format($receita->valor, 2, ',', '.') }}</td>
                                         <td>
-                                            @if($receita->status === 'RECEIVED')
+                                            @if($receita->status === 'RECEBIDA')
                                                 <span class="badge bg-success">Recebido</span>
                                             @else
                                                 <span class="badge bg-warning">Pendente</span>

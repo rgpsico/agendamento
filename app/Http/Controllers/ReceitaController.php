@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Agendamento;
 use App\Models\Pagamento;
+use App\Models\Receita;
 use App\Services\FinanceiroReceitaService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -22,10 +23,35 @@ class ReceitaController extends Controller
      */
     public function index()
     {
-        
-        $receitas = $this->receitaService->listarReceitas();
+        $request = request(); // pega a instância do Request
+        $query = Receita::with(['usuario', 'categoria', 'pagamento.agendamento.modalidade']);
+
+        if ($request->aluno) {
+            $query->whereHas('usuario', function ($q) use ($request) {
+                $q->where('nome', 'like', '%' . $request->aluno . '%');
+            });
+        }
+
+        if ($request->descricao) {
+            $query->where('descricao', 'like', '%' . $request->descricao . '%');
+        }
+
+        if ($request->status) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->metodo_pagamento) {
+            $query->whereHas('pagamento', function ($q) use ($request) {
+                $q->where('metodo_pagamento', $request->metodo_pagamento);
+            });
+        }
+
+        $receitas = $query->orderBy('created_at', 'desc')->paginate(15)->withQueryString();
+
         return view('admin.financeiro.receitas.index', compact('receitas'));
     }
+
+
 
     /**
      * Formulário de lançamento manual de receita.
@@ -58,9 +84,11 @@ class ReceitaController extends Controller
             'agendamento_id'    => 'nullable|exists:agendamentos,id',
             'valor'             => 'required|numeric|min:0',
             'metodo_pagamento'  => 'required|string',
-            'status'            => 'required|in:PENDING,RECEIVED',
+            'status'            => 'required|in:PENDENTE,RECEBIDA',
             'data_vencimento'   => 'nullable|date',
         ]);
+
+   
 
         $dadosReceita = [
             'descricao'      => 'Pagamento da aula', // ou personalize como quiser
@@ -97,10 +125,11 @@ class ReceitaController extends Controller
      * Atualizar receita.
      */
     public function update(Request $request, $id)
-    {
+    {        
+     
         $request->validate([
             'valor' => 'required|numeric|min:0',
-            'status' => 'required|in:PENDING,RECEIVED',
+            'status' => 'required|in:PENDENTE,RECEBIDA',
             'metodo_pagamento' => 'required|string',
         ]);
 
