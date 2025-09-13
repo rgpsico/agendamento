@@ -35,12 +35,14 @@
                             @enderror
                         </div>
 
-                        <div class="mb-3">
-                            <label for="categoria" class="form-label">Categoria</label>
-                            <input type="text" class="form-control" id="categoria" name="categoria" value="{{ old('categoria') }}">
-                            @error('categoria')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
+                           <div class="mb-3">
+                              <label for="categoria_id" class="form-label">Categoria</label>
+                            <select id="categoria_id" name="categoria_id" class="form-control">
+                                <option value="">Selecione uma categoria</option>
+                                @foreach($categorias as $categoria)
+                                    <option value="{{ $categoria->id }}">{{ $categoria->nome }}</option>
+                                @endforeach
+                            </select>
                         </div>
 
                         <div class="mb-3">

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreDespesaRequest;
 use App\Http\Requests\UpdateDespesaRequest;
 use App\Models\Despesas;
+use App\Models\FinanceiroCategoria;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;  // Para usuário logado
 
@@ -25,6 +26,7 @@ class DespesaController extends Controller
     // Mostrar formulário de criação (pré-preenche empresa_id e usuario_id)
     public function create()
     {
+           $categorias = FinanceiroCategoria::where('tipo', 'despesa')->get();
         $user = Auth::user();
         $defaultData = [
             'empresa_id' => $user->empresa_id ?? null,  // Assuma que Usuario tem empresa_id
@@ -32,7 +34,7 @@ class DespesaController extends Controller
             'status' => 'PENDING',
         ];
 
-        return view('admin.financeiro.despesas.create', compact('defaultData'));
+        return view('admin.financeiro.despesas.create', compact('defaultData','categorias'));
     }
 
     // Salvar nova despesa
@@ -42,7 +44,7 @@ class DespesaController extends Controller
         $data = $request->validated();
         $data['empresa_id'] ??= $user->empresa_id ?? null;  // Define se não passado
         $data['usuario_id'] ??= $user->id;  // Sempre define o usuário logado
-
+        
         Despesas::create($data);
 
         return redirect()->route('financeiro.despesas.index')
@@ -52,11 +54,11 @@ class DespesaController extends Controller
     // Mostrar formulário de edição
     public function edit($id)
     {
-    
+       $categorias = FinanceiroCategoria::where('tipo', 'despesa')->get();
         $despesa = Despesas::findOrFail($id);
     
         // $this->authorize('update', $despesa);  // Policy verifica se é do usuário
-        return view('admin.financeiro.despesas.edit', compact('despesa'));
+        return view('admin.financeiro.despesas.edit', compact('despesa','categorias'));
     }
 
     // Atualizar despesa existente

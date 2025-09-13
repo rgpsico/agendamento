@@ -289,7 +289,7 @@ Route::prefix('financeiro')->middleware(['auth'])->group(function() {
     // Route::post('/config', [FinanceiroConfigController::class, 'store'])->name('financeiro.config.store');
 
       Route::get('/dashboard', [\App\Http\Controllers\FinanceiroDashboardController::class, 'index'])
-        ->name('dashboard');
+        ->name('admin.financeiro.dashboard');
 });
 
 

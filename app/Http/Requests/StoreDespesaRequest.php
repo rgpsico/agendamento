@@ -24,7 +24,7 @@ class StoreDespesaRequest extends FormRequest
         return [
             'descricao' => 'required|string|max:255',
             'valor' => 'required|numeric|min:0',
-            'categoria' => 'required|string|max:255',  // Removi nullable, pois na migração é nullable, mas valide como required se quiser
+            'categoria_id' => 'required|string|max:255',  // Removi nullable, pois na migração é nullable, mas valide como required se quiser
             'status' => 'required|in:PENDING,PAID',
             'data_vencimento' => 'nullable|date|after_or_equal:today',  // Evita datas passadas
             'empresa_id' => 'required|exists:empresa,id',  // Valida existência

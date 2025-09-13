@@ -35,7 +35,7 @@
                                 @forelse($despesas as $despesa)
                                     <tr>
                                         <td>{{ $despesa->descricao }}</td>
-                                        <td>R$ {{ number_format($despesa->valor, 2, ',', '.') }}</td>
+                                        <td>R$ {{ $despesa->valor }}</td>
                                         <td>{{ $despesa->categoria ?? '-' }}</td>
                                         <td>
                                             @if($despesa->status === 'PAID')

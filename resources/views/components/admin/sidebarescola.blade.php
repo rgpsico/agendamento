@@ -78,7 +78,7 @@
                             </a>
                          <ul>
                             <!-- Visão geral -->
-                            {{-- <li><a href="{{ route('financeiro.dashboard') }}">📊 Dashboard</a></li> --}}
+                            <li><a href="{{ route('admin.financeiro.dashboard') }}">📊 Dashboard</a></li>
 
                             <!-- Contas a receber -->
                             <li class="submenu">
