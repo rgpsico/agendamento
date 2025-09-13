@@ -14,9 +14,10 @@ class FinanceiroReceitaService
     {
         return DB::transaction(function () use ($dados) {
             return Receita::create([
+                'pagamento_id' => $dados['pagamento_id'],
                 'descricao'     => $dados['descricao'] ?? 'Receita automática',
                 'valor'         => $dados['valor'],
-                'data'          => $dados['data'] ?? now(),
+                'data_recebimento'          => $dados['data'] ?? now(),
                 'categoria_id'  => $dados['categoria_id'] ?? null,
                 'usuario_id'    => $dados['usuario_id'],
                 'status'        => $dados['status'] ?? 'confirmado',
@@ -36,12 +37,18 @@ class FinanceiroReceitaService
     /**
      * Listar todas as receitas
      */
-    public function listarReceitas()
+public function listarReceitas()
     {
-        return Receita::with(['categoria', 'usuario', 'empresa'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(15);
+        return Receita::with([
+            'categoria',                    // Adicione isso se não estiver carregando
+            'usuario',                      // Adicione isso para $receita->usuario
+            'empresa',
+            'pagamento.agendamento.modalidade', // Já ok para serviço
+            'pagamento.aluno.usuario'       // Já ok para aluno/usuario
+        ])->orderBy('created_at', 'desc')
+          ->paginate(15);
     }
+
 
     /**
      * Buscar receita pelo ID

@@ -22,6 +22,7 @@ class ReceitaController extends Controller
      */
     public function index()
     {
+        
         $receitas = $this->receitaService->listarReceitas();
         return view('admin.financeiro.receitas.index', compact('receitas'));
     }
@@ -53,18 +54,33 @@ class ReceitaController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'agendamento_id' => 'required|exists:agendamentos,id',
-            'aluno_id' => 'required|exists:alunos,id',
-            'valor' => 'required|numeric|min:0',
-            'status' => 'required|in:PENDING,RECEIVED',
-            'metodo_pagamento' => 'required|string',
+            'aluno_id'          => 'required|exists:alunos,id',
+            'agendamento_id'    => 'nullable|exists:agendamentos,id',
+            'valor'             => 'required|numeric|min:0',
+            'metodo_pagamento'  => 'required|string',
+            'status'            => 'required|in:PENDING,RECEIVED',
+            'data_vencimento'   => 'nullable|date',
         ]);
 
-        $this->receitaService->lancarReceitaManual($request->all());
+        $dadosReceita = [
+            'descricao'      => 'Pagamento da aula', // ou personalize como quiser
+            'valor'          => $request->valor,
+            'data'           => $request->data_vencimento ?? now(),
+            'categoria_id'   => null, // se quiser, pode ter select de categoria
+            'usuario_id'     => auth()->id(),
+            'status'         => $request->status,
+            'empresa_id'     => auth()->user()->empresa_id ?? null,
+            'agendamento_id' => $request->agendamento_id,
+            'aluno_id'       => $request->aluno_id,
+            'metodo_pagamento' => $request->metodo_pagamento,
+        ];
+
+        $this->receitaService->lancarReceitaManual($dadosReceita);
 
         return redirect()->route('financeiro.receitas.index')
-            ->with('success', 'Receita lançada com sucesso!');
+                        ->with('success', 'Receita lançada com sucesso!');
     }
+
 
     /**
      * Editar receita.

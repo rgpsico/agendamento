@@ -9,48 +9,41 @@ class Receita extends Model
 {
     use HasFactory;
 
-    protected $table = 'receitas';
+    protected $table = 'receitas'; // Ajuste se necessário
 
     protected $fillable = [
-        'pagamento_id',       // vínculo direto com pagamento
-        'categoria_id',       // vínculo com categoria financeira
         'descricao',
+        'pagamento_id',
         'valor',
-        'status',             // RECEBIDA, PENDENTE, CANCELADA
-        'data_recebimento',
-        'empresa_id',
+        'data',
+        'categoria_id',
         'usuario_id',
+        'status',
+        'empresa_id'
     ];
 
     protected $casts = [
-        'valor' => 'decimal:2',
-        'data_recebimento' => 'datetime',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
+        'data' => 'datetime',
     ];
 
-    /*
-    |--------------------------------------------------------------------------
-    | Relacionamentos
-    |--------------------------------------------------------------------------
-    */
-    public function pagamento()
-    {
-        return $this->belongsTo(Pagamento::class);
-    }
-
+    // Relacionamentos necessários
     public function categoria()
     {
         return $this->belongsTo(FinanceiroCategoria::class, 'categoria_id');
     }
 
-    public function empresa()
-    {
-        return $this->belongsTo(Empresa::class);
-    }
-
     public function usuario()
     {
         return $this->belongsTo(Usuario::class, 'usuario_id');
+    }
+
+    public function empresa()
+    {
+        return $this->belongsTo(Empresa::class, 'empresa_id');
+    }
+
+    public function pagamento()
+    {
+        return $this->belongsTo(Pagamento::class); // Assumindo que Receita tem 'pagamento_id' ou similar
     }
 }

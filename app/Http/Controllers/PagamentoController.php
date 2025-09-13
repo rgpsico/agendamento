@@ -716,17 +716,19 @@ class PagamentoController extends Controller
         // Redirecionar para a página de confirmação
         $empresaId = $professor->empresa->id;
 
+       
         // Lançar receita como pendente
         app(\App\Services\FinanceiroReceitaService::class)->lancarReceita([
             'descricao' => 'Receita pendente do agendamento do aluno #'.$agendamento->id,
+            'pagamento_id' => $pagamento->id,
             'valor' => $pagamento->valor,
-            'data'  => now(),
+            'data_recebimento'  => null,
             'categoria_id' => $request->input('categoria_id') ?? null,
             'usuario_id' => $request->input('aluno_id'),
             'status' => 'pendente', // 👈 marca como pendente
             'empresa_id' => $empresaId,
         ]);
-
+     
         return redirect()->route('home.checkoutsucesso', ['id' => $professorId])
             ->with('success', 'Agendamento e pagamento presencial registrados com sucesso');
     }

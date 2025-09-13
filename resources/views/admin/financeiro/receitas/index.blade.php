@@ -23,6 +23,7 @@
                                 <tr>
                                     <th>Aluno</th>
                                     <th>Serviço/Agendamento</th>
+                                    <th>Categoria</th>
                                     <th>Valor</th>
                                     <th>Status</th>
                                     <th>Método</th>
@@ -33,8 +34,11 @@
                             <tbody>
                                 @forelse($receitas as $receita)
                                     <tr>
-                                        <td>{{ $receita->aluno->usuario->nome ?? '-' }}</td>
-                                        <td>{{ $receita->agendamento->modalidade->nome ?? '-' }}</td>
+                                        {{-- Aluno: Priorize via pagamento.aluno.usuario, fallback para usuario direto --}}
+                                        <td>{{ $receita->usuario->nome }}</td>
+                                        {{-- Serviço: Via pagamento.agendamento.modalidade --}}
+                                        <td>{{ $receita->pagamento->agendamento->modalidade->nome ?? '-' }}</td>
+                                        <td>{{ $receita->categoria->nome ?? '-' }}</td>
                                         <td>R$ {{ number_format($receita->valor, 2, ',', '.') }}</td>
                                         <td>
                                             @if($receita->status === 'RECEIVED')
@@ -43,8 +47,9 @@
                                                 <span class="badge bg-warning">Pendente</span>
                                             @endif
                                         </td>
-                                        <td>{{ $receita->metodo_pagamento }}</td>
-                                        <td>{{ $receita->created_at->format('d/m/Y H:i') }}</td>
+                                        <td>{{ $receita->pagamento->metodo_pagamento ?? '-' }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($receita->data_recebimento ?? $receita->created_at)->format('d/m/Y H:i') }}</td>
+
                                         <td class="text-center">
                                             <div class="d-flex flex-wrap gap-2 justify-content-center">
                                                 <a href="{{ route('financeiro.receitas.edit', $receita->id) }}" class="btn btn-warning btn-sm">
@@ -62,7 +67,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="7" class="text-center">Nenhuma receita encontrada.</td>
+                                        <td colspan="8" class="text-center">Nenhuma receita encontrada.</td>
                                     </tr>
                                 @endforelse
                             </tbody>

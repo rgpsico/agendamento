@@ -28,18 +28,15 @@
 
                         <!-- Agendamento (opcional) -->
                         <div class="mb-3">
-                            <label for="agendamento_id" class="form-label">Agendamento (opcional)</label>
-                            <select id="agendamento_id" name="agendamento_id" class="form-control">
-                                <option value="">Nenhum</option>
-                                @foreach($agendamentos as $agendamento)
-                                    <option value="{{ $agendamento->id }}">
-                                        {{ $agendamento->aluno->usuario->nome ?? 'Aluno sem nome' }} -
-                                        {{ $agendamento->modalidade->nome ?? 'Serviço' }} 
-                                        ({{ $agendamento->data_da_aula }})
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
+                        <label for="categoria_id" class="form-label">Categoria</label>
+                        <select id="categoria_id" name="categoria_id" class="form-control">
+                            <option value="">Selecione uma categoria</option>
+                            @foreach($categorias as $categoria)
+                                <option value="{{ $categoria->id }}">{{ $categoria->nome }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
 
                         <!-- Valor -->
                         <div class="mb-3">
