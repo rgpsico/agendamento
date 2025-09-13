@@ -39,6 +39,8 @@ use App\Http\Controllers\DespesaController;
 use App\Http\Controllers\DespesasRecorrenteController;
 //   Route::get('/', [UserManagementController::class, 'index'])->name('register.aluno');
 
+use App\Http\Controllers\FinanceiroCategoriaController;
+use App\Http\Controllers\ReceitaRecorrenteController;
 
 
 
@@ -250,6 +252,7 @@ Route::put('/virtualhosts/{file}', [VirtualHostController::class, 'update'])->na
 Route::delete('/virtualhosts/{file}', [VirtualHostController::class, 'destroy'])->name('virtualhosts.destroy');
 
 
+
 Route::prefix('financeiro')->middleware(['auth'])->group(function() {
     
     // Dashboard financeiro
@@ -284,10 +287,12 @@ Route::prefix('financeiro')->middleware(['auth'])->group(function() {
     // // Configurações
     // Route::get('/config', [FinanceiroConfigController::class, 'index'])->name('financeiro.config.index');
     // Route::post('/config', [FinanceiroConfigController::class, 'store'])->name('financeiro.config.store');
+
+      Route::get('/dashboard', [\App\Http\Controllers\FinanceiroDashboardController::class, 'index'])
+        ->name('dashboard');
 });
 
-use App\Http\Controllers\FinanceiroCategoriaController;
-use App\Http\Controllers\ReceitaRecorrenteController;
+
 
 Route::prefix('financeiro')->name('financeiro.')->group(function () {
     Route::resource('categorias', FinanceiroCategoriaController::class);
@@ -331,4 +336,6 @@ Route::delete('financeiro/despesas_recorrentes/{despesaRecorrente}', [DespesasRe
     Route::get('receitas_recorrentes/{receitaRecorrente}/edit', [ReceitaRecorrenteController::class, 'edit'])->name('receitas_recorrentes.edit');
     Route::put('receitas_recorrentes/{receitaRecorrente}', [ReceitaRecorrenteController::class, 'update'])->name('receitas_recorrentes.update');
     Route::delete('receitas_recorrentes/{receitaRecorrente}', [ReceitaRecorrenteController::class, 'destroy'])->name('receitas_recorrentes.destroy');
+
+
 });
