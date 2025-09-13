@@ -70,39 +70,46 @@
 
 
               
-                   <li class="submenu">
-                    <a href="#">
-                        <i class="fas fa-dollar-sign" style="font-size: 18px;"></i>
-                        <span>Financeiro</span>
-                        <span class="menu-arrow"></span>
-                    </a>
+                        <li class="submenu">
+            <a href="#">
+                <i class="fas fa-dollar-sign" style="font-size: 18px;"></i>
+                <span>Financeiro</span>
+                <span class="menu-arrow"></span>
+            </a>
+            <ul>
+                <!-- Visão geral -->
+                {{-- <li><a href="{{ route('financeiro.dashboard') }}">📊 Dashboard</a></li> --}}
+
+                <!-- Contas a receber -->
+                <li class="submenu">
+                    <a href="#">💳 Receitas<span class="menu-arrow"></span></a>
                     <ul>
-                        <!-- Visão geral -->
-                        {{-- <li><a href="{{ route('financeiro.dashboard') }}">📊 Dashboard</a></li> --}}
-
-                        <!-- Contas a receber -->
-                        <li class="submenu">
-                            <a href="#">💳 Receitas<span class="menu-arrow"></span></a>
-                            <ul>
-                                <li><a href="{{ route('financeiro.receitas.index') }}">Listar Receitas</a></li>
-                                <li><a href="{{ route('financeiro.receitas.create') }}">Lançar Receita</a></li>
-                                <li><a href="{{ route('financeiro.receitas_recorrentes.index') }}">Receitas Recorrentes</a></li>
-                            </ul>
-                        </li>
-
-                        <!-- Contas a pagar -->
-                        <li class="submenu">
-                            <a href="#">💸 Despesas<span class="menu-arrow"></span></a>
-                            <ul>
-                                <li><a href="{{ route('financeiro.despesas.index') }}">Listar Despesas</a></li>
-                                <li><a href="{{ route('financeiro.despesas.create') }}">Cadastrar Despesa</a></li>
-                             <li><a href="{{ route('categorias.index') }}">Categorias Financeiras</a></li>
-
-                                <li><a href="{{ route('financeiro.despesas_recorrentes.index') }}">Despesas Recorrentes</a></li> 
-                            </ul>
-                        </li>
+                        <li><a href="{{ route('financeiro.receitas.index') }}">Listar Receitas</a></li>
+                        <li><a href="{{ route('financeiro.receitas.create') }}">Lançar Receita</a></li>
+                        <li><a href="{{ route('financeiro.receitas_recorrentes.index') }}">Receitas Recorrentes</a></li>
                     </ul>
                 </li>
+
+                <!-- Contas a pagar -->
+                <li class="submenu">
+                    <a href="#">💸 Despesas<span class="menu-arrow"></span></a>
+                    <ul>
+                        <li><a href="{{ route('financeiro.despesas.index') }}">Listar Despesas</a></li>
+                        <li><a href="{{ route('financeiro.despesas.create') }}">Cadastrar Despesa</a></li>                   
+                        <li><a href="{{ route('financeiro.despesas_recorrentes.index') }}">Despesas Recorrentes</a></li> 
+                    </ul>
+                </li>
+
+            <li class="submenu">
+                <a href="#">🏷️ Categoria<span class="menu-arrow"></span></a>
+                <ul>                      
+                    <li><a href="{{ route('categorias.index') }}">Categorias Financeiras</a></li>
+                </ul>
+            </li>
+
+            </ul>
+        </li>
+
 
 
 
