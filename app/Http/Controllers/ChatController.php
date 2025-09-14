@@ -64,7 +64,9 @@ class ChatController extends Controller
 
 
         
-$empresa = $conversation->empresa;
+    $empresa = $conversation->empresa;
+    
+    
     if ($empresa && $empresa->telefone) {
         app(\App\Services\TwilioService::class)
             ->enviarAlertaNovaMensagem($userMessage, $empresa);
