@@ -108,12 +108,18 @@
                                     </tr>
                                 @endforelse
                             </tbody>
+                            
                         </table>
                     </div>
 
-                    <div class="mt-3">
-                        {{ $receitas->links() }}
+                  <div class="mt-3 d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>Total Receitas (filtro aplicado):</strong> 
+                        R$ {{ number_format($totalReceitas, 2, ',', '.') }}
                     </div>
+
+                    {{ $receitas->links() }}
+                </div>
                 </div>
             </div>
 
