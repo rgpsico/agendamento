@@ -23,39 +23,48 @@ class ReceitaController extends Controller
      * Listar todas as receitas.
      */
     public function index()
-{
-    $request = request(); 
-    $query = Receita::with(['usuario', 'categoria', 'pagamento.agendamento.modalidade']);
+    {
+        $request = request();
+        
+        $query = Receita::with(['usuario', 'categoria', 'pagamento.agendamento.modalidade']);
 
-    if ($request->aluno) {
-        $query->whereHas('usuario', function ($q) use ($request) {
-            $q->where('nome', 'like', '%' . $request->aluno . '%');
-        });
+        // Filtros
+        if ($request->aluno) {
+            $query->whereHas('usuario', function ($q) use ($request) {
+                $q->where('nome', 'like', '%' . $request->aluno . '%');
+            });
+        }
+
+        if ($request->descricao) {
+            $query->where('descricao', 'like', '%' . $request->descricao . '%');
+        }
+
+        if ($request->status) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->metodo_pagamento) {
+            $query->whereHas('pagamento', function ($q) use ($request) {
+                $q->where('metodo_pagamento', $request->metodo_pagamento);
+            });
+        }
+
+        // Novo: filtro por período
+        if ($request->filled('data_inicio') && $request->filled('data_fim')) {
+            $query->whereBetween('data_vencimento', [$request->data_inicio, $request->data_fim]);
+        }
+
+        // Clone da query para total filtrado
+        $totalReceitas = (clone $query)->sum('valor');
+
+        // Paginação
+        $receitas = $query->orderBy('created_at', 'desc')
+                        ->paginate(15)
+                        ->withQueryString();
+
+        return view('admin.financeiro.receitas.index', compact('receitas', 'totalReceitas'));
     }
 
-    if ($request->descricao) {
-        $query->where('descricao', 'like', '%' . $request->descricao . '%');
-    }
-
-    if ($request->status) {
-        $query->where('status', $request->status);
-    }
-
-    if ($request->metodo_pagamento) {
-        $query->whereHas('pagamento', function ($q) use ($request) {
-            $q->where('metodo_pagamento', $request->metodo_pagamento);
-        });
-    }
-
-    // 👇 clone da query para calcular o total filtrado
-    $totalReceitas = (clone $query)->sum('valor');
-
-    $receitas = $query->orderBy('created_at', 'desc')
-                      ->paginate(15)
-                      ->withQueryString();
-
-    return view('admin.financeiro.receitas.index', compact('receitas', 'totalReceitas'));
-}
 
 
 
