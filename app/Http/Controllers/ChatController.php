@@ -50,7 +50,9 @@ class ChatController extends Controller
                 'telefone' => $request->phone,
             ]);
         }
-$cleanUserMessage = $this->sanitizeMessage($request->mensagem);
+
+
+        $cleanUserMessage = $this->sanitizeMessage($request->mensagem);
         // Salva a mensagem do usuário
         $userMessage = Message::create([
             'from' => 'user',
