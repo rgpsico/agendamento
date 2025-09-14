@@ -12,7 +12,7 @@ use App\Models\TokenUsage;
 use App\Services\DeepSeekService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
-
+use DeepSeek\Tokenizer\Tokenizer;
 class BotController extends Controller
 {
 
@@ -25,6 +25,7 @@ class BotController extends Controller
     
    public function dashboard()
     {
+       
         // Bots ativos
         $botsAtivos = Bot::where('status', true)->count();
 
@@ -77,13 +78,15 @@ class BotController extends Controller
     }
 
         public function tokens() {
-            $usage = TokenUsage::with('bot')->get();
+            $usage = TokenUsage::with('bot')->get();         
             return view('admin.bot.tokens', compact('usage'));
         }
 
         public function logs() {
             $logs = BotLog::with('bot')->get();
-            return view('admin.bot.logs', compact('logs'));
+
+            
+            return view('admin.bot.log', compact('logs'));
         }
 
 
