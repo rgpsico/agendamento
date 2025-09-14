@@ -4,111 +4,23 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreDespesaRequest;
 use App\Http\Requests\UpdateDespesaRequest;
-use App\Models\DespesaCategoria;
 use App\Models\Despesas;
 use App\Models\FinanceiroCategoria;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;  // Para usuário logado
-use Illuminate\Support\Facades\DB;
 
 class DespesaController extends Controller
 {
     // Listar todas as despesas (filtrado por usuário/empresa logado, com paginação)
-   public function index()
-    {
-        $request = request();
-        $user = Auth::user();
-        
-        // Query base
-        $query = Despesas::where('usuario_id', $user->id)
-                         ->when($user->empresa_id, fn($q) => $q->where('empresa_id', $user->empresa_id))
-                         ->with(['categoria', 'empresa', 'usuario']);
-
-        // Aplicar filtros
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
-        if ($request->filled('categoria_id')) {
-            $query->where('categoria_id', $request->categoria_id);
-        }
-
-        if ($request->filled('data_inicial')) {
-            $query->whereDate('data_vencimento', '>=', $request->data_inicial);
-        }
-
-        if ($request->filled('data_final')) {
-            $query->whereDate('data_vencimento', '<=', $request->data_final);
-        }
-
-        if ($request->filled('search')) {
-            $query->where('descricao', 'like', '%' . $request->search . '%');
-        }
-
-        // Buscar despesas com paginação
-        $despesas = $query->orderBy('data_vencimento', 'desc')->paginate(15);
-
-        // Manter parâmetros de filtro na paginação
-        $despesas->appends($request->query());
-
-        // Calcular resumo (sem filtros para comparação)
-        $resumoQuery = Despesas::where('usuario_id', $user->id)
-                              ->when($user->empresa_id, fn($q) => $q->where('empresa_id', $user->empresa_id));
-
-        $resumo = [
-            'total_geral' => $resumoQuery->sum(DB::raw('CAST(valor AS DECIMAL(10,2))')),
-            'total_pago' => $resumoQuery->where('status', 'PAID')->sum(DB::raw('CAST(valor AS DECIMAL(10,2))')),
-            'total_pendente' => $resumoQuery->where('status', 'PENDING')->sum(DB::raw('CAST(valor AS DECIMAL(10,2))')),
-            'count_pago' => $resumoQuery->where('status', 'PAID')->count(),
-            'count_pendente' => $resumoQuery->where('status', 'PENDING')->count(),
-        ];
-
-        // Buscar categorias para o filtro
-        
-        $categorias = DespesaCategoria::orderBy('nome')->get();
-
-        return view('admin.financeiro.despesas.index', compact('despesas', 'resumo', 'categorias'));
-    }
-
-
-     public function resumo(Request $request)
+    public function index()
     {
         $user = Auth::user();
-        
-        $query = Despesas::where('usuario_id', $user->id)
-                         ->when($user->empresa_id, fn($q) => $q->where('empresa_id', $user->empresa_id));
+        $despesas = Despesas::where('usuario_id', $user->id)  // Filtra pelo usuário logado
+                          ->when($user->empresa_id, fn($q) => $q->where('empresa_id', $user->empresa_id))  // Se usuário tem empresa
+                          ->orderBy('data_vencimento', 'desc')
+                          ->paginate(15);
 
-        // Aplicar os mesmos filtros
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
-        if ($request->filled('categoria_id')) {
-            $query->where('categoria_id', $request->categoria_id);
-        }
-
-        if ($request->filled('data_inicial')) {
-            $query->whereDate('data_vencimento', '>=', $request->data_inicial);
-        }
-
-        if ($request->filled('data_final')) {
-            $query->whereDate('data_vencimento', '<=', $request->data_final);
-        }
-
-        if ($request->filled('search')) {
-            $query->where('descricao', 'like', '%' . $request->search . '%');
-        }
-
-      $filteredQuery = clone $query;
-
-        $resumoFiltrado = [
-            'total_filtrado' => (clone $filteredQuery)->sum(DB::raw('CAST(valor AS DECIMAL(10,2))')),
-            'total_pago_filtrado' => (clone $filteredQuery)->where('status', 'PAID')->sum(DB::raw('CAST(valor AS DECIMAL(10,2))')),
-            'total_pendente_filtrado' => (clone $filteredQuery)->where('status', 'PENDING')->sum(DB::raw('CAST(valor AS DECIMAL(10,2))')),
-            'count_filtrado' => $filteredQuery->count(),
-        ];
-
-        return response()->json($resumoFiltrado);
+        return view('admin.financeiro.despesas.index', compact('despesas'));
     }
 
     // Mostrar formulário de criação (pré-preenche empresa_id e usuario_id)

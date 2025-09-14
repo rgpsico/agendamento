@@ -292,6 +292,8 @@ Route::prefix('financeiro')->middleware(['auth'])->group(function() {
         ->name('admin.financeiro.dashboard');
 
           Route::get('despesas/resumo/ajax', [DespesaController::class, 'resumo'])->name('despesas.resumo');
+
+            Route::get('despesas/buscar_despesas', [DespesaController::class, 'buscar_despesas'])->name('despesas.buscar_despesas');
     
 });
 
