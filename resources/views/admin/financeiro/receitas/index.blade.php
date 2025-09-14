@@ -147,13 +147,24 @@
 
                         {{ $receitas->links() }}
                     </div>
+                    <div class="mb-2 text-end">
+                        <button id="exportCsv" class="btn btn-success btn-sm">Exportar CSV</button>
+                    </div>
                 </div>
             </div>
 
         </div>
     </div>
 </x-admin.layout>
+
+
+
+    <button id="exportCsv" class="btn btn-success mb-2">Exportar CSV</button>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
+
+
     const checkbox = document.getElementById('filtrarPeriodo');
     const periodoInputs = document.querySelectorAll('.periodo-inputs');
 
@@ -162,4 +173,74 @@
             el.style.display = checkbox.checked ? 'block' : 'none';
         });
     });
+
+document.getElementById('exportCsv').addEventListener('click', function () {
+    const rows = [];
+    let total = 0;
+    const trs = document.querySelectorAll('table tbody tr');
+
+    trs.forEach(tr => {
+        const tds = tr.querySelectorAll('td');
+
+        // Pula linhas vazias
+        if(tds.length === 0) return;
+
+        // Valor numérico
+        const valor = parseFloat(tds[4].innerText.replace('R$', '').replace('.', '').replace(',', '.')) || 0;
+        total += valor;
+
+        rows.push({
+            "Aluno": tds[0].innerText.trim(),
+            "Descrição": tds[1].innerText.trim(),
+            "Serviço": tds[2].innerText.trim(),
+            "Categoria": tds[3].innerText.trim(),
+            "Valor (R$)": valor,
+            "Status": tds[5].innerText.trim(),
+            "Método": tds[6].innerText.trim(),
+            "Data Recebimento": tds[7].innerText.trim(),
+            "Data Vencimento": tds[8].innerText.trim()
+        });
+    });
+
+    // Adiciona linha de total
+    rows.push({
+        "Aluno": "",
+        "Descrição": "TOTAL",
+        "Serviço": "",
+        "Categoria": "",
+        "Valor (R$)": total,
+        "Status": "",
+        "Método": "",
+        "Data Recebimento": "",
+        "Data Vencimento": ""
+    });
+
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(rows);
+
+    // Formata coluna de valores como número
+    const valorCol = XLSX.utils.decode_col("E"); // Coluna E = Valor
+    for(let i = 1; i <= rows.length; i++) {
+        if(ws[XLSX.utils.encode_cell({c: valorCol, r: i})]) {
+            ws[XLSX.utils.encode_cell({c: valorCol, r: i})].t = 'n';
+        }
+    }
+
+    // Largura das colunas
+    ws['!cols'] = [
+        { wch: 20 }, // Aluno
+        { wch: 30 }, // Descrição
+        { wch: 20 }, // Serviço
+        { wch: 20 }, // Categoria
+        { wch: 12 }, // Valor
+        { wch: 12 }, // Status
+        { wch: 15 }, // Método
+        { wch: 15 }, // Recebimento
+        { wch: 15 }  // Vencimento
+    ];
+
+    XLSX.utils.book_append_sheet(wb, ws, "Receitas");
+    XLSX.writeFile(wb, "receitas.xlsx");
+});
+
 </script>

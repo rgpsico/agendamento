@@ -9,10 +9,45 @@ use Illuminate\Http\Request;
 
 class ReceitaRecorrenteController extends Controller
 {
-    public function index() {
-        $receitas = ReceitaRecorrente::all();
-        return view('admin.financeiro.receitas_recorrentes.index', compact('receitas'));
+    public function index()
+{
+    $query = ReceitaRecorrente::query();
+
+    if ($aluno = request('aluno')) {
+        $query->whereHas('usuario', fn($q) => $q->where('nome', 'like', "%{$aluno}%"));
     }
+
+    if ($descricao = request('descricao')) {
+        $query->where('descricao', 'like', "%{$descricao}%");
+    }
+
+    if ($categoria = request('categoria_id')) {
+        $query->where('categoria_id', $categoria);
+    }
+
+    if ($status = request('status')) {
+        $query->where('status', $status);
+    }
+
+    if ($frequencia = request('frequencia')) {
+        $query->where('frequencia', $frequencia);
+    }
+
+    if ($data_inicio = request('data_inicio')) {
+        $query->whereDate('data_inicio', '>=', $data_inicio);
+    }
+
+    if ($data_fim = request('data_fim')) {
+        $query->whereDate('data_fim', '<=', $data_fim);
+    }
+
+    $receitas = $query->get();
+
+      $totalReceitas = $receitas->sum('valor');
+    return view('admin.financeiro.receitas_recorrentes.index', compact('receitas', 'totalReceitas'));
+}
+
+
 
     public function create() {
         $categorias = FinanceiroCategoria::all();
