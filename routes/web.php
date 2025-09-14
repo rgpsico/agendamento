@@ -290,6 +290,9 @@ Route::prefix('financeiro')->middleware(['auth'])->group(function() {
 
       Route::get('/dashboard', [\App\Http\Controllers\FinanceiroDashboardController::class, 'index'])
         ->name('admin.financeiro.dashboard');
+
+          Route::get('despesas/resumo/ajax', [DespesaController::class, 'resumo'])->name('despesas.resumo');
+    
 });
 
 

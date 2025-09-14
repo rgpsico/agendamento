@@ -19,31 +19,40 @@
 
             <!-- Filtros Responsivos -->
             <div class="filters-container mb-4">
-                <div class="card shadow-sm">
-                    <div class="card-body py-3">
-                        <div class="row g-3">
-                            <div class="col-12 col-md-6 col-lg-3">
-                                <select class="form-select form-select-sm" id="statusFilter">
-                                    <option value="">Todos os Status</option>
-                                    <option value="PAID">Pago</option>
-                                    <option value="PENDING">Pendente</option>
-                                </select>
-                            </div>
-                            <div class="col-12 col-md-6 col-lg-3">
-                                <select class="form-select form-select-sm" id="categoriaFilter">
-                                    <option value="">Todas as Categorias</option>
-                                </select>
-                            </div>
-                            <div class="col-12 col-md-6 col-lg-3">
-                                <input type="date" class="form-control form-control-sm" id="dataFilter">
-                            </div>
-                            <div class="col-12 col-md-6 col-lg-3">
-                                <input type="text" class="form-control form-control-sm" placeholder="Buscar..." id="searchFilter">
+                    <form id="filterForm" action="{{ route('financeiro.despesas.index') }}" method="GET">
+                        <div class="card shadow-sm">
+                            <div class="card-body py-3">
+                                <div class="row g-3">
+                                    <div class="col-12 col-md-6 col-lg-3">
+                                        <select class="form-select form-select-sm" id="statusFilter" name="status">
+                                            <option value="">Todos os Status</option>
+                                            <option value="PAID">Pago</option>
+                                            <option value="PENDING">Pendente</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12 col-md-6 col-lg-3">
+                                        <select class="form-select form-select-sm" id="categoriaFilter" name="categoria_id">
+                                            <option value="">Todas as Categorias</option>
+                                            @foreach($categorias as $categoria)
+                                                <option value="{{ $categoria->id }}">{{ $categoria->nome }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-12 col-md-6 col-lg-3">
+                                        <input type="date" class="form-control form-control-sm" id="dataInicialFilter" name="data_inicial">
+                                    </div>
+                                    <div class="col-12 col-md-6 col-lg-3">
+                                        <input type="date" class="form-control form-control-sm" id="dataFinalFilter" name="data_final">
+                                    </div>
+                                    <div class="col-12 col-md-6 col-lg-3 mt-2">
+                                        <input type="text" class="form-control form-control-sm" placeholder="Buscar..." id="searchFilter" name="search">
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </form>
                 </div>
-            </div>
+
 
             <div class="card shadow table-card">
                 <div class="card-body p-0">
@@ -214,6 +223,11 @@
                         @endforelse
                     </div>
 
+                    <div class="mb-3">
+                        <strong>Total Filtrado: </strong>
+                        <span id="totalFiltrado">R$ 0,00</span>
+                    </div>
+
                     <!-- Paginação -->
                     @if($despesas->hasPages())
                         <div class="card-footer bg-transparent border-top-0 pt-3">
@@ -317,7 +331,7 @@
         }
 
         .filters-container {
-            opacity: 0;
+            opacity: 1;
             transform: translateY(-20px);
         }
 
@@ -417,198 +431,161 @@
     </style>
 
     <!-- Scripts GSAP -->
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Inicializar tooltips do Bootstrap
-            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl);
-            });
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 
-            // Animações GSAP
-            const tl = gsap.timeline();
+   <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar tooltips do Bootstrap
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
 
-            // Animar header
-            tl.from('.page-header-animated', {
-                duration: 0.8,
-                y: -50,
-                opacity: 0,
-                ease: 'power3.out'
-            });
+    // Timeline GSAP
+    const tl = gsap.timeline();
 
-            // Animar botão de ação
-            tl.from('.action-buttons', {
-                duration: 0.6,
-                x: 50,
-                opacity: 0,
-                ease: 'power2.out'
-            }, '-=0.4');
+    // Animar header
+    tl.from('.page-header-animated', {
+        duration: 0.8,
+        y: -50,
+        opacity: 0,
+        ease: 'power3.out'
+    });
 
-            // Animar filtros
-            tl.from('.filters-container', {
-                duration: 0.6,
-                y: -30,
-                opacity: 0,
-                ease: 'power2.out'
-            }, '-=0.3');
+    // Animar botão de ação
+    tl.from('.action-buttons', {
+        duration: 0.6,
+        x: 50,
+        opacity: 0,
+        ease: 'power2.out'
+    }, '-=0.4');
 
-            // Animar card da tabela
-            tl.from('.table-card', {
-                duration: 0.8,
-                y: 30,
-                opacity: 0,
-                ease: 'power2.out'
-            }, '-=0.2');
+    // Animar filtros
+    tl.from('.filters-container', {
+        duration: 0.6,
+        y: -30,
+        opacity: 0,
+        ease: 'power2.out'
+    }, '-=0.3');
 
-            // Animar linhas da tabela (desktop)
-            gsap.set('.table-row', { opacity: 0, y: 20 });
-            gsap.to('.table-row', {
-                duration: 0.5,
-                opacity: 1,
-                y: 0,
-                stagger: 0.1,
-                ease: 'power2.out',
-                delay: 1.2
-            });
+    // Animar card da tabela
+    tl.from('.table-card', {
+        duration: 0.8,
+        y: 30,
+        opacity: 0,
+        ease: 'power2.out'
+    }, '-=0.2');
 
-            // Animar cards mobile
-            gsap.set('.mobile-card', { opacity: 0, x: -30 });
-            gsap.to('.mobile-card', {
-                duration: 0.6,
-                opacity: 1,
-                x: 0,
-                stagger: 0.15,
-                ease: 'power2.out',
-                delay: 1.2
-            });
+    // Animar linhas da tabela (desktop)
+    gsap.fromTo('.table-row', 
+        { opacity: 0, y: 20 }, 
+        { opacity: 1, y: 0, stagger: 0.1, duration: 0.5, ease: 'power2.out', delay: 1.2 }
+    );
 
-            // Animar estado vazio
-            gsap.set('.empty-state', { opacity: 0, scale: 0.9 });
-            gsap.to('.empty-state', {
-                duration: 0.8,
-                opacity: 1,
-                scale: 1,
-                ease: 'back.out(1.7)',
-                delay: 1.5
-            });
+    // Animar cards mobile
+    gsap.fromTo('.mobile-card', 
+        { opacity: 0, x: -30 }, 
+        { opacity: 1, x: 0, stagger: 0.15, duration: 0.6, ease: 'power2.out', delay: 1.2 }
+    );
 
-            // Animar paginação
-            gsap.set('.pagination-container', { opacity: 0, y: 20 });
-            gsap.to('.pagination-container', {
-                duration: 0.6,
-                opacity: 1,
-                y: 0,
-                ease: 'power2.out',
-                delay: 1.8
-            });
+    // Animar estado vazio
+    gsap.fromTo('.empty-state', 
+        { opacity: 0, scale: 0.9 }, 
+        { opacity: 1, scale: 1, duration: 0.8, ease: 'back.out(1.7)', delay: 1.5 }
+    );
 
-            // Hover effects para botões
-            document.querySelectorAll('.btn-animated').forEach(btn => {
-                btn.addEventListener('mouseenter', function() {
-                    gsap.to(this, {
-                        duration: 0.3,
-                        scale: 1.05,
-                        y: -3,
-                        boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
-                        ease: 'power2.out'
-                    });
-                });
+    // Animar paginação
+    gsap.fromTo('.pagination-container', 
+        { opacity: 0, y: 20 }, 
+        { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', delay: 1.8 }
+    );
 
-                btn.addEventListener('mouseleave', function() {
-                    gsap.to(this, {
-                        duration: 0.3,
-                        scale: 1,
-                        y: 0,
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                        ease: 'power2.out'
-                    });
-                });
-            });
-
-            // Hover effects para linhas da tabela
-            document.querySelectorAll('.table-row').forEach(row => {
-                row.addEventListener('mouseenter', function() {
-                    gsap.to(this, {
-                        duration: 0.3,
-                        backgroundColor: 'rgba(79, 70, 229, 0.05)',
-                        scale: 1.01,
-                        ease: 'power2.out'
-                    });
-                });
-
-                row.addEventListener('mouseleave', function() {
-                    gsap.to(this, {
-                        duration: 0.3,
-                        backgroundColor: 'transparent',
-                        scale: 1,
-                        ease: 'power2.out'
-                    });
-                });
-            });
-
-            // Filtros funcionais
-            const statusFilter = document.getElementById('statusFilter');
-            const categoriaFilter = document.getElementById('categoriaFilter');
-            const searchFilter = document.getElementById('searchFilter');
-            const dataFilter = document.getElementById('dataFilter');
-
-            function filterRows() {
-                const statusValue = statusFilter?.value || '';
-                const categoriaValue = categoriaFilter?.value || '';
-                const searchValue = searchFilter?.value.toLowerCase() || '';
-                
-                document.querySelectorAll('.table-row, .mobile-card').forEach(row => {
-                    const status = row.getAttribute('data-status');
-                    const categoria = row.getAttribute('data-categoria');
-                    const text = row.textContent.toLowerCase();
-                    
-                    const matchStatus = !statusValue || status === statusValue;
-                    const matchCategoria = !categoriaValue || categoria === categoriaValue;
-                    const matchSearch = !searchValue || text.includes(searchValue);
-                    
-                    if (matchStatus && matchCategoria && matchSearch) {
-                        gsap.to(row, { duration: 0.3, opacity: 1, display: 'table-row' });
-                    } else {
-                        gsap.to(row, { duration: 0.3, opacity: 0, display: 'none' });
-                    }
-                });
-            }
-
-            // Event listeners para filtros
-            [statusFilter, categoriaFilter, searchFilter, dataFilter].forEach(filter => {
-                if (filter) {
-                    filter.addEventListener('change', filterRows);
-                    filter.addEventListener('input', filterRows);
-                }
-            });
-
-            // Animação de loading para forms
-            document.querySelectorAll('form').forEach(form => {
-                form.addEventListener('submit', function() {
-                    const btn = this.querySelector('button[type="submit"]');
-                    if (btn) {
-                        btn.classList.add('loading');
-                        gsap.to(btn, { duration: 0.3, scale: 0.95 });
-                    }
-                });
-            });
-
-            // Parallax effect sutil no scroll
-            gsap.registerPlugin(ScrollTrigger);
-            
-            gsap.utils.toArray('.table-card, .filters-container').forEach(element => {
-                gsap.to(element, {
-                    yPercent: -10,
-                    ease: 'none',
-                    scrollTrigger: {
-                        trigger: element,
-                        start: 'top bottom',
-                        end: 'bottom top',
-                        scrub: true
-                    }
-                });
-            });
+    // Hover effects para botões
+    document.querySelectorAll('.btn-animated').forEach(btn => {
+        btn.addEventListener('mouseenter', () => {
+            gsap.to(btn, { duration: 0.3, scale: 1.05, y: -3, boxShadow: '0 8px 25px rgba(0,0,0,0.15)' });
         });
-    </script>
+        btn.addEventListener('mouseleave', () => {
+            gsap.to(btn, { duration: 0.3, scale: 1, y: 0, boxShadow: '0 2px 4px rgba(0,0,0,0.1)' });
+        });
+    });
+
+    // Hover effects para linhas da tabela
+    document.querySelectorAll('.table-row').forEach(row => {
+        row.addEventListener('mouseenter', () => {
+            gsap.to(row, { duration: 0.3, backgroundColor: 'rgba(79, 70, 229, 0.05)', scale: 1.01 });
+        });
+        row.addEventListener('mouseleave', () => {
+            gsap.to(row, { duration: 0.3, backgroundColor: 'transparent', scale: 1 });
+        });
+    });
+
+    // Função de resumo filtrado
+    function updateSummary() {
+        let totalFiltrado = 0;
+        document.querySelectorAll('.table-row:not([style*="display: none"]), .mobile-card:not([style*="display: none"])')
+            .forEach(row => {
+                const valor = parseFloat(row.getAttribute('data-valor') || 0);
+                totalFiltrado += valor;
+            });
+        const totalFiltradoEl = document.getElementById('totalFiltrado');
+        if(totalFiltradoEl){
+            totalFiltradoEl.textContent = 'R$ ' + totalFiltrado.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+        }
+    }
+
+    // Filtros funcionais
+   const filterForm = document.getElementById('filterForm');
+
+function fetchResumo() {
+    const formData = new FormData(filterForm);
+    const params = new URLSearchParams(formData).toString();
+
+    fetch(`{{ route('despesas.resumo') }}?${params}`)
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('totalFiltrado').textContent = 
+                'R$ ' + parseFloat(data.total_filtrado).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+        });
+}
+
+// Aplicar filtros com delay (busca) ou onchange
+[statusFilter, categoriaFilter, document.getElementById('dataInicialFilter'), document.getElementById('dataFinalFilter')]
+.forEach(filter => {
+    if(filter){
+        filter.addEventListener('change', () => {
+            filterForm.submit(); // ou fetchResumo() se quiser sem reload
+        });
+    }
+});
+
+if(searchFilter){
+    let searchTimeout;
+    searchFilter.addEventListener('input', () => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            // filterForm.submit(); // reload
+            fetchResumo(); // AJAX
+        }, 700);
+    });
+}
+
+// Inicializar resumo ao carregar a página
+fetchResumo();
+
+
+    // Parallax sutil
+    gsap.registerPlugin(ScrollTrigger);
+    gsap.utils.toArray('.table-card, .filters-container').forEach(el => {
+        gsap.to(el, {
+            yPercent: -10,
+            ease: 'none',
+            scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: true }
+        });
+    });
+});
+</script>
+
 </x-admin.layout>
