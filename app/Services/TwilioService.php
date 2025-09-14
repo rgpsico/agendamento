@@ -35,7 +35,7 @@ class TwilioService
         $texto = "📩 Novo cliente está falando com você!\n\n";
         $texto .= "Mensagem: \"{$mensagem->conteudo}\"\n";
         $texto .= "Acesse o chat e responda em tempo real: ";
-        $texto .= url("/chat/{$mensagem->chat_id}");
+        $texto .= url("/chat/{$mensagem->conversation_id}");
 
         try {
             $telefone = $this->formatPhone($empresa->telefone);

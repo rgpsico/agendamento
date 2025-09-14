@@ -67,12 +67,13 @@ class ChatController extends Controller
     $empresa = $conversation->empresa;
     
     
-    if ($empresa && $empresa->telefone) {
-        app(\App\Services\TwilioService::class)
-            ->enviarAlertaNovaMensagem($userMessage, $empresa);
-    }
-
-    
+        if ($empresa && $empresa->telefone) {
+            $userMessage->load('conversation'); // garante que tem a conversa
+            app(\App\Services\TwilioService::class)
+                ->enviarAlertaNovaMensagem($userMessage, $empresa);
+        }
+     
+            
         // Gera resposta do bot
         $botResponseText = $this->deepSeekService->getDeepSeekResponse(
             $conversation->bot,
