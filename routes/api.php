@@ -300,3 +300,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/despesas/resumo', [DespesaController::class, 'apiResumo']);
 });
 
+
+use App\Http\Controllers\DeepSeekController;
+
+Route::post('/bots/{bot_id}/message', [DeepSeekController::class, 'sendMessage']);

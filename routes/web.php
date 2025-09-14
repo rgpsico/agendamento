@@ -21,6 +21,7 @@ use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\Api\AsaasController;
 use App\Http\Controllers\BoletoController;
 use App\Http\Controllers\BotController;
+use App\Http\Controllers\BotServiceController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ConfigController;
 use App\Http\Controllers\DashBoardController;
@@ -343,4 +344,14 @@ Route::delete('financeiro/despesas_recorrentes/{despesaRecorrente}', [DespesasRe
     Route::delete('receitas_recorrentes/{receitaRecorrente}', [ReceitaRecorrenteController::class, 'destroy'])->name('receitas_recorrentes.destroy');
 
 
+});
+
+
+Route::prefix('admin/botservice')->name('admin.botservice.')->group(function() {
+    Route::get('/', [BotServiceController::class, 'index'])->name('index');
+    Route::get('/create', [BotServiceController::class, 'create'])->name('create');
+    Route::post('/store', [BotServiceController::class, 'store'])->name('store');
+    Route::get('/{id}/edit', [BotServiceController::class, 'edit'])->name('edit');
+    Route::put('/{id}', [BotServiceController::class, 'update'])->name('update');
+    Route::delete('/{id}', [BotServiceController::class, 'destroy'])->name('destroy');
 });

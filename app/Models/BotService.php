@@ -15,6 +15,7 @@ class BotService extends Model
         'professor',
         'horario',
         'valor',
+        'servico_id'
     ];
 
     public function bot()

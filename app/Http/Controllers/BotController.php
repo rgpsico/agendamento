@@ -25,23 +25,25 @@ class BotController extends Controller
     
    public function dashboard()
     {
-       
         // Bots ativos
         $botsAtivos = Bot::where('status', true)->count();
 
         // Tokens consumidos
         $totalTokens = TokenUsage::sum('tokens_usados');
 
-        // Custo estimado (exemplo: R$ 0,002 por 1k tokens)
+        // Valor total cobrado
+        $totalCusto = TokenUsage::sum('valor_cobrado');
+
+        // Custo estimado por padrão (ex: R$ 0,002 por 1k tokens)
         $custoEstimado = ($totalTokens / 1000) * 0.002;
 
-            // Conversas de hoje
+        // Conversas de hoje
         $conversasHoje = Conversation::whereDate('created_at', today())->count();
 
         // Serviços cadastrados
         $services = BotService::all();
 
-        // Consumo nos últimos 7 dias
+        // Consumo de tokens nos últimos 7 dias
         $labels = [];
         $dataTokens = [];
         for ($i = 6; $i >= 0; $i--) {
@@ -50,9 +52,12 @@ class BotController extends Controller
             $dataTokens[] = TokenUsage::whereDate('created_at', $day)->sum('tokens_usados');
         }
 
+        
+
         return view('admin.bot.dashboard', compact(
             'botsAtivos',
             'totalTokens',
+            'totalCusto',     // novo: valor total cobrado
             'custoEstimado',
             'conversasHoje',
             'services',
@@ -60,6 +65,7 @@ class BotController extends Controller
             'dataTokens'
         ));
     }
+
 
 
     public function index() {

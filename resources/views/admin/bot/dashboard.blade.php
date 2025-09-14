@@ -9,48 +9,60 @@
 
             <div class="row">
                 <!-- Métrica 1 -->
-                <div class="col-lg-3 mb-4">
-                    <div class="card shadow">
+                <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
+                    <div class="card shadow text-center">
                         <div class="card-header">
                             <h6 class="mb-0">Bots Ativos</h6>
                         </div>
-                        <div class="card-body text-center">
+                        <div class="card-body">
                             <h2>{{ $botsAtivos }}</h2>
                         </div>
                     </div>
                 </div>
 
                 <!-- Métrica 2 -->
-                <div class="col-lg-3 mb-4">
-                    <div class="card shadow">
+                <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
+                    <div class="card shadow text-center">
                         <div class="card-header">
                             <h6 class="mb-0">Tokens Consumidos</h6>
                         </div>
-                        <div class="card-body text-center">
+                        <div class="card-body">
                             <h2>{{ number_format($totalTokens, 0, ',', '.') }}</h2>
                         </div>
                     </div>
                 </div>
 
                 <!-- Métrica 3 -->
-                <div class="col-lg-3 mb-4">
-                    <div class="card shadow">
+                <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
+                    <div class="card shadow text-center">
                         <div class="card-header">
                             <h6 class="mb-0">Custo Estimado</h6>
                         </div>
-                        <div class="card-body text-center">
+                        <div class="card-body">
                             <h2>R$ {{ number_format($custoEstimado, 2, ',', '.') }}</h2>
                         </div>
                     </div>
                 </div>
 
                 <!-- Métrica 4 -->
-                <div class="col-lg-3 mb-4">
-                    <div class="card shadow">
+                <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
+                    <div class="card shadow text-center">
+                        <div class="card-header">
+                            <h6 class="mb-0">Valor Cobrado</h6>
+                        </div>
+                        <div class="card-body">
+                            <h2>R$ {{ number_format($totalCusto ?? 0, 2, ',', '.') }}</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Métrica 5 -->
+                <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
+                    <div class="card shadow text-center">
                         <div class="card-header">
                             <h6 class="mb-0">Conversas Hoje</h6>
                         </div>
-                        <div class="card-body text-center">
+                        <div class="card-body">
                             <h2>{{ $conversasHoje }}</h2>
                         </div>
                     </div>
@@ -62,8 +74,8 @@
                 <div class="card-header">
                     <h5 class="card-title mb-0">Serviços do Bot</h5>
                 </div>
-                <div class="card-body">
-                    <table class="table table-striped">
+                <div class="card-body table-responsive">
+                    <table class="table table-striped table-bordered">
                         <thead>
                             <tr>
                                 <th>Serviço</th>
@@ -86,7 +98,7 @@
                 </div>
             </div>
 
-            <!-- Gráfico -->
+            <!-- Gráfico de Tokens -->
             <div class="card shadow mb-5">
                 <div class="card-header">
                     <h5 class="card-title mb-0">Consumo de Tokens (Últimos 7 dias)</h5>
@@ -112,10 +124,27 @@
                     data: @json($dataTokens),
                     borderWidth: 2,
                     borderColor: '#007bff',
-                    backgroundColor: 'rgba(0, 123, 255, 0.3)',
+                    backgroundColor: 'rgba(0, 123, 255, 0.2)',
                     fill: true,
                     tension: 0.4
                 }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return 'Tokens: ' + context.parsed.y.toLocaleString('pt-BR');
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
             }
         });
     </script>
