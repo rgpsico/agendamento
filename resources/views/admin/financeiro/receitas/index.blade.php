@@ -80,7 +80,9 @@
                                             @endif
                                         </td>
                                         <td>{{ $receita->pagamento->metodo_pagamento ?? '-' }}</td>
-                                        <td>{{$receita->data_recebimento ?? 'Não Pagou' }}</td>
+                                       <td>
+                                        {{ $receita->data_recebimento ? \Carbon\Carbon::parse($receita->data_vencimento)->format('d/m/Y') : '-' }}
+                                    </td>
                                      <td>
                                         {{ $receita->data_vencimento ? \Carbon\Carbon::parse($receita->data_vencimento)->format('d/m/Y') : '-' }}
                                     </td>

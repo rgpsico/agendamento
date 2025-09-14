@@ -87,7 +87,7 @@ class ReceitaController extends Controller
         'metodo_pagamento' => 'required|string',
         'status'           => 'required|in:PENDENTE,RECEBIDA',
         'data_vencimento'  => 'nullable|date',
-        'empresa_id'       => 'required|exists:empresas,id',
+        'empresa_id'       => 'required|exists:empresa,id',
     ]);
 
     $dadosReceita = [
