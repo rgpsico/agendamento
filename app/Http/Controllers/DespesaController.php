@@ -12,21 +12,38 @@ use Illuminate\Support\Facades\Auth;  // Para usuário logado
 class DespesaController extends Controller
 {
     // Listar todas as despesas (filtrado por usuário/empresa logado, com paginação)
-    public function index()
-    {
-        
-        $categorias = FinanceiroCategoria::where('tipo', 'despesa')->get();
-        $user = Auth::user();
-        $despesas = Despesas::where('usuario_id', $user->id)  // Filtra pelo usuário logado
-                          ->when($user->empresa_id, fn($q) => $q->where('empresa_id', $user->empresa_id))  // Se usuário tem empresa
-                          ->orderBy('data_vencimento', 'desc')
-                          ->paginate(15);
-        $totalDespesas = Despesas::where('usuario_id', $user->id)
-                          ->when($user->empresa_id, fn($q) => $q->where('empresa_id', $user->empresa_id))
-                          ->sum('valor');
+  public function index()
+{
+    $request = request();
+    $categorias = FinanceiroCategoria::where('tipo', 'despesa')->get();
+    $user = Auth::user();
 
-        return view('admin.financeiro.despesas.index', compact('despesas','totalDespesas','categorias'));
-    }
+    // Query base para despesas
+    $query = Despesas::where('usuario_id', $user->id)
+        ->when($user->empresa_id, fn($q) => $q->where('empresa_id', $user->empresa_id))
+        // Filtros
+        ->when($request->filled('categoria_id'), fn($q) => 
+            $q->where('categoria_id', $request->categoria_id)
+        )
+        ->when($request->filled('status'), fn($q) => 
+            $q->where('status', $request->status)
+        )
+        ->when($request->filled('data_inicio') && $request->filled('data_fim'), fn($q) => 
+            $q->whereBetween('data_vencimento', [$request->data_inicio, $request->data_fim])
+        );
+
+    // Total das despesas filtradas (soma no banco)
+    $totalDespesas = $query->sum('valor');
+
+    // Paginação
+    $despesas = $query->orderBy('data_vencimento', 'desc')
+                      ->paginate(15)
+                      ->withQueryString(); // mantém filtros na paginação
+
+    return view('admin.financeiro.despesas.index', compact('despesas', 'totalDespesas', 'categorias'));
+}
+
+
 
 
     public function apiIndex(Request $request)
