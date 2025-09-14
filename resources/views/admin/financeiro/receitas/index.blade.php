@@ -19,56 +19,69 @@
             <div class="card mb-3 shadow-sm">
                 <div class="card-body">
                     <form action="{{ route('financeiro.receitas.index') }}" method="GET" class="row g-2 align-items-end">
-                        <div class="col-md-3 col-sm-6">
-                            <label class="form-label">Aluno</label>
-                            <input type="text" name="aluno" class="form-control" placeholder="Nome do Aluno" value="{{ request('aluno') }}">
+    
+                    <div class="col-md-3 col-sm-6">
+                        <label class="form-label">Aluno</label>
+                        <input type="text" name="aluno" class="form-control" placeholder="Nome do Aluno" value="{{ request('aluno') }}">
+                    </div>
+                    
+                    <div class="col-md-3 col-sm-6">
+                        <label class="form-label">Descrição</label>
+                        <input type="text" name="descricao" class="form-control" placeholder="Descrição" value="{{ request('descricao') }}">
+                    </div>
+                    
+                    <div class="col-md-2 col-sm-6">
+                        <label class="form-label">Status</label>
+                        <select name="status" class="form-control">
+                            <option value="">Todos Status</option>
+                            <option value="RECEBIDA" {{ request('status') === 'RECEBIDA' ? 'selected' : '' }}>Recebido</option>
+                            <option value="PENDENTE" {{ request('status') === 'PENDENTE' ? 'selected' : '' }}>Pendente</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-2 col-sm-6">
+                        <label class="form-label">Método Pagamento</label>
+                        <select name="metodo_pagamento" class="form-control">
+                            <option value="">Todos Métodos</option>
+                            <option value="PRESENCIAL" {{ request('metodo_pagamento') === 'PRESENCIAL' ? 'selected' : '' }}>Presencial</option>
+                            <option value="PIX" {{ request('metodo_pagamento') === 'PIX' ? 'selected' : '' }}>Pix</option>
+                            <option value="DINHEIRO" {{ request('metodo_pagamento') === 'DINHEIRO' ? 'selected' : '' }}>Dinheiro</option>
+                            <option value="CARTAO" {{ request('metodo_pagamento') === 'CARTAO' ? 'selected' : '' }}>Cartão</option>
+                        </select>
+                    </div>
+
+                    <!-- Checkbox para ativar filtro por período -->
+                    <div class="col-md-2 col-sm-6 d-flex align-items-center mt-2">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="1" id="filtrarPeriodo" {{ request('data_inicio') || request('data_fim') ? 'checked' : '' }}>
+                            <label class="form-check-label" for="filtrarPeriodo">
+                                Filtrar por período
+                            </label>
                         </div>
-                        <div class="col-md-3 col-sm-6">
-                            <label class="form-label">Descrição</label>
-                            <input type="text" name="descricao" class="form-control" placeholder="Descrição" value="{{ request('descricao') }}">
-                        </div>
-                        <div class="col-md-2 col-sm-6">
-                            <label class="form-label">Status</label>
-                            <select name="status" class="form-control">
-                                <option value="">Todos Status</option>
-                                <option value="RECEBIDA" {{ request('status') === 'RECEBIDA' ? 'selected' : '' }}>Recebido</option>
-                                <option value="PENDENTE" {{ request('status') === 'PENDENTE' ? 'selected' : '' }}>Pendente</option>
-                            </select>
-                        </div>
-                        <div class="col-md-2 col-sm-6">
-                            <label class="form-label">Método Pagamento</label>
-                            <select name="metodo_pagamento" class="form-control">
-                                <option value="">Todos Métodos</option>
-                                <option value="PRESENCIAL" {{ request('metodo_pagamento') === 'PRESENCIAL' ? 'selected' : '' }}>Presencial</option>
-                                <option value="PIX" {{ request('metodo_pagamento') === 'PIX' ? 'selected' : '' }}>Pix</option>
-                                <option value="DINHEIRO" {{ request('metodo_pagamento') === 'DINHEIRO' ? 'selected' : '' }}>Dinheiro</option>
-                                <option value="CARTAO" {{ request('metodo_pagamento') === 'CARTAO' ? 'selected' : '' }}>Cartão</option>
-                            </select>
-                        </div>
-                        <div class="col-md-2 col-sm-6">
-                            <label class="form-label">De</label>
-                            <input type="date" name="data_inicio" class="form-control" value="{{ request('data_inicio') }}">
-                        </div>
-                        <div class="col-md-2 col-sm-6">
-                            <label class="form-label">Até</label>
-                            <input type="date" name="data_fim" class="form-control" value="{{ request('data_fim') }}">
-                        </div>
-                        <div class="col-md-2 col-sm-6 d-grid">
-                            <button type="submit" class="btn btn-primary mt-1">Filtrar</button>
-                        </div>
-                        <div class="col-md-2 col-sm-6 d-grid">
-                            <a href="{{ route('financeiro.receitas.index') }}" class="btn btn-secondary mt-1">Limpar</a>
-                        </div>
-                    </form>
+                    </div>
+
+                    <!-- Campos de datas -->
+                    <div class="col-md-2 col-sm-6 periodo-inputs" style="display: {{ request('data_inicio') || request('data_fim') ? 'block' : 'none' }};">
+                        <label class="form-label">De</label>
+                        <input type="date" name="data_inicio" class="form-control" value="{{ request('data_inicio') }}">
+                    </div>
+                    <div class="col-md-2 col-sm-6 periodo-inputs" style="display: {{ request('data_inicio') || request('data_fim') ? 'block' : 'none' }};">
+                        <label class="form-label">Até</label>
+                        <input type="date" name="data_fim" class="form-control" value="{{ request('data_fim') }}">
+                    </div>
+
+                    <div class="col-md-2 col-sm-6 d-grid">
+                        <button type="submit" class="btn btn-primary mt-1">Filtrar</button>
+                    </div>
+                    <div class="col-md-2 col-sm-6 d-grid">
+                        <a href="{{ route('financeiro.receitas.index') }}" class="btn btn-secondary mt-1">Limpar</a>
+                    </div>
+                </form>
                 </div>
             </div>
 
             <!-- Total -->
-            <div class="mb-3">
-                <h6>Total Receitas (filtro aplicado): 
-                    <strong>R$ {{ number_format($totalReceitas, 2, ',', '.') }}</strong>
-                </h6>
-            </div>
+        
 
             <!-- Tabela de Receitas -->
             <div class="card shadow-sm">
@@ -140,3 +153,13 @@
         </div>
     </div>
 </x-admin.layout>
+<script>
+    const checkbox = document.getElementById('filtrarPeriodo');
+    const periodoInputs = document.querySelectorAll('.periodo-inputs');
+
+    checkbox.addEventListener('change', () => {
+        periodoInputs.forEach(el => {
+            el.style.display = checkbox.checked ? 'block' : 'none';
+        });
+    });
+</script>
