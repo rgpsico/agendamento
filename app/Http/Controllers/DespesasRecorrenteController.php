@@ -13,9 +13,39 @@ class DespesasRecorrenteController extends Controller
      */
     public function index()
     {
-        
-        $despesas = DespesaRecorrente::with('categoria')->get();
-        return view('admin.financeiro.despesas_recorrentes.index', compact('despesas'));
+        $categorias = DespesaCategoria::all();
+        $query = DespesaRecorrente::query()->with('categoria', 'usuario', 'empresa');
+
+        if ($descricao = request('descricao')) {
+            $query->where('descricao', 'like', "%{$descricao}%");
+        }
+
+        if ($categoria = request('categoria_id')) {
+            $query->where('categoria_id', $categoria);
+        }
+
+        if ($status = request('status')) {
+            $query->where('status', $status);
+        }
+
+        if ($frequencia = request('frequencia')) {
+            $query->where('frequencia', $frequencia);
+        }
+
+        if ($data_inicio = request('data_inicio')) {
+            $query->whereDate('data_inicio', '>=', $data_inicio);
+        }
+
+        if ($data_fim = request('data_fim')) {
+            $query->whereDate('data_fim', '<=', $data_fim);
+        }
+
+        $despesas = $query->get();
+
+        // Total filtrado
+        $totalDespesas = $despesas->sum('valor');
+
+        return view('admin.financeiro.despesas_recorrentes.index', compact('despesas', 'totalDespesas', 'categorias'));
     }
 
     /**
