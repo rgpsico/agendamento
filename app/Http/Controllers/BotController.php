@@ -7,6 +7,7 @@ use App\Models\Bot;
 use App\Models\BotLog;
 use App\Models\BotService;
 use App\Models\Conversation;
+use App\Models\Empresa;
 use App\Models\Servicos;
 use App\Models\TokenUsage;
 use App\Services\DeepSeekService;
@@ -83,10 +84,29 @@ class BotController extends Controller
         return redirect()->route('admin.bot.index')->with('success', 'Bot criado com sucesso!');
     }
 
-        public function tokens() {
-            $usage = TokenUsage::with('bot')->get();         
-            return view('admin.bot.tokens', compact('usage'));
+    public function tokens(Request $request)
+    {
+        $query = TokenUsage::with(['bot', 'empresa']);
+
+        // Filtro por Bot
+        if ($request->filled('bot_id')) {
+            $query->where('bot_id', $request->bot_id);
         }
+
+        // Filtro por Empresa
+        if ($request->filled('empresa_id')) {
+            $query->where('empresa_id', $request->empresa_id);
+        }
+
+        // Paginação
+        $TokenUsage = $query->orderBy('created_at', 'desc')->paginate(20);
+
+        // Para filtros, também precisamos enviar bots e empresas para o select
+        $bots = Bot::where('status', true)->get();
+        $empresas = Empresa::all();
+
+        return view('admin.bot.tokens', compact('TokenUsage', 'bots', 'empresas'));
+    }
 
         public function logs() {
             $logs = BotLog::with('bot')->get();
