@@ -57,7 +57,8 @@
                                     <th>Valor</th>
                                     <th>Status</th>
                                     <th>Método</th>
-                                    <th>Data</th>
+                                    <th>Data Recebimento</th>
+                                    <th>Data Vencto</th>
                                     <th class="text-center">Ações</th>
                                 </tr>
                             </thead>
@@ -79,7 +80,10 @@
                                             @endif
                                         </td>
                                         <td>{{ $receita->pagamento->metodo_pagamento ?? '-' }}</td>
-                                        <td>{{ \Carbon\Carbon::parse($receita->data_recebimento ?? $receita->created_at)->format('d/m/Y H:i') }}</td>
+                                        <td>{{$receita->data_recebimento ?? 'Não Pagou' }}</td>
+                                     <td>
+                                        {{ $receita->data_vencimento ? \Carbon\Carbon::parse($receita->data_vencimento)->format('d/m/Y') : '-' }}
+                                    </td>
 
                                         <td class="text-center">
                                             <div class="d-flex flex-wrap gap-2 justify-content-center">

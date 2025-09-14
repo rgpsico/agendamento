@@ -19,12 +19,16 @@ class Receita extends Model
         'categoria_id',
         'usuario_id',
         'status',
-        'empresa_id'
+        'empresa_id',
+        'data_recebimento',
+        'data_vencimento'
     ];
 
-    protected $casts = [
-        'data' => 'datetime',
-    ];
+ protected $casts = [
+    'data' => 'datetime',
+    'data_vencimento' => 'datetime',
+    'data_recebimento' => 'datetime',
+];
 
     // Relacionamentos necessários
     public function categoria()

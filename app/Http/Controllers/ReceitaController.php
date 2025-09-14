@@ -79,39 +79,37 @@ class ReceitaController extends Controller
      * Salvar nova receita manual.
      */
     public function store(Request $request)
-    {
-        $request->validate([
-            'aluno_id'          => 'required|exists:alunos,id',
-            'agendamento_id'    => 'nullable|exists:agendamentos,id',
-            'valor'             => 'required|numeric|min:0',
-            'metodo_pagamento'  => 'required|string',
-            'status'            => 'required|in:PENDENTE,RECEBIDA',
-            'data_vencimento'   => 'nullable|date',
-            'empresa_id'        => 'required|exists:empresa,id',
-        ]);
+{
+    $request->validate([
+        'aluno_id'         => 'required|exists:alunos,id',
+     
+        'valor'            => 'required|numeric|min:0',
+        'metodo_pagamento' => 'required|string',
+        'status'           => 'required|in:PENDENTE,RECEBIDA',
+        'data_vencimento'  => 'nullable|date',
+        'empresa_id'       => 'required|exists:empresas,id',
+    ]);
 
-   
+    $dadosReceita = [
+        'descricao'        => 'Pagamento da aula',
+        'valor'            => $request->valor,
+        'data'             => now(), // data de lançamento
+        'data_vencimento'  => $request->data_vencimento, // vencimento
+        'categoria_id'     => null, // ajustar se tiver categorias
+        'usuario_id'       => auth()->id(),
+        'status'           => $request->status,
+        'empresa_id'       => $request->empresa_id,     
+        'aluno_id'         => $request->aluno_id,
+        'metodo_pagamento' => $request->metodo_pagamento,
+        'pagamento_id'     => null, 
+    ];
 
-        $dadosReceita = [
-            'descricao'      => 'Pagamento da aula', // ou personalize como quiser
-            'valor'          => $request->valor,
-            'data'           => $request->data_vencimento ?? now(),
-            'categoria_id'   => null, // se quiser, pode ter select de categoria
-            'usuario_id'     => auth()->id(),
-            'status'         => $request->status,
-            'empresa_id'     => auth()->user()->empresa_id ?? null,
-            'agendamento_id' => $request->agendamento_id,
-            'aluno_id'       => $request->aluno_id,
-            'metodo_pagamento' => $request->metodo_pagamento,
-            'pagamento_id'   => null, // ou vincule a um pagamento existente, se aplicável
-            'empresa_id'     => $request->empresa_id
-        ];
+    $this->receitaService->lancarReceitaManual($dadosReceita);
 
-        $this->receitaService->lancarReceitaManual($dadosReceita);
+    return redirect()->route('financeiro.receitas.index')
+        ->with('success', 'Receita lançada com sucesso!');
+}
 
-        return redirect()->route('financeiro.receitas.index')
-                        ->with('success', 'Receita lançada com sucesso!');
-    }
 
 
     /**
@@ -130,22 +128,34 @@ class ReceitaController extends Controller
      * Atualizar receita.
      */
     public function update(Request $request, $id)
-    {        
-     
+    {
         $request->validate([
-            'valor' => 'required|numeric|min:0',
-            'status' => 'required|in:PENDENTE,RECEBIDA',
+            'descricao'        => 'nullable|string|max:255',
+            'valor'            => 'required|numeric|min:0',
+            'status'           => 'required|in:PENDENTE,RECEBIDA',
             'metodo_pagamento' => 'required|string',
-            'data_vencimento' => 'nullable|date',
-            'empresa_id'        => 'required|exists:empresa,id',
-            'categoria_id' => 'nullable|exists:financeiro_categorias,id'
+            'data_vencimento'  => 'nullable|date',
+            'empresa_id'       => 'required|exists:empresa,id',
+            'categoria_id'     => 'nullable|exists:financeiro_categorias,id'
         ]);
 
-        $this->receitaService->atualizarReceita($id, $request->only(['valor', 'status', 'metodo_pagamento', 'data_vencimento', 'categoria_id','empresa_id']));
+        $this->receitaService->atualizarReceita(
+            $id,
+            $request->only([
+                'descricao',
+                'valor',
+                'status',
+                'metodo_pagamento',
+                'data_vencimento',
+                'categoria_id',
+                'empresa_id'
+            ])
+        );
 
         return redirect()->route('financeiro.receitas.index')
             ->with('success', 'Receita atualizada com sucesso!');
     }
+
 
     /**
      * Excluir receita.
