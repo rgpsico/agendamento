@@ -30,6 +30,23 @@ class TwilioService
         );
     }
 
+    public function enviarAlertaNovaMensagem($mensagem, $empresa)
+    {
+        $texto = "📩 Novo cliente está falando com você!\n\n";
+        $texto .= "Mensagem: \"{$mensagem->conteudo}\"\n";
+        $texto .= "Acesse o chat e responda em tempo real: ";
+        $texto .= url("/chat/{$mensagem->chat_id}");
+
+        try {
+            $telefone = $this->formatPhone($empresa->telefone);
+            $this->sendWhatsApp($telefone, $texto);
+
+        } catch (\Exception $e) {
+            \Log::error('Erro ao enviar alerta de mensagem: ' . $e->getMessage());
+        }
+    }
+
+
     public function enviarConfirmacaoAgendamento($agendamento, $pagamento)
     {
 

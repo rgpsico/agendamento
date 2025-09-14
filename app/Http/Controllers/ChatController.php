@@ -62,6 +62,15 @@ class ChatController extends Controller
             'body' => $cleanUserMessage 
         ]);
 
+
+        
+$empresa = $conversation->empresa;
+    if ($empresa && $empresa->telefone) {
+        app(\App\Services\TwilioService::class)
+            ->enviarAlertaNovaMensagem($userMessage, $empresa);
+    }
+
+    
         // Gera resposta do bot
         $botResponseText = $this->deepSeekService->getDeepSeekResponse(
             $conversation->bot,
@@ -92,6 +101,24 @@ class ChatController extends Controller
     // Mantém letras, números, pontuação básica e espaços
     return preg_replace('/[^\p{L}\p{N}\p{P}\p{Z}]/u', '', $message);
 }
+
+    public function chat(Request $request, $conversationId = null)
+    {
+        // Busca a conversa ou cria uma nova
+        if ($conversationId) {
+            $conversation = Conversation::with('messages')->findOrFail($conversationId);
+        } else {
+            $conversation = null;
+        }
+
+        // Carrega os bots disponíveis (caso queira permitir escolher)
+        $bots = Bot::all();
+
+        return view('admin.chat.index', [
+            'conversation' => $conversation,
+            'bots' => $bots,
+        ]);
+    }
 
 
 }

@@ -241,6 +241,8 @@ Route::post('/admin/bot/{bot}/chat', [BotController::class, 'chat'])->name('admi
 
 Route::post('/chat/store', [ChatController::class, 'store'])->name('chat.store')->middleware('auth');
 
+Route::get('/chat/{conversationId?}', [ChatController::class, 'chat'])->name('chat.index');
+
 
 use App\Http\Controllers\VirtualHostController;
 
