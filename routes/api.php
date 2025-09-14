@@ -194,6 +194,7 @@ use App\Http\Controllers\Api\SiteDepoimentoControllerApi;
 use App\Http\Controllers\Api\SiteServicoController;
 use App\Http\Controllers\Api\SiteServicoControllerApi;
 use App\Http\Controllers\BotController;
+use App\Http\Controllers\DespesaController;
 
 Route::middleware('auth:sanctum')->prefix('site')->group(function () {
     Route::get('depoimentos', [SiteDepoimentoControllerApi::class, 'index']);
@@ -293,3 +294,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('siteservicos', SiteServicoControllerApi::class);
     Route::post('siteservicos/store', [SiteServicoControllerApi::class, 'store']);
 });
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/despesas', [DespesaController::class, 'apiIndex']);
+    Route::get('/despesas/resumo', [DespesaController::class, 'apiResumo']);
+});
+
