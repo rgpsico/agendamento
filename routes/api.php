@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Admin\ConversationController;
+use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\AlunosController;
 use App\Http\Controllers\Api\AgendamentoControllerApi;
 use App\Http\Controllers\Api\AlunosControllerApi;
@@ -285,7 +285,7 @@ Route::post('bot/{botId}/interact', [BotController::class, 'interact'])->name('b
 Route::post('/bots/{bot}/chat', [BotController::class, 'chat']);
 
 
-// Route::get('/conversations/{id}', [ConversationController::class, 'showapi']);
+ Route::get('/conversations/{id}', [ConversationController::class, 'showapi']);
 
 Route::post('/fill-site-fields', [BotController::class, 'fillSiteFields'])->name('fill.site.fields');
 
