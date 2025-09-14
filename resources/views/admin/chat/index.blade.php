@@ -10,9 +10,21 @@
                     <!-- Caixa do chat -->
                     <div id="chat-box" class="border rounded p-3 mb-3" 
                          style="height: 400px; overflow-y: auto; background-color: #f9f9f9;">
-                        <div id="messages">
-                            <!-- As mensagens serão carregadas aqui -->
-                        </div>
+                      <div id="messages">
+                    @if($conversation && $conversation->messages)
+                        @foreach($conversation->messages as $message)
+                            @if($message->from === 'user')
+                                <div class="text-end mb-2">
+                                    <span class="badge bg-primary">{{ $message->body }}</span>
+                                </div>
+                            @else
+                                <div class="text-start mb-2">
+                                    <span class="badge bg-secondary">{{ $message->body }}</span>
+                                </div>
+                            @endif
+                        @endforeach
+                    @endif
+                </div>
                     </div>
 
                     <!-- Formulário -->
