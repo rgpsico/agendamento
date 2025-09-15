@@ -112,6 +112,7 @@
 
 <script>
 $(document).ready(function() {
+    alert('aaaa')
     let conversationId = null;
     let isOpen = false;
     let isMinimized = false;
