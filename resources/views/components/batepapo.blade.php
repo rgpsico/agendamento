@@ -112,7 +112,7 @@
 
 <script>
 $(document).ready(function() {
-    alert('aaaa')
+   
     let conversationId = null;
     let isOpen = false;
     let isMinimized = false;
@@ -353,7 +353,7 @@ $(document).ready(function() {
         if (!message) return;
 
         // Mostrar mensagem do usuário imediatamente
-        appendMessage('user', message);
+       // appendMessage('user', message);
         $('#chatbot-input').val('');
         showBotTyping();
 
