@@ -173,7 +173,7 @@
                                         </td>
                                         <td class="text-center">
                                             <div class="action-buttons">
-                                                <a href="{{ route('admin.conversations.show', $conversa->id) }}" 
+                                                <a href="{{ route('chat.index', $conversa->id) }}" 
                                                    class="btn btn-sm btn-primary action-btn">
                                                     <i class="fas fa-eye me-1"></i>Ver
                                                 </a>
