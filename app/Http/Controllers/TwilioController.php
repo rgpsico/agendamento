@@ -7,6 +7,8 @@ use App\Services\TwilioService;
 
 class TwilioController extends Controller
 {
+
+
     public function sendWhatsApp(Request $request, TwilioService $twilioService)
     {
         $request->validate([
@@ -14,7 +16,7 @@ class TwilioController extends Controller
             'message' => 'required|string',
         ]);
 
-        $twilioService->sendWhatsAppMessage($request->to, $request->message);
+         app(\App\Services\TwilioService::class)->sendWhatsApp($request->to, $request->message);
 
         return response()->json([
             'status' => 'success',
