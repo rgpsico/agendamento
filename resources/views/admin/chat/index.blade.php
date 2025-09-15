@@ -103,7 +103,7 @@
                 });
 
                 // Opcional: salvar no backend via AJAX
-                fetch("{{ route('chat.store') }}", {
+                fetch("{{ route('chat.enviarparabatepaposite') }}", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",

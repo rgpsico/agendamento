@@ -241,6 +241,9 @@ Route::post('/admin/bot/{bot}/chat', [BotController::class, 'chat'])->name('admi
 
 Route::post('/chat/store', [ChatController::class, 'store'])->name('chat.store');
 
+Route::post('/chat/enviarparabatepaposite', [ChatController::class, 'enviarparabatepaposite'])->name('chat.enviarparabatepaposite');
+
+
 Route::get('/chat/{conversationId?}', [ChatController::class, 'chat'])->name('chat.index');
 
 
