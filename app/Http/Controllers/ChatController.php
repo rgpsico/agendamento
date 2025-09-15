@@ -147,11 +147,7 @@ class ChatController extends Controller
             'body' => $cleanUserMessage 
         ]);
 
-    Http::post('https://www.comunidadeppg.com.br:3000/chatmessage', [
-                    'conversation_id' => $request->conversation_id,
-                    'user_id' => $userId ?? 'guest',
-                    'mensagem' => $cleanUserMessage,
-                ]);
+  
 
         
         $empresa = $conversation->empresa;
@@ -184,6 +180,11 @@ class ChatController extends Controller
             'body' =>  $request->mensagem
         ]);
 
+          Http::post('https://www.comunidadeppg.com.br:3000/chatmessage', [
+                    'conversation_id' => $request->conversation_id,
+                    'user_id' => $userId ?? 'guest',
+                    'mensagem' => $cleanUserMessage,
+                ]);
         
 
 
