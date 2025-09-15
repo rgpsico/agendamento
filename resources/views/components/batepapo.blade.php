@@ -353,7 +353,7 @@ $(document).ready(function() {
         if (!message) return;
 
         // Mostrar mensagem do usuário imediatamente
-       // appendMessage('user', message);
+        appendMessage('user', message);
         $('#chatbot-input').val('');
         showBotTyping();
 
