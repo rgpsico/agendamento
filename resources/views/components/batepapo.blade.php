@@ -1,18 +1,21 @@
 <style>
-    .chatbot-float-btn {
+    /* .chatbot-float-btn {
         position: fixed;
         bottom: 100px; /* antes era 20px */
         right: 20px;
         /* resto igual */
-    }
+        background: red;
+     */
 
     .chatbot-container {
         position: fixed;
         bottom: 100px; /* antes era 20px */
-        right: 90px;
+        right: 0;
         /* resto igual */
     }
 </style>
+
+@include('components.style.chatstyle')
 
 <!-- Chatbot Float Button -->
 <div class="chatbot-float-btn" id="chatbot-float-btn" style="margin-right:7em;">
@@ -557,4 +560,3 @@ $(document).ready(function() {
 });
 </script>
 
-@include('components.style.chatstyle')

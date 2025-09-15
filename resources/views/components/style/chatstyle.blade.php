@@ -1,4 +1,3 @@
-
 <style>
 /* Chatbot Styles */
 .chatbot-float-btn {
@@ -389,18 +388,29 @@
 
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
+    .chatbot-float-btn{    
+        left: 20px;   /* Fica no lado esquerdo */
+        bottom:0%;
+        z-index: 1000;
+        right: auto;  /* Remove fixação à direita */
+   
+ 
+
+    }
     .chatbot-container {
-        bottom: 0;
-        right: 0;
-        left: 0;
-        width: 100%;
-        height: 100vh;
-        border-radius: 0;
+        bottom: 10px;
+        left: 20px;   /* Fica no lado esquerdo */
+        right: auto;  /* Remove fixação à direita */
+        width: 90%;   /* Ajuste proporcional */
+        height: 80vh; /* Evita ocupar tela toda */
+        border-radius: 12px;
         max-height: none;
+        background: red;
     }
     
     .chatbot-float-btn {
-        bottom: 80px; /* Above mobile navigation if present */
+        bottom: 80px;
+        right: 20px; /* Mantém botão no lado direito */
     }
     
     .chatbot-overlay {
