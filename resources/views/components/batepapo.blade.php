@@ -322,8 +322,8 @@ $(document).ready(function() {
             console.log('Conectado ao servidor Socket.IO.');
         });
 
-        socket.on('chatmessage' + convId, (data) => {
-            console.log('Mensagem recebida:', data);
+        socket.on('enviarparaosass' + convId, (data) => {
+            console.log('Mensagem recebida enviarparaosass:', data);
             hideBotTyping();
             appendMessage(data.from, data.mensagem);
         });
