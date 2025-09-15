@@ -26,6 +26,53 @@ class ChatController extends Controller
     }
 
 
+    public function updateControl(Request $request)
+    {
+        $request->validate([
+            'conversation_id' => 'required|integer',
+            'human_control' => 'required|boolean'
+        ]);
+
+        try {
+            // Buscar a conversa
+            $conversation = Conversation::findOrFail($request->conversation_id);
+            
+            // Atualizar o campo de controle
+            $conversation->update([
+                'human_controlled' => $request->human_control,
+                'controlled_by' => $request->human_control ? auth()->id() : null,
+                'control_changed_at' => now()
+            ]);
+
+            // Log da mudança para auditoria
+            \Log::info('Controle de conversa alterado', [
+                'conversation_id' => $conversation->id,
+                'human_controlled' => $request->human_control,
+                'user_id' => auth()->id(),
+                'timestamp' => now()
+            ]);
+
+            // Opcional: Enviar notificação via Socket.IO para outros usuários
+            // $this->notifyControlChange($conversation->id, $request->human_control);
+
+            return response()->json([
+                'success' => true,
+                'message' => $request->human_control ? 'Controle transferido para humano' : 'Controle transferido para bot',
+                'human_controlled' => $request->human_control,
+                'controlled_by' => $request->human_control ? auth()->user()->name : 'Bot'
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Erro ao atualizar controle de conversa: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro interno do servidor'
+            ], 500);
+        }
+    }
+
+
     public function enviarparabatepaposite(Request $request)
     {
         $request->validate([
@@ -161,35 +208,35 @@ class ChatController extends Controller
      
             
         // Gera resposta do bot
-        $botResponseText = $this->deepSeekService->getDeepSeekResponse(
-            $conversation->bot,
-            $request->mensagem,
-            $conversation->empresa_id
-        );
+        // $botResponseText = $this->deepSeekService->getDeepSeekResponse(
+        //     $conversation->bot,
+        //     $request->mensagem,
+        //     $conversation->empresa_id
+        // );
 
 
 
-        $respostaboot = $this->sanitizeMessage($botResponseText);
+        // $respostaboot = $this->sanitizeMessage($botResponseText);
         // Salva a resposta do bot
         $botMessage = Message::create([
             'from' => 'bot',
             'to' => 'user',
             'conversation_id' => $conversation->id,
               'role' => 'assistant',
-            'body' =>  $respostaboot
+            'body' =>  $request->mensagem
         ]);
 
         
-          Http::post('https://www.comunidadeppg.com.br:3000/enviarparaosass', [
+          Http::post('https://www.comunidadeppg.com.br:3000/chatmessage', [
                     'conversation_id' => $request->conversation_id,
                     'user_id' => $userId ?? 'guest',
-                    'mensagem' => $respostaboot,
+                    'mensagem' =>$request->mensagem,
                 ]);
         
 
         return response()->json([
             'conversation_id' => $conversation->id,
-            'bot_response' =>  $respostaboot,
+            'bot_response' => $request->mensagem,
         ]);
     }
 

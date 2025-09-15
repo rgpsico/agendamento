@@ -246,6 +246,8 @@ Route::post('/chat/enviarparabatepaposite', [ChatController::class, 'enviarparab
 
 Route::get('/chat/{conversationId?}', [ChatController::class, 'chat'])->name('chat.index');
 
+   Route::post('/chat/update-control', [ChatController::class, 'updateControl'])
+         ->name('chat.updateControl');
 
 use App\Http\Controllers\VirtualHostController;
 
