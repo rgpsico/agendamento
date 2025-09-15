@@ -239,7 +239,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
 Route::post('/admin/bot/{bot}/chat', [BotController::class, 'chat'])->name('admin.bot.chat');
 
-Route::post('/chat/store', [ChatController::class, 'store'])->name('chat.store')->middleware('auth');
+Route::post('/chat/store', [ChatController::class, 'store'])->name('chat.store');
 
 Route::get('/chat/{conversationId?}', [ChatController::class, 'chat'])->name('chat.index');
 

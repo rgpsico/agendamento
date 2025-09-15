@@ -57,14 +57,19 @@ class ChatController extends Controller
         $userMessage = Message::create([
             'from' => 'user',
             'to' => 'bot',
-            'conversation_id' => $conversation->id,
+            'conversation_id' => $request->conversation_id,
             'role' => 'user',
             'body' => $cleanUserMessage 
         ]);
 
+    Http::post('https://www.comunidadeppg.com.br:3000/chatmessage', [
+                    'conversation_id' => $request->conversation_id,
+                    'user_id' => $userId ?? 'guest',
+                    'mensagem' => $cleanUserMessage,
+                ]);
 
         
-    $empresa = $conversation->empresa;
+        $empresa = $conversation->empresa;
     
     
         if ($empresa && $empresa->telefone) {
@@ -75,28 +80,31 @@ class ChatController extends Controller
      
             
         // Gera resposta do bot
-        $botResponseText = $this->deepSeekService->getDeepSeekResponse(
-            $conversation->bot,
-            $request->mensagem,
-            $conversation->empresa_id
-        );
+        // $botResponseText = $this->deepSeekService->getDeepSeekResponse(
+        //     $conversation->bot,
+        //     $request->mensagem,
+        //     $conversation->empresa_id
+        // );
 
 
 
-        $respostaboot = $this->sanitizeMessage($botResponseText);
+       
+        // $respostaboot = $this->sanitizeMessage($botResponseText);
         // Salva a resposta do bot
         $botMessage = Message::create([
             'from' => 'bot',
             'to' => 'user',
             'conversation_id' => $conversation->id,
               'role' => 'assistant',
-            'body' =>  $respostaboot
+            'body' =>  $request->mensagem
         ]);
+
+        
 
 
         return response()->json([
             'conversation_id' => $conversation->id,
-            'bot_response' =>  $respostaboot,
+            'bot_response' =>  $request->mensagem,
         ]);
     }
 

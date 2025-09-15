@@ -10,27 +10,27 @@
                     <!-- Caixa do chat -->
                     <div id="chat-box" class="border rounded p-3 mb-3" 
                          style="height: 400px; overflow-y: auto; background-color: #f9f9f9;">
-                      <div id="messages">
-                    @if($conversation && $conversation->messages)
-                        @foreach($conversation->messages as $message)
-                            @if($message->from === 'user')
-                                <div class="text-end mb-2">
-                                    <span class="badge bg-primary">{{ $message->body }}</span>
-                                </div>
-                            @else
-                                <div class="text-start mb-2">
-                                    <span class="badge bg-secondary">{{ $message->body }}</span>
-                                </div>
+                        <div id="messages">
+                            @if($conversation && $conversation->messages)
+                                @foreach($conversation->messages as $message)
+                                    @if($message->from === 'user')
+                                        <div class="text-end mb-2">
+                                            <span class="badge bg-primary">{{ $message->body }}</span>
+                                        </div>
+                                    @else
+                                        <div class="text-start mb-2">
+                                            <span class="badge bg-secondary">{{ $message->body }}</span>
+                                        </div>
+                                    @endif
+                                @endforeach
                             @endif
-                        @endforeach
-                    @endif
-                </div>
+                        </div>
                     </div>
 
                     <!-- Formulário -->
                     <form id="chat-form">
                         @csrf
-                        <input type="hidden" id="conversation_id" name="conversation_id">
+                        <input type="hidden" id="conversation_id" name="conversation_id" value="{{ $conversation->id ?? '' }}">
                         <div class="input-group">
                             <input type="text" id="mensagem" name="mensagem" class="form-control" 
                                    placeholder="Digite sua mensagem..." required>
@@ -45,32 +45,65 @@
         </div>
     </div>
 
-    <!-- Script para AJAX -->
+    <!-- Socket.IO -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
+
     <script>
-        const chatForm = document.getElementById('chat-form');
-        const chatBox = document.getElementById('chat-box');
-        const messagesDiv = document.getElementById('messages');
-        const conversationInput = document.getElementById('conversation_id');
+        $(document).ready(function() {
+            const socket = io('https://www.comunidadeppg.com.br:3000');
 
-        chatForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
+            const conversation_id = $('#conversation_id').val();
+            const messagesDiv = $('#messages');
+            const chatBox = $('#chat-box');
 
-            let mensagem = document.getElementById('mensagem').value;
-            let conversation_id = conversationInput.value;
+            console.log('ID da conversa:', conversation_id);
 
-            // Mostra a mensagem do usuário na tela
-            messagesDiv.innerHTML += `
-                <div class="text-end mb-2">
-                    <span class="badge bg-primary">${mensagem}</span>
-                </div>
-            `;
-            chatBox.scrollTop = chatBox.scrollHeight;
+            // Conexão
+            socket.on('connect', () => {
+                console.log('Conectado ao servidor Socket.IO.');
+            });
 
-            // Limpa o campo
-            document.getElementById('mensagem').value = "";
+            // Receber mensagens em tempo real
+            socket.on('chatmessage' + conversation_id, (data) => {
+                console.log('Mensagem recebida:', data);
 
-            try {
-                let response = await fetch("{{ route('chat.store') }}", {
+                const align = data.from === 'user' ? 'text-end' : 'text-start';
+                const badge = data.from === 'user' ? 'bg-primary' : 'bg-secondary';
+
+                messagesDiv.append(`
+                    <div class="${align} mb-2">
+                        <span class="badge ${badge}">${data.mensagem}</span>
+                    </div>
+                `);
+                chatBox.scrollTop(chatBox[0].scrollHeight);
+            });
+
+            // Enviar mensagem
+            $('#chat-form').submit((e) => {
+                e.preventDefault();
+
+                const mensagem = $('#mensagem').val();
+                if (!mensagem) return;
+
+                // Mostra imediatamente no chat
+                messagesDiv.append(`
+                    <div class="text-end mb-2">
+                        <span class="badge bg-primary">${mensagem}</span>
+                    </div>
+                `);
+                chatBox.scrollTop(chatBox[0].scrollHeight);
+                $('#mensagem').val('');
+
+                // Emite para o servidor via Socket.IO
+                socket.emit('chatmessage', {
+                    conversation_id: conversation_id,
+                    user_id: '{{ auth()->id() ?? "guest" }}',
+                    from: 'user',
+                    mensagem: mensagem
+                });
+
+                // Opcional: salvar no backend via AJAX
+                fetch("{{ route('chat.store') }}", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -80,26 +113,14 @@
                         mensagem: mensagem,
                         conversation_id: conversation_id
                     })
-                });
+                }).then(res => res.json())
+                  .then(data => console.log('Mensagem salva no backend:', data))
+                  .catch(err => console.error('Erro ao salvar mensagem:', err));
+            });
 
-                let data = await response.json();
-
-                // Atualiza o conversation_id se for a primeira mensagem
-                if (!conversationInput.value) {
-                    conversationInput.value = data.conversation_id;
-                }
-
-                // Exibe a resposta do bot
-                messagesDiv.innerHTML += `
-                    <div class="text-start mb-2">
-                        <span class="badge bg-secondary">${data.bot_response}</span>
-                    </div>
-                `;
-                chatBox.scrollTop = chatBox.scrollHeight;
-
-            } catch (error) {
-                console.error("Erro no chat:", error);
-            }
+            socket.on('disconnect', () => {
+                console.log('Desconectado do servidor Socket.IO.');
+            });
         });
     </script>
 </x-admin.layout>
