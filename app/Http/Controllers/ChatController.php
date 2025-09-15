@@ -161,36 +161,35 @@ class ChatController extends Controller
      
             
         // Gera resposta do bot
-        // $botResponseText = $this->deepSeekService->getDeepSeekResponse(
-        //     $conversation->bot,
-        //     $request->mensagem,
-        //     $conversation->empresa_id
-        // );
+        $botResponseText = $this->deepSeekService->getDeepSeekResponse(
+            $conversation->bot,
+            $request->mensagem,
+            $conversation->empresa_id
+        );
 
 
 
-       
-        // $respostaboot = $this->sanitizeMessage($botResponseText);
+        $respostaboot = $this->sanitizeMessage($botResponseText);
         // Salva a resposta do bot
         $botMessage = Message::create([
             'from' => 'bot',
             'to' => 'user',
             'conversation_id' => $conversation->id,
               'role' => 'assistant',
-            'body' =>  $request->mensagem
+            'body' =>  $respostaboot
         ]);
 
-          Http::post('https://www.comunidadeppg.com.br:3000/chatmessage', [
+        
+          Http::post('https://www.comunidadeppg.com.br:3000/enviarparaosass', [
                     'conversation_id' => $request->conversation_id,
                     'user_id' => $userId ?? 'guest',
-                    'mensagem' => $cleanUserMessage,
+                    'mensagem' => $respostaboot,
                 ]);
         
 
-
         return response()->json([
             'conversation_id' => $conversation->id,
-            'bot_response' =>  $request->mensagem,
+            'bot_response' =>  $respostaboot,
         ]);
     }
 
