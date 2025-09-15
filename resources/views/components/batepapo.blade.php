@@ -371,10 +371,10 @@ $(document).ready(function() {
                 _token: '{{ csrf_token() }}'
             },
             success: function(response) {
-                setTimeout(() => {
-                    hideBotTyping();
-                    // appendMessage('bot', response.bot_response || 'Entendido! Como posso ajudar mais?');
-                }, 1500);
+                // setTimeout(() => {
+                //     hideBotTyping();
+                //     // appendMessage('bot', response.bot_response || 'Entendido! Como posso ajudar mais?');
+                // }, 1500);
             },
             error: function() {
                 hideBotTyping();
