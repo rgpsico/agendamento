@@ -9,7 +9,7 @@ class EmpresaPlano extends Model
 {
     use HasFactory;
 
-    protected $table = 'empresa_plano'; // nome da tabela
+    protected $table = 'empresa_planos'; // nome da tabela
 
     // Campos que podem ser preenchidos em massa
     protected $fillable = [
@@ -18,6 +18,17 @@ class EmpresaPlano extends Model
         'status',        // ativo, cancelado, trial, etc
         'data_inicio',
         'data_fim',
+        'valor'
+    ];
+
+    
+  
+
+     protected $dates = ['data_inicio', 'data_fim'];
+
+       protected $casts = [
+        'data_inicio' => 'datetime',
+        'data_fim'    => 'datetime',
     ];
 
     // Relacionamentos

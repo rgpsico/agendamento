@@ -115,6 +115,7 @@
                                 <ul>                      
                                     <li><a href="{{ route('admin.planos.index') }}">Listar Planos</a></li>
                                     <li><a href="{{ route('admin.planos.create') }}">Cadastrar Plano</a></li>
+                                  <li><a href="{{ route('admin.empresas.planos.index',  Auth::user()->empresa->id ) }}">🏢 Plano da Empresa</a></li>
                                 </ul>
                             </li>
 

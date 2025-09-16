@@ -375,3 +375,11 @@ Route::get('planos/{plano}', [PlanoController::class, 'show'])->name('admin.plan
 Route::get('planos/{plano}/edit', [PlanoController::class, 'edit'])->name('admin.planos.edit');
 Route::put('planos/{plano}', [PlanoController::class, 'update'])->name('admin.planos.update');
 Route::delete('planos/{plano}', [PlanoController::class, 'destroy'])->name('admin.planos.destroy');
+
+
+use App\Http\Controllers\EmpresaPlanoController;
+
+Route::prefix('admin/empresas/{empresa}')->group(function () {
+    Route::get('planos', [EmpresaPlanoController::class, 'index'])->name('admin.empresas.planos.index');
+    Route::post('planos', [EmpresaPlanoController::class, 'store'])->name('admin.empresas.planos.store');
+});
