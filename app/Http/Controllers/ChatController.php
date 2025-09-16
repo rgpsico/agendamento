@@ -208,7 +208,7 @@ class ChatController extends Controller
                 ->enviarAlertaNovaMensagem($request->conversation_id, $userMessage, $empresa);
              }
      
-            
+           
         // Gera resposta do bot
         // $botResponseText = $this->deepSeekService->getDeepSeekResponse(
         //     $conversation->bot,
