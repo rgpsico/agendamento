@@ -30,12 +30,12 @@ class TwilioService
         );
     }
 
-    public function enviarAlertaNovaMensagem($mensagem, $empresa)
+    public function enviarAlertaNovaMensagem($conversation_id,$mensagem, $empresa)
     {
         $texto = "📩 Novo cliente está falando com você!\n\n";
         $texto .= "Mensagem: \"{$mensagem->conteudo}\"\n";
         $texto .= "Acesse o chat e responda em tempo real: ";
-        $texto .= url("/chat/{$mensagem->conversation_id}");
+        $texto .= url("/chat/{$conversation_id}");
 
         try {
             $telefone = $this->formatPhone($empresa->telefone);

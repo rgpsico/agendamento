@@ -202,9 +202,11 @@ class ChatController extends Controller
     
         if ($empresa && $empresa->telefone) {
             $userMessage->load('conversation'); // garante que tem a conversa
+
+            
             app(\App\Services\TwilioService::class)
-                ->enviarAlertaNovaMensagem($userMessage, $empresa);
-        }
+                ->enviarAlertaNovaMensagem($request->conversation_id, $userMessage, $empresa);
+             }
      
             
         // Gera resposta do bot
