@@ -362,3 +362,16 @@ Route::prefix('admin/botservice')->name('admin.botservice.')->group(function() {
     Route::put('/{id}', [BotServiceController::class, 'update'])->name('update');
     Route::delete('/{id}', [BotServiceController::class, 'destroy'])->name('destroy');
 });
+
+
+
+use App\Http\Controllers\PlanoController;
+
+
+Route::get('planos', [PlanoController::class, 'index'])->name('admin.planos.index');
+Route::get('planos/create', [PlanoController::class, 'create'])->name('admin.planos.create');
+Route::post('planos', [PlanoController::class, 'store'])->name('admin.planos.store');
+Route::get('planos/{plano}', [PlanoController::class, 'show'])->name('admin.planos.show');
+Route::get('planos/{plano}/edit', [PlanoController::class, 'edit'])->name('admin.planos.edit');
+Route::put('planos/{plano}', [PlanoController::class, 'update'])->name('admin.planos.update');
+Route::delete('planos/{plano}', [PlanoController::class, 'destroy'])->name('admin.planos.destroy');

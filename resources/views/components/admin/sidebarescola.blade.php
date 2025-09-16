@@ -72,12 +72,12 @@
 
               
                         <li class="submenu">
-                            <a href="#">
-                                <i class="fas fa-dollar-sign" style="font-size: 18px;"></i>
-                                <span>Financeiro</span>
-                                <span class="menu-arrow"></span>
-                            </a>
-                         <ul>
+                        <a href="#">
+                            <i class="fas fa-dollar-sign" style="font-size: 18px;"></i>
+                            <span>Financeiro</span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <ul>
                             <!-- Visão geral -->
                             <li><a href="{{ route('admin.financeiro.dashboard') }}">📊 Dashboard</a></li>
 
@@ -101,15 +101,26 @@
                                 </ul>
                             </li>
 
-                        <li class="submenu">
-                            <a href="#">🏷️ Categoria<span class="menu-arrow"></span></a>
-                            <ul>                      
-                                <li><a href="{{ route('financeiro.categorias.index') }}">Categorias Financeiras</a></li>
-                            </ul>
-                        </li>
+                            <!-- Categorias -->
+                            <li class="submenu">
+                                <a href="#">🏷️ Categorias<span class="menu-arrow"></span></a>
+                                <ul>                      
+                                    <li><a href="{{ route('financeiro.categorias.index') }}">Categorias Financeiras</a></li>
+                                </ul>
+                            </li>
 
-                     </ul>
-                 </li>
+                            <!-- Planos -->
+                            <li class="submenu">
+                                <a href="#">📦 Planos<span class="menu-arrow"></span></a>
+                                <ul>                      
+                                    <li><a href="{{ route('admin.planos.index') }}">Listar Planos</a></li>
+                                    <li><a href="{{ route('admin.planos.create') }}">Cadastrar Plano</a></li>
+                                </ul>
+                            </li>
+
+                        </ul>
+                    </li>
+
 
 
 
