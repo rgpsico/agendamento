@@ -39,6 +39,18 @@ class Empresa extends Model
     ];
 
 
+        public function plano()
+    {
+        return $this->belongsTo(Plano::class);
+    }
+
+    public function planos()
+    {
+        return $this->belongsToMany(Plano::class, 'empresa_plano')
+                    ->withPivot(['data_inicio', 'data_fim'])
+                    ->withTimestamps();
+    }
+
       public function bairros()
     {
         return $this->belongsToMany(
