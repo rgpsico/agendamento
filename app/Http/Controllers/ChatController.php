@@ -36,7 +36,7 @@ class ChatController extends Controller
         try {
             // Buscar a conversa
             $conversation = Conversation::findOrFail($request->conversation_id);
-            
+
             // Atualizar o campo de controle
             $conversation->update([
                 'human_controlled' => $request->human_control,
@@ -45,7 +45,7 @@ class ChatController extends Controller
             ]);
 
             // Log da mudança para auditoria
-            \Log::info('Controle de conversa alterado', [
+            Log::info('Controle de conversa alterado', [
                 'conversation_id' => $conversation->id,
                 'human_controlled' => $request->human_control,
                 'user_id' => auth()->id(),
@@ -61,10 +61,9 @@ class ChatController extends Controller
                 'human_controlled' => $request->human_control,
                 'controlled_by' => $request->human_control ? auth()->user()->name : 'Bot'
             ]);
-
         } catch (\Exception $e) {
-            \Log::error('Erro ao atualizar controle de conversa: ' . $e->getMessage());
-            
+            Log::error('Erro ao atualizar controle de conversa: ' . $e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'message' => 'Erro interno do servidor'
@@ -107,26 +106,26 @@ class ChatController extends Controller
             'to' => 'bot',
             'conversation_id' => $request->conversation_id,
             'role' => 'user',
-            'body' => $cleanUserMessage 
+            'body' => $cleanUserMessage
         ]);
 
-    Http::post('https://www.comunidadeppg.com.br:3000/enviarparaosass', [
-                    'conversation_id' => $request->conversation_id,
-                    'user_id' => $userId ?? 'guest',
-                    'mensagem' => $cleanUserMessage,
-                ]);
+        Http::post('https://www.comunidadeppg.com.br:3000/enviarparaosass', [
+            'conversation_id' => $request->conversation_id,
+            'user_id' => $userId ?? 'guest',
+            'mensagem' => $cleanUserMessage,
+        ]);
 
-        
+
         $empresa = $conversation->empresa;
-    
-    
+
+
         if ($empresa && $empresa->telefone) {
             $userMessage->load('conversation'); // garante que tem a conversa
             app(\App\Services\TwilioService::class)
                 ->enviarAlertaNovaMensagem($userMessage, $empresa);
         }
-     
-            
+
+
         // Gera resposta do bot
         // $botResponseText = $this->deepSeekService->getDeepSeekResponse(
         //     $conversation->bot,
@@ -136,18 +135,18 @@ class ChatController extends Controller
 
 
 
-       
+
         // $respostaboot = $this->sanitizeMessage($botResponseText);
         // Salva a resposta do bot
         $botMessage = Message::create([
             'from' => 'bot',
             'to' => 'user',
             'conversation_id' => $conversation->id,
-              'role' => 'assistant',
+            'role' => 'assistant',
             'body' =>  $request->mensagem
         ]);
 
-        
+
 
 
         return response()->json([
@@ -157,7 +156,7 @@ class ChatController extends Controller
     }
 
 
-   public function store(Request $request)
+    public function store(Request $request)
     {
         $request->validate([
             'mensagem' => 'required|string',
@@ -191,80 +190,87 @@ class ChatController extends Controller
             'to' => 'bot',
             'conversation_id' => $request->conversation_id,
             'role' => 'user',
-            'body' => $cleanUserMessage 
+            'body' => $cleanUserMessage
         ]);
 
-  
 
-        
+
+
         $empresa = $conversation->empresa;
-    
-    
+
+
         if ($empresa && $empresa->telefone) {
             $userMessage->load('conversation'); // garante que tem a conversa
 
-            
             app(\App\Services\TwilioService::class)
                 ->enviarAlertaNovaMensagem($request->conversation_id, $userMessage, $empresa);
-             }
-     
-           
+        }
+
+
         // Gera resposta do bot
-        // $botResponseText = $this->deepSeekService->getDeepSeekResponse(
-        //     $conversation->bot,
-        //     $request->mensagem,
-        //     $conversation->empresa_id
-        // );
+        $botResponseText = $this->deepSeekService->getDeepSeekResponse(
+            $conversation->bot,
+            $request->mensagem,
+            $conversation->empresa_id
+        );
 
 
 
-        // $respostaboot = $this->sanitizeMessage($botResponseText);
+        $respostaboot = $this->sanitizeMessage($botResponseText);
         // Salva a resposta do bot
         $botMessage = Message::create([
             'from' => 'bot',
             'to' => 'user',
             'conversation_id' => $conversation->id,
-              'role' => 'assistant',
+            'role' => 'assistant',
             'body' =>  $request->mensagem
         ]);
 
-        
-          Http::post('https://www.comunidadeppg.com.br:3000/chatmessage', [
-                    'conversation_id' => $request->conversation_id,
-                    'user_id' => $userId ?? 'guest',
-                    'mensagem' =>$request->mensagem,
-                ]);
-        
+
+        if (isset($respostaboot)) {
+            Http::post('https://www.comunidadeppg.com.br:3000/enviarparaosass', [
+                'conversation_id' => $request->conversation_id,
+                'user_id' => $userId ?? 'guest',
+                'mensagem' => $respostaboot,
+            ]);
+        }
+
+        Http::post('https://www.comunidadeppg.com.br:3000/chatmessage', [
+            'conversation_id' => $request->conversation_id,
+            'user_id' => $userId ?? 'guest',
+            'mensagem' => $request->mensagem,
+        ]);
+
+
 
         return response()->json([
             'conversation_id' => $conversation->id,
-            'bot_response' => $request->mensagem,
+            'bot_response' =>  $respostaboot,
         ]);
     }
 
-    public function sanitizeMessage(string $message): string {
-    // Mantém letras, números, pontuação básica e espaços
-    return preg_replace('/[^\p{L}\p{N}\p{P}\p{Z}]/u', '', $message);
-}
 
-public function chat(Request $request, $conversationId = null)
-{
-    // Busca a conversa com as mensagens
-    if ($conversationId) {
-        $conversation = Conversation::with('messages')->findOrFail($conversationId);
-    } else {
-        $conversation = null;
+    public function sanitizeMessage(string $message): string
+    {
+        // Mantém letras, números, pontuação básica e espaços
+        return preg_replace('/[^\p{L}\p{N}\p{P}\p{Z}]/u', '', $message);
     }
 
-    // Carrega os bots disponíveis (caso queira permitir escolher)
-    $bots = Bot::all();
+    public function chat(Request $request, $conversationId = null)
+    {
+        // Busca a conversa com as mensagens
+        if ($conversationId) {
+            $conversation = Conversation::with('messages')->findOrFail($conversationId);
+        } else {
+            $conversation = null;
+        }
 
-    return view('admin.chat.index', [
-        'conversation' => $conversation,
-        'bots' => $bots,
-    ]);
-}
+        // Carrega os bots disponíveis (caso queira permitir escolher)
+        $bots = Bot::all();
 
-
-
+        return view('admin.chat.index', [
+            'conversation' => $conversation,
+            'bots' => $bots,
+        ]);
+    }
 }

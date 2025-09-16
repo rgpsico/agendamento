@@ -51,4 +51,21 @@ class RealTimeChatService
             return null;
         }
     }
+
+
+    public function enviarRealTime(array $payload)
+    {
+        try {
+            $response = Http::post('https://www.comunidadeppg.com.br:3000/chatmessage', [
+                'conversation_id' => $payload['conversation_id'] ?? null,
+                'user_id' => $payload['user_id'] ?? 'guest',
+                'mensagem' => $payload['mensagem'] ?? '',
+            ]);
+
+            return $response->json();
+        } catch (\Exception $e) {
+            Log::error("Erro ao enviar mensagem em tempo real: " . $e->getMessage());
+            return null;
+        }
+    }
 }
