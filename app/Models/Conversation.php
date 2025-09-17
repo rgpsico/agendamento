@@ -19,6 +19,21 @@ class Conversation extends Model
 
     ];
 
+
+    public static function createWithBot($phone = null, $userId = null, $empresaId = 1)
+    {
+        $bot = Bot::where('nome', 'Manicure')->first();
+
+        return self::create([
+            'empresa_id' => $empresaId,
+            'bot_id' => $bot->id ?? null,
+            'user_id' => $userId,
+            'mensagem' => 'Início da conversa',
+            'telefone' => $phone,
+            'human_controlled' => false,
+        ]);
+    }
+
     public function empresa()
     {
         return $this->belongsTo(Empresa::class);

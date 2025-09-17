@@ -159,6 +159,10 @@ class ChatController extends Controller
     }
 
     //Metodo enviar do site para o bate papo interno
+
+    /**
+     * @param \App\Http\Requests\StoreMensagemRequest $request
+     */
     public function store(StoreMensagemRequest $request)
     {
         $userId = auth()->check() ? auth()->id() : null;
@@ -166,7 +170,7 @@ class ChatController extends Controller
         // Busca ou cria a conversa
         $conversation = $request->conversation_id
             ? Conversation::find($request->conversation_id)
-            : $this->createConversation($request, $userId);
+            : Conversation::createWithBot($request->phone, $userId);
 
         // Sanitiza a mensagem do usuário
         $cleanUserMessage = $this->sanitizeMessage($request->mensagem);
@@ -194,22 +198,7 @@ class ChatController extends Controller
         ]);
     }
 
-    /**
-     * Cria uma nova conversa.
-     */
-    private function createConversation($request, $userId)
-    {
-        $bot = Bot::where('nome', 'Manicure')->first();
 
-        return Conversation::create([
-            'empresa_id' => 1,
-            'bot_id' => $bot->id ?? null,
-            'user_id' => $userId,
-            'mensagem' => 'Início da conversa',
-            'telefone' => $request->phone,
-            'human_controlled' => false,
-        ]);
-    }
 
     /**
      * Obtem a resposta do bot e salva no banco.
