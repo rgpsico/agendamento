@@ -226,10 +226,8 @@ Route::prefix('admin/bot')->name('admin.bot.')->middleware('auth')->group(functi
     Route::post('destroy', [BotController::class, 'destroy'])->name('destroy');;
     Route::get('tokens', [BotController::class, 'tokens'])->name('tokens');
     Route::get('logs', [BotController::class, 'logs'])->name('logs');
-    
-Route::get('/{bot}', [BotController::class, 'show'])->name('show');
 
-   
+    Route::get('/{bot}', [BotController::class, 'show'])->name('show');
 });
 
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -246,8 +244,8 @@ Route::post('/chat/enviarparabatepaposite', [ChatController::class, 'enviarparab
 
 Route::get('/chat/{conversationId?}', [ChatController::class, 'chat'])->name('chat.index');
 
-   Route::post('/chat/update-control', [ChatController::class, 'updateControl'])
-         ->name('chat.updateControl');
+Route::post('/chat/update-control', [ChatController::class, 'updateControl'])
+    ->name('chat.updateControl');
 
 use App\Http\Controllers\VirtualHostController;
 
@@ -261,11 +259,11 @@ Route::delete('/virtualhosts/{file}', [VirtualHostController::class, 'destroy'])
 
 
 
-Route::prefix('financeiro')->middleware(['auth'])->group(function() {
-    
+Route::prefix('financeiro')->middleware(['auth'])->group(function () {
+
     // Dashboard financeiro
-  
-    
+
+
     // Receitas (Contas a Receber)
     Route::get('/receitas', [ReceitaController::class, 'index'])->name('financeiro.receitas.index');
     Route::get('/receitas/create', [ReceitaController::class, 'create'])->name('financeiro.receitas.create');
@@ -276,7 +274,7 @@ Route::prefix('financeiro')->middleware(['auth'])->group(function() {
 
 
     // Route::get('/', [FinanceiroController::class, 'index'])->name('financeiro.index');
-   //  Despesas (Contas a Pagar)
+    //  Despesas (Contas a Pagar)
 
 
     Route::get('/despesas', [DespesaController::class, 'index'])->name('financeiro.despesas.index');
@@ -296,13 +294,12 @@ Route::prefix('financeiro')->middleware(['auth'])->group(function() {
     // Route::get('/config', [FinanceiroConfigController::class, 'index'])->name('financeiro.config.index');
     // Route::post('/config', [FinanceiroConfigController::class, 'store'])->name('financeiro.config.store');
 
-      Route::get('/dashboard', [\App\Http\Controllers\FinanceiroDashboardController::class, 'index'])
+    Route::get('/dashboard', [\App\Http\Controllers\FinanceiroDashboardController::class, 'index'])
         ->name('admin.financeiro.dashboard');
 
-          Route::get('despesas/resumo/ajax', [DespesaController::class, 'resumo'])->name('despesas.resumo');
+    Route::get('despesas/resumo/ajax', [DespesaController::class, 'resumo'])->name('despesas.resumo');
 
-            Route::get('despesas/buscar_despesas', [DespesaController::class, 'buscar_despesas'])->name('despesas.buscar_despesas');
-    
+    Route::get('despesas/buscar_despesas', [DespesaController::class, 'buscar_despesas'])->name('despesas.buscar_despesas');
 });
 
 
@@ -342,19 +339,17 @@ Route::delete('financeiro/despesas_recorrentes/{despesaRecorrente}', [DespesasRe
     ->name('financeiro.despesas_recorrentes.destroy');
 
 
-    Route::prefix('financeiro')->name('financeiro.')->group(function () {
+Route::prefix('financeiro')->name('financeiro.')->group(function () {
     Route::get('receitas_recorrentes', [ReceitaRecorrenteController::class, 'index'])->name('receitas_recorrentes.index');
     Route::get('receitas_recorrentes/create', [ReceitaRecorrenteController::class, 'create'])->name('receitas_recorrentes.create');
     Route::post('receitas_recorrentes', [ReceitaRecorrenteController::class, 'store'])->name('receitas_recorrentes.store');
     Route::get('receitas_recorrentes/{receitaRecorrente}/edit', [ReceitaRecorrenteController::class, 'edit'])->name('receitas_recorrentes.edit');
     Route::put('receitas_recorrentes/{receitaRecorrente}', [ReceitaRecorrenteController::class, 'update'])->name('receitas_recorrentes.update');
     Route::delete('receitas_recorrentes/{receitaRecorrente}', [ReceitaRecorrenteController::class, 'destroy'])->name('receitas_recorrentes.destroy');
-
-
 });
 
 
-Route::prefix('admin/botservice')->name('admin.botservice.')->group(function() {
+Route::prefix('admin/botservice')->name('admin.botservice.')->group(function () {
     Route::get('/', [BotServiceController::class, 'index'])->name('index');
     Route::get('/create', [BotServiceController::class, 'create'])->name('create');
     Route::post('/store', [BotServiceController::class, 'store'])->name('store');
@@ -382,4 +377,50 @@ use App\Http\Controllers\EmpresaPlanoController;
 Route::prefix('admin/empresas/{empresa}')->group(function () {
     Route::get('planos', [EmpresaPlanoController::class, 'index'])->name('admin.empresas.planos.index');
     Route::post('planos', [EmpresaPlanoController::class, 'store'])->name('admin.empresas.planos.store');
+});
+
+
+
+
+use Prometheus\CollectorRegistry;
+use Prometheus\RenderTextFormat;
+use Prometheus\Storage\InMemory;
+use Prometheus\Exception\MetricAlreadyExistsException;
+
+Route::get('/metrics', function () {
+    $registry = new CollectorRegistry(new InMemory());
+
+    // Contador de requisições GET
+    try {
+        $counter = $registry->registerCounter(
+            'app',               // namespace
+            'requests_total',    // nome da métrica
+            'Total de requisições', // descrição
+            ['method']           // labels
+        );
+    } catch (MetricAlreadyExistsException $e) {
+        $counter = $registry->getCounter('app', 'requests_total');
+    }
+
+    $counter->inc(['GET']); // incrementa a cada requisição
+
+    // Tempo de execução simulando uma métrica de histogram
+    try {
+        $histogram = $registry->registerHistogram(
+            'app',
+            'response_time_seconds',
+            'Tempo de resposta',
+            ['route'],
+            [0.1, 0.5, 1, 2, 5]
+        );
+    } catch (MetricAlreadyExistsException $e) {
+        $histogram = $registry->getHistogram('app', 'response_time_seconds');
+    }
+
+    // Simula tempo de resposta aleatório entre 0.1 e 2s
+    $histogram->observe(rand(1, 20) / 10, ['/metrics']);
+
+    $renderer = new RenderTextFormat();
+    return response($renderer->render($registry->getMetricFamilySamples()))
+        ->header('Content-Type', RenderTextFormat::MIME_TYPE);
 });
