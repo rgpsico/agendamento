@@ -20,8 +20,33 @@ class Message extends Model
         'conversation_id'
     ];
 
-        public function conversation()
+    public function conversation()
     {
         return $this->belongsTo(Conversation::class);
+    }
+
+    public static function createUserMessage($conversationId, $body)
+    {
+        return self::create([
+            'from' => 'user',
+            'to' => 'bot',
+            'conversation_id' => $conversationId,
+            'role' => 'user',
+            'body' => $body,
+        ]);
+    }
+
+    /**
+     * Cria uma mensagem de bot.
+     */
+    public static function createBotMessage($conversationId, $body)
+    {
+        return self::create([
+            'from' => 'bot',
+            'to' => 'user',
+            'conversation_id' => $conversationId,
+            'role' => 'assistant',
+            'body' => $body,
+        ]);
     }
 }

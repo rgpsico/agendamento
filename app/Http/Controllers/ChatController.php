@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreMensagemRequest;
 use App\Models\Bot;
 use App\Models\BotLog;
 use App\Models\BotService;
@@ -157,85 +158,30 @@ class ChatController extends Controller
         ]);
     }
 
-
-    public function store(Request $request)
+    //Metodo enviar do site para o bate papo interno
+    public function store(StoreMensagemRequest $request)
     {
-        $request->validate([
-            'mensagem' => 'required|string',
-            'conversation_id' => 'nullable|integer|exists:conversations,id',
-            'phone' => 'nullable|string',
-            'professor_id' => 'nullable|exists:usuarios,id',
-        ]);
-
         $userId = auth()->check() ? auth()->id() : null;
 
         // Busca ou cria a conversa
-        if ($request->conversation_id) {
-            $conversation = Conversation::find($request->conversation_id);
-        } else {
-            $bot = Bot::where('nome', 'Manicure')->first();
-            $conversation = Conversation::create([
-                'empresa_id' => 1,
-                'bot_id' => $bot->id ?? null,
-                'user_id' => $userId,
-                'mensagem' => 'Início da conversa',
-                'telefone' => $request->phone,
-                'human_controlled' => false, // default quando cria
-            ]);
-        }
+        $conversation = $request->conversation_id
+            ? Conversation::find($request->conversation_id)
+            : $this->createConversation($request, $userId);
 
+        // Sanitiza a mensagem do usuário
         $cleanUserMessage = $this->sanitizeMessage($request->mensagem);
 
         // Salva a mensagem do usuário
-        $userMessage = Message::create([
-            'from' => 'user',
-            'to' => 'bot',
-            'conversation_id' => $conversation->id,
-            'role' => 'user',
-            'body' => $cleanUserMessage
-        ]);
+        $userMessage = Message::createUserMessage($conversation->id, $cleanUserMessage);
 
-        $empresa = $conversation->empresa;
+        $respostaBot = null;
 
-        // Notificação opcional via Twilio
-        // if ($empresa && $empresa->telefone) {
-        //     $userMessage->load('conversation');
-        //     app(\App\Services\TwilioService::class)
-        //         ->enviarAlertaNovaMensagem($conversation->id, $userMessage, $empresa);
-        // }
-
-        $respostaboot = null;
-
-        // Só chama o DeepSeek se NÃO estiver sob controle humano
+        // Chama o DeepSeek apenas se não estiver sob controle humano
         if (!$conversation->human_controlled) {
-            $botResponseText = $this->deepSeekService->getDeepSeekResponse(
-                $conversation->bot,
-                $request->mensagem,
-                $conversation->empresa_id
-            );
-
-            $respostaboot = $this->sanitizeMessage($botResponseText);
-
-            // Salva a resposta do bot
-            Message::create([
-                'from' => 'bot',
-                'to' => 'user',
-                'conversation_id' => $conversation->id,
-                'role' => 'assistant',
-                'body' => $respostaboot
-            ]);
+            $respostaBot = $this->getBotResponse($request->mensagem, $conversation, $userId);
         }
 
-        // Se existir resposta do bot, envia para o socket
-        if ($respostaboot) {
-            Http::post('https://www.comunidadeppg.com.br:3000/enviarparaosass', [
-                'conversation_id' => $conversation->id,
-                'user_id' => $userId ?? 'guest',
-                'mensagem' => $respostaboot,
-            ]);
-        }
-
-        // Sempre envia a mensagem do usuário
+        // Sempre envia a mensagem do usuário para o endpoint externo
         Http::post('https://www.comunidadeppg.com.br:3000/chatmessage', [
             'conversation_id' => $conversation->id,
             'user_id' => $userId ?? 'guest',
@@ -244,9 +190,55 @@ class ChatController extends Controller
 
         return response()->json([
             'conversation_id' => $conversation->id,
-            'bot_response' => $respostaboot,
+            'bot_response' => $respostaBot,
         ]);
     }
+
+    /**
+     * Cria uma nova conversa.
+     */
+    private function createConversation($request, $userId)
+    {
+        $bot = Bot::where('nome', 'Manicure')->first();
+
+        return Conversation::create([
+            'empresa_id' => 1,
+            'bot_id' => $bot->id ?? null,
+            'user_id' => $userId,
+            'mensagem' => 'Início da conversa',
+            'telefone' => $request->phone,
+            'human_controlled' => false,
+        ]);
+    }
+
+    /**
+     * Obtem a resposta do bot e salva no banco.
+     */
+    private function getBotResponse($mensagem, $conversation, $userId)
+    {
+        $botResponseText = $this->deepSeekService->getDeepSeekResponse(
+            $conversation->bot,
+            $mensagem,
+            $conversation->empresa_id
+        );
+
+        $respostaBot = $this->sanitizeMessage($botResponseText);
+
+        if ($respostaBot) {
+            // Envia para endpoint externo
+            Http::post('https://www.comunidadeppg.com.br:3000/enviarparaosass', [
+                'conversation_id' => $conversation->id,
+                'user_id' => $userId ?? 'guest',
+                'mensagem' => $respostaBot,
+            ]);
+
+            // Salva a resposta do bot
+            Message::createBotMessage($conversation->id, $respostaBot);
+        }
+
+        return $respostaBot;
+    }
+
 
 
 
@@ -278,10 +270,12 @@ class ChatController extends Controller
     public function toggleHumanControl(Request $request, $id)
     {
         $request->validate([
-            'human_controlled' => 'required|boolean',
+            'human_controlled' => 'boolean',
         ]);
 
         $conversation = Conversation::findOrFail($id);
+
+
 
         $conversation->update([
             'human_controlled' => $request->human_controlled,

@@ -15,7 +15,7 @@ class Conversation extends Model
         'user_id',
         'mensagem',
         'tipo',
-        'is_user_assigned',
+        'human_controlled',
 
     ];
 
