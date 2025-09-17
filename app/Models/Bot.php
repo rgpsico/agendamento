@@ -10,12 +10,13 @@ class Bot extends Model
     use HasFactory;
 
     protected $fillable = [
-        'empresa_id', 
-        'nome', 
-        'segmento', 
-        'tom', 
-        'status', 
-        'token_deepseek'
+        'empresa_id',
+        'nome',
+        'segmento',
+        'tom',
+        'status',
+        'token_deepseek',
+        'prompt',
     ];
 
     public function empresa()
@@ -37,5 +38,4 @@ class Bot extends Model
     {
         return $this->hasMany(BotService::class);
     }
-    
 }

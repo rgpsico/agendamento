@@ -22,6 +22,12 @@
                         </div>
 
                         <div class="mb-3">
+                            <label for="prompt" class="form-label">Prompt / Missão do Bot</label>
+                            <textarea id="prompt" name="prompt" class="form-control" rows="4" placeholder="Ex: Você é um assistente especializado em aulas de surf, sempre amigável e motivador."></textarea>
+                        </div>
+
+
+                        <div class="mb-3">
                             <label for="segmento" class="form-label">Segmento</label>
                             <input type="text" id="segmento" name="segmento" class="form-control" value="{{ old('segmento') }}" required>
                         </div>
