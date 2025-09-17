@@ -167,7 +167,6 @@ class ChatController extends Controller
             'professor_id' => 'nullable|exists:usuarios,id',
         ]);
 
-        // Define o ID do usuário (ou null se não estiver autenticado)
         $userId = auth()->check() ? auth()->id() : null;
 
         // Busca ou cria a conversa
@@ -181,72 +180,74 @@ class ChatController extends Controller
                 'user_id' => $userId,
                 'mensagem' => 'Início da conversa',
                 'telefone' => $request->phone,
+                'human_controlled' => false, // default quando cria
             ]);
         }
 
-
         $cleanUserMessage = $this->sanitizeMessage($request->mensagem);
+
         // Salva a mensagem do usuário
         $userMessage = Message::create([
             'from' => 'user',
             'to' => 'bot',
-            'conversation_id' => $request->conversation_id,
+            'conversation_id' => $conversation->id,
             'role' => 'user',
             'body' => $cleanUserMessage
         ]);
 
         $empresa = $conversation->empresa;
 
-
+        // Notificação opcional via Twilio
         // if ($empresa && $empresa->telefone) {
-        //     $userMessage->load('conversation'); // garante que tem a conversa
-
+        //     $userMessage->load('conversation');
         //     app(\App\Services\TwilioService::class)
-        //         ->enviarAlertaNovaMensagem($request->conversation_id, $userMessage, $empresa);
+        //         ->enviarAlertaNovaMensagem($conversation->id, $userMessage, $empresa);
         // }
 
+        $respostaboot = null;
 
-        // Gera resposta do bot
-        $botResponseText = $this->deepSeekService->getDeepSeekResponse(
-            $conversation->bot,
-            $request->mensagem,
-            $conversation->empresa_id
-        );
+        // Só chama o DeepSeek se NÃO estiver sob controle humano
+        if (!$conversation->human_controlled) {
+            $botResponseText = $this->deepSeekService->getDeepSeekResponse(
+                $conversation->bot,
+                $request->mensagem,
+                $conversation->empresa_id
+            );
 
+            $respostaboot = $this->sanitizeMessage($botResponseText);
 
+            // Salva a resposta do bot
+            Message::create([
+                'from' => 'bot',
+                'to' => 'user',
+                'conversation_id' => $conversation->id,
+                'role' => 'assistant',
+                'body' => $respostaboot
+            ]);
+        }
 
-        $respostaboot = $this->sanitizeMessage($botResponseText);
-        // Salva a resposta do bot
-        $botMessage = Message::create([
-            'from' => 'bot',
-            'to' => 'user',
-            'conversation_id' => $conversation->id,
-            'role' => 'assistant',
-            'body' =>  $request->mensagem
-        ]);
-
-
-        if (isset($respostaboot)) {
+        // Se existir resposta do bot, envia para o socket
+        if ($respostaboot) {
             Http::post('https://www.comunidadeppg.com.br:3000/enviarparaosass', [
-                'conversation_id' => $request->conversation_id,
+                'conversation_id' => $conversation->id,
                 'user_id' => $userId ?? 'guest',
                 'mensagem' => $respostaboot,
             ]);
         }
 
+        // Sempre envia a mensagem do usuário
         Http::post('https://www.comunidadeppg.com.br:3000/chatmessage', [
-            'conversation_id' => $request->conversation_id,
+            'conversation_id' => $conversation->id,
             'user_id' => $userId ?? 'guest',
             'mensagem' => $request->mensagem,
         ]);
 
-
-
         return response()->json([
             'conversation_id' => $conversation->id,
-            'bot_response' =>  $respostaboot,
+            'bot_response' => $respostaboot,
         ]);
     }
+
 
 
     public function sanitizeMessage(string $message): string
