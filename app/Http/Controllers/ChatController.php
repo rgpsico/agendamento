@@ -196,26 +196,18 @@ class ChatController extends Controller
     }
 
 
-    protected function enviarMensagemExterna(int $conversationId, $mensagem, $userId = null)
-    {
-        Http::post('https://www.comunidadeppg.com.br:3000/chatmessage', [
-            'conversation_id' => $conversationId,
-            'user_id' => $userId ?? 'guest',
-            'mensagem' => $mensagem,
-        ]);
-    }
-
-
     /**
      * Obtem a resposta do bot e salva no banco.
      */
     private function getBotResponse($mensagem, $conversation, $userId)
     {
-        $botResponseText = $this->deepSeekService->getDeepSeekResponse(
+        $botResponseText = $this->deepSeekService->getDeepSeekResponseWithPrompt(
             $conversation->bot,
             $mensagem,
+            $conversation,
             $conversation->empresa_id
         );
+
 
         $respostaBot = $this->sanitizeMessage($botResponseText);
 
@@ -234,6 +226,16 @@ class ChatController extends Controller
         }
 
         return $respostaBot;
+    }
+
+
+    protected function enviarMensagemExterna(int $conversationId, $mensagem, $userId = null)
+    {
+        Http::post('https://www.comunidadeppg.com.br:3000/chatmessage', [
+            'conversation_id' => $conversationId,
+            'user_id' => $userId ?? 'guest',
+            'mensagem' => $mensagem,
+        ]);
     }
 
 
