@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Models\Agendamento;
 use App\Models\Bot;
+use App\Models\Conversation;
 use App\Models\Servicos;
 use App\Models\TokenUsage;
 use Illuminate\Support\Facades\Http;
@@ -18,6 +20,7 @@ class DeepSeekService
      */
     public function getDeepSeekResponse(Bot $bot, string $question, int $empresa_id): string
     {
+
         // 1. Carrega os serviços associados ao bot
         $services = Servicos::where('empresa_id', $empresa_id)->get();
 
@@ -89,6 +92,157 @@ class DeepSeekService
 
         // 8. Retorna a resposta limpa
         return $cleanResponse;
+    }
+
+
+
+    public function getDeepSeekResponseWithPrompt(Bot $bot, string $question, Conversation $conversation, int $empresa_id, int $contextMessages = 3): string
+    {
+        // 1️⃣ Pega últimas mensagens da conversa para contexto
+        $messages = $conversation->messages()
+            ->latest()
+            ->take($contextMessages)
+            ->get()
+            ->reverse();
+
+        $conversationContext = "";
+        foreach ($messages as $msg) {
+            $author = $msg->tipo === 'user' ? 'Cliente' : 'Bot';
+            $conversationContext .= "{$author}: {$msg->mensagem}\n";
+        }
+
+        // Adiciona a pergunta atual do usuário
+        $conversationContext .= "Cliente: {$question}\n";
+
+
+
+        // 2️⃣ Carrega os serviços do bot
+        $services = Servicos::with('disponibilidades.diaDaSemana')
+            ->where('empresa_id', $empresa_id)
+            ->get();
+
+
+        $servicesText = "";
+        if ($services->isNotEmpty()) {
+            $servicesText .= "Serviços disponíveis e horários desta semana:\n";
+
+            foreach ($services as $service) {
+                $servicesText .= "- {$service->titulo}: {$service->descricao}. Preço: R$ {$service->preco}. Duração: {$service->tempo_de_aula} minutos. Tipo de agendamento: {$service->tipo_agendamento}\n";
+
+                // Horários
+                if ($service->disponibilidades->isNotEmpty()) {
+                    $servicesText .= "  Horários:\n";
+                    foreach ($service->disponibilidades as $disp) {
+                        $dia = $disp->diaDaSemana->nome ?? $disp->id_dia;
+                        $servicesText .= "    - {$dia}: {$disp->hora_inicio} às {$disp->hora_fim}\n";
+                    }
+                }
+            }
+        }
+
+        // 3️⃣ Monta o system prompt usando o prompt/missão do bot
+        $systemPrompt = $bot->prompt;;
+        $systemPrompt .= "\nTom: " . ($bot->tom ?? 'informal') . ". Segmento: " . ($bot->segmento ?? 'estético') . ".\n";
+        $systemPrompt .= $servicesText;
+
+
+        if (preg_match('/horário|hora|disponível|quando/i', $question)) {
+            $systemPrompt = "Responda de forma curta e natural. Apenas informe os horários disponíveis para o cliente.\n";
+            $systemPrompt .= $this->montarPromptHorarios($empresa_id);
+        }
+
+
+        // 4️⃣ Chamada à API DeepSeek
+        $data = $this->callDeepSeekApi($systemPrompt, $conversationContext, $bot);
+
+
+        $responseText = $data['choices'][0]['message']['content'] ?? 'Sem resposta';
+        $cleanResponse = preg_replace('/[\x{10000}-\x{10FFFF}]/u', '', $responseText);
+
+        // 6️⃣ Salva log e uso de tokens
+        $usage = $data['usage'] ?? [];
+        $tokensUsados = $usage['total_tokens'] ?? 0;
+        $promptTokens = $usage['prompt_tokens'] ?? 0;
+        $completionTokens = $usage['completion_tokens'] ?? 0;
+
+
+        $bot->logs()->create(['bot_id' => $bot->id, 'mensagem_usuario' => $question, 'resposta_bot' => $cleanResponse, 'tokens_usados' => $tokensUsados, 'prompt_tokens' => $promptTokens, 'completion_tokens' => $completionTokens]);
+
+        TokenUsage::registrarUso($bot->id, $empresa_id, $tokensUsados, $promptTokens, $completionTokens);
+
+
+        // 7️⃣ Retorna a resposta limpa
+        return $cleanResponse;
+    }
+
+    private function montarPromptHorarios(int $empresa_id, $serviceText = null): string
+    {
+        $services = Servicos::with('disponibilidades.diaDaSemana')
+            ->where('empresa_id', $empresa_id)
+            ->get();
+
+        $horariosText = "Horários atualizados disponíveis:\n";
+
+        foreach ($services as $service) {
+            if ($service->disponibilidades->isNotEmpty()) {
+                $horariosText .= "- {$service->titulo}:\n";
+
+                foreach ($service->disponibilidades as $disp) {
+                    $diaSemana = $disp->diaDaSemana->nome ?? $disp->id_dia;
+
+                    // Mantemos a data no formato Y-m-d para consulta
+                    $dataParaBanco = $disp->data
+                        ? \Carbon\Carbon::parse($disp->data)->format('Y-m-d')
+                        : null;
+
+                    // Verifica se já existe agendamento nesse horário
+                    $agendamentoExistente = Agendamento::where('servico_id', $service->id)
+                        ->where('data_da_aula', $dataParaBanco)
+                        ->where('horario', $disp->hora_inicio)
+                        ->exists();
+
+
+
+                    if ($agendamentoExistente) {
+                        continue; // pula esse horário
+                    }
+
+                    // Formata data para exibição ao usuário
+                    $dataExibir = $dataParaBanco
+                        ? \Carbon\Carbon::parse($dataParaBanco)->format('d/m/Y')
+                        : '';
+
+                    $horariosText .= "   {$diaSemana}" . ($dataExibir ? " ({$dataExibir})" : "") . ": {$disp->hora_inicio} às {$disp->hora_fim}\n";
+                }
+            }
+        }
+
+        return $horariosText;
+    }
+
+
+
+
+    private function callDeepSeekApi(string $systemPrompt, string $conversationContext, Bot $bot)
+    {
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . env('DEEP_SEEK_API_KEY'),
+            'Content-Type' => 'application/json',
+        ])->post('https://api.deepseek.com/v1/chat/completions', [
+            'model' => 'deepseek-chat',
+            'messages' => [
+                ['role' => 'system', 'content' => $systemPrompt],
+                ['role' => 'user', 'content' => $conversationContext],
+            ],
+            'temperature' => 0.7,
+            'max_tokens' => (int) $bot->token_deepseek,
+        ]);
+
+        if (!$response->successful()) {
+            throw new \Exception("Erro ao chamar DeepSeek API: " . $response->body());
+        }
+
+        return $response->json();
     }
 
 

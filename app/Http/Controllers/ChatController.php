@@ -239,6 +239,7 @@ class ChatController extends Controller
 
     public function chat(Request $request, $conversationId = null)
     {
+
         // Busca a conversa com as mensagens
         if ($conversationId) {
             $conversation = Conversation::with('messages')->findOrFail($conversationId);

@@ -19,6 +19,7 @@ class DeepSeekController extends Controller
     public function sendMessage(Request $request, $bot_id)
     {
 
+
         $request->validate([
             'message' => 'required|string',
             'empresa_id' => 'required|integer',

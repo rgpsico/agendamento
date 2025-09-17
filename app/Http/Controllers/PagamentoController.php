@@ -27,6 +27,7 @@ use App\Http\Requests\PagamentoComCartaoRequest;
 use App\Services\AgendamentoService;
 use App\Http\Requests\CriarPagamentoPresencialRequest;
 use App\Services\NotificationService;
+
 class PagamentoController extends Controller
 {
     protected $aluno_professor, $baseUri;
@@ -425,7 +426,7 @@ class PagamentoController extends Controller
             $cliente = $asaasService->createCustomer($clienteData, $gateway->api_key, $gateway->mode);
             $customerId = $cliente['id'];
 
-           Log::info('Cliente Asaas criado com sucesso: ' . json_encode($cliente));
+            Log::info('Cliente Asaas criado com sucesso: ' . json_encode($cliente));
 
             // Tentar obter o walletId com algumas tentativas, com intervalos entre elas
             $wallet = $this->getCustomerWallet($customerId);
@@ -434,18 +435,18 @@ class PagamentoController extends Controller
 
             // Se ainda não tiver walletId, tentar criar um manualmente (se houver endpoint para isso)
             if (!$walletId && method_exists($asaasService, 'createCustomerWallet')) {
-               Log::info("Tentando criar wallet manualmente para o cliente: $customerId");
+                Log::info("Tentando criar wallet manualmente para o cliente: $customerId");
                 try {
                     $wallet = $asaasService->createCustomerWallet($customerId, $gateway->api_key, $gateway->mode);
                     $walletId = $wallet['walletId'] ?? null;
                 } catch (\Exception $e) {
-                   Log::warning("Erro ao tentar criar wallet manualmente: " . $e->getMessage());
+                    Log::warning("Erro ao tentar criar wallet manualmente: " . $e->getMessage());
                 }
             }
 
             // Verificar se o walletId foi gerado
             if (!$walletId) {
-               Log::warning('Wallet ID não encontrado após múltiplas tentativas para o cliente: ' . $customerId);
+                Log::warning('Wallet ID não encontrado após múltiplas tentativas para o cliente: ' . $customerId);
 
                 // Salvar o customerId mesmo sem walletId
                 $professor->update([
@@ -483,7 +484,7 @@ class PagamentoController extends Controller
                 'message' => 'Integração com Asaas concluída com sucesso!'
             ]);
         } catch (\Exception $e) {
-           Log::error('Erro ao integrar com Asaas: ' . $e->getMessage());
+            Log::error('Erro ao integrar com Asaas: ' . $e->getMessage());
             $errorMessage = $e->getMessage();
 
             // Verificar se o erro é relacionado ao CPF/CNPJ já existente
@@ -520,7 +521,7 @@ class PagamentoController extends Controller
                         ]);
                     }
                 } catch (\Exception $ex) {
-                   Log::error('Erro ao buscar cliente existente: ' . $ex->getMessage());
+                    Log::error('Erro ao buscar cliente existente: ' . $ex->getMessage());
                 }
             }
 
@@ -674,7 +675,7 @@ class PagamentoController extends Controller
     public function criarPagamentoPresencial(CriarPagamentoPresencialRequest $request)
     {
 
-      
+
         $tipo_de_horario = Servicos::where('id', $request->servico_id)->value('tipo_agendamento');
 
         // Verificar disponibilidade do professor
@@ -716,10 +717,10 @@ class PagamentoController extends Controller
         // Redirecionar para a página de confirmação
         $empresaId = $professor->empresa->id;
 
-       
+
         // Lançar receita como pendente
         app(\App\Services\FinanceiroReceitaService::class)->lancarReceita([
-            'descricao' => 'Receita pendente do agendamento do aluno #'.$agendamento->id,
+            'descricao' => 'Receita pendente do agendamento do aluno #' . $agendamento->id,
             'pagamento_id' => $pagamento->id,
             'valor' => $pagamento->valor,
             'data_recebimento'  => null,
@@ -728,7 +729,7 @@ class PagamentoController extends Controller
             'status' => 'pendente', // 👈 marca como pendente
             'empresa_id' => $empresaId,
         ]);
-     
+
         return redirect()->route('home.checkoutsucesso', ['id' => $professorId])
             ->with('success', 'Agendamento e pagamento presencial registrados com sucesso');
     }
@@ -1021,7 +1022,7 @@ class PagamentoController extends Controller
             ]);
 
             $result = $this->tratarResposta($response->getStatusCode(), json_decode($response->getBody(), true));
-           Log::info('Resposta da busca de cliente por CPF/CNPJ: ' . json_encode($result));
+            Log::info('Resposta da busca de cliente por CPF/CNPJ: ' . json_encode($result));
 
             // Verificar se existe algum cliente na resposta
             if (isset($result['data']) && is_array($result['data']) && count($result['data']) > 0) {
@@ -1030,7 +1031,7 @@ class PagamentoController extends Controller
 
             return null;
         } catch (\Exception $e) {
-           Log::error('Erro ao buscar cliente por CPF/CNPJ: ' . $e->getMessage());
+            Log::error('Erro ao buscar cliente por CPF/CNPJ: ' . $e->getMessage());
             throw $e;
         }
     }

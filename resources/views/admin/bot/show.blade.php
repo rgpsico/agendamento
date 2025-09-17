@@ -44,37 +44,41 @@
     const input = document.getElementById('user-message');
     const chatBox = document.getElementById('chat-box');
 
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
+   let conversationId = null; // variável global
 
-        const message = input.value.trim();
-        if (!message) return;
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-        // mostra a mensagem do usuário
-        appendMessage('Você', message, ['text-end', 'text-primary']);
-        input.value = '';
+    const message = input.value.trim();
+    if (!message) return;
 
-        try {
-            // chama a API no api.php
-            const response = await fetch(`/api/bots/{{ $bot->id }}/chat`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    message: message,
-                    empresa_id: "{{ auth()->user()->empresa->id ?? '' }}"
-                })
-            });
+    appendMessage('Você', message, ['text-end', 'text-primary']);
+    input.value = '';
 
-            const data = await response.json();
+    try {
+        const response = await fetch(`/api/bots/{{ $bot->id }}/chat`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                message: message,
+                empresa_id: "{{ auth()->user()->empresa->id ?? '' }}",
+                user_id: "{{ auth()->user()->id ?? '' }}",
+                conversation_id: conversationId // envia se existir
+            })
+        });
 
-            // mostra resposta do bot
-            appendMessage("{{ $bot->nome }}", data.reply, ['text-start', 'text-success']);
-        } catch (error) {
-            appendMessage("Erro", "Não foi possível se conectar ao servidor.", ['text-start', 'text-danger']);
+        const data = await response.json();
+
+        appendMessage("{{ $bot->nome }}", data.reply, ['text-start', 'text-success']);
+
+        // salva o conversation_id retornado na primeira mensagem
+        if (!conversationId && data.conversation_id) {
+            conversationId = data.conversation_id;
         }
-    });
+    } catch (error) {
+        appendMessage("Erro", "Não foi possível se conectar ao servidor.", ['text-start', 'text-danger']);
+    }
+});
 
     function appendMessage(author, text, extraClasses = []) {
         const div = document.createElement('div');

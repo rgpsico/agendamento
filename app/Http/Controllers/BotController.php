@@ -201,18 +201,58 @@ class BotController extends Controller
 
     public function chat(Request $request, Bot $bot)
     {
+
         $request->validate([
             'message' => 'required|string',
-            'empresa_id' => 'required|integer'
+            'empresa_id' => 'required|integer',
+            'user_id' => 'nullable|integer',
+            'conversation_id' => 'nullable|integer',
         ]);
 
         $empresa_id = $request->input('empresa_id');
         $userMessage = $request->input('message');
+        $userId = $request->input('user_id');
+
+        // 1️⃣ Pega ou cria a conversa
+        $conversation = $request->filled('conversation_id')
+            ? \App\Models\Conversation::find($request->input('conversation_id'))
+            : null;
+
+        if (!$conversation) {
+            $conversation = \App\Models\Conversation::createWithBot(null, $userId, $empresa_id);
+        }
 
         try {
-            $reply = $this->deepSeekService->getDeepSeekResponse($bot, $userMessage, $empresa_id);
+            // 2️⃣ Salva a mensagem do usuário primeiro
+            $conversation->messages()->create([
+                'from' => 'user',
+                'to' => 'bot',
+                'user_id' => $userId,
+                'body' => $userMessage,
+                'tipo' => 'user'
+            ]);
 
+
+
+            // 3️⃣ Passa a conversa completa para o DeepSeek (incluindo a mensagem atual)
+            $reply = $this->deepSeekService->getDeepSeekResponseWithPrompt(
+                $bot,
+                $userMessage,
+                $conversation,
+                $empresa_id
+            );
+
+            // 4️⃣ Salva a resposta do bot na conversa
+            $conversation->messages()->create([
+                'from' => 'bot',
+                'to' => 'user',
+                'body' => $reply,
+                'tipo' => 'bot'
+            ]);
+
+            // 5️⃣ Retorna a resposta com o conversation_id
             return response()->json([
+                'conversation_id' => $conversation->id,
                 'reply' => $reply
             ]);
         } catch (\Exception $e) {
@@ -221,6 +261,8 @@ class BotController extends Controller
             ], 500);
         }
     }
+
+
 
 
     // private function getDeepSeekResponse(string $question): string

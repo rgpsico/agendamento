@@ -16,4 +16,9 @@ class Disponibilidade extends Model
     {
         return $this->belongsTo(DiaDaSemana::class, 'id_dia');
     }
+
+    public function servico()
+    {
+        return $this->belongsTo(Servicos::class, 'id_servico');
+    }
 }
