@@ -127,6 +127,8 @@ class ChatController extends Controller
 
 
         // Gera resposta do bot
+
+
         // $botResponseText = $this->deepSeekService->getDeepSeekResponse(
         //     $conversation->bot,
         //     $request->mensagem,

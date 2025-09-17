@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\Models;
 
@@ -14,8 +14,9 @@ class Conversation extends Model
         'bot_id',
         'user_id',
         'mensagem',
-        'tipo'
-    
+        'tipo',
+        'is_user_assigned',
+
     ];
 
     public function empresa()
@@ -23,10 +24,10 @@ class Conversation extends Model
         return $this->belongsTo(Empresa::class);
     }
 
- public function messages()
-{
-    return $this->hasMany(Message::class, 'conversation_id', 'id');
-}
+    public function messages()
+    {
+        return $this->hasMany(Message::class, 'conversation_id', 'id');
+    }
 
 
     public function bot()
@@ -38,5 +39,4 @@ class Conversation extends Model
     {
         return $this->belongsTo(Usuario::class, 'user_id', 'id');
     }
-
 }
