@@ -72,7 +72,7 @@ $(document).ready(function() {
     const humanToggle = $('#humanToggle');
 
     let humanTimeout;
-    let tempo_de_espera_ate_o_bot_assumir = 10000; // 10 segundos
+    let tempo_de_espera_ate_o_bot_assumir = 50000; // 10 segundos
 
     // ---------------------- Funções ----------------------
     function appendMessage(text, align = 'text-center', badgeClass = 'bg-secondary') {
