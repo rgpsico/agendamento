@@ -122,7 +122,7 @@ class ChatController extends Controller
         if ($empresa && $empresa->telefone) {
             $userMessage->load('conversation'); // garante que tem a conversa
             app(\App\Services\TwilioService::class)
-                ->enviarAlertaNovaMensagem($userMessage, $empresa);
+                ->enviarAlertaNovaMensagem($conversation->id, $userMessage, $empresa);
         }
 
 
@@ -268,9 +268,32 @@ class ChatController extends Controller
         // Carrega os bots disponíveis (caso queira permitir escolher)
         $bots = Bot::all();
 
+
         return view('admin.chat.index', [
             'conversation' => $conversation,
             'bots' => $bots,
+        ]);
+    }
+
+    public function toggleHumanControl(Request $request, $id)
+    {
+        $request->validate([
+            'human_controlled' => 'required|boolean',
+        ]);
+
+        $conversation = Conversation::findOrFail($id);
+
+        $conversation->update([
+            'human_controlled' => $request->human_controlled,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'conversation_id' => $conversation->id,
+            'human_controlled' => $conversation->human_controlled,
+            'message' => $conversation->human_controlled
+                ? 'Controle humano ativado'
+                : 'Controle humano desativado',
         ]);
     }
 }

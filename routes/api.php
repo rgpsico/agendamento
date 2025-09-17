@@ -63,7 +63,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 
-  Route::delete('/gallery/{id}', [EmpresaController::class, 'galleryDestroy'])->name('gallery.destroy');
+Route::delete('/gallery/{id}', [EmpresaController::class, 'galleryDestroy'])->name('gallery.destroy');
 Route::prefix('permissions')->group(function () {
     Route::get('/', [PermissionApiController::class, 'index']);
     Route::get('/{id}', [PermissionApiController::class, 'show']);
@@ -286,7 +286,7 @@ Route::post('bot/{botId}/interact', [BotController::class, 'interact'])->name('b
 Route::post('/bots/{bot}/chat', [BotController::class, 'chat']);
 
 
- Route::get('/conversations/{id}', [ConversationController::class, 'showapi']);
+Route::get('/conversations/{id}', [ConversationController::class, 'showapi']);
 
 Route::post('/fill-site-fields', [BotController::class, 'fillSiteFields'])->name('fill.site.fields');
 
@@ -304,3 +304,8 @@ Route::middleware('auth:sanctum')->group(function () {
 use App\Http\Controllers\DeepSeekController;
 
 Route::post('/bots/{bot_id}/message', [DeepSeekController::class, 'sendMessage']);
+
+
+use App\Http\Controllers\ChatController;
+
+Route::patch('/conversations/{id}/human-control', [ChatController::class, 'toggleHumanControl']);
