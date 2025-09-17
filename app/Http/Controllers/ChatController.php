@@ -186,11 +186,8 @@ class ChatController extends Controller
         }
 
         // Sempre envia a mensagem do usuário para o endpoint externo
-        Http::post('https://www.comunidadeppg.com.br:3000/chatmessage', [
-            'conversation_id' => $conversation->id,
-            'user_id' => $userId ?? 'guest',
-            'mensagem' => $request->mensagem,
-        ]);
+        $this->enviarMensagemExterna($conversation->id, $request->mensagem, $userId);
+
 
         return response()->json([
             'conversation_id' => $conversation->id,
@@ -198,6 +195,15 @@ class ChatController extends Controller
         ]);
     }
 
+
+    protected function enviarMensagemExterna(int $conversationId, $mensagem, $userId = null)
+    {
+        Http::post('https://www.comunidadeppg.com.br:3000/chatmessage', [
+            'conversation_id' => $conversationId,
+            'user_id' => $userId ?? 'guest',
+            'mensagem' => $mensagem,
+        ]);
+    }
 
 
     /**
@@ -220,6 +226,8 @@ class ChatController extends Controller
                 'user_id' => $userId ?? 'guest',
                 'mensagem' => $respostaBot,
             ]);
+
+
 
             // Salva a resposta do bot
             Message::createBotMessage($conversation->id, $respostaBot);
