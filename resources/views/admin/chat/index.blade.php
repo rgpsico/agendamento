@@ -59,210 +59,124 @@
     <!-- Socket.IO -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
 
-    <script>
-        $(document).ready(function() {
-            const socket = io('https://www.comunidadeppg.com.br:3000');
+  
+       <script>
+$(document).ready(function() {
+    const socket = io('https://www.comunidadeppg.com.br:3000');
 
-            const conversation_id = $('#conversation_id').val();
-            const messagesDiv = $('#messages');
-            const chatBox = $('#chat-box');
-            const mensagemInput = $('#mensagem');
-            const humanToggle = $('#humanToggle');
-            const conversationInput = $('#conversation_id');
-            let humanTimeout;
-            let tempo_de_espera_ate_o_bot_assumir = 10000; // 5 segundos
+    const conversationInput = $('#conversation_id');
+    const conversation_id = conversationInput.val();
+    const messagesDiv = $('#messages');
+    const chatBox = $('#chat-box');
+    const mensagemInput = $('#mensagem');
+    const humanToggle = $('#humanToggle');
 
+    let humanTimeout;
+    let tempo_de_espera_ate_o_bot_assumir = 10000; // 10 segundos
 
-            console.log('ID da conversa:', conversation_id);
+    // ---------------------- Funções ----------------------
+    function appendMessage(text, align = 'text-center', badgeClass = 'bg-secondary') {
+        messagesDiv.append(`
+            <div class="${align} mb-2">
+                <span class="badge ${badgeClass}">${text}</span>
+            </div>
+        `);
+        chatBox.scrollTop(chatBox[0].scrollHeight);
+    }
 
-            // Conexão
-            socket.on('connect', () => {
-                console.log('Conectado ao servidor Socket.IO.');
-            });
+    function updateHumanControl(isHuman, feedbackMsg = null) {
+        humanToggle.prop('checked', isHuman);
 
-            // Receber mensagens em tempo real
-            socket.on('chatmessage' + conversation_id, (data) => {
-                console.log('Mensagem recebida:', data);
+        fetch(`/api/conversations/${conversation_id}/human-control`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": "{{ csrf_token() }}"
+            },
+            body: JSON.stringify({ human_controlled: isHuman })
+        })
+        .then(res => res.json())
+        .then(data => {
+            console.log('Status atualizado:', data);
+            if(feedbackMsg) appendMessage(feedbackMsg, 'text-center', 'text-muted');
+        })
+        .catch(err => console.error('Erro ao atualizar controle humano:', err));
+    }
 
-                const align = data.from === 'user' ? 'text-end' : 'text-start';
-                const badge = data.from === 'user' ? 'bg-primary' : 'bg-secondary';
+    function ativarControleHumano() {
+        if (!humanToggle.is(':checked')) {
+            updateHumanControl(true, "🔒 Controle humano ativado automaticamente ao digitar.");
+        }
+    }
 
-                messagesDiv.append(`
-                    <div class="${align} mb-2">
-                        <span class="badge ${badge}">${data.mensagem}</span>
-                    </div>
-                `);
-                chatBox.scrollTop(chatBox[0].scrollHeight);
-            });
+    function reativarControleBot() {
+        updateHumanControl(false, "🤖 Controle do bot retomado automaticamente após inatividade.");
+    }
 
-            // Enviar mensagem
-            $('#chat-form').submit((e) => {
-                e.preventDefault();
+    function resetHumanTimeout() {
+        clearTimeout(humanTimeout);
+        humanTimeout = setTimeout(reativarControleBot, tempo_de_espera_ate_o_bot_assumir);
+    }
 
-                const mensagem = $('#mensagem').val();
-                if (!mensagem) return;
+    // ---------------------- Socket.IO ----------------------
+    socket.on('connect', () => console.log('Conectado ao servidor Socket.IO.'));
+    socket.on('disconnect', () => console.log('Desconectado do servidor Socket.IO.'));
 
-                // Mostra imediatamente no chat
-                messagesDiv.append(`
-                    <div class="text-end mb-2">
-                        <span class="badge bg-primary">${mensagem}</span>
-                    </div>
-                `);
-                chatBox.scrollTop(chatBox[0].scrollHeight);
-                $('#mensagem').val('');
+    socket.on('chatmessage' + conversation_id, (data) => {
+        const align = data.from === 'user' ? 'text-end' : 'text-start';
+        const badge = data.from === 'user' ? 'bg-primary' : 'bg-secondary';
+        appendMessage(data.mensagem, align, badge);
+    });
 
-                // Emite para o servidor via Socket.IO
-                socket.emit('chatmessage', {
-                    conversation_id: conversation_id,
-                    user_id: '{{ auth()->id() ?? "guest" }}',
-                    from: 'user',
-                    mensagem: mensagem
-                });
+    // ---------------------- Eventos ----------------------
+    // Enviar mensagem
+    $('#chat-form').submit((e) => {
+        e.preventDefault();
+        const mensagem = mensagemInput.val();
+        if (!mensagem) return;
 
-                // Opcional: salvar no backend via AJAX
-                fetch("{{ route('chat.enviarparabatepaposite') }}", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                    },
-                    body: JSON.stringify({
-                        mensagem: mensagem,
-                        conversation_id: conversation_id
-                    })
-                }).then(res => res.json())
-                  .then(data => console.log('Mensagem salva no backend:', data))
-                  .catch(err => console.error('Erro ao salvar mensagem:', err));
-            });
+        appendMessage(mensagem, 'text-end', 'bg-primary');
+        chatBox.scrollTop(chatBox[0].scrollHeight);
+        mensagemInput.val('');
 
-            socket.on('disconnect', () => {
-                console.log('Desconectado do servidor Socket.IO.');
-            });
-      
-        // Toggle humano/bot
-            $('#humanToggle').change(function () {
-                const conversation_id = $('#conversation_id').val();
-                const isHuman = $(this).is(':checked');
-
-                fetch(`/api/conversations/${conversation_id}/human-control`, {
-                    method: "PATCH",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                    },
-                    body: JSON.stringify({
-                        human_controlled: isHuman
-                    })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    console.log('Status atualizado:', data);
-
-                    // Mostra um feedback no chat
-                    const statusMsg = isHuman 
-                        ? "🔒 Controle humano ativado. O bot não responderá."
-                        : "🤖 Controle humano desativado. O bot voltou a responder.";
-
-                    messagesDiv.append(`
-                        <div class="text-center text-muted mb-2">
-                            <small>${statusMsg}</small>
-                        </div>
-                    `);
-                    chatBox.scrollTop(chatBox[0].scrollHeight);
-                })
-                .catch(err => console.error('Erro ao atualizar controle humano:', err));
-            });
-
-
-            mensagemInput.on('input', function () {
-                const conversation_id = conversationInput.val();
-
-                // Se já estiver no modo humano, não faz nada
-                if (humanToggle.is(':checked')) return;
-
-                // Ativa o controle humano
-                humanToggle.prop('checked', true);
-
-                fetch(`/api/conversations/${conversation_id}/human-control`, {
-                    method: "PATCH",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                    },
-                    body: JSON.stringify({
-                        human_controlled: true
-                    })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    console.log('Controle humano ativado automaticamente:', data);
-
-                    messagesDiv.append(`
-                        <div class="text-center text-muted mb-2">
-                            <small>🔒 Controle humano ativado automaticamente ao digitar.</small>
-                        </div>
-                    `);
-                    chatBox.scrollTop(chatBox[0].scrollHeight);
-                })
-                .catch(err => console.error('Erro ao ativar controle humano automaticamente:', err));
-            });
-
-
-            mensagemInput.on('input', function () {
-            const conversation_id = conversationInput.val();
-
-            // Ativa o controle humano se ainda não estiver ativo
-            if (!humanToggle.is(':checked')) {
-                humanToggle.prop('checked', true);
-
-                fetch(`/api/conversations/${conversation_id}/human-control`, {
-                    method: "PATCH",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                    },
-                    body: JSON.stringify({ human_controlled: true })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    messagesDiv.append(`
-                        <div class="text-center text-muted mb-2">
-                            <small>🔒 Controle humano ativado automaticamente ao digitar.</small>
-                        </div>
-                    `);
-                    chatBox.scrollTop(chatBox[0].scrollHeight);
-                })
-                .catch(err => console.error(err));
-            }
-
-            // Limpa qualquer timeout anterior
-            clearTimeout(humanTimeout);
-
-            // Define um novo timeout para 5 segundos
-            humanTimeout = setTimeout(() => {
-                humanToggle.prop('checked', false); // desativa controle humano
-
-                fetch(`/api/conversations/${conversation_id}/human-control`, {
-                    method: "PATCH",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                    },
-                    body: JSON.stringify({ human_controlled: false })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    messagesDiv.append(`
-                        <div class="text-center text-muted mb-2">
-                            <small>🤖 Controle do bot retomado automaticamente após 5 segundos de inatividade.</small>
-                        </div>
-                    `);
-                    chatBox.scrollTop(chatBox[0].scrollHeight);
-                })
-                .catch(err => console.error(err));
-            }, tempo_de_espera_ate_o_bot_assumir); // 5000ms = 5 segundos
+        socket.emit('chatmessage', {
+            conversation_id: conversation_id,
+            user_id: '{{ auth()->id() ?? "guest" }}',
+            from: 'user',
+            mensagem: mensagem
         });
-  });
 
-    </script>
+        fetch("{{ route('chat.enviarparabatepaposite') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": "{{ csrf_token() }}"
+            },
+            body: JSON.stringify({ mensagem, conversation_id })
+        })
+        .then(res => res.json())
+        .then(data => console.log('Mensagem salva no backend:', data))
+        .catch(err => console.error('Erro ao salvar mensagem:', err));
+    });
+
+    // Toggle manual
+    humanToggle.change(function () {
+        const isHuman = $(this).is(':checked');
+        const feedbackMsg = isHuman
+            ? "🔒 Controle humano ativado. O bot não responderá."
+            : "🤖 Controle humano desativado. O bot voltou a responder.";
+        updateHumanControl(isHuman, feedbackMsg);
+    });
+
+    // Input para ativar controle humano + timeout do bot
+    mensagemInput.on('input', function () {
+        ativarControleHumano();
+        resetHumanTimeout();
+    });
+
+});
+</script>
+
+
+ 
 </x-admin.layout>
