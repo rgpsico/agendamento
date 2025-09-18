@@ -183,7 +183,7 @@ class ChatController extends Controller
         $userMessage = Message::createUserMessage($conversation->id, $cleanUserMessage);
 
         $this->twilioService->enviarAlertaNovaMensagem($conversation->id, $userMessage, $request->empresa_id, $request->empresa_telefone);
-        dd('passou');
+
         $respostaBot = null;
 
         // Chama o DeepSeek apenas se não estiver sob controle humano
