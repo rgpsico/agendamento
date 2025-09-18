@@ -16,6 +16,7 @@ class Conversation extends Model
         'mensagem',
         'tipo',
         'human_controlled',
+        'telefone'
 
     ];
 

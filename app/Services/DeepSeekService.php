@@ -93,7 +93,50 @@ class DeepSeekService
         // 8. Retorna a resposta limpa
         return $cleanResponse;
     }
+    public function gerarImagem(
+        string $prompt,
+        int $width = 512,
+        int $height = 512,
+        string $quality = 'standard',
+        string $responseFormat = 'url'
+    ): array {
+        try {
+            $response = Http::timeout($this->timeout)
+                ->withHeaders([
+                    'Authorization' => "Bearer {$this->apiKey}",
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json',
+                ])
+                ->post("{$this->baseUrl}/images/generations", [
+                    'model' => 'deepseek-image', // Verificar modelo correto na documentação
+                    'prompt' => $this->sanitizePrompt($prompt),
+                    'size' => "{$width}x{$height}",
+                    'quality' => $quality,
+                    'response_format' => $responseFormat,
+                    'n' => 1,
+                ]);
 
+            if (!$response->successful()) {
+                $this->logError('DeepSeek API Error', $response);
+                throw new \Exception($this->getErrorMessage($response));
+            }
+
+            $data = $response->json();
+
+            if (!isset($data['data']) || empty($data['data'])) {
+                throw new \Exception('Resposta inválida da API DeepSeek');
+            }
+
+            return $data;
+        } catch (\Exception $e) {
+            Log::error('Erro ao gerar imagem DeepSeek', [
+                'message' => $e->getMessage(),
+                'prompt' => $prompt,
+                'dimensions' => "{$width}x{$height}",
+            ]);
+            throw $e;
+        }
+    }
 
 
     public function getDeepSeekResponseWithPrompt(Bot $bot, string $question, Conversation $conversation, int $empresa_id, int $contextMessages = 3): string

@@ -16,6 +16,8 @@ use App\Models\TokenUsage;
 use App\Services\DeepSeekService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class ChatController extends Controller
 {
@@ -238,6 +240,124 @@ class ChatController extends Controller
         ]);
     }
 
+
+    public function generateImage(Request $request)
+    {
+        // Validação dos parâmetros
+        $request->validate([
+            'prompt' => 'required|string|max:500',
+            'width' => 'sometimes|integer|in:256,512,1024', // Dimensões compatíveis
+            'height' => 'sometimes|integer|in:256,512,1024',
+        ]);
+
+        $prompt = $request->input('prompt');
+        $width = $request->input('width', 512);
+        $height = $request->input('height', 512);
+
+        // Mapear dimensões para image_size da fal.ai
+        $imageSize = $this->mapToFalAiImageSize($width, $height);
+        if (!$imageSize) {
+            return response()->json([
+                'success' => false,
+                'erro' => 'Dimensões inválidas. Use combinações como 512x512, 1024x768, ou 768x1024.',
+            ], 400);
+        }
+
+        // Verifica se a chave existe
+        $apiKey = env('FAL_AI_API_KEY');
+        if (empty($apiKey)) {
+            return response()->json([
+                'success' => false,
+                'erro' => 'Chave API da fal.ai não configurada em .env (FAL_AI_API_KEY)',
+            ], 500);
+        }
+
+        try {
+            // Chama a API do fal.ai (Janus-Pro)
+            $response = Http::timeout(120)
+                ->withHeaders([
+                    'Authorization' => 'Key ' . $apiKey,
+                    'Content-Type' => 'application/json',
+                ])
+                ->post('https://fal.run/fal-ai/janus', [
+                    'prompt' => $prompt,
+                    'image_size' => $imageSize, // Ex: "square", "landscape_4_3"
+                    'num_inference_steps' => 28,
+                    'guidance_scale' => 5.0,
+                    'seed' => rand(0, 1000000),
+                ]);
+
+            // Verifica status
+            if (!$response->successful()) {
+                $errorBody = $response->body();
+                Log::error('Erro na API fal.ai (Janus)', [
+                    'status' => $response->status(),
+                    'error' => $errorBody,
+                    'prompt' => $prompt,
+                    'image_size' => $imageSize,
+                ]);
+                throw new \Exception("Falha na geração: {$errorBody}");
+            }
+
+            $data = $response->json();
+
+            // Verifica resposta
+            if (!isset($data['images']) || empty($data['images'])) {
+                throw new \Exception('Resposta inválida: Nenhuma imagem gerada');
+            }
+
+            $imagemData = $data['images'][0];
+
+            // Se base64, salva localmente; senão, usa URL
+            if (isset($imagemData['base64']) && !empty($imagemData['base64'])) {
+                $nomeArquivo = 'deepseek_janus_' . time() . '.png';
+                $imagemBinaria = base64_decode($imagemData['base64']);
+                if ($imagemBinaria === false) {
+                    throw new \Exception('Erro ao decodificar base64');
+                }
+                Storage::disk('public')->put($nomeArquivo, $imagemBinaria);
+                $imagemUrl = asset("storage/{$nomeArquivo}");
+            } else {
+                $imagemUrl = $imagemData['url'] ?? null;
+                if (empty($imagemUrl)) {
+                    throw new \Exception('URL da imagem não encontrada na resposta');
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'imagem_url' => $imagemUrl,
+                'request_id' => $data['request_id'] ?? null,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Erro ao gerar imagem com fal.ai', [
+                'message' => $e->getMessage(),
+                'prompt' => $prompt,
+                'image_size' => $imageSize,
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'erro' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+
+    private function mapToFalAiImageSize($width, $height)
+    {
+        $sizes = [
+            '512x512' => 'square',
+            '1024x1024' => 'square_hd',
+            '768x1024' => 'portrait_4_3',
+            '1024x768' => 'landscape_4_3',
+            '576x1024' => 'portrait_16_9',
+            '1024x576' => 'landscape_16_9',
+        ];
+
+        $key = "{$width}x{$height}";
+        return $sizes[$key] ?? null;
+    }
 
 
 
