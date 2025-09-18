@@ -182,6 +182,8 @@ class ChatController extends Controller
         // Salva a mensagem do usuário
         $userMessage = Message::createUserMessage($conversation->id, $cleanUserMessage);
 
+        $this->twilioService->enviarAlertaNovaMensagem($conversation->id, $userMessage, $request->empresa_id, $request->empresa_telefone);
+        dd('passou');
         $respostaBot = null;
 
         // Chama o DeepSeek apenas se não estiver sob controle humano
@@ -192,8 +194,6 @@ class ChatController extends Controller
         // Sempre envia a mensagem do usuário para o endpoint externo
         $this->enviarMensagemExterna($conversation->id, $request->mensagem, $userId);
 
-
-        $this->twilioService->enviarAlertaNovaMensagem($conversation->id, $userMessage, $request->empresa_id, $request->empresa_telefone);
 
 
         return response()->json([
