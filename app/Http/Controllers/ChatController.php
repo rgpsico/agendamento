@@ -191,6 +191,13 @@ class ChatController extends Controller
         $this->enviarMensagemExterna($conversation->id, $request->mensagem, $userId);
 
 
+        if ($conversation->empresa_id) {
+            $userMessage->load('conversation'); // garante que tem a conversa
+            app(\App\Services\TwilioService::class)
+                ->enviarAlertaNovaMensagem($userMessage, $conversation->empresa_idmpresa);
+        }
+
+
         return response()->json([
             'conversation_id' => $conversation->id,
             'bot_response' => $respostaBot,
