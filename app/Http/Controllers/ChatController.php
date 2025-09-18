@@ -14,6 +14,7 @@ use App\Models\Professor;
 use App\Models\Servicos;
 use App\Models\TokenUsage;
 use App\Services\DeepSeekService;
+use App\Services\TwilioService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -21,11 +22,12 @@ use Illuminate\Support\Facades\Storage;
 
 class ChatController extends Controller
 {
-    protected $deepSeekService;
+    protected $deepSeekService, $twilioService;
 
-    public function __construct(DeepSeekService $deepSeekService)
+    public function __construct(DeepSeekService $deepSeekService, TwilioService $twilioService)
     {
         $this->deepSeekService = $deepSeekService;
+        $this->twilioService = $twilioService;
     }
 
 
@@ -191,10 +193,10 @@ class ChatController extends Controller
         $this->enviarMensagemExterna($conversation->id, $request->mensagem, $userId);
 
 
-        if ($conversation->empresa_id) {
-            $userMessage->load('conversation'); // garante que tem a conversa
-            app(\App\Services\TwilioService::class)
-                ->enviarAlertaNovaMensagem($userMessage, $conversation->empresa_idmpresa);
+
+        if ($request->empresa_id && $request->empresa_telefone) {
+            $userMessage->load('conversation');
+            $this->twilioService->enviarAlertaNovaMensagem($conversation->id, $userMessage, $request->empresa_id);
         }
 
 

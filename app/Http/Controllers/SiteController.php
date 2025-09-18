@@ -20,7 +20,7 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 class SiteController extends Controller
 {
 
-   public function lista(Request $request)
+    public function lista(Request $request)
     {
         $empresaId = Auth::user()->empresa->id;
 
@@ -54,7 +54,7 @@ class SiteController extends Controller
 
 
 
-  public function create()
+    public function create()
     {
         // Aqui você pega todos os templates disponíveis
         // Supondo que você tenha um Model Template
@@ -64,61 +64,61 @@ class SiteController extends Controller
         return view('admin.site.lista.create', compact('templates'));
     }
 
-  public function editSite($idsite)
-{
-   
-    $site = EmpresaSite::findOrFail($idsite);
+    public function editSite($idsite)
+    {
 
-    // Verifica se o usuário tem acesso ao site
-    if ($site->empresa_id !== Auth::user()->empresa->id) {
-        abort(403, 'Acesso não autorizado.');
+        $site = EmpresaSite::findOrFail($idsite);
+
+        // Verifica se o usuário tem acesso ao site
+        if ($site->empresa_id !== Auth::user()->empresa->id) {
+            abort(403, 'Acesso não autorizado.');
+        }
+
+        // Busca todos os templates
+        $templates = SiteTemplate::all();
+
+        // --- lógica de dnsStatus e sslStatus ---
+        $ipServidor = request()->server('SERVER_ADDR') ?? '191.252.92.206';
+
+        $dnsStatus = false;
+
+        if (!empty($site->dominio_personalizado)) {
+            $dnsRecords = dns_get_record($site->dominio_personalizado, DNS_A);
+            $ips = collect($dnsRecords)->pluck('ip')->toArray();
+            $dnsStatus = in_array($ipServidor, $ips);
+        }
+
+        $sslStatus = false;
+
+        if (!empty($site->dominio_personalizado)) {
+            $stream = @stream_context_create(["ssl" => ["capture_peer_cert" => true]]);
+            $read = @stream_socket_client("ssl://{$site->dominio_personalizado}:443", $errno, $errstr, 30, STREAM_CLIENT_CONNECT, $stream);
+            $sslStatus = $read !== false;
+        }
+
+        return view('admin.site.lista.edit', compact('site', 'templates', 'dnsStatus', 'sslStatus', 'ipServidor'));
     }
 
-    // Busca todos os templates
-    $templates = SiteTemplate::all();
+    private function verificarDnsSsl($dominio)
+    {
+        $ipServidor = request()->server('SERVER_ADDR') ?? '191.252.92.206';
 
-    // --- lógica de dnsStatus e sslStatus ---
-    $ipServidor = request()->server('SERVER_ADDR') ?? '191.252.92.206';
+        $dnsStatus = false;
+        if (!empty($dominio)) {
+            $dnsRecords = dns_get_record($dominio, DNS_A);
+            $ips = collect($dnsRecords)->pluck('ip')->toArray();
+            $dnsStatus = in_array($ipServidor, $ips);
+        }
 
-    $dnsStatus = false;
-   
-    if (!empty($site->dominio_personalizado)) {
-        $dnsRecords = dns_get_record($site->dominio_personalizado, DNS_A);
-        $ips = collect($dnsRecords)->pluck('ip')->toArray();
-        $dnsStatus = in_array($ipServidor, $ips);
+        $sslStatus = false;
+        if (!empty($dominio)) {
+            $stream = @stream_context_create(["ssl" => ["capture_peer_cert" => true]]);
+            $read = @stream_socket_client("ssl://{$dominio}:443", $errno, $errstr, 30, STREAM_CLIENT_CONNECT, $stream);
+            $sslStatus = $read !== false;
+        }
+
+        return compact('dnsStatus', 'sslStatus', 'ipServidor');
     }
-
-    $sslStatus = false;
-    
-    if (!empty($site->dominio_personalizado)) {
-        $stream = @stream_context_create(["ssl" => ["capture_peer_cert" => true]]);
-        $read = @stream_socket_client("ssl://{$site->dominio_personalizado}:443", $errno, $errstr, 30, STREAM_CLIENT_CONNECT, $stream);
-        $sslStatus = $read !== false;
-    }
-  
-    return view('admin.site.lista.edit', compact('site', 'templates', 'dnsStatus', 'sslStatus', 'ipServidor'));
-}
-
-private function verificarDnsSsl($dominio)
-{
-    $ipServidor = request()->server('SERVER_ADDR') ?? '191.252.92.206';
-
-    $dnsStatus = false;
-    if (!empty($dominio)) {
-        $dnsRecords = dns_get_record($dominio, DNS_A);
-        $ips = collect($dnsRecords)->pluck('ip')->toArray();
-        $dnsStatus = in_array($ipServidor, $ips);
-    }
-
-    $sslStatus = false;
-    if (!empty($dominio)) {
-        $stream = @stream_context_create(["ssl" => ["capture_peer_cert" => true]]);
-        $read = @stream_socket_client("ssl://{$dominio}:443", $errno, $errstr, 30, STREAM_CLIENT_CONNECT, $stream);
-        $sslStatus = $read !== false;
-    }
-
-    return compact('dnsStatus', 'sslStatus', 'ipServidor');
-}
 
 
 
@@ -144,8 +144,8 @@ private function verificarDnsSsl($dominio)
                 'trackingCodes' // Carrega os tracking codes ativos
             ])
             ->firstOrFail();
-              
-           $view_template = $site->template->path_view ?? 'site.publico';
+
+        $view_template = $site->template->path_view ?? 'site.publico';
         return view($view_template, compact('site'));
     }
 
@@ -154,7 +154,7 @@ private function verificarDnsSsl($dominio)
     public function mostrarDominio(Request $request)
     {
         $host = $request->getHost();
-  
+
         // Domínio padrão do sistema
         $dominioPrincipal = 'agendamento.rjpasseios.com.br';
 
@@ -168,15 +168,15 @@ private function verificarDnsSsl($dominio)
             ->firstOrFail();
 
         $view_template = $site->template->path_view ?? 'site.publico';
-      
-        return view($view_template , compact('site'));
+
+        return view($view_template, compact('site'));
     }
 
 
 
     public function edit()
     {
-       
+
         $empresa = Auth::user()->empresa;
 
         $site = EmpresaSite::firstOrNew(['empresa_id' => $empresa->id]);
@@ -219,145 +219,156 @@ private function verificarDnsSsl($dominio)
         return $slug;
     }
 
-    
 
 
- public function store(StoreSiteRequest $request)
 
-{
-    
-    // Todos os dados já estão validados aqui
-    $validated = $request->validated();
-   
-  
-    $slug = Str::slug($validated['titulo']);
+    public function store(StoreSiteRequest $request)
 
-    // Ensure the slug is unique (optional, if uniqueness is required)
-    $originalSlug = $slug;
-    $counter = 1;
-    while (EmpresaSite::where('slug', $slug)->exists()) {
-        $slug = $originalSlug . '-' . $counter++;
-    }
-    $site = EmpresaSite::create([
-        'empresa_id' => Auth::user()->empresa->id,
-        'template_id' => $validated['template_id'],
-        'titulo' => $validated['titulo'],
-        'slug' => $slug, // Add the slug here
-        'descricao' => $validated['descricao'],
-        'cores' => [
-            'primaria' => $validated['cores']['primaria'],
-            'secundaria' => $validated['cores']['secundaria'],
-        ],
-        'sobre_titulo' => $validated['sobre_titulo'],
-        'sobre_descricao' => $validated['sobre_descricao'],
-        'whatsapp' => $validated['whatsapp'],
-        'autoatendimento_ia' => $validated['autoatendimento_ia'] ?? false,
-        'dominio_personalizado' => $validated['dominio_personalizado'],
-        'gerar_vhost' => $validated['gerar_vhost'] ?? false,
-    ]);
+    {
 
-    // Salvar arquivos (logo, capa, sobre_imagem, etc.)
-    if ($request->hasFile('logo')) {
-        $site->logo = $request->file('logo')->store('logos', 'public');
-    }
-    if ($request->hasFile('capa')) {
-        $site->capa = $request->file('capa')->store('capas', 'public');
-    }
-    if ($request->hasFile('sobre_imagem')) {
-        $site->sobre_imagem = $request->file('sobre_imagem')->store('sobre_imagens', 'public');
-    }
+        // Todos os dados já estão validados aqui
+        $validated = $request->validated();
 
-    // Salvar itens do "Sobre Nós"
-    if (!empty($validated['sobre_itens'])) {
-        $site->sobre_itens = $validated['sobre_itens'];
-    }
 
-    // Salvar serviços
-    if ($request->filled('servicos')) {
-        foreach ($request->servicos as $servicoInput) {
-            $imagemPath = null;
-            if (!empty($servicoInput['imagem'])) {
-                $imagemPath = $servicoInput['imagem']->store('sites/servicos', 'public');
-            }
+        $slug = Str::slug($validated['titulo']);
 
-            if (!empty($servicoInput['id'])) {
-                $servico = SiteServico::find($servicoInput['id']);
-                if ($servico) {
-                    $servico->update([
+        // Ensure the slug is unique (optional, if uniqueness is required)
+        $originalSlug = $slug;
+        $counter = 1;
+        while (EmpresaSite::where('slug', $slug)->exists()) {
+            $slug = $originalSlug . '-' . $counter++;
+        }
+        $site = EmpresaSite::create([
+            'empresa_id' => Auth::user()->empresa->id,
+            'template_id' => $validated['template_id'],
+            'titulo' => $validated['titulo'],
+            'slug' => $slug, // Add the slug here
+            'descricao' => $validated['descricao'],
+            'cores' => [
+                'primaria' => $validated['cores']['primaria'],
+                'secundaria' => $validated['cores']['secundaria'],
+            ],
+            'sobre_titulo' => $validated['sobre_titulo'],
+            'sobre_descricao' => $validated['sobre_descricao'],
+            'whatsapp' => $validated['whatsapp'],
+            'autoatendimento_ia' => $validated['autoatendimento_ia'] ?? false,
+            'dominio_personalizado' => $validated['dominio_personalizado'],
+            'gerar_vhost' => $validated['gerar_vhost'] ?? false,
+        ]);
+
+        // Salvar arquivos (logo, capa, sobre_imagem, etc.)
+        if ($request->hasFile('logo')) {
+            $site->logo = $request->file('logo')->store('logos', 'public');
+        }
+        if ($request->hasFile('capa')) {
+            $site->capa = $request->file('capa')->store('capas', 'public');
+        }
+        if ($request->hasFile('sobre_imagem')) {
+            $site->sobre_imagem = $request->file('sobre_imagem')->store('sobre_imagens', 'public');
+        }
+
+        // Salvar itens do "Sobre Nós"
+        if (!empty($validated['sobre_itens'])) {
+            $site->sobre_itens = $validated['sobre_itens'];
+        }
+
+        // Salvar serviços
+        if ($request->filled('servicos')) {
+            foreach ($request->servicos as $servicoInput) {
+                $imagemPath = null;
+                if (!empty($servicoInput['imagem'])) {
+                    $imagemPath = $servicoInput['imagem']->store('sites/servicos', 'public');
+                }
+
+                if (!empty($servicoInput['id'])) {
+                    $servico = SiteServico::find($servicoInput['id']);
+                    if ($servico) {
+                        $servico->update([
+                            'titulo' => $servicoInput['titulo'],
+                            'descricao' => $servicoInput['descricao'] ?? null,
+                            'preco' => $servicoInput['preco'] ?? null,
+                            'imagem' => $imagemPath ?? $servicoInput['imagem_existente'] ?? $servico->imagem,
+                        ]);
+                    }
+                } else {
+                    SiteServico::create([
+                        'site_id' => $site->id,
                         'titulo' => $servicoInput['titulo'],
                         'descricao' => $servicoInput['descricao'] ?? null,
                         'preco' => $servicoInput['preco'] ?? null,
-                        'imagem' => $imagemPath ?? $servicoInput['imagem_existente'] ?? $servico->imagem,
+                        'imagem' => $imagemPath ?? null,
                     ]);
                 }
-            } else {
-                SiteServico::create([
-                    'site_id' => $site->id,
-                    'titulo' => $servicoInput['titulo'],
-                    'descricao' => $servicoInput['descricao'] ?? null,
-                    'preco' => $servicoInput['preco'] ?? null,
-                    'imagem' => $imagemPath ?? null,
-                ]);
             }
         }
-    }
 
-    // --- Depoimentos ---
-    if ($request->filled('depoimentos')) {
-        foreach ($request->depoimentos as $depoimentoInput) {
-            if (!empty($depoimentoInput['deleted']) && $depoimentoInput['deleted'] == 1 && !empty($depoimentoInput['id'])) {
-                $depo = SiteDepoimento::find($depoimentoInput['id']);
-                if ($depo) {
-                    if ($depo->foto && Storage::disk('public')->exists($depo->foto)) {
-                        Storage::disk('public')->delete($depo->foto);
+        // --- Depoimentos ---
+        if ($request->filled('depoimentos')) {
+            foreach ($request->depoimentos as $depoimentoInput) {
+                if (!empty($depoimentoInput['deleted']) && $depoimentoInput['deleted'] == 1 && !empty($depoimentoInput['id'])) {
+                    $depo = SiteDepoimento::find($depoimentoInput['id']);
+                    if ($depo) {
+                        if ($depo->foto && Storage::disk('public')->exists($depo->foto)) {
+                            Storage::disk('public')->delete($depo->foto);
+                        }
+                        $depo->delete();
                     }
-                    $depo->delete();
+                    continue;
                 }
-                continue;
-            }
 
-            $fotoPath = null;
-            if (!empty($depoimentoInput['foto'])) {
-                $fotoPath = $depoimentoInput['foto']->store('sites/depoimentos', 'public');
-            }
+                $fotoPath = null;
+                if (!empty($depoimentoInput['foto'])) {
+                    $fotoPath = $depoimentoInput['foto']->store('sites/depoimentos', 'public');
+                }
 
-            if (!empty($depoimentoInput['id'])) {
-                $depo = SiteDepoimento::find($depoimentoInput['id']);
-                if ($depo) {
-                    $depo->update([
+                if (!empty($depoimentoInput['id'])) {
+                    $depo = SiteDepoimento::find($depoimentoInput['id']);
+                    if ($depo) {
+                        $depo->update([
+                            'nome' => $depoimentoInput['nome'],
+                            'nota' => $depoimentoInput['nota'] ?? null,
+                            'comentario' => $depoimentoInput['comentario'] ?? null,
+                            'foto' => $fotoPath ?? $depoimentoInput['foto_existente'] ?? $depo->foto,
+                        ]);
+                    }
+                } else {
+                    SiteDepoimento::create([
+                        'site_id' => $site->id,
                         'nome' => $depoimentoInput['nome'],
                         'nota' => $depoimentoInput['nota'] ?? null,
                         'comentario' => $depoimentoInput['comentario'] ?? null,
-                        'foto' => $fotoPath ?? $depoimentoInput['foto_existente'] ?? $depo->foto,
+                        'foto' => $fotoPath ?? null,
                     ]);
                 }
-            } else {
-                SiteDepoimento::create([
-                    'site_id' => $site->id,
-                    'nome' => $depoimentoInput['nome'],
-                    'nota' => $depoimentoInput['nota'] ?? null,
-                    'comentario' => $depoimentoInput['comentario'] ?? null,
-                    'foto' => $fotoPath ?? null,
-                ]);
             }
         }
-    }
 
-    // --- Tracking Codes ---
-    if ($request->filled('tracking_codes')) {
-        foreach ($request->tracking_codes as $trackingInput) {
-            if (!empty($trackingInput['deleted']) && $trackingInput['deleted'] == 1 && !empty($trackingInput['id'])) {
-                $track = TrackingCode::find($trackingInput['id']);
-                if ($track) {
-                    $track->delete();
+        // --- Tracking Codes ---
+        if ($request->filled('tracking_codes')) {
+            foreach ($request->tracking_codes as $trackingInput) {
+                if (!empty($trackingInput['deleted']) && $trackingInput['deleted'] == 1 && !empty($trackingInput['id'])) {
+                    $track = TrackingCode::find($trackingInput['id']);
+                    if ($track) {
+                        $track->delete();
+                    }
+                    continue;
                 }
-                continue;
-            }
 
-            if (!empty($trackingInput['id'])) {
-                $track = TrackingCode::find($trackingInput['id']);
-                if ($track) {
-                    $track->update([
+                if (!empty($trackingInput['id'])) {
+                    $track = TrackingCode::find($trackingInput['id']);
+                    if ($track) {
+                        $track->update([
+                            'name' => $trackingInput['name'],
+                            'provider' => $trackingInput['provider'],
+                            'code' => $trackingInput['code'],
+                            'type' => $trackingInput['type'],
+                            'script' => $trackingInput['script'] ?? null,
+                            'status' => $trackingInput['status'] ?? true,
+                        ]);
+                    }
+                } else {
+                    TrackingCode::create([
+                        'site_id' => $site->id,
                         'name' => $trackingInput['name'],
                         'provider' => $trackingInput['provider'],
                         'code' => $trackingInput['code'],
@@ -366,216 +377,216 @@ private function verificarDnsSsl($dominio)
                         'status' => $trackingInput['status'] ?? true,
                     ]);
                 }
-            } else {
-                TrackingCode::create([
-                    'site_id' => $site->id,
-                    'name' => $trackingInput['name'],
-                    'provider' => $trackingInput['provider'],
-                    'code' => $trackingInput['code'],
-                    'type' => $trackingInput['type'],
-                    'script' => $trackingInput['script'] ?? null,
-                    'status' => $trackingInput['status'] ?? true,
-                ]);
             }
         }
+
+        $site->save();
+
+        return redirect()->route('admin.site.lista')->with('success', 'Site criado com sucesso!');
     }
-
-    $site->save();
-
-    return redirect()->route('admin.site.lista')->with('success', 'Site criado com sucesso!');
-}
 
 
 
     /**
      * Salva as configurações atualizadas do site
      */
-   public function update(Request $request, EmpresaSite $site)
-{
- 
-     
-    // Validação
-    $validated = $request->validate([
-        'titulo' => 'required|string|max:255',
-        'descricao' => 'nullable|string',
-        'cores' => 'required|array',
-        'cores.primaria' => 'required|string',
-        'cores.secundaria' => 'required|string',
-        'sobre_titulo' => 'nullable|string|max:255',
-        'sobre_descricao' => 'nullable|string',
-        'sobre_itens' => 'nullable|array',
-        'sobre_itens.*.icone' => 'nullable|string|max:255',
-        'sobre_itens.*.titulo' => 'nullable|string|max:255',
-        'sobre_itens.*.descricao' => 'nullable|string',
-        'whatsapp' => 'nullable|string|max:20',
-        'template_id' => 'required|exists:site_templates,id',
-        'atendimento_com_ia' => 'nullable|in:on,off',
-        'atendimento_com_whatsapp' => 'nullable|in:on,off',
+    public function update(Request $request, EmpresaSite $site)
+    {
 
-        // Novos campos
-        'servicos' => 'nullable|array',
-        'servicos.*.titulo' => 'required|string|max:255',
-        'servicos.*.descricao' => 'nullable|string',
-        'servicos.*.preco' => 'nullable|numeric',
-        'servicos.*.imagem' => 'nullable|image|max:2048',
 
-        'depoimentos' => 'nullable|array',
-        'depoimentos.*.nome' => 'required|string|max:255',
-        'depoimentos.*.nota' => 'nullable|numeric|min:0|max:5',
-        'depoimentos.*.comentario' => 'nullable|string',
-        'depoimentos.*.foto' => 'nullable|image|max:2048',
+        // Validação
+        $validated = $request->validate([
+            'titulo' => 'required|string|max:255',
+            'descricao' => 'nullable|string',
+            'cores' => 'required|array',
+            'cores.primaria' => 'required|string',
+            'cores.secundaria' => 'required|string',
+            'sobre_titulo' => 'nullable|string|max:255',
+            'sobre_descricao' => 'nullable|string',
+            'sobre_itens' => 'nullable|array',
+            'sobre_itens.*.icone' => 'nullable|string|max:255',
+            'sobre_itens.*.titulo' => 'nullable|string|max:255',
+            'sobre_itens.*.descricao' => 'nullable|string',
+            'whatsapp' => 'nullable|string|max:20',
+            'template_id' => 'required|exists:site_templates,id',
+            'atendimento_com_ia' => 'nullable|in:on,off',
+            'atendimento_com_whatsapp' => 'nullable|in:on,off',
 
-        // Tracking codes
-        'tracking_codes' => 'nullable|array',
-        'tracking_codes.*.name' => 'required|string|max:100',
-        'tracking_codes.*.provider' => 'required|string|max:50',
-        'tracking_codes.*.code' => 'required|string|max:255',
-        'tracking_codes.*.type' => 'required|in:analytics,ads,pixel,other',
-        'tracking_codes.*.script' => 'nullable|string',
-        'tracking_codes.*.status' => 'boolean',
-    ]);
+            // Novos campos
+            'servicos' => 'nullable|array',
+            'servicos.*.titulo' => 'required|string|max:255',
+            'servicos.*.descricao' => 'nullable|string',
+            'servicos.*.preco' => 'nullable|numeric',
+            'servicos.*.imagem' => 'nullable|image|max:2048',
 
-   
+            'depoimentos' => 'nullable|array',
+            'depoimentos.*.nome' => 'required|string|max:255',
+            'depoimentos.*.nota' => 'nullable|numeric|min:0|max:5',
+            'depoimentos.*.comentario' => 'nullable|string',
+            'depoimentos.*.foto' => 'nullable|image|max:2048',
 
-    // Dados principais do site
-    $data = [
-        'titulo' => $request->titulo,
-        'descricao' => $request->descricao,
-        'template_id' => $request->template_id,
-        'cores' => [
-            'primaria' => $request->input('cores.primaria', '#0ea5e9'),
-            'secundaria' => $request->input('cores.secundaria', '#38b2ac'),
-        ],
-        'sobre_titulo' => $request->sobre_titulo,
-        'sobre_descricao' => $request->sobre_descricao,
-        'sobre_itens' => $request->input('sobre_itens', []),
-        'whatsapp' => $request->whatsapp,
-        'atendimento_com_ia' => $request->input('atendimento_com_ia') == 'on' ? 1 : 0,
-        'atendimento_com_whatsapp' => $request->input('atendimento_com_whatsapp') == 'on' ? 1 : 0,
-    ];
-   
-    
-    // Upload logo
-    if ($request->hasFile('logo')) {
-        if ($site->logo && Storage::disk('public')->exists($site->logo)) {
-            Storage::disk('public')->delete($site->logo);
-        }
-        $data['logo'] = $request->file('logo')->store('sites/logos', 'public');
-    }
+            // Tracking codes
+            'tracking_codes' => 'nullable|array',
+            'tracking_codes.*.name' => 'required|string|max:100',
+            'tracking_codes.*.provider' => 'required|string|max:50',
+            'tracking_codes.*.code' => 'required|string|max:255',
+            'tracking_codes.*.type' => 'required|in:analytics,ads,pixel,other',
+            'tracking_codes.*.script' => 'nullable|string',
+            'tracking_codes.*.status' => 'boolean',
+        ]);
 
-    // Upload capa
-    if ($request->hasFile('capa')) {
-        if ($site->capa && Storage::disk('public')->exists($site->capa)) {
-            Storage::disk('public')->delete($site->capa);
-        }
-        $data['capa'] = $request->file('capa')->store('sites/capas', 'public');
-    }
 
-    // Upload sobre_imagem
-    if ($request->hasFile('sobre_imagem')) {
-        if ($site->sobre_imagem && Storage::disk('public')->exists($site->sobre_imagem)) {
-            Storage::disk('public')->delete($site->sobre_imagem);
-        }
-        $data['sobre_imagem'] = $request->file('sobre_imagem')->store('sites/sobre', 'public');
-    }
 
-    // Atualiza dados do site
-    $site->update($data);
+        // Dados principais do site
+        $data = [
+            'titulo' => $request->titulo,
+            'descricao' => $request->descricao,
+            'template_id' => $request->template_id,
+            'cores' => [
+                'primaria' => $request->input('cores.primaria', '#0ea5e9'),
+                'secundaria' => $request->input('cores.secundaria', '#38b2ac'),
+            ],
+            'sobre_titulo' => $request->sobre_titulo,
+            'sobre_descricao' => $request->sobre_descricao,
+            'sobre_itens' => $request->input('sobre_itens', []),
+            'whatsapp' => $request->whatsapp,
+            'atendimento_com_ia' => $request->input('atendimento_com_ia') == 'on' ? 1 : 0,
+            'atendimento_com_whatsapp' => $request->input('atendimento_com_whatsapp') == 'on' ? 1 : 0,
+        ];
 
-    
-    //  AtualizarConfiguracoesJob::dispatch($data, $site);
 
-    if(!empty($site->dominio_personalizado) && $site->gerar_vhost){
-        $this->criarOuAtualizarVirtualHost($site->dominio_personalizado);
-    }
-     
-    // --- Serviços ---
-    if ($request->filled('servicos')) {
-        foreach ($request->servicos as $servicoInput) {
-            $imagemPath = null;
-            if (!empty($servicoInput['imagem'])) {
-                $imagemPath = $servicoInput['imagem']->store('sites/servicos', 'public');
+        // Upload logo
+        if ($request->hasFile('logo')) {
+            if ($site->logo && Storage::disk('public')->exists($site->logo)) {
+                Storage::disk('public')->delete($site->logo);
             }
+            $data['logo'] = $request->file('logo')->store('sites/logos', 'public');
+        }
 
-            if (!empty($servicoInput['id'])) {
-                $servico = SiteServico::find($servicoInput['id']);
-                if ($servico) {
-                    $servico->update([
+        // Upload capa
+        if ($request->hasFile('capa')) {
+            if ($site->capa && Storage::disk('public')->exists($site->capa)) {
+                Storage::disk('public')->delete($site->capa);
+            }
+            $data['capa'] = $request->file('capa')->store('sites/capas', 'public');
+        }
+
+        // Upload sobre_imagem
+        if ($request->hasFile('sobre_imagem')) {
+            if ($site->sobre_imagem && Storage::disk('public')->exists($site->sobre_imagem)) {
+                Storage::disk('public')->delete($site->sobre_imagem);
+            }
+            $data['sobre_imagem'] = $request->file('sobre_imagem')->store('sites/sobre', 'public');
+        }
+
+        // Atualiza dados do site
+        $site->update($data);
+
+
+        //  AtualizarConfiguracoesJob::dispatch($data, $site);
+
+        if (!empty($site->dominio_personalizado) && $site->gerar_vhost) {
+            $this->criarOuAtualizarVirtualHost($site->dominio_personalizado);
+        }
+
+        // --- Serviços ---
+        if ($request->filled('servicos')) {
+            foreach ($request->servicos as $servicoInput) {
+                $imagemPath = null;
+                if (!empty($servicoInput['imagem'])) {
+                    $imagemPath = $servicoInput['imagem']->store('sites/servicos', 'public');
+                }
+
+                if (!empty($servicoInput['id'])) {
+                    $servico = SiteServico::find($servicoInput['id']);
+                    if ($servico) {
+                        $servico->update([
+                            'titulo' => $servicoInput['titulo'],
+                            'descricao' => $servicoInput['descricao'] ?? null,
+                            'preco' => $servicoInput['preco'] ?? null,
+                            'imagem' => $imagemPath ?? $servicoInput['imagem_existente'] ?? $servico->imagem,
+                        ]);
+                    }
+                } else {
+                    SiteServico::create([
+                        'site_id' => $site->id,
                         'titulo' => $servicoInput['titulo'],
                         'descricao' => $servicoInput['descricao'] ?? null,
                         'preco' => $servicoInput['preco'] ?? null,
-                        'imagem' => $imagemPath ?? $servicoInput['imagem_existente'] ?? $servico->imagem,
+                        'imagem' => $imagemPath ?? null,
                     ]);
                 }
-            } else {
-                SiteServico::create([
-                    'site_id' => $site->id,
-                    'titulo' => $servicoInput['titulo'],
-                    'descricao' => $servicoInput['descricao'] ?? null,
-                    'preco' => $servicoInput['preco'] ?? null,
-                    'imagem' => $imagemPath ?? null,
-                ]);
             }
         }
-    }
 
-    // --- Depoimentos ---
-    if ($request->filled('depoimentos')) {
-        foreach ($request->depoimentos as $depoimentoInput) {
-            if (!empty($depoimentoInput['deleted']) && $depoimentoInput['deleted'] == 1 && !empty($depoimentoInput['id'])) {
-                $depo = SiteDepoimento::find($depoimentoInput['id']);
-                if ($depo) {
-                    if ($depo->foto && Storage::disk('public')->exists($depo->foto)) {
-                        Storage::disk('public')->delete($depo->foto);
+        // --- Depoimentos ---
+        if ($request->filled('depoimentos')) {
+            foreach ($request->depoimentos as $depoimentoInput) {
+                if (!empty($depoimentoInput['deleted']) && $depoimentoInput['deleted'] == 1 && !empty($depoimentoInput['id'])) {
+                    $depo = SiteDepoimento::find($depoimentoInput['id']);
+                    if ($depo) {
+                        if ($depo->foto && Storage::disk('public')->exists($depo->foto)) {
+                            Storage::disk('public')->delete($depo->foto);
+                        }
+                        $depo->delete();
                     }
-                    $depo->delete();
+                    continue;
                 }
-                continue;
-            }
 
-            $fotoPath = null;
-           
-            if (!empty($depoimentoInput['foto'])) {
-                $fotoPath = $depoimentoInput['foto']->store('sites/depoimentos', 'public');
-            }
+                $fotoPath = null;
 
-            if (!empty($depoimentoInput['id'])) {
-                $depo = SiteDepoimento::find($depoimentoInput['id']);
-                if ($depo) {
-                    $depo->update([
+                if (!empty($depoimentoInput['foto'])) {
+                    $fotoPath = $depoimentoInput['foto']->store('sites/depoimentos', 'public');
+                }
+
+                if (!empty($depoimentoInput['id'])) {
+                    $depo = SiteDepoimento::find($depoimentoInput['id']);
+                    if ($depo) {
+                        $depo->update([
+                            'nome' => $depoimentoInput['nome'],
+                            'nota' => $depoimentoInput['nota'] ?? null,
+                            'comentario' => $depoimentoInput['comentario'] ?? null,
+                            'foto' => $fotoPath ?? $depoimentoInput['foto_existente'] ?? $depo->foto,
+                        ]);
+                    }
+                } else {
+                    SiteDepoimento::create([
+                        'site_id' => $site->id,
                         'nome' => $depoimentoInput['nome'],
                         'nota' => $depoimentoInput['nota'] ?? null,
                         'comentario' => $depoimentoInput['comentario'] ?? null,
-                        'foto' => $fotoPath ?? $depoimentoInput['foto_existente'] ?? $depo->foto,
+                        'foto' => $fotoPath ?? null,
                     ]);
                 }
-            } else {
-                SiteDepoimento::create([
-                    'site_id' => $site->id,
-                    'nome' => $depoimentoInput['nome'],
-                    'nota' => $depoimentoInput['nota'] ?? null,
-                    'comentario' => $depoimentoInput['comentario'] ?? null,
-                    'foto' => $fotoPath ?? null,
-                ]);
             }
         }
-    }
 
-    // --- Tracking Codes ---
-    if ($request->filled('tracking_codes')) {
-        foreach ($request->tracking_codes as $trackingInput) {
-            if (!empty($trackingInput['deleted']) && $trackingInput['deleted'] == 1 && !empty($trackingInput['id'])) {
-                $track = TrackingCode::find($trackingInput['id']);
-                if ($track) {
-                    $track->delete();
+        // --- Tracking Codes ---
+        if ($request->filled('tracking_codes')) {
+            foreach ($request->tracking_codes as $trackingInput) {
+                if (!empty($trackingInput['deleted']) && $trackingInput['deleted'] == 1 && !empty($trackingInput['id'])) {
+                    $track = TrackingCode::find($trackingInput['id']);
+                    if ($track) {
+                        $track->delete();
+                    }
+                    continue;
                 }
-                continue;
-            }
 
-            if (!empty($trackingInput['id'])) {
-                $track = TrackingCode::find($trackingInput['id']);
-                if ($track) {
-                    $track->update([
+                if (!empty($trackingInput['id'])) {
+                    $track = TrackingCode::find($trackingInput['id']);
+                    if ($track) {
+                        $track->update([
+                            'name' => $trackingInput['name'],
+                            'provider' => $trackingInput['provider'],
+                            'code' => $trackingInput['code'],
+                            'type' => $trackingInput['type'],
+                            'script' => $trackingInput['script'] ?? null,
+                            'status' => $trackingInput['status'] ?? true,
+                        ]);
+                    }
+                } else {
+                    TrackingCode::create([
+                        'site_id' => $site->id,
                         'name' => $trackingInput['name'],
                         'provider' => $trackingInput['provider'],
                         'code' => $trackingInput['code'],
@@ -584,22 +595,11 @@ private function verificarDnsSsl($dominio)
                         'status' => $trackingInput['status'] ?? true,
                     ]);
                 }
-            } else {
-                TrackingCode::create([
-                    'site_id' => $site->id,
-                    'name' => $trackingInput['name'],
-                    'provider' => $trackingInput['provider'],
-                    'code' => $trackingInput['code'],
-                    'type' => $trackingInput['type'],
-                    'script' => $trackingInput['script'] ?? null,
-                    'status' => $trackingInput['status'] ?? true,
-                ]);
             }
         }
-    }
 
-    return redirect()->back()->with('success', 'Configurações do site atualizadas com sucesso!');
-}
+        return redirect()->back()->with('success', 'Configurações do site atualizadas com sucesso!');
+    }
 
 
 
@@ -627,7 +627,7 @@ private function verificarDnsSsl($dominio)
     public function atualizarConfiguracoes(Request $request, EmpresaSite $site)
     {
         // Validação
-     set_time_limit(900);
+        set_time_limit(900);
 
         $data = $request->validate([
             'titulo' => 'required|string|max:255',
@@ -731,7 +731,7 @@ private function verificarDnsSsl($dominio)
         ]);
 
 
-   
+
         // Busca o site pelo ID e verifica se pertence à empresa logada
         $site = EmpresaSite::where('id', $request->site_id)
             ->where('empresa_id', Auth::user()->empresa->id)
@@ -806,5 +806,4 @@ private function verificarDnsSsl($dominio)
 
         return redirect()->route('admin.site.lista')->with('success', 'Site excluído com sucesso!');
     }
-
 }

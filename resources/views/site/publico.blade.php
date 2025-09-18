@@ -48,7 +48,7 @@
 
    @if($site->atendimento_com_ia)
    
-    <x-batepapo />
+    <x-batepapo  :site="$site"/>
     @endif
 
 

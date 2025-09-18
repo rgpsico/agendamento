@@ -30,7 +30,7 @@ class TwilioService
         );
     }
 
-    public function enviarAlertaNovaMensagem($conversation_id,$mensagem, $empresa)
+    public function enviarAlertaNovaMensagem($conversation_id, $mensagem, $empresaTelefone)
     {
         $texto = "📩 Novo cliente está falando com você!\n\n";
         $texto .= "Mensagem: \"{$mensagem->conteudo}\"\n";
@@ -38,9 +38,8 @@ class TwilioService
         $texto .= url("/chat/{$conversation_id}");
 
         try {
-            $telefone = $this->formatPhone($empresa->telefone);
+            $telefone = $this->formatPhone($empresaTelefone);
             $this->sendWhatsApp($telefone, $texto);
-
         } catch (\Exception $e) {
             \Log::error('Erro ao enviar alerta de mensagem: ' . $e->getMessage());
         }
@@ -64,10 +63,9 @@ class TwilioService
         $mensagem .= "Status do Pagamento: {$pagamento->status}";
 
         try {
-            
-            $telefone = $this->formatPhone($professor->empresa->telefone);
-             $this->sendWhatsApp($telefone, $mensagem);
 
+            $telefone = $this->formatPhone($professor->empresa->telefone);
+            $this->sendWhatsApp($telefone, $mensagem);
         } catch (\Exception $e) {
             \Log::error('Erro ao enviar WhatsApp: ' . $e->getMessage());
             // Não interrompe o fluxo do controller
@@ -86,6 +84,4 @@ class TwilioService
 
         return $digits;
     }
-
-
 }

@@ -17,6 +17,7 @@
 
 @include('components.style.chatstyle')
 
+
 <!-- Chatbot Float Button -->
 <div class="chatbot-float-btn" id="chatbot-float-btn" style="margin-right:7em;">
     <div class="chat-icon">
@@ -368,6 +369,7 @@ $(document).ready(function() {
                 mensagem: message,
                 conversation_id: conversationId,
                 professor_id: $('#professor_id').val(),
+                empresa_id:'{{ $site->empresa_id }}',
                 @if (!Auth::check())
                 phone: $('#chatbot-phone').val().trim(),
                 @endif
@@ -422,6 +424,8 @@ $(document).ready(function() {
                 mensagem: message,
                 conversation_id: conversationId,
                 professor_id: $('#professor_id').val(),
+                  empresa_id:'{{ $site->empresa_id }}',
+                  empresa_telefone:'{{ $site->whatsapp }}',
                 @if (!Auth::check())
                 phone: phone,
                 @endif
