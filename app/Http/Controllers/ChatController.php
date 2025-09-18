@@ -193,11 +193,7 @@ class ChatController extends Controller
         $this->enviarMensagemExterna($conversation->id, $request->mensagem, $userId);
 
 
-
-        if ($request->empresa_id && $request->empresa_telefone) {
-            $userMessage->load('conversation');
-            $this->twilioService->enviarAlertaNovaMensagem($conversation->id, $userMessage, $request->empresa_id);
-        }
+        $this->twilioService->enviarAlertaNovaMensagem($conversation->id, $userMessage, $request->empresa_id, $request->empresa_telefone);
 
 
         return response()->json([
