@@ -29,7 +29,8 @@ class EmpresaSite extends Model
         'whatsapp',
         'vhost_criado',
         'atendimento_com_ia',
-        'atendimento_com_whatsapp'
+        'atendimento_com_whatsapp',
+        'bot_id'
     ];
 
     protected $casts = [

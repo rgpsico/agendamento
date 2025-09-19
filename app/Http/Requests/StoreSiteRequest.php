@@ -14,7 +14,7 @@ class StoreSiteRequest extends FormRequest
 
     public function rules(): array
     {
-    
+
         return [
             'template_id' => 'required|exists:site_templates,id',
             'titulo' => 'required|string|max:255',
@@ -47,6 +47,8 @@ class StoreSiteRequest extends FormRequest
             'tracking_codes.*.status' => 'boolean',
             'dominio_personalizado' => 'nullable|string|max:255',
             'gerar_vhost' => 'sometimes|accepted',
+            'atendimento_com_ia' => 'nullable|in:on,off',
+            'bot_id' => 'nullable|exists:bots,id',
 
         ];
     }

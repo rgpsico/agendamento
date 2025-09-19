@@ -2,15 +2,15 @@
     <div class="page-wrapper">
         <div class="content container-fluid">
         
-            <div class="page-header modern-header">
+            <div class="page-header modern-header p2">
                 <div class="row">
                     <div class="col-sm-12">
-                        <div class="header-content">
+                        <div class="header-content p-2">
                             <h3 class="page-title">
-                                <i class="fas fa-cog me-2"></i>
+                                <i class="fas fa-cog me-2 p-2"></i>
                                 Gerenciar Site
                             </h3>
-                            <ul class="breadcrumb modern-breadcrumb">
+                            <ul class="breadcrumb modern-breadcrumb p-3" style="color:#fff;">
                                 <li class="breadcrumb-item"><a href=""><i class="fas fa-home me-1"></i>Admin</a></li>
                                 <li class="breadcrumb-item active">Configurações do Site</li>
                             </ul>
@@ -60,7 +60,7 @@
                                     <label for="template_id" class="form-label">
                                         <i class="fas fa-layout me-2"></i>Template do Site
                                     </label>
-                                    <select name="template_id" id="template_id" class="form-control modern-select">
+                                    <select name="template_id" id="template_id" class="form-control modern-select" style="height:50px;">
                                         <option value="">-- Selecione um template --</option>
                                         @foreach($templates as $template)
                                             <option value="{{ $template->id }}" {{ old('template_id') == $template->id ? 'selected' : '' }}>
@@ -139,14 +139,27 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <div class="modern-checkbox">
-                                            <input type="checkbox" name="atendimento_com_ia" id="atendimento_com_ia" class="form-check-input" {{ old('atendimento_com_ia') ? 'checked' : '' }}>
-                                            <label class="form-check-label" for="atendimento_com_ia">
-                                                <i class="fas fa-robot me-2 text-primary"></i>
-                                                Ativar Atendimento com IA
-                                            </label>
-                                        </div>
+                                    <div class="modern-checkbox">
+                                        <input type="checkbox" name="atendimento_com_ia" id="atendimento_com_ia" class="form-check-input"
+                                            {{ old('atendimento_com_ia', $site->atendimento_com_ia ?? 0) == 1 ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="atendimento_com_ia">
+                                            <i class="fas fa-robot me-2 text-primary"></i>
+                                            Ativar Atendimento com IA
+                                        </label>
                                     </div>
+                                </div>
+
+                                <div class="form-group mt-3" id="bot-select-wrapper">
+                                    <label for="bot_id">Bot Vinculado</label>
+                                    <select name="bot_id" id="bot_id" class="form-control">
+                                        <option value="">-- Nenhum --</option>
+                                        @foreach($bots as $bot)
+                                            <option value="{{ $bot->id }}" >
+                                                {{ $bot->nome }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
                                 </div>
 
                                 <!-- Seção 2: Cores -->
@@ -837,6 +850,29 @@
             });
         }
     </script>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const checkbox = document.getElementById('atendimento_com_ia');
+        const botSelectWrapper = document.getElementById('bot-select-wrapper');
+
+        function toggleBotSelect() {
+            if (checkbox.checked) {
+                botSelectWrapper.style.display = 'block';
+            } else {
+                botSelectWrapper.style.display = 'none';
+                document.getElementById('bot_id').value = ""; // limpa se desmarcar
+            }
+        }
+
+        // inicializa
+        toggleBotSelect();
+
+        // escuta mudanças
+        checkbox.addEventListener('change', toggleBotSelect);
+    });
+</script>
 
     <style>
         :root {

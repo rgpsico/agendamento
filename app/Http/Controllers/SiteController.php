@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreSiteRequest;
 use App\Jobs\AtualizarConfiguracoesJob;
 use App\Models\EmpresaSite;
-use App\Models\SiteContato;
+use App\Models\Bot;
 use App\Models\SiteDepoimento;
 use App\Models\SiteServico;
 use App\Models\TrackingCode;
@@ -59,9 +59,9 @@ class SiteController extends Controller
         // Aqui você pega todos os templates disponíveis
         // Supondo que você tenha um Model Template
         $templates = SiteTemplate::all(); // ou algum filtro específico
-
+        $bots = Bot::all();
         // Retorna a view passando os templates
-        return view('admin.site.lista.create', compact('templates'));
+        return view('admin.site.lista.create', compact('templates', 'bots'));
     }
 
     public function editSite($idsite)
@@ -87,7 +87,7 @@ class SiteController extends Controller
 
         // Busca todos os templates
         $templates = SiteTemplate::all();
-
+        $bots = Bot::all();
         // --- lógica de dnsStatus e sslStatus ---
         $ipServidor = request()->server('SERVER_ADDR') ?? '191.252.92.206';
 
@@ -107,7 +107,7 @@ class SiteController extends Controller
             $sslStatus = $read !== false;
         }
 
-        return view('admin.site.lista.edit', compact('site', 'templates', 'dnsStatus', 'sslStatus', 'ipServidor'));
+        return view('admin.site.lista.edit', compact('site', 'templates', 'dnsStatus', 'sslStatus', 'ipServidor', 'bots'));
     }
 
     private function verificarDnsSsl($dominio)
@@ -264,6 +264,8 @@ class SiteController extends Controller
             'sobre_descricao' => $validated['sobre_descricao'],
             'whatsapp' => $validated['whatsapp'],
             'autoatendimento_ia' => $validated['autoatendimento_ia'] ?? false,
+            'bot_id' => $validated['atendimento_com_ia'] == 'on' ? $validated['bot_id'] : null,
+
             'dominio_personalizado' => $validated['dominio_personalizado'],
             'gerar_vhost' => $validated['gerar_vhost'] ?? false,
         ]);
@@ -421,7 +423,10 @@ class SiteController extends Controller
             'sobre_itens.*.descricao' => 'nullable|string',
             'whatsapp' => 'nullable|string|max:20',
             'template_id' => 'required|exists:site_templates,id',
+
+
             'atendimento_com_ia' => 'nullable|in:on,off',
+            'bot_id' => 'nullable|exists:bots,id',
             'atendimento_com_whatsapp' => 'nullable|in:on,off',
 
             // Novos campos
@@ -430,6 +435,8 @@ class SiteController extends Controller
             'servicos.*.descricao' => 'nullable|string',
             'servicos.*.preco' => 'nullable|numeric',
             'servicos.*.imagem' => 'nullable|image|max:2048',
+
+
 
             'depoimentos' => 'nullable|array',
             'depoimentos.*.nome' => 'required|string|max:255',
@@ -462,6 +469,9 @@ class SiteController extends Controller
             'sobre_descricao' => $request->sobre_descricao,
             'sobre_itens' => $request->input('sobre_itens', []),
             'whatsapp' => $request->whatsapp,
+            'bot_id' => $request->input('atendimento_com_ia') == 'on'
+                ? $request->input('bot_id')
+                : null,
             'atendimento_com_ia' => $request->input('atendimento_com_ia') == 'on' ? 1 : 0,
             'atendimento_com_whatsapp' => $request->input('atendimento_com_whatsapp') == 'on' ? 1 : 0,
         ];
