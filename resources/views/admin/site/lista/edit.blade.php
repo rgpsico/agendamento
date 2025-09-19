@@ -2,12 +2,12 @@
     <div class="page-wrapper">
         <div class="content container-fluid">
         
-            <div class="page-header modern-header">
+            <div class="page-header modern-header p2">
                 <div class="row">
                     <div class="col-sm-12">
                         <div class="header-content">
                             <h3 class="page-title">
-                                <i class="fas fa-cog me-2"></i>
+                                <i class="fas fa-cog me-2 p-2"></i>
                                 Gerenciar Site
                             </h3>
                             <ul class="breadcrumb modern-breadcrumb">
