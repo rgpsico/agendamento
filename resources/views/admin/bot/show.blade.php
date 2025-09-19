@@ -63,7 +63,8 @@ form.addEventListener('submit', async (e) => {
                 message: message,
                 empresa_id: "{{ auth()->user()->empresa->id ?? '' }}",
                 user_id: "{{ auth()->user()->id ?? '' }}",
-                conversation_id: conversationId // envia se existir
+                conversation_id: conversationId ,
+                bot_id: "{{ $bot->id }}"
             })
         });
 

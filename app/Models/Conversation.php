@@ -21,13 +21,11 @@ class Conversation extends Model
     ];
 
 
-    public static function createWithBot($phone = null, $userId = null, $empresaId = 1)
+    public static function createWithBot(Bot $bot, $phone = null, $userId = null, $empresaId = 1)
     {
-        $bot = Bot::where('nome', 'Manicure')->first();
-
         return self::create([
             'empresa_id' => $empresaId,
-            'bot_id' => $bot->id ?? null,
+            'bot_id' => $bot->id,
             'user_id' => $userId,
             'mensagem' => 'Início da conversa',
             'telefone' => $phone,

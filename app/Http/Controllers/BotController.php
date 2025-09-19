@@ -139,16 +139,32 @@ class BotController extends Controller
     // Atualizar bot
     public function update(Request $request, $id)
     {
+        // Busca o bot
         $bot = Bot::findOrFail($id);
-        $bot->update($request->only(['nome', 'segmento', 'tom', 'token_deepseek', 'status', 'prompt']));
 
-        // Atualizar serviços
+        // Atualiza os dados do bot
+        $bot->update($request->only([
+            'nome',
+            'segmento',
+            'tom',
+            'token_deepseek',
+            'status',
+            'prompt'
+        ]));
+
+        // Atualiza os serviços que o bot conhece (pivot)
         if ($request->has('services')) {
-            $bot->services()->sync($request->services); // many-to-many se tiver pivot, ou ajustar se for hasMany
+            // $request->services deve ser um array de IDs de serviços
+            $bot->services()->sync($request->services);
+        } else {
+            // Se nenhum serviço for enviado, remove todos os serviços atuais
+            $bot->services()->sync([]);
         }
 
-        return redirect()->route('admin.bot.index')->with('success', 'Bot atualizado com sucesso!');
+        return redirect()->route('admin.bot.index')
+            ->with('success', 'Bot atualizado com sucesso!');
     }
+
 
     // Excluir bot
     public function destroy(Request $request)
@@ -202,6 +218,7 @@ class BotController extends Controller
     public function chat(Request $request, Bot $bot)
     {
 
+
         $request->validate([
             'message' => 'required|string',
             'empresa_id' => 'required|integer',
@@ -219,7 +236,7 @@ class BotController extends Controller
             : null;
 
         if (!$conversation) {
-            $conversation = \App\Models\Conversation::createWithBot(null, $userId, $empresa_id);
+            $conversation = \App\Models\Conversation::createWithBot($bot, $userId, $empresa_id);
         }
 
         try {

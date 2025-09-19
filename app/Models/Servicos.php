@@ -22,10 +22,17 @@ class Servicos extends Model
         'categoria_id'
     ];
 
+
+    public function bots()
+    {
+        return $this->belongsToMany(Bot::class, 'bot_services', 'servico_id', 'bot_id');
+    }
+
     public function servicos()
     {
         return $this->belongsTo(Servicos::class, 'empresa_id', 'id');
     }
+
 
     public function disponibilidades()
     {

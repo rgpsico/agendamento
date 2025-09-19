@@ -19,6 +19,8 @@ class Bot extends Model
         'prompt',
     ];
 
+
+
     public function empresa()
     {
         return $this->belongsTo(Empresa::class, 'empresa_id');
@@ -36,6 +38,6 @@ class Bot extends Model
 
     public function services()
     {
-        return $this->hasMany(BotService::class);
+        return $this->belongsToMany(Servicos::class, 'bot_services', 'bot_id', 'servico_id');
     }
 }
