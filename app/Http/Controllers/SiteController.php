@@ -67,7 +67,18 @@ class SiteController extends Controller
     public function editSite($idsite)
     {
 
-        $site = EmpresaSite::findOrFail($idsite);
+
+        $site = EmpresaSite::with('configuracao')->findOrFail($idsite);
+
+        if (!$site->configuracao) {
+            $site->configuracao = new \App\Models\SiteConfiguracao([
+                'exibir_sobre' => true,
+                'exibir_servicos' => true,
+                'exibir_depoimentos' => true,
+                'exibir_contatos' => true,
+                'exibir_whatsapp' => true,
+            ]);
+        }
 
         // Verifica se o usuário tem acesso ao site
         if ($site->empresa_id !== Auth::user()->empresa->id) {
@@ -176,6 +187,7 @@ class SiteController extends Controller
 
     public function edit()
     {
+
 
         $empresa = Auth::user()->empresa;
 
@@ -699,6 +711,7 @@ class SiteController extends Controller
 
     public function editarDominio()
     {
+
         $site = EmpresaSite::where('empresa_id', Auth::user()->empresa->id)->firstOrFail();
         $ipServidor = request()->server('SERVER_ADDR') ?? '191.252.92.206';
 
