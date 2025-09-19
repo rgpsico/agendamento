@@ -148,6 +148,8 @@ class DeepSeekService
             ->get()
             ->reverse();
 
+
+
         $conversationContext = "";
         foreach ($messages as $msg) {
             $author = $msg->tipo === 'user' ? 'Cliente' : 'Bot';

@@ -169,12 +169,17 @@ class ChatController extends Controller
      */
     public function store(StoreMensagemRequest $request)
     {
+
+
+        $bot = Bot::where('id', $request->bot_id)->firstOrFail(); // garante que existe
+
         $userId = auth()->check() ? auth()->id() : null;
+
 
         // Busca ou cria a conversa
         $conversation = $request->conversation_id
             ? Conversation::find($request->conversation_id)
-            : Conversation::createWithBot($request->phone, $userId);
+            : Conversation::createWithBot($bot, $request->phone, $userId, $request->empresa_id);
 
         // Sanitiza a mensagem do usuário
         $cleanUserMessage = $this->sanitizeMessage($request->mensagem);

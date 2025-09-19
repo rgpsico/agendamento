@@ -15,6 +15,7 @@ class StoreMensagemRequest extends FormRequest
     public function rules()
     {
         return [
+            'bot_id' => 'nullable',
             'mensagem' => 'required|string',
             'conversation_id' => 'nullable|integer|exists:conversations,id',
             'phone' => 'nullable|string',

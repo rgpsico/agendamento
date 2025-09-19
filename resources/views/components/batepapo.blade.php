@@ -370,6 +370,7 @@ $(document).ready(function() {
                 conversation_id: conversationId,
                 professor_id: $('#professor_id').val(),
                 empresa_id:'{{ $site->empresa_id }}',
+                bot_id:'{{ $site->bot_id }}',
                 @if (!Auth::check())
                 phone: $('#chatbot-phone').val().trim(),
                 @endif
@@ -424,8 +425,9 @@ $(document).ready(function() {
                 mensagem: message,
                 conversation_id: conversationId,
                 professor_id: $('#professor_id').val(),
-                  empresa_id:'{{ $site->empresa_id }}',
-                  empresa_telefone:'{{ $site->whatsapp }}',
+                empresa_id:'{{ $site->empresa_id }}',
+                bot_id:'{{ $site->bot_id }}',
+                empresa_telefone:'{{ $site->whatsapp }}',
                 @if (!Auth::check())
                 phone: phone,
                 @endif
