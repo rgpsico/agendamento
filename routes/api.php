@@ -307,7 +307,12 @@ Route::post('/bots/{bot_id}/message', [DeepSeekController::class, 'sendMessage']
 
 
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\EventController;
 
 Route::patch('/conversations/{id}/human-control', [ChatController::class, 'toggleHumanControl']);
 
 Route::post('/generate-image', [ChatController::class, 'generateImage']);
+
+
+
+Route::post('/track-event', [EventController::class, 'track']);

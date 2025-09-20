@@ -104,10 +104,10 @@
                                         <div class="mb-4 form-group-animated">
                                             <label for="token_deepseek" class="form-label fw-semibold floating-label">
                                                 <i class="fas fa-key text-primary me-1 label-icon"></i>
-                                                Token DeepSeek
+                                                Token DeepSeek 
                                             </label>
                                             <div class="input-group input-wrapper">
-                                                <input type="password" id="token_deepseek" name="token_deepseek" 
+                                                <input type="text" id="token_deepseek" name="token_deepseek" 
                                                        class="form-control form-control-lg animated-input" 
                                                        value="{{ old('token_deepseek', $bot->token_deepseek) }}"
                                                        placeholder="Digite o token da API">
@@ -1148,6 +1148,8 @@
             }
 
         });
+
+        
     </script>
     @endpush
 </x-admin.layout>
