@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\Models;
 
@@ -22,24 +22,27 @@ class ReceitaRecorrente extends Model
         'categoria_id',
     ];
 
-        protected $casts = [
+    protected $casts = [
         'valor' => 'decimal:2',
         'data_inicio' => 'date',   // garante Carbon
         'data_fim' => 'date',      // garante Carbon ou null
     ];
 
     // Em DespesaRecorrente ou ReceitaRecorrente
-    public function categoria() {
+    public function categoria()
+    {
         return $this->belongsTo(FinanceiroCategoria::class, 'categoria_id');
     }
 
 
     // Relacionamentos
-    public function empresa() {
+    public function empresa()
+    {
         return $this->belongsTo(Empresa::class);
     }
 
-    public function usuario() {
+    public function usuario()
+    {
         return $this->belongsTo(Usuario::class);
     }
 }

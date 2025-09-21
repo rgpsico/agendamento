@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\EventLogger;
 use App\Http\Controllers\Controller;
 use App\Models\Bot;
 use App\Models\BotLog;
@@ -10,10 +11,12 @@ use App\Models\Conversation;
 use App\Models\Empresa;
 use App\Models\Servicos;
 use App\Models\TokenUsage;
+use App\Models\UserEvent;
 use App\Services\DeepSeekService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use DeepSeek\Tokenizer\Tokenizer;
+use Illuminate\Support\Facades\Auth;
 
 class BotController extends Controller
 {
@@ -84,8 +87,19 @@ class BotController extends Controller
 
     public function store(Request $request)
     {
+        // Cria o Bot
         $bot = Bot::create($request->all());
-        return redirect()->route('admin.bot.index')->with('success', 'Bot criado com sucesso!');
+
+        // Registra o evento de criação
+        EventLogger::log('bot_store', [
+            'bot_id' => $bot->id,
+            'nome'   => $bot->nome,
+            'segmento' => $bot->segmento,
+        ], 'admin');
+
+        // Redireciona normalmente
+        return redirect()->route('admin.bot.index')
+            ->with('success', 'Bot criado com sucesso!');
     }
 
     public function tokens(Request $request)
@@ -152,6 +166,12 @@ class BotController extends Controller
             'prompt'
         ]));
 
+        EventLogger::log('bot_updated', [
+            'bot_id' => $bot->id,
+            'nome'   => $bot->nome,
+            'segmento' => $bot->segmento,
+        ], 'admin');
+
         // Atualiza os serviços que o bot conhece (pivot)
         if ($request->has('services')) {
             // $request->services deve ser um array de IDs de serviços
@@ -171,6 +191,13 @@ class BotController extends Controller
     {
         $bot = Bot::findOrFail($request->id);
         $bot->delete();
+
+        EventLogger::log('bot_delete', [
+            'bot_id' => $bot->id,
+            'nome'   => $bot->nome,
+            'segmento' => $bot->segmento,
+        ], 'admin');
+
         return redirect()->route('admin.bot.index')->with('success', 'Bot excluído com sucesso!');
     }
 

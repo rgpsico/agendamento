@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\AlunosControllerApi;
 use App\Http\Controllers\Api\AsaasController;
 use App\Http\Controllers\Api\AulasControllerApi;
 use App\Http\Controllers\Api\AuthControllerApi;
+use App\Http\Controllers\Api\DespesaRecorrenteApiController;
 use App\Http\Controllers\Api\DiaDaSemanaControllerApi;
 use App\Http\Controllers\Api\DisponibilidadeControllerApi;
 
@@ -316,3 +317,40 @@ Route::post('/generate-image', [ChatController::class, 'generateImage']);
 
 
 Route::post('/track-event', [EventController::class, 'track']);
+
+
+use App\Http\Controllers\Api\ReceitaApiController;
+
+
+
+
+
+use App\Http\Controllers\Api\DespesasApiController;
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/despesas', [DespesasApiController::class, 'index']);
+    Route::get('/despesas/{id}', [DespesasApiController::class, 'show']);
+    Route::get('/despesas/resumo', [DespesasApiController::class, 'resumo']);
+});
+
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/receitas', [ReceitaApiController::class, 'index']);
+    Route::get('/receitas/{id}', [ReceitaApiController::class, 'show']);
+    Route::get('/receita/resumo', [ReceitaApiController::class, 'resumo']);
+});
+
+
+Route::get('/despesas-recorrentes', [DespesaRecorrenteApiController::class, 'index']);
+Route::get('/despesas-recorrentes/{id}', [DespesaRecorrenteApiController::class, 'show']);
+Route::get('/despesas-recorrente/resumo', [DespesaRecorrenteApiController::class, 'resumo']);
+Route::middleware('auth:sanctum')->group(function () {});
+
+
+
+use App\Http\Controllers\Api\ReceitaRecorrenteApiController;
+
+Route::get('/receitas-recorrente', [ReceitaRecorrenteApiController::class, 'index']);
+Route::get('/receitas-recorrentes/{id}', [ReceitaRecorrenteApiController::class, 'show']);
+Route::get('/receitas-recorren/resumo', [ReceitaRecorrenteApiController::class, 'resumo']);
+Route::middleware('auth:sanctum')->group(function () {});

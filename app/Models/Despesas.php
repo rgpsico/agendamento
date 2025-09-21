@@ -14,14 +14,14 @@ class Despesas extends Model
     protected $fillable = [
         'descricao',
         'valor',
-            'status',
+        'status',
         'data_vencimento',
         'empresa_id',  // Adicionado
         'usuario_id',  // Adicionado
         'categoria_id',   // Substituindo 'categoria'
     ];
 
-     protected function casts(): array
+    protected function casts(): array
     {
         return [
             'valor' => 'decimal:2',  // Isso força float com 2 casas decimais
@@ -55,7 +55,7 @@ class Despesas extends Model
     protected function valor(): Attribute
     {
         return Attribute::make(
-            get: fn ($value) => number_format($value, 2, ',', '.'),
+            get: fn($value) => number_format($value, 2, ',', '.'),
         );
     }
 }

@@ -223,7 +223,7 @@ Route::prefix('admin/bot')->name('admin.bot.')->middleware('auth')->group(functi
     Route::post('store', [BotController::class, 'store'])->name('store');
     Route::put('update/{id}', [BotController::class, 'update'])->name('update');
     Route::get('edit/{id}', [BotController::class, 'edit'])->name('edit');
-    Route::post('destroy', [BotController::class, 'destroy'])->name('destroy');;
+    Route::delete('destroy/{id}', [BotController::class, 'destroy'])->name('destroy');;
     Route::get('tokens', [BotController::class, 'tokens'])->name('tokens');
     Route::get('logs', [BotController::class, 'logs'])->name('logs');
 
