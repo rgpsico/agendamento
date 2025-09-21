@@ -373,6 +373,7 @@ Route::delete('planos/{plano}', [PlanoController::class, 'destroy'])->name('admi
 
 
 use App\Http\Controllers\EmpresaPlanoController;
+use App\Http\Controllers\FinanceiroDashboardController;
 
 Route::prefix('admin/empresas/{empresa}')->group(function () {
     Route::get('planos', [EmpresaPlanoController::class, 'index'])->name('admin.empresas.planos.index');
@@ -381,6 +382,7 @@ Route::prefix('admin/empresas/{empresa}')->group(function () {
 
 
 
+Route::get('/admin/financeiro/detalhes', [FinanceiroDashboardController::class, 'detalhes'])->name('financeiro.detalhes');
 
 use Prometheus\CollectorRegistry;
 use Prometheus\RenderTextFormat;

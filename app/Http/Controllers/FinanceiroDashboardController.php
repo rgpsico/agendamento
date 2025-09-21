@@ -163,6 +163,49 @@ class FinanceiroDashboardController extends Controller
             $receitasDetalhadas = $receitasDetalhadas->merge($receitasRecorrentes->get());
         }
 
+
+
+        $despesasDetalhadas = collect();
+
+        // Despesas normais
+        if (in_array('todos', $tipos) || in_array('despesas', $tipos)) {
+            $despesas = Despesas::with(['usuario', 'categoria', 'pagamento'])
+                ->whereBetween('created_at', [$dataInicio, $dataFim]);
+
+            if ($request->get('status') === 'PENDENTE') {
+                $despesas->where('status', 'PENDENTE');
+            } elseif ($request->get('status') === 'RECEBIDA') {
+                $despesas->where('status', 'RECEBIDA');
+            }
+
+            $despesasDetalhadas = $despesasDetalhadas->merge($despesas->get());
+        }
+
+        // Despesas recorrentes
+        if (in_array('todos', $tipos) || in_array('despesas_recorrentes', $tipos)) {
+            $despesasRecorrentes = DespesaRecorrente::with(['usuario', 'categoria'])
+                ->where(function ($query) use ($dataInicio, $dataFim) {
+                    $query->whereBetween('data_inicio', [$dataInicio, $dataFim])
+                        ->orWhere(function ($q) use ($dataInicio, $dataFim) {
+                            $q->where('data_inicio', '<', $dataInicio)
+                                ->where(function ($q2) {
+                                    $q2->whereNull('data_fim')->orWhere('data_fim', '>=', now());
+                                });
+                        });
+                });
+
+            if ($request->get('status') === 'ACTIVE') {
+                $despesasRecorrentes->where('status', 'ACTIVE'); // ajuste conforme sua regra
+            } elseif ($request->get('status') === 'INACTIVE') {
+                $despesasRecorrentes->where('status', 'INACTIVE');
+            }
+
+            $despesasDetalhadas = $despesasDetalhadas->merge($despesasRecorrentes->get());
+        }
+
+        // Ordenar por data
+        $despesasDetalhadas = $despesasDetalhadas->sortByDesc('created_at');
+
         // Ordenar por data
         $receitasDetalhadas = $receitasDetalhadas->sortByDesc('created_at');
         $tipoSelecionado = request()->get('tipo', ['todos']);
@@ -183,7 +226,30 @@ class FinanceiroDashboardController extends Controller
             'dataInicio',
             'dataFim',
             'tipoSelecionado',
-            'receitasDetalhadas'
+            'receitasDetalhadas',
+            'despesasDetalhadas'
         ));
+    }
+
+    public function detalhes(Request $request)
+    {
+        $tipo = $request->get('tipo'); // 'receitas' ou 'despesas'
+        $status = $request->get('status'); // 'RECEBIDA' ou 'PENDENTE'
+        $dataInicio = $request->get('data_inicio', now()->startOfMonth()->format('Y-m-d'));
+        $dataFim = $request->get('data_fim', now()->endOfMonth()->format('Y-m-d'));
+
+        if ($tipo === 'receitas') {
+            $query = Receita::whereBetween('created_at', [$dataInicio, $dataFim]);
+        } else { // despesas
+            $query = Despesas::whereBetween('created_at', [$dataInicio, $dataFim]);
+        }
+
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        $dados = $query->get(['descricao', 'valor', 'status', 'data_vencimento']);
+
+        return response()->json($dados);
     }
 }

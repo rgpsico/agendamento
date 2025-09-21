@@ -58,4 +58,9 @@ class Despesas extends Model
             get: fn($value) => number_format($value, 2, ',', '.'),
         );
     }
+
+    public function pagamento()
+    {
+        return $this->belongsTo(Pagamento::class, 'pagamento_id'); // ajuste o nome da FK
+    }
 }

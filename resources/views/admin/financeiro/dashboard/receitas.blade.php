@@ -5,7 +5,7 @@
             <div class="row">
                 <!-- Receitas Recebidas -->
                 @if(in_array('todos', $tipoSelecionado) || in_array('receitas', $tipoSelecionado))
-                <div class="col-xl-3 col-lg-4 col-md-6">
+                <div class="col-xl-3 col-lg-4 col-md-6 card-indicador">
                     <div class="metric-card info">
                         <div class="card-header">
                             <div>
@@ -21,7 +21,7 @@
 
                 <!-- Receitas Recorrentes -->
                 @if(in_array('todos', $tipoSelecionado) || in_array('receitas_recorrentes', $tipoSelecionado))
-                <div class="col-xl-3 col-lg-4 col-md-6">
+                <div class="col-xl-3 col-lg-4 col-md-6 card-indicador">
                     <div class="metric-card success">
                         <div class="card-header">
                             <div>
@@ -37,7 +37,7 @@
 
                 <!-- Receitas Pendentes -->
                 @if(in_array('todos', $tipoSelecionado) || in_array('receitas', $tipoSelecionado))
-                <div class="col-xl-3 col-lg-4 col-md-6">
+                <div class="col-xl-3 col-lg-4 col-md-6 card-indicador">
                     <div class="metric-card warning">
                         <div class="card-header">
                             <div>
@@ -53,7 +53,7 @@
 
                 <!-- Despesas Pendentes -->
                 @if(in_array('todos', $tipoSelecionado) || in_array('despesas', $tipoSelecionado))
-                <div class="col-xl-3 col-lg-4 col-md-6">
+                <div class="col-xl-3 col-lg-4 col-md-6 card-indicador">
                     <div class="metric-card danger">
                         <div class="card-header">
                             <div>
@@ -69,7 +69,7 @@
 
                 <!-- Taxa de Recebimento -->
                 @if(in_array('todos', $tipoSelecionado) || in_array('receitas', $tipoSelecionado))
-                <div class="col-xl-3 col-lg-4 col-md-6">
+                <div class="col-xl-3 col-lg-4 col-md-6 card-indicador">
                     <div class="metric-card info">
                         <div class="card-header">
                             <div>

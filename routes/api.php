@@ -349,6 +349,7 @@ Route::middleware('auth:sanctum')->group(function () {});
 
 
 use App\Http\Controllers\Api\ReceitaRecorrenteApiController;
+use App\Http\Controllers\FinanceiroDashboardController;
 
 Route::get('/receitas-recorrente', [ReceitaRecorrenteApiController::class, 'index']);
 Route::get('/receitas-recorrentes/{id}', [ReceitaRecorrenteApiController::class, 'show']);

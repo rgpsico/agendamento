@@ -283,5 +283,46 @@ pieChart.options.onClick = function(evt, elements) {
     }
 };
 
+
+
+
+
+document.querySelectorAll('.card-indicador').forEach(card => {
+    card.addEventListener('click', function() {
+        const tipo = this.dataset.tipo;
+        let dados = [];
+
+        if (tipo === 'despesas') {
+            dados = [
+                @foreach($despesasDetalhadas as $d)
+                    { descricao: "{{ $d->descricao }}", valor: "{{ $d->valor }}", status: "{{ $d->status }}", data_vencimento: "{{ $d->data_vencimento }}" },
+                @endforeach
+            ];
+        } else if (tipo === 'receitas') {
+            dados = [
+                @foreach($receitasDetalhadas as $r)
+                    { descricao: "{{ $r->descricao }}", valor: "{{ $r->valor }}", status: "{{ $r->status }}", data_vencimento: "{{ $r->data_vencimento }}" },
+                @endforeach
+            ];
+        }
+
+        // Preenche tabela
+        const tbody = document.querySelector('#tabelaDetalhes tbody');
+        tbody.innerHTML = '';
+        dados.forEach(d => {
+            tbody.innerHTML += `<tr>
+                <td>${d.descricao}</td>
+                <td>${d.valor}</td>
+                <td>${d.status}</td>
+                <td>${d.data_vencimento}</td>
+            </tr>`;
+        });
+
+        // Mostra modal
+        const modal = new bootstrap.Modal(document.getElementById('detalhesModal'));
+        modal.show();
+    });
+});
+
     </script>
 </x-admin.layout>

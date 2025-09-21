@@ -5,7 +5,7 @@
                 <div class="row">
                     <!-- Total de Receitas -->
                         @if(in_array('todos', $tipoSelecionado) || in_array('receitas', $tipoSelecionado))
-                        <div class="col-xl-3 col-lg-4 col-md-6">
+                        <div class="col-xl-3 col-lg-4 col-md-6 card-indicador">
                             <div class="metric-card success">
                                 <div class="card-header">
                                     <div>
@@ -20,7 +20,7 @@
 
                     <!-- Total de Despesas -->
                          @if(in_array('todos', $tipoSelecionado) || in_array('despesas', $tipoSelecionado))
-                        <div class="col-xl-3 col-lg-4 col-md-6">
+                        <div class="col-xl-3 col-lg-4 col-md-6 card-indicador">
                             <div class="metric-card danger">
                                 <div class="card-header">
                                     <div>
@@ -36,7 +36,7 @@
                     <!-- Despesas Recorrentes -->
                  <!-- Despesas Recorrentes -->
                 @if(in_array('todos', $tipoSelecionado) || in_array('despesas_recorrentes', $tipoSelecionado))
-                <div class="col-xl-3 col-lg-4 col-md-6">
+                <div class="col-xl-3 col-lg-4 col-md-6 card-indicador">
                     <div class="metric-card danger">
                         <div class="card-header">
                             <div>
@@ -52,7 +52,7 @@
 
                     <!-- Saldo Atual -->
                        @if(in_array('todos', $tipoSelecionado))
-                        <div class="col-xl-3 col-lg-4 col-md-6">
+                        <div class="col-xl-3 col-lg-4 col-md-6 card-indicador">
                             <div class="metric-card {{ ($totalReceitas - $totalDespesas) >= 0 ? 'success' : 'danger' }}">
                                 <div class="card-header">
                                     <div>
@@ -67,7 +67,7 @@
 
                     <!-- Resultado do Mês -->
                     @if(in_array('todos', $tipoSelecionado) || in_array('receitas', $tipoSelecionado) || in_array('despesas', $tipoSelecionado))
-                    <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="col-xl-3 col-lg-4 col-md-6 card-indicador">
                         <div class="metric-card {{ ($receitasMes - $despesasMes) >= 0 ? 'success' : 'danger' }}">
                             <div class="card-header">
                                 <div>
