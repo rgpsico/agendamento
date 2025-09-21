@@ -19,6 +19,7 @@
         "laravel/sanctum": "^3.2",
         "laravel/socialite": "^5.8",
         "laravel/tinker": "^2.8",
+        "maatwebsite/excel": "^1.1",
         "nwidart/laravel-modules": "^10.0",
         "proengsoft/laravel-jsvalidation": "^4.8",
         "rap2hpoutre/laravel-log-viewer": "^2.3",
