@@ -20,6 +20,7 @@ class ReceitaRecorrente extends Model
         'empresa_id',
         'usuario_id',
         'categoria_id',
+        'status'
     ];
 
     protected $casts = [
@@ -44,5 +45,10 @@ class ReceitaRecorrente extends Model
     public function usuario()
     {
         return $this->belongsTo(Usuario::class);
+    }
+
+    public function scopeAtivas($query)
+    {
+        return $query->where('status', 'ACTIVE');
     }
 }
