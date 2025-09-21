@@ -2,6 +2,38 @@
     <!-- CSS Customizado -->
    @include('admin.financeiro.dashboard.style')
 
+   <!-- Modal de Detalhes Financeiros -->
+<div class="modal fade" id="detalhesModal" tabindex="-1" aria-labelledby="detalhesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content bg-dark text-white">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detalhesModalLabel">Detalhes Financeiros</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-dark table-striped" id="tabelaDetalhes">
+                    <thead>
+                        <tr>
+                            <th>Descrição</th>
+                            <th>Valor (R$)</th>
+                            <th>Status</th>
+                            <th>Data Vencimento</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dados serão inseridos via JS -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button id="exportExcel" class="btn btn-success">Exportar para Excel</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
         <div class="page-wrapper">
             <div class="content container-fluid">
                 <div class="dashboard-title">
@@ -204,5 +236,52 @@
                 }, index * 100);
             });
         });
+
+
+        // Exemplo para o gráfico de pizza
+pieChart.options.onClick = function(evt, elements) {
+    if (elements.length > 0) {
+        // Pega o índice do slice clicado
+        const index = elements[0].index;
+        const label = this.data.labels[index];
+
+        // Filtrar dados do front-end (ou pegar via API depois)
+        let dados = [];
+        if (label === 'Recebidas') {
+            dados = [
+                @foreach($receitasDetalhadas as $r)
+                    @if($r->status === 'RECEBIDA')
+                        { descricao: "{{ $r->descricao }}", valor: "{{ $r->valor }}", status: "{{ $r->status }}", data_vencimento: "{{ $r->data_vencimento }}" },
+                    @endif
+                @endforeach
+            ];
+        } else {
+            dados = [
+                @foreach($receitasDetalhadas as $r)
+                    @if($r->status === 'PENDENTE')
+                        { descricao: "{{ $r->descricao }}", valor: "{{ $r->valor }}", status: "{{ $r->status }}", data_vencimento: "{{ $r->data_vencimento }}" },
+                    @endif
+                @endforeach
+            ];
+        }
+
+        // Preencher tabela
+        const tbody = document.querySelector('#tabelaDetalhes tbody');
+        tbody.innerHTML = '';
+        dados.forEach(d => {
+            tbody.innerHTML += `<tr>
+                <td>${d.descricao}</td>
+                <td>${d.valor}</td>
+                <td>${d.status}</td>
+                <td>${d.data_vencimento}</td>
+            </tr>`;
+        });
+
+        // Abrir modal
+        const modal = new bootstrap.Modal(document.getElementById('detalhesModal'));
+        modal.show();
+    }
+};
+
     </script>
 </x-admin.layout>
