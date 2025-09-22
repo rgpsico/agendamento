@@ -426,3 +426,15 @@ Route::get('/metrics', function () {
     return response($renderer->render($registry->getMetricFamilySamples()))
         ->header('Content-Type', RenderTextFormat::MIME_TYPE);
 });
+
+
+use App\Http\Controllers\PlanoAlunoController;
+
+Route::prefix('admin')->group(function () {
+    Route::get('planos', [PlanoAlunoController::class, 'indexView'])->name('alunos.planos.index');
+    Route::get('planos/create', [PlanoAlunoController::class, 'create'])->name('alunos.planos.create');
+    Route::post('planos', [PlanoAlunoController::class, 'store'])->name('alunos.planos.store');
+    Route::get('planos/{plano}/edit', [PlanoAlunoController::class, 'edit'])->name('alunos.planos.edit');
+    Route::put('planos/{plano}', [PlanoAlunoController::class, 'update'])->name('alunos.planos.update');
+    Route::delete('planos/{plano}', [PlanoAlunoController::class, 'destroy'])->name('alunos.planos.destroy');
+});

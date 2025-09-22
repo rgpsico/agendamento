@@ -355,3 +355,9 @@ Route::get('/receitas-recorrente', [ReceitaRecorrenteApiController::class, 'inde
 Route::get('/receitas-recorrentes/{id}', [ReceitaRecorrenteApiController::class, 'show']);
 Route::get('/receitas-recorren/resumo', [ReceitaRecorrenteApiController::class, 'resumo']);
 Route::middleware('auth:sanctum')->group(function () {});
+
+
+
+use App\Http\Controllers\PlanoAlunoController;
+
+Route::apiResource('planos-alunos', PlanoAlunoController::class);

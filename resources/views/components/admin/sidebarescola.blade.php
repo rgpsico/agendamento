@@ -111,13 +111,24 @@
 
                             <!-- Planos -->
                             <li class="submenu">
-                                <a href="#">📦 Planos<span class="menu-arrow"></span></a>
+                                <a href="#">📦 Planos Empresas<span class="menu-arrow"></span></a>
                                 <ul>                      
                                     <li><a href="{{ route('admin.planos.index') }}">Listar Planos</a></li>
                                     <li><a href="{{ route('admin.planos.create') }}">Cadastrar Plano</a></li>
                                   <li><a href="{{ route('admin.empresas.planos.index',  Auth::user()->empresa->id ) }}">🏢 Plano da Empresa</a></li>
                                 </ul>
                             </li>
+
+
+                           <li class="submenu">
+                                <a href="#">📦 Planos Aluno<span class="menu-arrow"></span></a>
+                                <ul>                      
+                                    <li><a href="{{ route('alunos.planos.index') }}">Listar Planos</a></li>
+                                    <li><a href="{{ route('alunos.planos.create') }}">Cadastrar Plano</a></li>
+                                </ul>
+                            </li>
+
+
 
                         </ul>
                     </li>
