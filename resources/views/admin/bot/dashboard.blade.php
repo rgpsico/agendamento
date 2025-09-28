@@ -203,110 +203,97 @@
             </div>
 
             <!-- Serviços do Bot -->
-            <div class="card shadow-lg border-0 mt-4">
-                <div class="card-header bg-gradient-info text-white py-3">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <div>
-                            <h5 class="card-title mb-0 fw-bold">
-                                <i class="fas fa-cogs me-2"></i>
-                                Serviços Ativos
-                            </h5>
-                            <small class="opacity-75">{{ count($services) }} serviços cadastrados</small>
-                        </div>
-                        <a href="{{ route('admin.botservice.create') }}" class="btn btn-sm btn-outline-light">
-                            <i class="fas fa-plus me-1"></i>Novo Serviço
-                        </a>
-                    </div>
-                </div>
-                <div class="card-body p-0">
-                    @if(count($services) > 0)
-                        <div class="table-responsive">
-                            <table class="table table-hover mb-0">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th class="border-0 fw-bold">
-                                            <i class="fas fa-tag text-primary me-2"></i>
-                                            Serviço
-                                        </th>
-                                        <th class="border-0 fw-bold">
-                                            <i class="fas fa-chalkboard-teacher text-warning me-2"></i>
-                                            Professor
-                                        </th>
-                                        <th class="border-0 fw-bold">
-                                            <i class="fas fa-clock text-info me-2"></i>
-                                            Horário
-                                        </th>
-                                        <th class="border-0 fw-bold text-end">
-                                            <i class="fas fa-dollar-sign text-success me-2"></i>
-                                            Valor
-                                        </th>
-                                        <th class="border-0 fw-bold text-center">Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($services as $service)
-                                    <tr class="service-row">
-                                        <td class="align-middle">
-                                            <div class="d-flex align-items-center">
-                                                <div class="service-avatar bg-primary text-white rounded-circle me-3">
-                                                    <i class="fas fa-cog"></i>
-                                                </div>
-                                                <div>
-                                                    <h6 class="mb-0 fw-bold">{{ $service->nome_servico }}</h6>
-                                                    <small class="text-muted">ID: #{{ $service->id }}</small>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="align-middle">
-                                            @if($service->professor)
-                                                <span class="badge bg-light text-dark">{{ $service->professor }}</span>
-                                            @else
-                                                <span class="text-muted">-</span>
-                                            @endif
-                                        </td>
-                                        <td class="align-middle">
-                                            @if($service->horario)
-                                                <small class="text-muted">{{ $service->horario }}</small>
-                                            @else
-                                                <span class="text-muted">-</span>
-                                            @endif
-                                        </td>
-                                        <td class="align-middle text-end">
-                                            <span class="fw-bold text-success fs-6">
-                                                R$ {{ number_format($service->valor, 2, ',', '.') }}
-                                            </span>
-                                        </td>
-                                        <td class="align-middle text-center">
-                                            <div class="btn-group btn-group-sm" role="group">
-                                                <a href="{{ route('admin.botservice.edit', $service->id) }}" 
-                                                   class="btn btn-outline-primary btn-sm" 
-                                                   title="Editar">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
-                                                <button class="btn btn-outline-danger btn-sm" 
-                                                        title="Excluir"
-                                                        onclick="confirmDelete({{ $service->id }})">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    @else
-                        <div class="text-center py-5">
-                            <i class="fas fa-robot text-muted mb-3" style="font-size: 3rem;"></i>
-                            <h5 class="text-muted">Nenhum serviço cadastrado</h5>
-                            <p class="text-muted mb-4">Comece criando seu primeiro serviço de bot</p>
-                            <a href="{{ route('admin.botservice.create') }}" class="btn btn-primary">
-                                <i class="fas fa-plus me-2"></i>Criar Primeiro Serviço
-                            </a>
-                        </div>
-                    @endif
-                </div>
-            </div>
+            ```blade
+<div class="card-body p-0">
+    @if(count($services) > 0)
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="border-0 fw-bold">
+                            <i class="fas fa-tag text-primary me-2"></i>
+                            Serviço
+                        </th>
+                        <th class="border-0 fw-bold">
+                            <i class="fas fa-chalkboard-teacher text-warning me-2"></i>
+                            Professor / Empresa
+                        </th>
+                        <th class="border-0 fw-bold">
+                            <i class="fas fa-clock text-info me-2"></i>
+                            Tempo de Aula
+                        </th>
+                        <th class="border-0 fw-bold text-end">
+                            <i class="fas fa-dollar-sign text-success me-2"></i>
+                            Valor
+                        </th>
+                        <th class="border-0 fw-bold text-center">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($services as $service)
+                    <tr class="service-row">
+                        <td class="align-middle">
+                            <div class="d-flex align-items-center">
+                                <div class="service-avatar bg-primary text-white rounded-circle me-3">
+                                    <i class="fas fa-cog"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 fw-bold">{{ $service->titulo }}</h6>
+                                    <small class="text-muted">ID: #{{ $service->id }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="align-middle">
+                            @if($service->empresa)
+                                <span class="badge bg-light text-dark">{{ $service->empresa->professor ?? $service->empresa->nome }}</span>
+                            @else
+                                <span class="text-muted">-</span>
+                            @endif
+                        </td>
+                        <td class="align-middle">
+                            @if($service->tempo_de_aula)
+                                <small class="text-muted">{{ $service->tempo_de_aula }} min</small>
+                            @else
+                                <span class="text-muted">-</span>
+                            @endif
+                        </td>
+                        <td class="align-middle text-end">
+                            <span class="fw-bold text-success fs-6">
+                                R$ {{ number_format($service->preco, 2, ',', '.') }}
+                            </span>
+                        </td>
+                        <td class="align-middle text-center">
+                            <div class="btn-group btn-group-sm" role="group">
+                                <a href="{{ route('admin.servico.edit', $service->id) }}" 
+                                   class="btn btn-outline-primary btn-sm" 
+                                   title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button class="btn btn-outline-danger btn-sm" 
+                                        title="Excluir"
+                                        onclick="confirmDelete({{ $service->id }})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    @else
+        <div class="text-center py-5">
+            <i class="fas fa-robot text-muted mb-3" style="font-size: 3rem;"></i>
+            <h5 class="text-muted">Nenhum serviço cadastrado</h5>
+            <p class="text-muted mb-4">Comece criando seu primeiro serviço</p>
+            <a href="{{ route('admin.servico.create') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Criar Primeiro Serviço
+            </a>
+        </div>
+    @endif
+</div>
+
+
 
         </div>
     </div>

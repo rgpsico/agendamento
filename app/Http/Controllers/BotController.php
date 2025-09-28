@@ -31,6 +31,7 @@ class BotController extends Controller
     public function dashboard()
     {
         // Bots ativos
+
         $botsAtivos = Bot::where('status', true)->count();
 
         // Tokens consumidos
@@ -46,7 +47,7 @@ class BotController extends Controller
         $conversasHoje = Conversation::whereDate('created_at', today())->count();
 
         // Serviços cadastrados
-        $services = BotService::all();
+        $services = Servicos::all();
 
         // Consumo de tokens nos últimos 7 dias
         $labels = [];
