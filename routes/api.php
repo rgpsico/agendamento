@@ -361,3 +361,8 @@ Route::middleware('auth:sanctum')->group(function () {});
 use App\Http\Controllers\PlanoAlunoController;
 
 Route::apiResource('planos-alunos', PlanoAlunoController::class);
+
+
+
+
+Route::post('/deepseek/image', [DeepSeekController::class, 'analyzeImage']);

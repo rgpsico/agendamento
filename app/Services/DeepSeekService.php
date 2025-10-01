@@ -24,6 +24,7 @@ class DeepSeekService
         // 1. Carrega os serviços associados ao bot
         $services = Servicos::where('empresa_id', $empresa_id)->get();
 
+
         // 2. Constrói o system prompt
         $systemPrompt = "Você é um assistente especializado em serviços de praia, como aulas de surf e bodyboard. ";
         $systemPrompt .= "Seu tom é " . ($bot->tom ?? 'amigável e motivador') . ", e o segmento é " . ($bot->segmento ?? 'esportes aquáticos na praia') . ". ";
@@ -141,6 +142,7 @@ class DeepSeekService
 
     public function getDeepSeekResponseWithPrompt(Bot $bot, string $question, Conversation $conversation, int $empresa_id, int $contextMessages = 3): string
     {
+
         // 1️⃣ Pega últimas mensagens da conversa para contexto
         $messages = $conversation->messages()
             ->latest()
@@ -162,8 +164,8 @@ class DeepSeekService
 
 
         // 2️⃣ Carrega os serviços do bot
-        $services = Servicos::with('disponibilidades.diaDaSemana')
-            ->where('empresa_id', $empresa_id)
+        $services = $bot->services()
+            ->with('disponibilidades.diaDaSemana')
             ->get();
 
 
@@ -192,9 +194,13 @@ class DeepSeekService
 
 
         if (preg_match('/horário|hora|disponível|quando/i', $question)) {
-            $systemPrompt = "Responda de forma curta e natural. Apenas informe os horários disponíveis para o cliente.\n";
-            $systemPrompt .= $this->montarPromptHorarios($empresa_id);
+            // Verifica se o serviço NÃO é do tipo "DIA"
+            if ($service->tipo_agendamento !== 'DIA') {
+                $systemPrompt = "Responda de forma curta e natural. Apenas informe os horários disponíveis para o cliente.\n";
+                $systemPrompt .= $this->montarPromptHorarios($empresa_id, '', $bot);
+            }
         }
+
 
 
         // 4️⃣ Chamada à API DeepSeek
@@ -220,10 +226,10 @@ class DeepSeekService
         return $cleanResponse;
     }
 
-    private function montarPromptHorarios(int $empresa_id, $serviceText = null): string
+    private function montarPromptHorarios(int $empresa_id, $serviceText = null, $bot): string
     {
-        $services = Servicos::with('disponibilidades.diaDaSemana')
-            ->where('empresa_id', $empresa_id)
+        $services = $bot->services()
+            ->with('disponibilidades.diaDaSemana')
             ->get();
 
         $horariosText = "Horários atualizados disponíveis:\n";
