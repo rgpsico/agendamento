@@ -62,7 +62,7 @@
                         <li><a href="{{ route('admin.bot.dashboard') }}">Dashboard</a></li>
                         <li><a href="{{ route('admin.bot.index') }}">Lista de Bots</a></li>
                         <li><a href="{{ route('admin.bot.create') }}">Criar Bot</a></li>
-                        <li><a href="{{ route('admin.botservice.index') }}">Serviços do Bot</a></li>
+                        {{-- <li><a href="{{ route('admin.botservice.index') }}">Serviços do Bot</a></li> --}}
                         <li><a href="{{ route('admin.bot.tokens') }}">Tokens / Consumo</a></li>
                         <li><a href="{{ route('admin.bot.logs') }}">Histórico / Logs</a></li>
                         <li><a href="{{ route('admin.conversations.index') }}">Conversas</a></li> <!-- Novo -->
