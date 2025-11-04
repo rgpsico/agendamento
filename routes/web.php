@@ -20,6 +20,7 @@ use App\Http\Controllers\BoletoController;
 use App\Http\Controllers\ProfessoresAsaasController;
 use App\Http\Controllers\PagamentoController;
 use App\Http\Controllers\SiteDepoimentoController;
+use App\Http\Controllers\FinanceiroAlunoPlanoController;
 
 //   Route::get('/', [UserManagementController::class, 'index'])->name('register.aluno');
 Route::get('/create', [UserManagementController::class, 'create'])->name('register.professor');
@@ -49,6 +50,11 @@ Route::get('/auth/callback/google', [SocialLiteController::class, 'alunoGoogleCa
 
 
 Route::get('/empresa/pagamento/boleto', [BoletoController::class, 'boleto'])->name('empresa.pagamento.boleto');
+
+Route::prefix('admin/financeiro')->middleware(['auth'])->name('admin.financeiro.')->group(function () {
+    Route::get('vinculos', [FinanceiroAlunoPlanoController::class, 'index'])->name('vinculos.index');
+    Route::get('vinculos/novo', [FinanceiroAlunoPlanoController::class, 'create'])->name('vinculos.create');
+});
 
 // Route::get('/google-calendar/auth', [GoogleCalendarController::class, 'authenticate'])->name('google.calendar.auth');
 // Route::get('/google-calendar/events', [GoogleCalendarController::class, 'listEvents'])->name('google.calendar.events');
