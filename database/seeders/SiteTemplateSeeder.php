@@ -38,6 +38,13 @@ class SiteTemplateSeeder extends Seeder
                 'preview_image' => 'templates/boxe.png',
                 'path_view' => 'site.boxe',
             ],
+            [
+                'titulo' => 'Minimalista',
+                'slug' => 'minimalista',
+                'descricao' => 'Template escuro e sofisticado focado em conversão',
+                'preview_image' => 'templates/minimalista.png',
+                'path_view' => 'site.minimalista',
+            ],
         ];
 
         foreach ($templates as $template) {
