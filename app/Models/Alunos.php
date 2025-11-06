@@ -31,7 +31,12 @@ class Alunos extends Model
         return $this->hasOne(AlunoEndereco::class, 'aluno_id', 'id');
     }
 
-
+    public function planos()
+    {
+        return $this->belongsToMany(AlunoPlano::class, 'aluno_planos', 'aluno_id', 'plano_id')
+            ->withPivot('data_inicio', 'data_fim', 'status', 'valor_pago', 'forma_pagamento')
+            ->withTimestamps();
+    }
 
     public function alunos()
     {

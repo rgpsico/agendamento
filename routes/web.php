@@ -434,6 +434,8 @@ Route::prefix('admin')->group(function () {
     Route::get('planos', [PlanoAlunoController::class, 'indexView'])->name('alunos.planos.index');
     Route::get('planos/create', [PlanoAlunoController::class, 'create'])->name('alunos.planos.create');
     Route::post('planos', [PlanoAlunoController::class, 'store'])->name('alunos.planos.store');
+    Route::get('planos/vincular', [PlanoAlunoController::class, 'vincular'])->name('alunos.planos.vincular');
+    Route::post('planos/vincular', [PlanoAlunoController::class, 'vincularStore'])->name('alunos.planos.vincular.store');
     Route::get('planos/{plano}/edit', [PlanoAlunoController::class, 'edit'])->name('alunos.planos.edit');
     Route::put('planos/{plano}', [PlanoAlunoController::class, 'update'])->name('alunos.planos.update');
     Route::delete('planos/{plano}', [PlanoAlunoController::class, 'destroy'])->name('alunos.planos.destroy');

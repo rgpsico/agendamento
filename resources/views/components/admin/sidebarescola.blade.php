@@ -120,11 +120,12 @@
                             </li>
 
 
-                           <li class="submenu">
+                            <li class="submenu">
                                 <a href="#">📦 Planos Aluno<span class="menu-arrow"></span></a>
-                                <ul>                      
+                                <ul>
                                     <li><a href="{{ route('alunos.planos.index') }}">Listar Planos</a></li>
                                     <li><a href="{{ route('alunos.planos.create') }}">Cadastrar Plano</a></li>
+                                    <li><a href="{{ route('alunos.planos.vincular') }}">Vincular Alunos a Planos</a></li>
                                 </ul>
                             </li>
 
