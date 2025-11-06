@@ -11,7 +11,10 @@
 
             <div class="row">
                 <div class="col-md-12">
-                    <a href="{{ route('alunos.planos.create') }}" class="btn btn-success mb-3">Criar Novo Plano</a>
+                    <div class="d-flex flex-wrap mb-3">
+                        <a href="{{ route('alunos.planos.create') }}" class="btn btn-success me-2 mb-2">Criar Novo Plano</a>
+                        <a href="{{ route('alunos.planos.vincular') }}" class="btn btn-primary mb-2">Vincular alunos a planos</a>
+                    </div>
                     <div class="card">
                         <div class="card-body">
                             <table class="table table-striped">
