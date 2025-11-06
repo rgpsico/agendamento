@@ -3,6 +3,7 @@
 use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\AlunosController;
 use App\Http\Controllers\Api\AgendamentoControllerApi;
+use App\Http\Controllers\Api\AcessoControllerApi;
 use App\Http\Controllers\Api\AlunosControllerApi;
 use App\Http\Controllers\Api\AsaasController;
 use App\Http\Controllers\Api\AulasControllerApi;
@@ -75,6 +76,8 @@ Route::prefix('permissions')->group(function () {
 
 
 Route::post('/login', [AuthControllerApi::class, 'login']);
+
+Route::post('acesso/verificar', [AcessoControllerApi::class, 'verificar'])->name('acesso.verificar');
 
 Route::resource('agendamento', AgendamentoControllerApi::class);
 
