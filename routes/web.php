@@ -32,6 +32,7 @@ use App\Http\Controllers\ViaCepController;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\FinanceiroController;
 use App\Http\Controllers\SiteCliqueWhatsappController;
+use App\Http\Controllers\SiteArtigoController;
 use App\Http\Controllers\ProfessoresController;
 use App\Http\Controllers\ReceitaController;
 use App\Http\Controllers\RelatorioController;
@@ -181,6 +182,15 @@ Route::prefix('admin/site/contatos')->middleware('auth')->name('admin.site.conta
     Route::get('{contato}/edit', [SiteContatoController::class, 'edit'])->name('edit');
     Route::put('{contato}/update', [SiteContatoController::class, 'update'])->name('update');
     Route::delete('{contato}/destroy', [SiteContatoController::class, 'destroy'])->name('destroy');
+});
+
+Route::prefix('admin/site/artigos')->middleware('auth')->name('admin.site.artigos.')->group(function () {
+    Route::get('/', [SiteArtigoController::class, 'index'])->name('index');
+    Route::get('create', [SiteArtigoController::class, 'create'])->name('create');
+    Route::post('store', [SiteArtigoController::class, 'store'])->name('store');
+    Route::get('{artigo}/edit', [SiteArtigoController::class, 'edit'])->name('edit');
+    Route::put('{artigo}', [SiteArtigoController::class, 'update'])->name('update');
+    Route::delete('{artigo}', [SiteArtigoController::class, 'destroy'])->name('destroy');
 });
 
 

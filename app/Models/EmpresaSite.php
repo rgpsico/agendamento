@@ -77,6 +77,11 @@ class EmpresaSite extends Model
         return $this->hasMany(SiteDepoimento::class, 'site_id');
     }
 
+    public function artigos()
+    {
+        return $this->hasMany(SiteArtigo::class, 'site_id');
+    }
+
     public function contatos()
     {
         return $this->hasMany(SiteContato::class, 'site_id');
