@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\EmpresaSite;
 use App\Models\SiteArtigo;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
@@ -94,6 +96,67 @@ class SiteArtigoController extends Controller
         return redirect()
             ->route('admin.site.artigos.index')
             ->with('success', 'Artigo removido com sucesso!');
+    }
+
+    public function generateContent(Request $request): JsonResponse
+    {
+        $this->getEmpresaSite();
+
+        $validated = $request->validate([
+            'titulo' => 'required|string|max:255',
+        ]);
+
+        $apiKey = config('services.deepseek.key');
+
+        if (!$apiKey) {
+            return response()->json([
+                'message' => 'A chave da API do DeepSeek não está configurada.',
+            ], 500);
+        }
+
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $apiKey,
+                'Content-Type' => 'application/json',
+            ])->post('https://api.deepseek.com/chat/completions', [
+                'model' => config('services.deepseek.model', 'deepseek-chat'),
+                'messages' => [
+                    [
+                        'role' => 'system',
+                        'content' => 'Você é um assistente que gera artigos de blog em português com tom informativo e organizado.',
+                    ],
+                    [
+                        'role' => 'user',
+                        'content' => 'Escreva um artigo em português para o título: "' . $validated['titulo'] . '". Inclua uma introdução, subtítulos e um encerramento.',
+                    ],
+                ],
+                'temperature' => 0.7,
+            ]);
+
+            if ($response->failed()) {
+                return response()->json([
+                    'message' => 'Não foi possível gerar o conteúdo no momento. Tente novamente mais tarde.',
+                ], 422);
+            }
+
+            $content = data_get($response->json(), 'choices.0.message.content');
+
+            if (!$content) {
+                return response()->json([
+                    'message' => 'Não foi possível obter um conteúdo da IA.',
+                ], 422);
+            }
+
+            return response()->json([
+                'conteudo' => $content,
+            ]);
+        } catch (\Throwable $exception) {
+            report($exception);
+
+            return response()->json([
+                'message' => 'Ocorreu um erro ao solicitar o conteúdo da IA.',
+            ], 500);
+        }
     }
 
     private function getEmpresaSite(): EmpresaSite
