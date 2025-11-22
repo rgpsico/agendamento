@@ -185,6 +185,7 @@ Route::prefix('admin/site/contatos')->middleware('auth')->name('admin.site.conta
 });
 
 Route::prefix('admin/site/artigos')->middleware('auth')->name('admin.site.artigos.')->group(function () {
+    Route::post('gerar-conteudo', [SiteArtigoController::class, 'generateContent'])->name('generate');
     Route::get('/', [SiteArtigoController::class, 'index'])->name('index');
     Route::get('create', [SiteArtigoController::class, 'create'])->name('create');
     Route::post('store', [SiteArtigoController::class, 'store'])->name('store');
