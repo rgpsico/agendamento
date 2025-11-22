@@ -44,10 +44,11 @@
                                 <li><a href="{{ route('admin.site.servicos.index') }}">Serviços</a></li>
                                 <li><a href="{{ route('admin.site.depoimentos.index') }}">Depoimentos</a></li>
                                 <li><a href="{{ route('admin.site.contatos.index') }}">Contatos</a></li>
-                                   <li><a href="{{ route('virtualhosts.index') }}">Virtual</a></li>
-                        
-                          
-                            
+                                <li><a href="{{ route('admin.site.artigos.index') }}">Artigos</a></li>
+                                <li><a href="{{ route('virtualhosts.index') }}">Virtual</a></li>
+
+
+
                             </ul>
                         </li>
                     @endisset
