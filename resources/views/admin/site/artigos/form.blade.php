@@ -35,6 +35,12 @@
 
         <div class="form-group">
             <label for="conteudo">Conteúdo *</label>
+            <div class="d-flex align-items-center mb-2">
+                <button type="button" class="btn btn-outline-secondary btn-sm" id="gerar-ia">
+                    Gerar conteúdo com IA
+                </button>
+                <small class="text-muted ml-2" id="ia-status"></small>
+            </div>
             <textarea name="conteudo" id="conteudo" rows="8" class="form-control" required>{{ old('conteudo', optional($artigo)->conteudo) }}</textarea>
         </div>
 
@@ -64,3 +70,52 @@
         </div>
     </div>
 </div>
+
+<script>
+    $(function() {
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
+        const $gerarBotao = $('#gerar-ia');
+        const $status = $('#ia-status');
+        const $titulo = $('#titulo');
+        const $conteudo = $('#conteudo');
+
+        $gerarBotao.on('click', function() {
+            const titulo = ($titulo.val() || '').trim();
+
+            if (!titulo) {
+                $status.text('Informe o título antes de gerar.');
+                return;
+            }
+
+            $gerarBotao.prop('disabled', true);
+            $status.text('Gerando conteúdo...');
+
+            $.ajax({
+                method: 'POST',
+                url: '{{ route('admin.site.artigos.generate') }}',
+                headers: { 'Accept': 'application/json' },
+                data: { titulo },
+                success: function(response) {
+                    if (response.conteudo) {
+                        $conteudo.val(response.conteudo);
+                        $status.text('Conteúdo gerado com sucesso.');
+                    }
+                },
+                error: function(xhr) {
+                    const message = xhr.responseJSON && xhr.responseJSON.message
+                        ? xhr.responseJSON.message
+                        : 'Não foi possível gerar o conteúdo agora.';
+                    $status.text(message);
+                },
+                complete: function() {
+                    $gerarBotao.prop('disabled', false);
+                }
+            });
+        });
+    });
+</script>
