@@ -35,8 +35,8 @@ return [
     ],
 
     'deepseek' => [
-        'key' => env('DEEP_SEEK_API_KEY', env('DEEPSEEK_API_KEY')),
-        'model' => env('DEEPSEEK_MODEL', 'deepseek-chat'),
+     'key' => env('DEEP_SEEK_API_KEY', env('DEEPSEEK_API_KEY')),
+     'model' => env('DEEPSEEK_MODEL', 'deepseek-chat'),
     ],
 
 
