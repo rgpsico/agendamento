@@ -3,35 +3,35 @@
     <div class="sidebar-inner slimscroll">
         <div id="sidebar-menu" class="sidebar-menu">
             <ul>
-                <li class="menu-title"> 
-                    <span>Menu</span>
+                <li class="menu-title">
+                    <span>Menu Pet</span>
                 </li>
 
                 <li> 
                     <a href="{{route('cliente.dashboard')}}">
                         <i class="fe fe-home"></i> 
-                        <span>Dashboard</span>
+                        <span>Painel Pet</span>
                     </a>
                 </li>
 
                 <li> 
                     <a href="{{route('cliente.dashboard')}}">
                         <i class="fe fe-home"></i> 
-                        <span>Escolas de Surf</span>
+                        <span>Clínicas Pet</span>
                     </a>
                 </li>
 
                 <li> 
                     <a href="{{route('cliente.dashboard')}}">
                         <i class="fe fe-home"></i> 
-                        <span>Modalidades</span>
+                        <span>Especialidades Pet</span>
                     </a>
                 </li>
 
                 <li> 
                     <a href="{{route('cliente.dashboard')}}">
                         <i class="fe fe-home"></i> 
-                        <span>Configuração Sistema</span>
+                        <span>Configuração Petshop</span>
                     </a>
                 </li>
 
@@ -49,30 +49,30 @@
     <div class="sidebar-inner slimscroll">
         <div id="sidebar-menu" class="sidebar-menu">
             <ul>
-                <li class="menu-title"> 
-                    <span>Menu</span>
+                <li class="menu-title">
+                    <span>Menu Pet</span>
                 </li>
 
                 <li> 
                     <a href="{{route('cliente.dashboard')}}">
-                        <i class="fe fe-home"></i> <span>Dashboard</span>
+                        <i class="fe fe-home"></i> <span>Painel Pet</span>
                     </a>
                 </li>
 
                 <li> 
                     <a href="{{route('alunos.index')}}">
-                        <i class="fe fe-layout"></i><span>Alunos</span>
+                        <i class="fe fe-layout"></i><span>Pets & Tutores</span>
                     </a>
                 </li>
                 <li> 
                     <a href="{{route('agenda.index')}}">
-                        <i class="fe fe-layout"></i><span>Agenda</span>
+                        <i class="fe fe-layout"></i><span>Agenda Pet</span>
                     </a>
                 </li>    
                 
                 <li> 
                     <a href="">
-                        <i class="fe fe-layout"></i><span>Configuração</span>
+                        <i class="fe fe-layout"></i><span>Configuração Pet</span>
                     </a>
                 </li>  
                 
