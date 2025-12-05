@@ -8,11 +8,11 @@
                     <span class="text-white text-2xl font-bold">{{ $site->titulo }}</span>
                 </div>
                 <div class="hidden md:flex space-x-8 nav-menu">
-                    <a href="#home" class="nav-link text-white hover:text-gray-200">Início</a>
-                    <a href="#services" class="nav-link text-white hover:text-gray-200">Serviços</a>
-                    <a href="#about" class="nav-link text-white hover:text-gray-200">Sobre</a>
-                    <a href="#testimonials" class="nav-link text-white hover:text-gray-200">Depoimentos</a>
-                    <a href="#contact" class="nav-link text-white hover:text-gray-200">Contato</a>
+                    <a href="#home" class="nav-link text-white hover:text-gray-200">Início Pet</a>
+                    <a href="#services" class="nav-link text-white hover:text-gray-200">Serviços Pet</a>
+                    <a href="#about" class="nav-link text-white hover:text-gray-200">Sobre a Clínica</a>
+                    <a href="#testimonials" class="nav-link text-white hover:text-gray-200">Depoimentos de Tutores</a>
+                    <a href="#contact" class="nav-link text-white hover:text-gray-200">Contato Pet</a>
                 </div>
                 <button class="md:hidden focus:outline-none mobile-menu-btn" id="mobileMenuBtn">
                     <i class="fas fa-bars text-white text-2xl"></i>
@@ -30,11 +30,11 @@
                 </button>
             </div>
             <div class="space-y-6">
-                <a href="#home" class="block text-white text-lg mobile-nav-link">Início</a>
-                <a href="#services" class="block text-white text-lg mobile-nav-link">Serviços</a>
-                <a href="#about" class="block text-white text-lg mobile-nav-link">Sobre</a>
-                <a href="#testimonials" class="block text-white text-lg mobile-nav-link">Depoimentos</a>
-                <a href="#contact" class="block text-white text-lg mobile-nav-link">Contato</a>
+                <a href="#home" class="block text-white text-lg mobile-nav-link">Início Pet</a>
+                <a href="#services" class="block text-white text-lg mobile-nav-link">Serviços Pet</a>
+                <a href="#about" class="block text-white text-lg mobile-nav-link">Sobre a Clínica</a>
+                <a href="#testimonials" class="block text-white text-lg mobile-nav-link">Depoimentos de Tutores</a>
+                <a href="#contact" class="block text-white text-lg mobile-nav-link">Contato Pet</a>
             </div>
         </div>
     </div>

@@ -22,29 +22,29 @@
             <div id="sidebar-menu" class="sidebar-menu">
                 <ul>
                     <!-- Seção: Menu -->
-                    <li class="menu-title"><span>Menu</span></li>
+                    <li class="menu-title"><span>Menu Pet</span></li>
 
                     <!-- Dashboard -->
                     <li>
                         <a href="{{ route('cliente.dashboard') }}">
-                            <i class="fe fe-home"></i> <span>Dashboard</span>
+                            <i class="fe fe-home"></i> <span>Painel Pet</span>
                         </a>
                     </li>
                     @isset(Auth::user()->empresa->user_id)
                         <li class="submenu">
                             <a href="#">
                                 <i class="fas fa-globe" style="font-size: 18px;"></i>
-                                <span>Site</span>
+                                <span>Site Pet</span>
                                 <span class="menu-arrow"></span>
                             </a>
                             <ul>
-                                <li><a href="{{ route('admin.site.lista') }}">Lista</a></li>
+                                <li><a href="{{ route('admin.site.lista') }}">Lista de Páginas Pet</a></li>
 
                                 {{-- <li><a href="{{ route('admin.site.configuracoes') }}">Configurações do Site</a></li> --}}
-                                <li><a href="{{ route('admin.site.servicos.index') }}">Serviços</a></li>
-                                <li><a href="{{ route('admin.site.depoimentos.index') }}">Depoimentos</a></li>
-                                <li><a href="{{ route('admin.site.contatos.index') }}">Contatos</a></li>
-                                   <li><a href="{{ route('virtualhosts.index') }}">Virtual</a></li>
+                                <li><a href="{{ route('admin.site.servicos.index') }}">Serviços Pet</a></li>
+                                <li><a href="{{ route('admin.site.depoimentos.index') }}">Depoimentos de Tutores</a></li>
+                                <li><a href="{{ route('admin.site.contatos.index') }}">Contatos da Clínica</a></li>
+                                   <li><a href="{{ route('virtualhosts.index') }}">Ambiente Virtual</a></li>
                         
                           
                             
@@ -55,14 +55,14 @@
                 <li class="submenu">
                     <a href="#">
                         <i class="fas fa-robot" style="font-size: 18px;"></i>
-                        <span>Bot / IA</span>
+                        <span>Bot / IA Pet</span>
                         <span class="menu-arrow"></span>
                     </a>
                     <ul>
                         <li><a href="{{ route('admin.bot.dashboard') }}">Dashboard</a></li>
                         <li><a href="{{ route('admin.bot.index') }}">Lista de Bots</a></li>
-                        <li><a href="{{ route('admin.bot.create') }}">Criar Bot</a></li>
-                        <li><a href="{{ route('admin.botservice.index') }}">Serviços do Bot</a></li>
+                        <li><a href="{{ route('admin.bot.create') }}">Criar Bot Pet</a></li>
+                        <li><a href="{{ route('admin.botservice.index') }}">Serviços do Bot Pet</a></li>
                         <li><a href="{{ route('admin.bot.tokens') }}">Tokens / Consumo</a></li>
                         <li><a href="{{ route('admin.bot.logs') }}">Histórico / Logs</a></li>
                         <li><a href="{{ route('admin.conversations.index') }}">Conversas</a></li> <!-- Novo -->
@@ -74,12 +74,12 @@
                         <li class="submenu">
                         <a href="#">
                             <i class="fas fa-dollar-sign" style="font-size: 18px;"></i>
-                            <span>Financeiro</span>
+                            <span>Financeiro Pet</span>
                             <span class="menu-arrow"></span>
                         </a>
                         <ul>
                             <!-- Visão geral -->
-                            <li><a href="{{ route('admin.financeiro.dashboard') }}">📊 Dashboard</a></li>
+                            <li><a href="{{ route('admin.financeiro.dashboard') }}">📊 Painel Financeiro</a></li>
 
                             <!-- Contas a receber -->
                             <li class="submenu">
@@ -103,7 +103,7 @@
 
                             <!-- Categorias -->
                             <li class="submenu">
-                                <a href="#">🏷️ Categorias<span class="menu-arrow"></span></a>
+                                <a href="#">🏷️ Categorias Pet<span class="menu-arrow"></span></a>
                                 <ul>                      
                                     <li><a href="{{ route('financeiro.categorias.index') }}">Categorias Financeiras</a></li>
                                 </ul>
@@ -111,11 +111,11 @@
 
                             <!-- Planos -->
                             <li class="submenu">
-                                <a href="#">📦 Planos<span class="menu-arrow"></span></a>
+                                <a href="#">📦 Planos Pet<span class="menu-arrow"></span></a>
                                 <ul>                      
                                     <li><a href="{{ route('admin.planos.index') }}">Listar Planos</a></li>
                                     <li><a href="{{ route('admin.planos.create') }}">Cadastrar Plano</a></li>
-                                  <li><a href="{{ route('admin.empresas.planos.index',  Auth::user()->empresa->id ) }}">🏢 Plano da Empresa</a></li>
+                                  <li><a href="{{ route('admin.empresas.planos.index',  Auth::user()->empresa->id ) }}">🏢 Plano da Clínica</a></li>
                                 </ul>
                             </li>
 
@@ -133,7 +133,7 @@
                         <li class="submenu">
                             <a href="#">
                              <i class="fas fa-layer-group" style="font-size: 14px; margin-left: 5px;"></i>
-                                <span>Site Templates</span>
+                                <span>Templates de Site Pet</span>
                              
                                 <span class="menu-arrow"></span>
                             </a>
@@ -151,12 +151,12 @@
                         <li class="submenu">
                             <a href="#">
                                 <i class="fe fe-activity"></i>
-                                <span>Serviços</span>
+                                <span>Serviços Pet</span>
                                 <span class="menu-arrow"></span>
                             </a>
                             <ul>
-                                <li><a href="{{ route('admin.servico.index') }}">Listar Serviços</a></li>
-                                <li><a href="{{ route('admin.servico.create') }}">Cadastrar Serviço</a></li>
+                                <li><a href="{{ route('admin.servico.index') }}">Listar Serviços Pet</a></li>
+                                <li><a href="{{ route('admin.servico.create') }}">Cadastrar Serviço Pet</a></li>
                             </ul>
                         </li>
                     @endisset
@@ -166,20 +166,20 @@
                         <li class="submenu">
                             <a href="#">
                                 <i class="fas fa-clock" style="font-size: 18px;"></i>
-                                <span>Horários</span>
+                                <span>Horários Pet</span>
                                 <span class="menu-arrow"></span>
                             </a>
                             <ul>
-                                <li><a href="{{ route('empresa.disponibilidade') }}">Únicos</a></li>
-                                <li><a href="{{ route('empresa.disponibilidadePersonalizada') }}">Personalizado</a></li>
-                                <li><a href="{{ route('empresa.horarios.auto') }}">Automaticos</a></li>
+                                <li><a href="{{ route('empresa.disponibilidade') }}">Atendimentos Únicos</a></li>
+                                <li><a href="{{ route('empresa.disponibilidadePersonalizada') }}">Agenda Personalizada</a></li>
+                                <li><a href="{{ route('empresa.horarios.auto') }}">Horários Automáticos</a></li>
                             </ul>
                         </li>
 
                         <!-- Alunos -->
                         <li>
                             <a href="{{ route('alunos.index') }}">
-                                <i class="fe fe-users"></i><span>Alunos</span>
+                                <i class="fe fe-users"></i><span>Pets & Tutores</span>
                             </a>
                         </li>
                     @endisset
@@ -188,12 +188,12 @@
                     <li class="submenu">
                         <a href="#">
                             <i class="fe fe-calendar"></i>
-                            <span>Agenda</span>
+                            <span>Agenda Pet</span>
                             <span class="menu-arrow"></span>
                         </a>
                         <ul>
-                            <li><a href="{{ route('agenda.index') }}">Listar Aulas</a></li>
-                            <li><a href="{{ route('agenda.calendario') }}">Calendário</a></li>
+                            <li><a href="{{ route('agenda.index') }}">Listar Consultas</a></li>
+                            <li><a href="{{ route('agenda.calendario') }}">Calendário Pet</a></li>
                         </ul>
                     </li>
 
@@ -202,7 +202,7 @@
                         <li>
                             <a href="{{ route('empresa.fotos', ['userId' => Auth::user()->id]) }}">
                                 <i class="fe fe-camera"></i>
-                                <span>Fotos</span>
+                                <span>Galeria Pet</span>
                             </a>
                         </li>
                     @endisset
@@ -211,19 +211,19 @@
                     <li class="submenu">
                         <a href="#">
                             <i class="fe fe-file"></i>
-                            <span>Dados Cadastrais</span>
+                            <span>Dados da Clínica Pet</span>
                             <span class="menu-arrow"></span>
                         </a>
                         <ul>
                             <li>
                                 <a href="{{ route('empresa.configuracao', ['userId' => Auth::user()->id]) }}">
-                                    <i class="fe fe-briefcase"></i> <span> Empresa</span>
+                                    <i class="fe fe-briefcase"></i> <span> Clínica</span>
                                 </a>
                             </li>
                             @isset(Auth::user()->isAdmin)
                                 <li>
                                     <a href="{{ route('empresa.endereco', ['userId' => Auth::user()->id]) }}">
-                                        <i class="fe fe-map-pin"></i> <span> Endereço</span>
+                                        <i class="fe fe-map-pin"></i> <span> Endereço da Clínica</span>
                                     </a>
                                 </li>
                                
@@ -236,20 +236,20 @@
                         <li class="submenu">
                             <a href="#">
                                 <i class="fas fa-credit-card" style="font-size: 18px;"></i>
-                                <span>Pagamentos</span>
+                                <span>Pagamentos Pet</span>
                                 <span class="menu-arrow"></span>
                             </a>
                             <ul>
-                                <li><a href="{{ route('pagamento.index') }}">Listar</a></li>
-                                <li><a href="{{ route('empresa.pagamento.create') }}">Cadastrar</a></li>
-                                <li><a href="{{ route('empresa.pagamento.config.index') }}">Configurações</a></li>
+                                <li><a href="{{ route('pagamento.index') }}">Listar Cobranças</a></li>
+                                <li><a href="{{ route('empresa.pagamento.create') }}">Cadastrar Forma de Pagamento</a></li>
+                                <li><a href="{{ route('empresa.pagamento.config.index') }}">Configurar Caixa Pet</a></li>
                             </ul>
                         </li>
 
                         <li class="submenu">
                             <a href="#">
                                 <i class="fas fa-credit-card" style="font-size: 18px;"></i>
-                                <span>Integrações</span>
+                                <span>Integrações Financeiras</span>
                                 <span class="menu-arrow"></span>
                             </a>
                             <ul>
@@ -264,11 +264,11 @@
                     @endisset
                    
                       @can('admin-access') 
-                        <!-- Gestão de Empresas -->
+                        <!-- Gestão de Clínicas -->
                         <li class="submenu">
                             <a href="#">
                                 <i class="fas fa-building"></i>
-                                <span>Empresas</span>
+                                <span>Clínicas</span>
                                 <span class="menu-arrow"></span>
                             </a>
                             <ul>
@@ -277,16 +277,16 @@
                             </ul>
                         </li>
                       @endcan
-                        <!-- Modalidades -->
+                        <!-- Especialidades -->
                       
                         <li class="submenu">
                             <a href="#">
                                 <i class="fas fa-swimmer"></i>
-                                <span>Modalidades</span>
+                                <span>Especialidades Pet</span>
                                 <span class="menu-arrow"></span>
                             </a>
                             <ul>
-                                <li><a href="{{ route('modalidade.index') }}">Listar</a></li>
+                                <li><a href="{{ route('modalidade.index') }}">Listar Especialidades</a></li>
                               
                             </ul>
                         </li>
@@ -295,11 +295,11 @@
                      
                             <a href="#">
                                 <i class="fas fa-users-cog" style="font-size: 18px;"></i>
-                                <span>Usuários & Perfis</span>
+                                <span>Equipe & Perfis</span>
                                 <span class="menu-arrow"></span>
                             </a>
                             <ul>
-                                <li><a href="{{ route('admin.usuarios.index') }}">Usuários</a></li>
+                                <li><a href="{{ route('admin.usuarios.index') }}">Colaboradores</a></li>
                                 {{-- <li><a href="{{ route('admin.perfis.index') }}">Perfis</a></li> --}}
                                 <li><a href="{{ route('admin.permissions.index') }}">Permissões</a></li>
                                 <li><a href="{{ route('admin.roles.index') }}">Papéis</a></li>
@@ -311,7 +311,7 @@
                         <li class="submenu">
                             <a href="#">
                                 <i class="fas fa-cogs" style="font-size: 18px;"></i>
-                                <span>Configurações</span>
+                                <span>Configurações do Petshop</span>
                                 <span class="menu-arrow"></span>
                             </a>
                             <ul>
