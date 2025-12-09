@@ -7,12 +7,13 @@
                     </div>
                     <span class="text-white text-2xl font-bold">{{ $site->titulo }}</span>
                 </div>
-                <div class="hidden md:flex space-x-8 nav-menu">
+                <div class="hidden md:flex space-x-8 nav-menu items-center">
                     <a href="#home" class="nav-link text-white hover:text-gray-200">Início</a>
                     <a href="#services" class="nav-link text-white hover:text-gray-200">Serviços</a>
                     <a href="#about" class="nav-link text-white hover:text-gray-200">Sobre</a>
                     <a href="#testimonials" class="nav-link text-white hover:text-gray-200">Depoimentos</a>
                     <a href="#contact" class="nav-link text-white hover:text-gray-200">Contato</a>
+                    <div id="google_translate_element"></div>
                 </div>
                 <button class="md:hidden focus:outline-none mobile-menu-btn" id="mobileMenuBtn">
                     <i class="fas fa-bars text-white text-2xl"></i>
@@ -35,6 +36,9 @@
                 <a href="#about" class="block text-white text-lg mobile-nav-link">Sobre</a>
                 <a href="#testimonials" class="block text-white text-lg mobile-nav-link">Depoimentos</a>
                 <a href="#contact" class="block text-white text-lg mobile-nav-link">Contato</a>
+            </div>
+            <div class="mt-8">
+                <div id="google_translate_element_mobile" class="text-white"></div>
             </div>
         </div>
     </div>

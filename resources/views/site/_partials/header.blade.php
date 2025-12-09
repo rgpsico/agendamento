@@ -19,6 +19,25 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/TextPlugin.min.js"></script>
 
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            const translateConfig = {
+                pageLanguage: 'pt',
+                includedLanguages: 'pt,en,es',
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+            };
+
+            if (document.getElementById('google_translate_element')) {
+                new google.translate.TranslateElement(translateConfig, 'google_translate_element');
+            }
+
+            if (document.getElementById('google_translate_element_mobile')) {
+                new google.translate.TranslateElement(translateConfig, 'google_translate_element_mobile');
+            }
+        }
+    </script>
+    <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
     <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-4ZMP2C63TR">
 </script>
@@ -119,6 +138,27 @@
         .diagonal-whatsapp:hover {
             transform: scale(1.1);
             box-shadow: 0 15px 40px rgba(37, 211, 102, 0.6);
+        }
+
+        #google_translate_element {
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        #google_translate_element .goog-te-combo {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 0.35rem 0.6rem;
+            border-radius: 0.5rem;
+            outline: none;
+            backdrop-filter: blur(6px);
+        }
+
+        #google_translate_element .goog-te-combo option {
+            color: #0f172a;
         }
 
         .nav-link {
