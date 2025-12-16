@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\AlunosControllerApi;
 use App\Http\Controllers\Api\AsaasController;
 use App\Http\Controllers\Api\AulasControllerApi;
 use App\Http\Controllers\Api\AuthControllerApi;
+use App\Http\Controllers\Api\SiteArtigoPublicController;
 use App\Http\Controllers\Api\DespesaRecorrenteApiController;
 use App\Http\Controllers\Api\DiaDaSemanaControllerApi;
 use App\Http\Controllers\Api\DisponibilidadeControllerApi;
@@ -273,6 +274,11 @@ Route::post('/clique-whatsapp', [SiteCliqueWhatsappController::class, 'store']);
 
 
 Route::post('/visualizacao', [SiteVisualizacaoController::class, 'store']);
+
+
+
+Route::get('/site-artigos', [SiteArtigoPublicController::class, 'index']);
+Route::post('/site-artigos', [SiteArtigoPublicController::class, 'store']);
 
 
 Route::post('/visitante', [SiteVisitanteController::class, 'store']);
