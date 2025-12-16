@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 
 class SiteArtigoPublicController extends Controller
 {
+
     public function index(Request $request): JsonResponse
     {
         $artigos = SiteArtigo::query()
