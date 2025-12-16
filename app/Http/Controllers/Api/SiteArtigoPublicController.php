@@ -9,12 +9,13 @@ use Illuminate\Http\Request;
 
 class SiteArtigoPublicController extends Controller
 {
-    public function index(): JsonResponse
+
+    public function index(Request $request): JsonResponse
     {
         $artigos = SiteArtigo::query()
             ->when(
-                request()->filled('site_id'),
-                fn ($query) => $query->where('site_id', request()->integer('site_id'))
+                $request->filled('site_id'),
+                fn ($query) => $query->where('site_id', $request->integer('site_id'))
             )
             ->latest()
             ->get();
