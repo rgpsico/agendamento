@@ -82,6 +82,8 @@ class FinanceiroDashboardController extends Controller
             $despesasMes += $totalDespesasRecorrentes;
         }
 
+        $resultadoMes = $receitasMes - $despesasMes;
+
         $receitasDetalhadas = collect();
 
         // Receitas normais
@@ -164,6 +166,7 @@ class FinanceiroDashboardController extends Controller
             'totalDespesasPendentes',
             'totalReceitasRecorrentes',
             'totalDespesasRecorrentes',
+            'resultadoMes',
             'dataInicio',
             'dataFim',
             'tipoSelecionado',
