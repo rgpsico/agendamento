@@ -66,18 +66,16 @@
                         @endif
 
                     <!-- Resultado do Mês -->
-                    @if(in_array('todos', $tipoSelecionado) || in_array('receitas', $tipoSelecionado) || in_array('despesas', $tipoSelecionado))
                     <div class="col-xl-3 col-lg-4 col-md-6 card-indicador">
-                        <div class="metric-card {{ ($receitasMes - $despesasMes) >= 0 ? 'success' : 'danger' }}">
+                        <div class="metric-card {{ $resultadoMes >= 0 ? 'success' : 'danger' }}">
                             <div class="card-header">
                                 <div>
                                     <h5 class="card-title">Resultado do Mês</h5>
-                                    <p class="card-value">R$ {{ number_format($receitasMes - $despesasMes, 2, ',', '.') }}</p>
+                                    <p class="card-value">R$ {{ number_format($resultadoMes, 2, ',', '.') }}</p>
                                 </div>
                                 <div class="card-icon">📊</div>
                             </div>
                         </div>
                     </div>
-                    @endif
                 </div>
             </div>
