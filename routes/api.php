@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\AsaasController;
 use App\Http\Controllers\Api\AulasControllerApi;
 use App\Http\Controllers\Api\AuthControllerApi;
 use App\Http\Controllers\Api\SiteArtigoPublicController;
+use App\Http\Controllers\Api\TesteController;
 use App\Http\Controllers\Api\DespesaRecorrenteApiController;
 use App\Http\Controllers\Api\DiaDaSemanaControllerApi;
 use App\Http\Controllers\Api\DisponibilidadeControllerApi;
@@ -279,6 +280,8 @@ Route::post('/visualizacao', [SiteVisualizacaoController::class, 'store']);
 
 Route::get('/site-artigos', [SiteArtigoPublicController::class, 'index']);
 Route::post('/site-artigos', [SiteArtigoPublicController::class, 'store']);
+Route::post('/teste/artigos', [TesteController::class, 'store']);
+Route::get('/teste/artigos/exemplo', [TesteController::class, 'exemplo']);
 
 
 Route::post('/visitante', [SiteVisitanteController::class, 'store']);
