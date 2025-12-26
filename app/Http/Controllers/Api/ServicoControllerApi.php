@@ -44,7 +44,7 @@ class ServicoControllerApi extends Controller
             'tipo_agendamento' => 'required|in:DIA,HORARIO',
             'vagas' => 'required_if:tipo_agendamento,DIA|integer|min:1',
             'categoria_id' => 'nullable|exists:financeiro_categorias,id',
-            'empresa_id' => 'required|integer|exists:empresas,id',
+            'empresa_id' => 'required|integer|exists:empresa,id',
             'imagem' => 'nullable|image',
         ]);
 
