@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\TesteController;
 use App\Http\Controllers\Api\DespesaRecorrenteApiController;
 use App\Http\Controllers\Api\DiaDaSemanaControllerApi;
 use App\Http\Controllers\Api\DisponibilidadeControllerApi;
+use App\Http\Controllers\Api\FinanceiroCategoriaControllerApi;
 
 use App\Http\Controllers\Api\EmpresaControllerApi;
 use App\Http\Controllers\Api\ProfessoresControllerApi;
@@ -96,6 +97,7 @@ Route::get('empresa/verificarstatus/{empresaId}',  [EmpresaControllerApi::class,
 
 Route::get('servicos/empresa/{empresaId}', [ServicoControllerApi::class, 'byEmpresa']);
 Route::resource('servicos', ServicoControllerApi::class);
+Route::get('financeiro-categorias', [FinanceiroCategoriaControllerApi::class, 'index']);
 
 Route::post('pagamentoApi', [PagamentoController::class, 'pagamentoStripe']);
 Route::post('/admin/asaas/limpar-sandbox', [PagamentoController::class, 'deleteAllPayments']);
