@@ -113,6 +113,7 @@ Route::resource('users', UserControllerApi::class);
 Route::post('transacao', [UserControllerApi::class, 'transacao']);
 Route::post('googleAuth', [UserControllerApi::class, 'googleAuth']);
 
+Route::get('/alunos/empresa/{empresaId}', [AlunosControllerApi::class, 'byEmpresa']);
 
 Route::resource('aulas', AulasControllerApi::class);
 

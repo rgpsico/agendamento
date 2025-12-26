@@ -35,6 +35,17 @@ class AlunosControllerApi extends Controller
         return response()->json($users);
     }
 
+    public function byEmpresa($empresaId)
+    {
+        $alunos = Alunos::with('usuario')
+            ->whereHas('professores', function ($query) use ($empresaId) {
+                $query->where('empresa_id', $empresaId);
+            })
+            ->get();
+
+        return response()->json($alunos);
+    }
+
     public function treinoEmail()
     {
         // Mail::raw('Texto do e-mail', function ($message) {
