@@ -82,6 +82,8 @@ Route::post('/login', [AuthControllerApi::class, 'login']);
 
 Route::post('acesso/verificar', [AcessoControllerApi::class, 'verificar'])->name('acesso.verificar');
 
+Route::get('agendamento/professor/{professorId}', [AgendamentoControllerApi::class, 'byProfessor']);
+Route::get('agendamento/empresa/{empresaId}', [AgendamentoControllerApi::class, 'byEmpresa']);
 Route::resource('agendamento', AgendamentoControllerApi::class);
 
 Route::get('professor/{id}/aulas', [ProfessoresControllerApi::class, 'aulas']);

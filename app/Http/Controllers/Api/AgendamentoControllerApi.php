@@ -18,6 +18,25 @@ class AgendamentoControllerApi extends Controller
         return response()->json($users);
     }
 
+    public function byProfessor($professorId)
+    {
+        $agendamentos = Agendamento::with('aluno.usuario')
+            ->where('professor_id', $professorId)
+            ->get();
+        return response()->json($agendamentos);
+    }
+
+    public function byEmpresa($empresaId)
+    {
+        $agendamentos = Agendamento::with('aluno.usuario')
+            ->whereHas('professor', function ($query) use ($empresaId) {
+                $query->where('empresa_id', $empresaId);
+            })
+            ->get();
+
+        return response()->json($agendamentos);
+    }
+
     // Criar um novo usuário
     public function store(Request $request)
     {
