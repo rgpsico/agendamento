@@ -78,6 +78,14 @@
                                 </li>
                             @else
                                 {{-- Caso não haja usuário autenticado, mostre as opções de login --}}
+                                <li class="nav-item me-2">
+                                    <select id="google-translate-select" class="form-select form-select-sm"
+                                        aria-label="Selecionar idioma" style="min-width: 160px;">
+                                        <option value="pt">🇧🇷 Português</option>
+                                        <option value="en">🇺🇸 Inglês</option>
+                                        <option value="es">🇪🇸 Espanhol</option>
+                                    </select>
+                                </li>
                                 <li class="nav-item">
                                     <a href="{{ route('home.login') }}" class="btn btn-primary">
                                         <i class="fas fa-sign-in-alt"></i> Login
@@ -98,4 +106,5 @@
             </div>
         </header>
         <!-- /Header -->
+        <div id="google_translate_element" class="d-none"></div>
     </div>

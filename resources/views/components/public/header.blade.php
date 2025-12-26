@@ -57,6 +57,41 @@
     <script src="{{ asset('template/assets/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('js/analytics.js') }}"></script>
     <script>
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'pt',
+                includedLanguages: 'pt,en,es',
+                autoDisplay: false
+            }, 'google_translate_element');
+        }
+
+        function setGoogleTranslateLanguage(language) {
+            const baseValue = '/pt/' + language;
+            document.cookie = 'googtrans=' + baseValue + ';path=/';
+            document.cookie = 'googtrans=' + baseValue + ';path=/;domain=' + window.location.hostname;
+            window.location.reload();
+        }
+
+        function getGoogleTranslateLanguage() {
+            const match = document.cookie.match(/(?:^|;\s*)googtrans=([^;]+)/);
+            if (!match) return 'pt';
+            const parts = decodeURIComponent(match[1]).split('/');
+            return parts[2] || 'pt';
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const languageSelect = document.getElementById('google-translate-select');
+            if (!languageSelect) return;
+
+            languageSelect.value = getGoogleTranslateLanguage();
+
+            languageSelect.addEventListener('change', function(event) {
+                setGoogleTranslateLanguage(event.target.value);
+            });
+        });
+    </script>
+    <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Validação de confirmação de senha
             try {
