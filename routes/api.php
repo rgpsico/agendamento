@@ -94,6 +94,7 @@ Route::get('professores/{id}/alunos', [EmpresaControllerApi::class, 'getAlunoByI
 Route::get('empresa/verificarstatus/{empresaId}',  [EmpresaControllerApi::class, 'verificarStatus'])->name('empresa.verificarStatus');
 
 
+Route::get('servicos/empresa/{empresaId}', [ServicoControllerApi::class, 'byEmpresa']);
 Route::resource('servicos', ServicoControllerApi::class);
 
 Route::post('pagamentoApi', [PagamentoController::class, 'pagamentoStripe']);

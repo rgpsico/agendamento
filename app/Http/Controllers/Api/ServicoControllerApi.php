@@ -25,6 +25,12 @@ class ServicoControllerApi extends Controller
         return response()->json($model);
     }
 
+    public function byEmpresa($empresaId)
+    {
+        $servicos = $this->model::where('empresa_id', $empresaId)->get();
+        return response()->json($servicos);
+    }
+
     // Criar um novo usuário
     public function store(Request $request)
     {

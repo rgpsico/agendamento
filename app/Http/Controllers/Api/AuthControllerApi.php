@@ -17,7 +17,8 @@ class AuthControllerApi extends Controller
 
             $user = Usuario::where('email', $request->email)->first();
             $token = $user->createToken('authToken')->plainTextToken;
-            return response()->json(['token' => $token], 200);
+            $empresaId = $user->empresa?->id;
+            return response()->json(['token' => $token, 'empresa_id' => $empresaId], 200);
         } else {
 
             return response()->json(['error' => 'Invalid email/password'], 401);
