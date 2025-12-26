@@ -175,7 +175,7 @@ class AlunosController extends Controller
         $request->validate([
             'nome' => 'required',
             'telefone' => 'required',
-            // 'data_nascimento' => 'required|date',
+             'data_nascimento' => 'required|date',
             'email' => 'required|email',
             // 'cep' => 'required',
             // 'rua' => 'required',
