@@ -14,6 +14,9 @@ use App\Http\Controllers\Api\DespesaRecorrenteApiController;
 use App\Http\Controllers\Api\DiaDaSemanaControllerApi;
 use App\Http\Controllers\Api\DisponibilidadeControllerApi;
 use App\Http\Controllers\Api\FinanceiroCategoriaControllerApi;
+use App\Http\Controllers\Api\Frontend\AgendamentoFrontendController;
+use App\Http\Controllers\Api\Frontend\DisponibilidadeFrontendController;
+use App\Http\Controllers\Api\Frontend\AlunoFrontendController;
 
 use App\Http\Controllers\Api\EmpresaControllerApi;
 use App\Http\Controllers\Api\ProfessoresControllerApi;
@@ -81,6 +84,27 @@ Route::prefix('permissions')->group(function () {
 Route::post('/login', [AuthControllerApi::class, 'login']);
 
 Route::post('acesso/verificar', [AcessoControllerApi::class, 'verificar'])->name('acesso.verificar');
+
+Route::options('frontend/{any}', function () {
+    return response()->noContent();
+})->where('any', '.*');
+
+Route::prefix('frontend')->group(function () {
+    Route::get('agendamentos/empresa/{empresaId}', [AgendamentoFrontendController::class, 'byEmpresa']);
+    Route::post('agendamentos', [AgendamentoFrontendController::class, 'store']);
+    Route::put('agendamentos/{id}', [AgendamentoFrontendController::class, 'update']);
+    Route::patch('agendamentos/{id}', [AgendamentoFrontendController::class, 'update']);
+    Route::delete('agendamentos/{id}', [AgendamentoFrontendController::class, 'destroy']);
+
+    Route::get('disponibilidades/empresa/{empresaId}', [DisponibilidadeFrontendController::class, 'byEmpresa']);
+    Route::get('disponibilidades/professor/{professorId}', [DisponibilidadeFrontendController::class, 'byProfessor']);
+    Route::post('disponibilidades', [DisponibilidadeFrontendController::class, 'store']);
+    Route::put('disponibilidades/{id}', [DisponibilidadeFrontendController::class, 'update']);
+    Route::patch('disponibilidades/{id}', [DisponibilidadeFrontendController::class, 'update']);
+    Route::delete('disponibilidades/{id}', [DisponibilidadeFrontendController::class, 'destroy']);
+
+    Route::get('alunos/empresa/{empresaId}', [AlunoFrontendController::class, 'byEmpresa']);
+});
 
 Route::get('agendamento/professor/{professorId}', [AgendamentoControllerApi::class, 'byProfessor']);
 Route::get('agendamento/empresa/{empresaId}', [AgendamentoControllerApi::class, 'byEmpresa']);
