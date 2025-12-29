@@ -143,6 +143,7 @@ Route::resource('aulas', AulasControllerApi::class);
 
 Route::resource('disponibilidade', DisponibilidadeControllerApi::class);
 Route::get('disponibilidade', [DisponibilidadeControllerApi::class, 'disponibilidade']);
+Route::get('disponibilidade/horarios-contratados', [DisponibilidadeControllerApi::class, 'horariosContratados']);
 
 Route::resource('dias', DiaDaSemanaControllerApi::class);
 

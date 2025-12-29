@@ -22,7 +22,7 @@ class DisponibilidadeControllerApi extends Controller
     }
 
  
-   public function disponibilidade(Request $request)
+    public function disponibilidade(Request $request)
     {
         $day = $request->input('day');
         $data_selecionada = $request->input('data_select');
@@ -80,6 +80,38 @@ class DisponibilidadeControllerApi extends Controller
         \Log::info('Horários disponíveis finais:', $timeslots);
 
         return response()->json($timeslots);
+    }
+
+    public function horariosContratados(Request $request)
+    {
+        $dataSelecionada = $request->input('data_select');
+        $professorId = $request->input('professor_id');
+        $servicoId = $request->input('servico_id');
+
+        $agendamentos = Agendamento::with(['aluno.usuario'])
+            ->where('data_da_aula', $dataSelecionada)
+            ->where('professor_id', $professorId)
+            ->when($servicoId, function ($query, $servicoId) {
+                return $query->where('servico_id', $servicoId);
+            })
+            ->get();
+
+        $payload = $agendamentos->map(function ($agendamento) {
+            $aluno = $agendamento->aluno;
+            $usuario = $aluno?->usuario;
+
+            return [
+                'agendamento_id' => $agendamento->id,
+                'horario' => Carbon::parse($agendamento->horario)->format('H:i'),
+                'aluno' => [
+                    'id' => $aluno?->id,
+                    'usuario_id' => $aluno?->usuario_id,
+                    'nome' => $usuario?->nome,
+                ],
+            ];
+        });
+
+        return response()->json($payload);
     }
 
 
