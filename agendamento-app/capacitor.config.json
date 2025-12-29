@@ -1,0 +1,9 @@
+{
+  "appId": "com.agendamento.app",
+  "appName": "Agendamento",
+  "webDir": "public",
+  "server": {
+    "url": "https://agendamento.rjpasseios.com.br",
+    "cleartext": false
+  }
+}
