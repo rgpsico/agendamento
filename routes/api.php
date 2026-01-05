@@ -49,6 +49,8 @@ use App\Http\Controllers\ContatoController;
 use App\Http\Controllers\EmpresaController;
 
 Route::post('pagamento/presencial', [PagamentoController::class, 'criarPagamentoPresencial'])->name('empresa.pagamento.prensencial');
+Route::post('pagamento/presencial-api', [PagamentoController::class, 'criarPagamentoPresencialApi'])
+    ->name('empresa.pagamento.presencial.api');
 
 
 
