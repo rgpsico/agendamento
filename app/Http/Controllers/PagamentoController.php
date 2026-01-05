@@ -768,13 +768,13 @@ class PagamentoController extends Controller
             }
 
             $notificationService = app(\App\Services\NotificationService::class);
-            $canais = ['whatsapp', 'email'];
+            $canais = ['whatsapp'];
             $notificationService->enviarAgendamento($agendamento, $pagamento, $canais);
 
             if (!$professor || !$professor->empresa) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Professor nÃ£o encontrado ou sem empresa vinculada.',
+                    'message' => 'Professor não encontrado ou sem empresa vinculada.',
                 ], 422);
             }
 
@@ -803,7 +803,7 @@ class PagamentoController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Erro ao processar o pagamento presencial.',
+                'message' => 'Erro ao processar o pagamento presencial. '.$e->getMessage(),
             ], 500);
         }
     }
