@@ -11,7 +11,6 @@ class EmpresaControllerApi extends Controller
 {
     public function index()
     {
-
         return $empresas = Empresa::with('endereco', 'galeria', 'avaliacao')->get();
     }
 

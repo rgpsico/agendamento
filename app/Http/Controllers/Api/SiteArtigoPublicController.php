@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 class SiteArtigoPublicController extends Controller
 {
 
-    public function index(Request $request): JsonResponse
+    public function index(Request $request)
     {
         $artigos = SiteArtigo::query()
             ->when(
