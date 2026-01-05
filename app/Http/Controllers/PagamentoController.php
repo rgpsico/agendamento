@@ -734,6 +734,80 @@ class PagamentoController extends Controller
             ->with('success', 'Agendamento e pagamento presencial registrados com sucesso');
     }
 
+    public function criarPagamentoPresencialApi(CriarPagamentoPresencialRequest $request)
+    {
+        try {
+            $tipo_de_horario = Servicos::where('id', $request->servico_id)->value('tipo_agendamento');
+
+            if (Agendamento::verificarDisponibilidade($request, $tipo_de_horario)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'O professor jÃ¡ possui um agendamento neste horÃ¡rio. Procure uma nova data ou horÃ¡rio diferente',
+                ], 422);
+            }
+
+            $agendamento = Agendamento::criarAgendamento($request->all());
+            $pagamento = Pagamento::criarPagamentoPresencial($agendamento, $request->all());
+
+            if (!$agendamento || !$pagamento) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Falha ao criar agendamento ou pagamento.',
+                ], 500);
+            }
+
+            $professorId = $request->input('professor_id');
+            $alunoId = $request->input('aluno_id');
+
+            $professor = Professor::find($professorId);
+
+            if ($professor && $alunoId) {
+                if (!$professor->alunos()->where('aluno_id', $alunoId)->exists()) {
+                    $professor->alunos()->attach($alunoId);
+                }
+            }
+
+            $notificationService = app(\App\Services\NotificationService::class);
+            $canais = ['whatsapp', 'email'];
+            $notificationService->enviarAgendamento($agendamento, $pagamento, $canais);
+
+            if (!$professor || !$professor->empresa) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Professor nÃ£o encontrado ou sem empresa vinculada.',
+                ], 422);
+            }
+
+            $empresaId = $professor->empresa->id;
+
+            app(\App\Services\FinanceiroReceitaService::class)->lancarReceita([
+                'descricao' => 'Receita pendente do agendamento do aluno #' . $agendamento->id,
+                'pagamento_id' => $pagamento->id,
+                'valor' => $pagamento->valor,
+                'data_recebimento'  => null,
+                'categoria_id' => $request->input('categoria_id') ?? null,
+                'usuario_id' => $request->input('aluno_id'),
+                'status' => 'pendente',
+                'empresa_id' => $empresaId,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'agendamento_id' => $agendamento->id,
+                'pagamento_id' => $pagamento->id,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Erro ao criar pagamento presencial via API', [
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao processar o pagamento presencial.',
+            ], 500);
+        }
+    }
+
 
 
 
