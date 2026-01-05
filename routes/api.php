@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\AlunosControllerApi;
 use App\Http\Controllers\Api\AsaasController;
 use App\Http\Controllers\Api\AulasControllerApi;
 use App\Http\Controllers\Api\AuthControllerApi;
+use App\Http\Controllers\Api\CheckoutControllerApi;
 use App\Http\Controllers\Api\SiteArtigoPublicController;
 use App\Http\Controllers\Api\TesteController;
 use App\Http\Controllers\Api\DespesaRecorrenteApiController;
@@ -84,6 +85,8 @@ Route::prefix('permissions')->group(function () {
 Route::post('/login', [AuthControllerApi::class, 'login']);
 
 Route::post('acesso/verificar', [AcessoControllerApi::class, 'verificar'])->name('acesso.verificar');
+
+Route::get('checkout-auth/{userId}', [CheckoutControllerApi::class, 'checkoutAuth']);
 
 Route::options('frontend/{any}', function () {
     return response()->noContent();
