@@ -57,6 +57,32 @@ class AlunoadminController extends Controller
         return view('alunoadmin::alunos.index', compact('title', 'agendamentos', 'config'));
     }
 
+    public function aulasJson(Request $request)
+    {
+        if (!auth()->user()->aluno) {
+            auth()->logout();
+            return response()->json(['error' => 'O aluno não existe.'], 404);
+        }
+
+        $id = auth()->user()->aluno->id;
+
+        $query = Agendamento::with('professor.usuario', 'modalidade')
+            ->where('aluno_id', $id);
+
+        if ($request->filled('data')) {
+            $query->whereDate('data_da_aula', $request->data);
+        }
+
+        if ($request->filled('professor')) {
+            $query->whereHas('professor.usuario', function ($q) use ($request) {
+                $q->where('nome', 'LIKE', '%' . $request->professor . '%');
+            });
+        }
+
+        $agendamentos = $query->get();
+
+        return response()->json(['agendamentos' => $agendamentos]);
+    }
 
 
 

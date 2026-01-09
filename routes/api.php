@@ -47,6 +47,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\ContatoController;
 use App\Http\Controllers\EmpresaController;
+use Modules\Alunoadmin\Http\Controllers\AlunoadminController;
 
 Route::post('pagamento/presencial', [PagamentoController::class, 'criarPagamentoPresencial'])->name('empresa.pagamento.prensencial');
 Route::post('pagamento/presencial-api', [PagamentoController::class, 'criarPagamentoPresencialApi'])
@@ -387,6 +388,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/receitas/{id}', [ReceitaApiController::class, 'show']);
     Route::get('/receita/resumo', [ReceitaApiController::class, 'resumo']);
 });
+
+Route::middleware('auth:sanctum')->get('/alunoadmin/aulas', [AlunoadminController::class, 'aulasJson']);
 
 
 Route::get('/despesas-recorrentes', [DespesaRecorrenteApiController::class, 'index']);
