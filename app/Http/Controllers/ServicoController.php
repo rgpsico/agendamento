@@ -202,7 +202,7 @@ class ServicoController extends Controller
         'preco' => 'required|numeric',
         'tempo_de_aula' => 'nullable|integer',
         'tipo_agendamento' => 'required|in:DIA,HORARIO',
-        'vagas' => 'required_if:tipo_agendamento,DIA|integer|min:1',
+     //   'vagas' => 'required_if:tipo_agendamento,DIA|integer|min:1',
         'categoria_id' => 'nullable|exists:financeiro_categorias,id',
     ]);
 

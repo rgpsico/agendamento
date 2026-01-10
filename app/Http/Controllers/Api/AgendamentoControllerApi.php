@@ -72,13 +72,34 @@ class AgendamentoControllerApi extends Controller
     // Deletar um usuário específico
     public function destroy($id)
     {
-        $user = Aulas::find($id);
-        if ($user) {
-            $user->delete();
-            return response()->json(['success' => 'Usuário deletado com sucesso'], 200);
-        } else {
-            return response()->json(['error' => 'Usuário não encontrado'], 404);
+        $agendamento = Agendamento::find($id);
+        if (!$agendamento) {
+            return response()->json(['error' => 'Agendamento nao encontrado'], 404);
         }
+
+        $user = Auth::user();
+        if (!$user) {
+            dd("aaa");
+            return response()->json(['error' => 'Nao autenticado'], 401);
+        }
+
+        $aluno = $user->aluno;
+        $professor = $user->professor;
+
+        if ($aluno && $agendamento->aluno_id !== $aluno->id) {
+            return response()->json(['error' => 'Sem permissao para cancelar este agendamento'], 403);
+        }
+
+        if ($professor && $agendamento->professor_id !== $professor->id) {
+            return response()->json(['error' => 'Sem permissao para cancelar este agendamento'], 403);
+        }
+
+        if (!$aluno && !$professor) {
+            return response()->json(['error' => 'Sem permissao para cancelar este agendamento'], 403);
+        }
+
+        $agendamento->delete();
+        return response()->json(['success' => 'Agendamento deletado com sucesso'], 200);
     }
 
     public function getAgendamentos()

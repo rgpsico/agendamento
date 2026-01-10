@@ -114,7 +114,8 @@ Route::prefix('frontend')->group(function () {
 
 Route::get('agendamento/professor/{professorId}', [AgendamentoControllerApi::class, 'byProfessor']);
 Route::get('agendamento/empresa/{empresaId}', [AgendamentoControllerApi::class, 'byEmpresa']);
-Route::resource('agendamento', AgendamentoControllerApi::class);
+Route::resource('agendamento', AgendamentoControllerApi::class)->except(['destroy']);
+Route::middleware('auth:sanctum')->post('agendamento/{id}', [AgendamentoControllerApi::class, 'destroy']);
 
 Route::get('professor/{id}/aulas', [ProfessoresControllerApi::class, 'aulas']);
 Route::resource('professor', ProfessoresControllerApi::class);

@@ -26,6 +26,8 @@ class NotificationService
             'status'     => $pagamento->status,
         ];
 
+      
+     
         if (in_array('whatsapp', $canais)) {
             $telefone = $this->formatPhone($agendamento->professor->empresa->telefone);
             $mensagem = $this->montarMensagem($dados);
