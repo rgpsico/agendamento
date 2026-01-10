@@ -59,8 +59,10 @@ class AlunoadminController extends Controller
 
     public function aulasJson(Request $request)
     {
-        if (!auth()->user()->aluno) {
-            auth()->logout();
+       
+        if (!auth()->user()->aluno) 
+            {
+           
             return response()->json(['error' => 'O aluno não existe.'], 404);
         }
 

@@ -212,7 +212,7 @@ Route::delete('modalidade/{id}/destroy', [ModalidadeController::class, 'destroy'
 
 
 
-Route::post('/aluno/store', [AlunosController::class, 'store']);
+Route::post('/aluno/store', [AlunosControllerApi::class, 'store']);
 Route::post('/aluno/{id}/update', [AlunosControllerApi::class, 'update']);
 Route::post('/aluno/{id}/update-endereco', [AlunosControllerApi::class, 'updateEndereco']);
 Route::delete('/aluno/{id}/destroy/{professor_id}', [AlunosController::class, 'destroy']);
