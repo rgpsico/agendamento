@@ -86,6 +86,7 @@ Route::prefix('permissions')->group(function () {
 
 
 Route::post('/login', [AuthControllerApi::class, 'login']);
+Route::middleware('auth:sanctum')->get('/me', [AuthControllerApi::class, 'me']);
 
 Route::post('acesso/verificar', [AcessoControllerApi::class, 'verificar'])->name('acesso.verificar');
 

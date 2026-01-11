@@ -9,6 +9,16 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthControllerApi extends Controller
 {
+    public function me(Request $request)
+    {
+        $user = $request->user();
+        if (!$user) {
+            return response()->json(['error' => 'Nao autenticado'], 401);
+        }
+
+        return response()->json($user);
+    }
+
     public function login(Request $request)
     {
         $credentials = $request->only('email', 'password');
