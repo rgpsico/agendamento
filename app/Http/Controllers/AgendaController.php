@@ -26,7 +26,7 @@ class AgendaController extends Controller
 
     public function index()
     {
-        dd('aaa');
+        
         if (isset(Auth::user()->professor->id)) {
             $professor_id = Auth::user()->professor->id; // suponho que o professor esteja logado.
 
