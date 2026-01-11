@@ -37,6 +37,28 @@ class AgendamentoControllerApi extends Controller
         return response()->json($agendamentos);
     }
 
+    public function byDia(Request $request)
+    {
+        $data = $request->query('data', Carbon::today()->toDateString());
+        $horario = $request->query('horario');
+        $status = $request->query('status');
+
+        $query = Agendamento::with('aluno.usuario')
+            ->whereDate('data_da_aula', $data);
+
+        if ($horario) {
+            $query->where('horario', '>=', $horario);
+        }
+
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        $agendamentos = $query->orderBy('horario')->get();
+
+        return response()->json($agendamentos);
+    }
+
     // Criar um novo usuário
     public function store(Request $request)
     {
@@ -79,7 +101,7 @@ class AgendamentoControllerApi extends Controller
 
         $user = Auth::user();
         if (!$user) {
-            dd("aaa");
+            
             return response()->json(['error' => 'Nao autenticado'], 401);
         }
 
