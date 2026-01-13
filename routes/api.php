@@ -240,6 +240,7 @@ use App\Http\Controllers\Api\SiteDepoimentoControllerApi;
 use App\Http\Controllers\Api\SiteServicoController;
 use App\Http\Controllers\Api\SiteServicoControllerApi;
 use App\Http\Controllers\BotController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\DespesaController;
 
 Route::middleware('auth:sanctum')->prefix('site')->group(function () {
