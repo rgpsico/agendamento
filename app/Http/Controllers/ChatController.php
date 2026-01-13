@@ -171,7 +171,7 @@ class ChatController extends Controller
     {
 
 
-        $bot = Bot::where('id', $request->bot_id)->firstOrFail(); // garante que existe
+        $bot = Bot::where('id', $request->bot_id)->first(); // garante que existe
 
         $userId = auth()->check() ? auth()->id() : null;
 
@@ -204,26 +204,6 @@ class ChatController extends Controller
         return response()->json([
             'conversation_id' => $conversation->id,
             'bot_response' => $respostaBot,
-        ]);
-    }
-
-    public function listByEmpresaAndUser(Request $request)
-    {
-        $validated = $request->validate([
-            'empresa_id' => 'required|integer',
-            'user_id' => 'required|integer',
-        ]);
-
-        $conversations = Conversation::with(['messages' => function ($query) {
-            $query->orderBy('id');
-        }])
-            ->where('empresa_id', $validated['empresa_id'])
-            ->where('user_id', $validated['user_id'])
-            ->orderBy('id', 'desc')
-            ->get();
-
-        return response()->json([
-            'data' => $conversations,
         ]);
     }
 
