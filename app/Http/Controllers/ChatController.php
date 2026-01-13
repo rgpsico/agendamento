@@ -207,6 +207,26 @@ class ChatController extends Controller
         ]);
     }
 
+    public function listByEmpresaAndUser(Request $request)
+    {
+        $validated = $request->validate([
+            'empresa_id' => 'required|integer',
+            'user_id' => 'required|integer',
+        ]);
+
+        $conversations = Conversation::with(['messages' => function ($query) {
+            $query->orderBy('id');
+        }])
+            ->where('empresa_id', $validated['empresa_id'])
+            ->where('user_id', $validated['user_id'])
+            ->orderBy('id', 'desc')
+            ->get();
+
+        return response()->json([
+            'data' => $conversations,
+        ]);
+    }
+
 
     /**
      * Obtem a resposta do bot e salva no banco.

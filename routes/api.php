@@ -339,6 +339,7 @@ Route::post('bot/{botId}/interact', [BotController::class, 'interact'])->name('b
 Route::post('/bots/{bot}/chat', [BotController::class, 'chat']);
 
 
+Route::get('/conversations', [ChatController::class, 'listByEmpresaAndUser']);
 Route::get('/conversations/{id}', [ConversationController::class, 'showapi']);
 
 Route::post('/fill-site-fields', [BotController::class, 'fillSiteFields'])->name('fill.site.fields');
