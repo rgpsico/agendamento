@@ -13,6 +13,7 @@ use App\Models\Message;
 use App\Models\Professor;
 use App\Models\Servicos;
 use App\Models\TokenUsage;
+use App\Models\Usuario;
 use App\Services\DeepSeekService;
 use App\Services\TwilioService;
 use Illuminate\Http\Request;
@@ -34,6 +35,74 @@ class ChatController extends Controller
     {
         $this->deepSeekService = $deepSeekService;
         $this->twilioService = $twilioService;
+    }
+
+    /**
+     * Lista conversas por empresa e usuario (aluno ou professor).
+     */
+    public function listByEmpresaAndUser(Request $request)
+    {
+        $validated = $request->validate([
+            'empresa_id' => 'required|integer|exists:empresas,id',
+            'user_id' => 'nullable|integer|exists:usuarios,id',
+        ]);
+
+        $userId = $validated['user_id'] ?? auth()->id();
+        if (!$userId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'user_id e obrigatorio quando nao autenticado.',
+            ], 422);
+        }
+
+        $user = Usuario::with('professor.alunos')->findOrFail($userId);
+
+        $query = Conversation::with([
+            'user',
+            'bot',
+            'messages' => function ($q) {
+                $q->latest()->limit(1);
+            },
+        ])->where('empresa_id', $validated['empresa_id']);
+
+        if ($user->tipo_usuario === 'professor' && $user->professor) {
+            $alunoUserIds = $user->professor->alunos()->pluck('usuario_id')->filter()->all();
+            $userIds = array_unique(array_merge($alunoUserIds, [$userId]));
+            $query->whereIn('user_id', $userIds);
+        } else {
+            $query->where('user_id', $userId);
+        }
+
+        $conversas = $query->orderByDesc('updated_at')->get();
+
+        return response()->json($conversas->map(function ($conversa) {
+            $lastMessage = $conversa->messages->first();
+
+            return [
+                'id' => $conversa->id,
+                'empresa_id' => $conversa->empresa_id,
+                'user' => $conversa->user ? [
+                    'id' => $conversa->user->id,
+                    'name' => $conversa->user->nome ?? $conversa->user->name ?? null,
+                    'email' => $conversa->user->email,
+                ] : null,
+                'bot' => $conversa->bot ? [
+                    'id' => $conversa->bot->id,
+                    'nome' => $conversa->bot->nome,
+                ] : null,
+                'human_controlled' => (bool) $conversa->human_controlled,
+                'last_message' => $lastMessage ? [
+                    'id' => $lastMessage->id,
+                    'from' => $lastMessage->from,
+                    'to' => $lastMessage->to,
+                    'role' => $lastMessage->role,
+                    'body' => $lastMessage->body,
+                    'created_at' => $lastMessage->created_at->toDateTimeString(),
+                ] : null,
+                'created_at' => $conversa->created_at->toDateTimeString(),
+                'updated_at' => $conversa->updated_at->toDateTimeString(),
+            ];
+        }));
     }
 
     /**
