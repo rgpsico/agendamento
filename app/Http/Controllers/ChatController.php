@@ -43,7 +43,7 @@ class ChatController extends Controller
     public function listByEmpresaAndUser(Request $request)
     {
         $validated = $request->validate([
-            'empresa_id' => 'required|integer|exists:empresas,id',
+            'empresa_id' => 'required|integer|exists:empresa,id',
             'user_id' => 'nullable|integer|exists:usuarios,id',
         ]);
 
