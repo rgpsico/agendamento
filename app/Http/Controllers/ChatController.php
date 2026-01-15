@@ -201,23 +201,27 @@ class ChatController extends Controller
             ], 422);
         }
 
-        $professorUser = Usuario::find($professorUserId);
-        if (!$professorUser || $professorUser->tipo_usuario !== 'professor') {
+        $professorUser = Usuario::with('empresa')->find($professorUserId);
+        $isProfessor = $professorUser && $professorUser->tipo_usuario === 'professor';
+        $isEmpresa = $professorUser && $professorUser->empresa;
+        if (!$professorUser || (!$isProfessor && !$isEmpresa)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Usuario informado nao e um professor.',
+                'message' => 'Usuario informado nao e um professor ou empresa.',
             ], 403);
         }
 
-        $professor = Professor::where('usuario_id', $professorUserId)->first();
-        if (!$professor) {
+        $professor = $isProfessor
+            ? Professor::where('usuario_id', $professorUserId)->first()
+            : null;
+        if ($isProfessor && !$professor) {
             return response()->json([
                 'success' => false,
                 'message' => 'Professor nao encontrado.',
             ], 404);
         }
 
-        $empresaId = $validated['empresa_id'] ?? $professor->empresa_id ?? null;
+        $empresaId = $validated['empresa_id'] ?? ($professor->empresa_id ?? $professorUser->empresa->id ?? null);
         if (!$empresaId) {
             return response()->json([
                 'success' => false,
