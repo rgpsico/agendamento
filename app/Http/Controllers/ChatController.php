@@ -150,8 +150,9 @@ class ChatController extends Controller
             ], 422);
         }
 
-        $conversation = $validated['conversation_id']
-            ? Conversation::findOrFail($validated['conversation_id'])
+        $conversationId = $validated['conversation_id'] ?? null;
+        $conversation = $conversationId
+            ? Conversation::findOrFail($conversationId)
             : Conversation::create([
                 'empresa_id' => $empresaId,
                 'bot_id' => null,
@@ -229,8 +230,9 @@ class ChatController extends Controller
             ], 422);
         }
 
-        $conversation = $validated['conversation_id']
-            ? Conversation::findOrFail($validated['conversation_id'])
+        $conversationId = $validated['conversation_id'] ?? null;
+        $conversation = $conversationId
+            ? Conversation::findOrFail($conversationId)
             : Conversation::create([
                 'empresa_id' => $empresaId,
                 'bot_id' => null,
