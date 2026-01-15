@@ -20,17 +20,25 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
+/**
+ * Controlador de chat: mensagens, controle humano e integracoes externas.
+ */
 class ChatController extends Controller
 {
     protected $deepSeekService, $twilioService;
 
+    /**
+     * Injeta os servicos usados para IA e notificacoes.
+     */
     public function __construct(DeepSeekService $deepSeekService, TwilioService $twilioService)
     {
         $this->deepSeekService = $deepSeekService;
         $this->twilioService = $twilioService;
     }
 
-
+    /**
+     * Alterna o controle humano de uma conversa e registra auditoria.
+     */
     public function updateControl(Request $request)
     {
         $request->validate([
@@ -77,6 +85,9 @@ class ChatController extends Controller
     }
 
 
+    /**
+     * Recebe mensagem do site, registra conversa e replica para endpoint externo.
+     */
     public function enviarparabatepaposite(Request $request)
     {
         $request->validate([
@@ -165,6 +176,8 @@ class ChatController extends Controller
     //Metodo enviar do site para o bate papo interno
 
     /**
+     * Entrada principal do chat: cria/recupera conversa, salva mensagem e gera resposta.
+     *
      * @param \App\Http\Requests\StoreMensagemRequest $request
      */
     public function store(StoreMensagemRequest $request)
@@ -209,7 +222,7 @@ class ChatController extends Controller
 
 
     /**
-     * Obtem a resposta do bot e salva no banco.
+     * Obtem a resposta do bot, envia para endpoint externo e salva no banco.
      */
     private function getBotResponse($mensagem, $conversation, $userId)
     {
@@ -241,6 +254,9 @@ class ChatController extends Controller
     }
 
 
+    /**
+     * Envia mensagem para o endpoint externo (integracao).
+     */
     protected function enviarMensagemExterna(int $conversationId, $mensagem, $userId = null)
     {
         Http::post('https://www.comunidadeppg.com.br:3000/chatmessage', [
@@ -251,6 +267,9 @@ class ChatController extends Controller
     }
 
 
+    /**
+     * Gera imagem via fal.ai (Janus) e retorna URL publica.
+     */
     public function generateImage(Request $request)
     {
         // Validação dos parâmetros
@@ -354,6 +373,9 @@ class ChatController extends Controller
     }
 
 
+    /**
+     * Mapeia dimensoes aceitas para o formato esperado pela fal.ai.
+     */
     private function mapToFalAiImageSize($width, $height)
     {
         $sizes = [
@@ -371,12 +393,18 @@ class ChatController extends Controller
 
 
 
+    /**
+     * Remove caracteres fora de letras, numeros, pontuacao basica e espacos.
+     */
     public function sanitizeMessage(string $message): string
     {
         // Mantém letras, números, pontuação básica e espaços
         return preg_replace('/[^\p{L}\p{N}\p{P}\p{Z}]/u', '', $message);
     }
 
+    /**
+     * Renderiza a tela do chat interno com conversa e bots disponiveis.
+     */
     public function chat(Request $request, $conversationId = null)
     {
 
@@ -397,6 +425,9 @@ class ChatController extends Controller
         ]);
     }
 
+    /**
+     * Ativa ou desativa o controle humano via endpoint dedicado.
+     */
     public function toggleHumanControl(Request $request, $id)
     {
         $request->validate([
