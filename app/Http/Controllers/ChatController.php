@@ -106,6 +106,156 @@ class ChatController extends Controller
     }
 
     /**
+     * Salva a mensagem do aluno para o professor e retorna a conversa.
+     */
+    public function alunoenviandomensagemparaoprofessor(Request $request)
+    {
+        $validated = $request->validate([
+            'mensagem' => 'required|string',
+            'professor_id' => 'required|integer|exists:usuarios,id',
+            'conversation_id' => 'nullable|integer|exists:conversations,id',
+            'aluno_user_id' => 'nullable|integer|exists:usuarios,id',
+            'empresa_id' => 'nullable|integer',
+        ]);
+
+        $alunoUserId = auth()->id() ?? $validated['aluno_user_id'] ?? null;
+        if (!$alunoUserId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'aluno_user_id e obrigatorio quando nao autenticado.',
+            ], 422);
+        }
+
+        $alunoUser = Usuario::find($alunoUserId);
+        if (!$alunoUser || $alunoUser->tipo_usuario !== 'aluno') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Usuario informado nao e um aluno.',
+            ], 403);
+        }
+
+        $professor = Professor::where('usuario_id', $validated['professor_id'])->first();
+        if (!$professor) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Professor nao encontrado.',
+            ], 404);
+        }
+
+        $empresaId = $validated['empresa_id'] ?? $professor->empresa_id ?? null;
+        if (!$empresaId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'empresa_id e obrigatorio para criar a conversa.',
+            ], 422);
+        }
+
+        $conversation = $validated['conversation_id']
+            ? Conversation::findOrFail($validated['conversation_id'])
+            : Conversation::create([
+                'empresa_id' => $empresaId,
+                'bot_id' => null,
+                'user_id' => $alunoUserId,
+                'mensagem' => 'Inicio da conversa',
+                'telefone' => $alunoUser->telefone ?? null,
+                'human_controlled' => true,
+            ]);
+
+        $cleanMessage = $this->sanitizeMessage($validated['mensagem']);
+
+        $message = Message::create([
+            'from' => 'user',
+            'to' => 'professor',
+            'conversation_id' => $conversation->id,
+            'role' => 'user',
+            'body' => $cleanMessage,
+        ]);
+
+        $this->enviarMensagemExterna($conversation->id, $cleanMessage, $alunoUserId);
+
+        return response()->json([
+            'success' => true,
+            'conversation_id' => $conversation->id,
+            'message_id' => $message->id,
+        ]);
+    }
+
+    /**
+     * Salva a mensagem do professor para o aluno e retorna a conversa.
+     */
+    public function professorenviandomensagemparaaluno(Request $request)
+    {
+        $validated = $request->validate([
+            'mensagem' => 'required|string',
+            'aluno_user_id' => 'required|integer|exists:usuarios,id',
+            'conversation_id' => 'nullable|integer|exists:conversations,id',
+            'professor_user_id' => 'nullable|integer|exists:usuarios,id',
+            'empresa_id' => 'nullable|integer',
+        ]);
+
+        $professorUserId = auth()->id() ?? $validated['professor_user_id'] ?? null;
+        if (!$professorUserId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'professor_user_id e obrigatorio quando nao autenticado.',
+            ], 422);
+        }
+
+        $professorUser = Usuario::find($professorUserId);
+        if (!$professorUser || $professorUser->tipo_usuario !== 'professor') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Usuario informado nao e um professor.',
+            ], 403);
+        }
+
+        $professor = Professor::where('usuario_id', $professorUserId)->first();
+        if (!$professor) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Professor nao encontrado.',
+            ], 404);
+        }
+
+        $empresaId = $validated['empresa_id'] ?? $professor->empresa_id ?? null;
+        if (!$empresaId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'empresa_id e obrigatorio para criar a conversa.',
+            ], 422);
+        }
+
+        $conversation = $validated['conversation_id']
+            ? Conversation::findOrFail($validated['conversation_id'])
+            : Conversation::create([
+                'empresa_id' => $empresaId,
+                'bot_id' => null,
+                'user_id' => $validated['aluno_user_id'],
+                'mensagem' => 'Inicio da conversa',
+                'telefone' => null,
+                'human_controlled' => true,
+            ]);
+
+        $cleanMessage = $this->sanitizeMessage($validated['mensagem']);
+
+        $message = Message::create([
+            'from' => 'professor',
+            'to' => 'aluno',
+            'conversation_id' => $conversation->id,
+            'role' => 'assistant',
+            'body' => $cleanMessage,
+        ]);
+
+        $this->enviarMensagemExterna($conversation->id, $cleanMessage, $professorUserId);
+
+        return response()->json([
+            'success' => true,
+            'conversation_id' => $conversation->id,
+            'message_id' => $message->id,
+        ]);
+    }
+
+    /**
      * Alterna o controle humano de uma conversa e registra auditoria.
      */
     public function updateControl(Request $request)
