@@ -106,6 +106,82 @@ class ChatController extends Controller
     }
 
     /**
+     * Lista conversas por professor (alunos vinculados) ou por empresa.
+     */
+    public function listByEmpresaOrProfessor(Request $request)
+    {
+        $validated = $request->validate([
+            'empresa_id' => 'nullable|integer|exists:empresa,id',
+            'professor_user_id' => 'nullable|integer|exists:usuarios,id',
+        ]);
+
+        $userId = $validated['professor_user_id'] ?? auth()->id();
+        $empresaId = $validated['empresa_id'] ?? null;
+
+        if (!$userId && !$empresaId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Informe professor_user_id ou empresa_id.',
+            ], 422);
+        }
+
+        $user = $userId ? Usuario::with('professor.alunos', 'empresa')->findOrFail($userId) : null;
+
+        if (!$empresaId && $user && $user->empresa) {
+            $empresaId = $user->empresa->id;
+        }
+
+        $query = Conversation::with([
+            'user',
+            'bot',
+            'messages' => function ($q) {
+                $q->latest()->limit(1);
+            },
+        ]);
+
+        if ($empresaId) {
+            $query->where('empresa_id', $empresaId);
+        }
+
+        if ($user && $user->tipo_usuario === 'professor' && $user->professor) {
+            $alunoUserIds = $user->professor->alunos()->pluck('usuario_id')->filter()->all();
+            $userIds = array_unique(array_merge($alunoUserIds, [$user->id]));
+            $query->whereIn('user_id', $userIds);
+        }
+
+        $conversas = $query->orderByDesc('updated_at')->get();
+
+        return response()->json($conversas->map(function ($conversa) {
+            $lastMessage = $conversa->messages->first();
+
+            return [
+                'id' => $conversa->id,
+                'empresa_id' => $conversa->empresa_id,
+                'user' => $conversa->user ? [
+                    'id' => $conversa->user->id,
+                    'name' => $conversa->user->nome ?? $conversa->user->name ?? null,
+                    'email' => $conversa->user->email,
+                ] : null,
+                'bot' => $conversa->bot ? [
+                    'id' => $conversa->bot->id,
+                    'nome' => $conversa->bot->nome,
+                ] : null,
+                'human_controlled' => (bool) $conversa->human_controlled,
+                'last_message' => $lastMessage ? [
+                    'id' => $lastMessage->id,
+                    'from' => $lastMessage->from,
+                    'to' => $lastMessage->to,
+                    'role' => $lastMessage->role,
+                    'body' => $lastMessage->body,
+                    'created_at' => $lastMessage->created_at->toDateTimeString(),
+                ] : null,
+                'created_at' => $conversa->created_at->toDateTimeString(),
+                'updated_at' => $conversa->updated_at->toDateTimeString(),
+            ];
+        }));
+    }
+
+    /**
      * Salva a mensagem do aluno para o professor e retorna a conversa.
      */
     public function alunoenviandomensagemparaoprofessor(Request $request)
