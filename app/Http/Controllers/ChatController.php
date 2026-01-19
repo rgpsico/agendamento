@@ -39,10 +39,17 @@ class ChatController extends Controller
     }
 
 
-        public function mensagensDaConversa(int $conversationId)
+        public function mensagensDaConversa(Request $request)
         {
+            $validated = $request->validate([
+                'conversation_id' => 'required|integer|exists:conversations,id',
+            ]);
+
+            $conversationId = $validated['conversation_id'];
+        
+            dd('aaaa');
             $user = auth()->user();
-           
+         
             $conversation = Conversation::with([
                 'messages' => function ($q) {
                     $q->orderBy('created_at', 'asc');
@@ -338,31 +345,31 @@ class ChatController extends Controller
 
 
         public function listarProfessores(Request $request)
-    {
-        $empresaId = $request->get('empresa_id');
+        {
+            $empresaId = $request->get('empresa_id');
 
-        $query = Professor::with('usuario');
+            $query = Professor::with('usuario');
 
-        // Se quiser filtrar por empresa
-        if ($empresaId) {
-            $query->where('empresa_id', $empresaId);
+            // Se quiser filtrar por empresa
+            if ($empresaId) {
+                $query->where('empresa_id', $empresaId);
+            }
+
+            $professores = $query->get()->map(function ($professor) {
+                return [
+                    'professor_id' => $professor->id,
+                    'usuario_id'   => $professor->usuario->id ?? null,
+                    'nome'         => $professor->usuario->nome ?? null,
+                    'email'        => $professor->usuario->email ?? null,
+                    'empresa_id'   => $professor->empresa_id,
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'professores' => $professores
+            ]);
         }
-
-        $professores = $query->get()->map(function ($professor) {
-            return [
-                'professor_id' => $professor->id,
-                'usuario_id'   => $professor->usuario->id ?? null,
-                'nome'         => $professor->usuario->nome ?? null,
-                'email'        => $professor->usuario->email ?? null,
-                'empresa_id'   => $professor->empresa_id,
-            ];
-        });
-
-        return response()->json([
-            'success' => true,
-            'professores' => $professores
-        ]);
-    }
 
 
     /**
