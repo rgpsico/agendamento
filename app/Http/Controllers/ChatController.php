@@ -45,7 +45,7 @@ class ChatController extends Controller
                 'conversation_id' => 'required|integer|exists:conversations,id',
             ]);
 
-            
+
 
             $conversationId = $validated['conversation_id'];
         
@@ -61,14 +61,14 @@ class ChatController extends Controller
             ])->findOrFail($conversationId);
 
             // 🔐 Empresa
-            if ($user->empresa && $conversation->empresa_id !== $user->empresa->id) {
-                abort(403, 'Acesso negado.');
-            }
+            // if ($user->empresa && $conversation->empresa_id !== $user->empresa->id) {
+            //     abort(403, 'Acesso negado.');
+            // }
 
-            // 🔐 Aluno
-            if ($user->aluno && $conversation->user_id !== $user->id) {
-                abort(403, 'Acesso negado.');
-            }
+            // // 🔐 Aluno
+            // if ($user->aluno && $conversation->user_id !== $user->id) {
+            //     abort(403, 'Acesso negado.');
+            // }
 
             // 🔐 Professor
             if ($user->professor) {
