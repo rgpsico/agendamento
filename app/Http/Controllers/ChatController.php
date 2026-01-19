@@ -45,9 +45,11 @@ class ChatController extends Controller
                 'conversation_id' => 'required|integer|exists:conversations,id',
             ]);
 
+            
+
             $conversationId = $validated['conversation_id'];
         
-            dd('aaaa');
+        
             $user = auth()->user();
          
             $conversation = Conversation::with([
