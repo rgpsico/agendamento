@@ -26,13 +26,25 @@ class AuthControllerApi extends Controller
         if (Auth::attempt($credentials)) {
 
             $user = Usuario::where('email', $request->email)->first();
-            $token = $user->createToken('authToken')->plainTextToken;
-            $empresaId = $user->empresa?->id;
-            $professorId = $user->professor?->id;
-            return response()->json(['token' => $token, 'empresa_id' => $empresaId, 'professor_id' => $professorId], 200);
-        } else {
 
-            return response()->json(['error' => 'Invalid email/password'], 401);
+            $token = $user->createToken('authToken')->plainTextToken;
+
+            $empresaId   = $user->empresa?->id;
+            $professorId = $user->professor?->id;
+            $alunoId     = $user->aluno?->id;
+
+            return response()->json([
+                'token'        => $token,
+                'empresa_id'   => $empresaId,
+                'professor_id' => $professorId,
+                'aluno_id'     => $alunoId
+            ], 200);
+
+        } else {
+            return response()->json([
+                'error' => 'Invalid email/password'
+            ], 401);
         }
     }
+
 }

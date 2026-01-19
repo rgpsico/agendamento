@@ -343,12 +343,17 @@ Route::post('/bots/{bot}/chat', [BotController::class, 'chat']);
 Route::get('/conversations', [ChatController::class, 'listByEmpresaAndUser']);
 Route::get('/conversations/lista', [ChatController::class, 'listByEmpresaOrProfessor']);
 Route::get('/conversations/{id}', [ConversationController::class, 'showapi']);
-Route::post('/conversations/aluno/mensagem', [ChatController::class, 'alunoenviandomensagemparaoprofessor']);
-Route::post('/conversations/professor/mensagem', [ChatController::class, 'professorenviandomensagemparaaluno']);
+
 
 Route::post('/fill-site-fields', [BotController::class, 'fillSiteFields'])->name('fill.site.fields');
 
+
+Route::get('/professoresteste', [ChatController::class, 'listarProfessores']);
+Route::get('/alunosteste', [ChatController::class, 'listarAlunos']);
+
 Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/conversations/aluno/mensagem', [ChatController::class, 'alunoenviandomensagemparaoprofessor']);
+Route::post('/conversations/professor/mensagem', [ChatController::class, 'professorenviandomensagemparaaluno']);
     Route::apiResource('siteservicos', SiteServicoControllerApi::class);
     Route::post('siteservicos/store', [SiteServicoControllerApi::class, 'store']);
 });

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreMensagemRequest;
+use App\Models\Alunos;
 use App\Models\Bot;
 use App\Models\BotLog;
 use App\Models\BotService;
@@ -186,15 +187,17 @@ class ChatController extends Controller
      */
     public function alunoenviandomensagemparaoprofessor(Request $request)
     {
+       
         $validated = $request->validate([
             'mensagem' => 'required|string',
-            'professor_id' => 'required|integer|exists:usuarios,id',
-            'conversation_id' => 'nullable|integer|exists:conversations,id',
-            'aluno_user_id' => 'nullable|integer|exists:usuarios,id',
+           'professor_id' => 'required|integer|exists:usuarios,id',
+           // 'conversation_id' => 'nullable|integer|exists:conversations,id',
+         //   'aluno_user_id' => 'nullable|integer|exists:usuarios,id',
             'empresa_id' => 'nullable|integer',
         ]);
 
-        $alunoUserId = auth()->id() ?? $validated['aluno_user_id'] ?? null;
+        $alunoUserId = auth()->id() ;
+  
         if (!$alunoUserId) {
             return response()->json([
                 'success' => false,
@@ -202,13 +205,15 @@ class ChatController extends Controller
             ], 422);
         }
 
-        $alunoUser = Usuario::find($alunoUserId);
-        if (!$alunoUser || $alunoUser->tipo_usuario !== 'aluno') {
-            return response()->json([
-                'success' => false,
-                'message' => 'Usuario informado nao e um aluno.',
-            ], 403);
-        }
+            $alunoUser = auth()->user();
+
+            if (!$alunoUser || !$alunoUser->aluno) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Usuario autenticado nao e um aluno.',
+                ], 403);
+            }
+
 
         $professor = Professor::where('usuario_id', $validated['professor_id'])->first();
         if (!$professor) {
@@ -256,6 +261,47 @@ class ChatController extends Controller
             'message_id' => $message->id,
         ]);
     }
+
+
+    public function listarAlunos()
+    {
+        $alunos = Alunos::with('usuario')->get();
+
+        return response()->json([
+            'success' => true,
+            'alunos' => $alunos
+        ]);
+    }
+
+
+
+        public function listarProfessores(Request $request)
+    {
+        $empresaId = $request->get('empresa_id');
+
+        $query = Professor::with('usuario');
+
+        // Se quiser filtrar por empresa
+        if ($empresaId) {
+            $query->where('empresa_id', $empresaId);
+        }
+
+        $professores = $query->get()->map(function ($professor) {
+            return [
+                'professor_id' => $professor->id,
+                'usuario_id'   => $professor->usuario->id ?? null,
+                'nome'         => $professor->usuario->nome ?? null,
+                'email'        => $professor->usuario->email ?? null,
+                'empresa_id'   => $professor->empresa_id,
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'professores' => $professores
+        ]);
+    }
+
 
     /**
      * Salva a mensagem do professor para o aluno e retorna a conversa.
