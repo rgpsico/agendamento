@@ -60,6 +60,7 @@ class AlunoadminController extends Controller
     public function aulasJson(Request $request)
     {
        
+ 
         if (!auth()->user()->aluno) 
             {
            
@@ -68,7 +69,7 @@ class AlunoadminController extends Controller
 
         $id = auth()->user()->aluno->id;
 
-        dd($id);
+       
         $query = Agendamento::with('professor.usuario', 'modalidade')
             ->where('aluno_id', $id);
 
