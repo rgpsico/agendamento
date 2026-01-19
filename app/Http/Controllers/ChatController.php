@@ -604,14 +604,27 @@ class ChatController extends Controller
     /**
      * Envia mensagem para o endpoint externo (integracao).
      */
-    protected function enviarMensagemExterna(int $conversationId, $mensagem, $userId = null)
+
+
+    protected function enviarMensagemExterna(int $conversationId, $mensagem, $userId = null): void
     {
-        Http::post('https://www.comunidadeppg.com.br:3000/chatmessage', [
-            'conversation_id' => $conversationId,
-            'user_id' => $userId ?? 'guest',
-            'mensagem' => $mensagem,
-        ]);
+        try {
+            Http::timeout(3)->post('https://www.comunidadeppg.com.br:3000/chatmessage', [
+                'conversation_id' => $conversationId,
+                'user_id' => $userId ?? 'guest',
+                'mensagem' => $mensagem,
+            ]);
+
+        } catch (\Throwable $e) {
+            // Loga o erro mas NÃO quebra a aplicação
+            Log::warning('Falha ao enviar mensagem externa', [
+                'conversation_id' => $conversationId,
+                'user_id' => $userId,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
+
 
 
     /**
