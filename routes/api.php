@@ -353,7 +353,10 @@ Route::get('/alunosteste', [ChatController::class, 'listarAlunos']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/conversations/aluno/mensagem', [ChatController::class, 'alunoenviandomensagemparaoprofessor']);
-Route::post('/conversations/professor/mensagem', [ChatController::class, 'professorenviandomensagemparaaluno']);
+    Route::post('/conversations/professor/mensagem', [ChatController::class, 'professorenviandomensagemparaaluno']);
+
+        Route::get('/conversations', [ChatController::class, 'listByEmpresaAndUser']);
+  Route::get('/mensagensPorConversa/{idconverssa}', [ChatController::class, 'mensagensDaConversa']);
     Route::apiResource('siteservicos', SiteServicoControllerApi::class);
     Route::post('siteservicos/store', [SiteServicoControllerApi::class, 'store']);
 });

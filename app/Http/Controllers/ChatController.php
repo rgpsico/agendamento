@@ -38,24 +38,79 @@ class ChatController extends Controller
         $this->twilioService = $twilioService;
     }
 
+
+        public function mensagensDaConversa(int $conversationId)
+        {
+            $user = auth()->user();
+           
+            $conversation = Conversation::with([
+                'messages' => function ($q) {
+                    $q->orderBy('created_at', 'asc');
+                },
+                'user',
+                'empresa',
+            ])->findOrFail($conversationId);
+
+            // 🔐 Empresa
+            if ($user->empresa && $conversation->empresa_id !== $user->empresa->id) {
+                abort(403, 'Acesso negado.');
+            }
+
+            // 🔐 Aluno
+            if ($user->aluno && $conversation->user_id !== $user->id) {
+                abort(403, 'Acesso negado.');
+            }
+
+            // 🔐 Professor
+            if ($user->professor) {
+                $alunoIds = $user->professor->alunos()
+                    ->pluck('usuario_id')
+                    ->toArray();
+
+                if (!in_array($conversation->user_id, $alunoIds)) {
+                    abort(403, 'Acesso negado.');
+                }
+            }
+
+            return response()->json([
+                'conversation_id' => $conversation->id,
+                'aluno' => [
+                    'id' => $conversation->user->id,
+                    'nome' => $conversation->user->nome,
+                ],
+                'messages' => $conversation->messages->map(fn ($msg) => [
+                    'id' => $msg->id,
+                    'from' => $msg->from,
+                    'to' => $msg->to,
+                    'role' => $msg->role,
+                    'body' => $msg->body,
+                    'created_at' => $msg->created_at->toDateTimeString(),
+                ]),
+            ]);
+        }
+
+
+
     /**
      * Lista conversas por empresa e usuario (aluno ou professor).
      */
     public function listByEmpresaAndUser(Request $request)
     {
+         
         $validated = $request->validate([
             'empresa_id' => 'required|integer|exists:empresa,id',
             'user_id' => 'nullable|integer|exists:usuarios,id',
         ]);
 
         $userId = $validated['user_id'] ?? auth()->id();
+       
         if (!$userId) {
             return response()->json([
                 'success' => false,
                 'message' => 'user_id e obrigatorio quando nao autenticado.',
             ], 422);
         }
-
+  
         $user = Usuario::with('professor.alunos')->findOrFail($userId);
 
         $query = Conversation::with([
@@ -190,9 +245,8 @@ class ChatController extends Controller
        
         $validated = $request->validate([
             'mensagem' => 'required|string',
-           'professor_id' => 'required|integer|exists:usuarios,id',
-           // 'conversation_id' => 'nullable|integer|exists:conversations,id',
-         //   'aluno_user_id' => 'nullable|integer|exists:usuarios,id',
+            'professor_id' => 'required|integer|exists:usuarios,id',
+            'conversation_id' => 'nullable|integer|exists:conversations,id',
             'empresa_id' => 'nullable|integer',
         ]);
 
@@ -255,11 +309,19 @@ class ChatController extends Controller
 
         $this->enviarMensagemExterna($conversation->id, $cleanMessage, $alunoUserId);
 
-        return response()->json([
+       return response()->json([
             'success' => true,
             'conversation_id' => $conversation->id,
-            'message_id' => $message->id,
+            'message' => [
+                'id' => $message->id,
+                'from' => $message->from,
+                'to' => $message->to,
+                'role' => $message->role,
+                'body' => $message->body,
+                'created_at' => $message->created_at->toDateTimeString(),
+            ]
         ]);
+
     }
 
 
