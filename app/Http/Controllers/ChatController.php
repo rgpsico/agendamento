@@ -63,7 +63,7 @@ class ChatController extends Controller
             // 🔐 Empresa
             // if ($user->empresa && $conversation->empresa_id !== $user->empresa->id) {
             //     abort(403, 'Acesso negado.');
-            // }
+            // }  
 
             // // 🔐 Aluno
             // if ($user->aluno && $conversation->user_id !== $user->id) {
