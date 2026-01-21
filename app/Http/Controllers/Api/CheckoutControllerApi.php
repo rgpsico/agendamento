@@ -14,6 +14,7 @@ class CheckoutControllerApi extends Controller
     public function checkoutAuth(int $userId): JsonResponse
     {
         $empresa = Empresa::with('paymentGateways')->where('user_id', $userId)->first();
+        
 
         if (!$empresa) {
             return response()->json(['message' => 'Empresa nao encontrada.'], 404);
