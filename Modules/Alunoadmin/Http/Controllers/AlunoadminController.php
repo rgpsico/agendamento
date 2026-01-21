@@ -74,7 +74,7 @@ class AlunoadminController extends Controller
         $query = Agendamento::with('professor.usuario', 'modalidade')
             ->where('aluno_id', $id);
             
-        dd($query);
+  
         if ($request->filled('data')) {
             $query->whereDate('data_da_aula', $request->data);
         }
