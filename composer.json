@@ -33,7 +33,6 @@
         "friendsofphp/php-cs-fixer": "^3.86",
         "knuckleswtf/scribe": "^5.6",
         "laravel/breeze": "^1.29",
-
         "laravel/pint": "^1.0",
         "laravel/sail": "^1.18",
         "lucascudo/laravel-pt-br-localization": "^2.0",
