@@ -42,58 +42,62 @@ class GerarHorariosJob implements ShouldQueue
             $diasFolga = $this->dados['folga'];
             $considerarFeriados = $this->dados['feriados'];
 
-            $dataAtual = Carbon::today();
-        //    $dataFinal = Carbon::today()->addWeek();
-            $dataFinal = Carbon::today()->addDays(30);
-            
+          $dataAtual = Carbon::today();
+            $dataFinal = Carbon::today()->endOfMonth();
+
+
             $disponibilidades = [];
 
             while ($dataAtual->lte($dataFinal)) {
-                $diaDaSemana = $dataAtual->dayOfWeekIso;
+            $diaDaSemana = $dataAtual->dayOfWeekIso;
 
-                if (in_array($diaDaSemana, $diasFolga)) {
-                    $dataAtual->addDay();
-                    continue;
-                }
+    // Folga
+    if (in_array($diaDaSemana, $diasFolga)) {
+        $dataAtual->addDay();
+        continue;
+    }
 
-                if ($considerarFeriados) {
-                    $feriadoExiste = Feriado::where('data', $dataAtual->format('Y-m-d'))->exists();
-                    if ($feriadoExiste) {
-                        $dataAtual->addDay();
-                        continue;
-                    }
-                }
+    // Feriados
+    if ($considerarFeriados) {
+        if (Feriado::whereDate('data', $dataAtual)->exists()) {
+            $dataAtual->addDay();
+            continue;
+        }
+    }
 
-                $horaAtual = Carbon::parse($dataAtual->format('Y-m-d') . ' ' . $horaInicio);
-                $fimExpediente = Carbon::parse($dataAtual->format('Y-m-d') . ' ' . $horaFim);
-                $inicioAlmoco = Carbon::parse($dataAtual->format('Y-m-d') . ' ' . $horaInicioAlmoco);
-                $fimAlmoco = Carbon::parse($dataAtual->format('Y-m-d') . ' ' . $horaFimAlmoco);
+    $horaAtual = Carbon::parse($dataAtual->format('Y-m-d') . ' ' . $horaInicio);
+    $fimExpediente = Carbon::parse($dataAtual->format('Y-m-d') . ' ' . $horaFim);
+    $inicioAlmoco = Carbon::parse($dataAtual->format('Y-m-d') . ' ' . $horaInicioAlmoco);
+    $fimAlmoco = Carbon::parse($dataAtual->format('Y-m-d') . ' ' . $horaFimAlmoco);
 
-                while ($horaAtual->lte($fimExpediente)) {
-                    if ($horaAtual->between($inicioAlmoco, $fimAlmoco, true)) {
-                        $horaAtual = $fimAlmoco->copy();
-                    }
+    while ($horaAtual->lt($fimExpediente)) {
 
-                    $horaFimAtendimento = $horaAtual->copy()->addMinutes($tempoAtendimento);
+        // Pula almoço
+        if ($horaAtual->between($inicioAlmoco, $fimAlmoco, true)) {
+            $horaAtual = $fimAlmoco->copy();
+            continue;
+        }
 
-                    if ($horaFimAtendimento->lte($fimExpediente)) {
-                        $disponibilidades[] = [
-                            'id_professor' => $professorId,
-                            'id_servico' => $servicoId,
-                            'id_dia' => $diaDaSemana,
-                            'data' => $dataAtual->format('Y-m-d'),
-                            'hora_inicio' => $horaAtual->format('H:i:s'),
-                            'hora_fim' => $horaFimAtendimento->format('H:i:s'),
-                            'created_at' => now(),
-                            'updated_at' => now()
-                        ];
-                    }
+        $horaFimAtendimento = $horaAtual->copy()->addMinutes($tempoAtendimento);
 
-                    $horaAtual->addMinutes($tempoAtendimento + $intervalo);
-                }
+        if ($horaFimAtendimento->lte($fimExpediente)) {
+            $disponibilidades[] = [
+                'id_professor' => $professorId,
+                'id_servico' => $servicoId,
+                'id_dia' => $diaDaSemana,
+                'data' => $dataAtual->toDateString(),
+                'hora_inicio' => $horaAtual->format('H:i:s'),
+                'hora_fim' => $horaFimAtendimento->format('H:i:s'),
+                'created_at' => now(),
+                'updated_at' => now()
+            ];
+        }
 
-                $dataAtual->addDay();
-            }
+        $horaAtual->addMinutes($tempoAtendimento + $intervalo);
+    }
+
+    $dataAtual->addDay();
+}
 
             // Insert em chunk
             $chunkSize = 10;
