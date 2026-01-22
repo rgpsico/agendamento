@@ -43,8 +43,9 @@ class GerarHorariosJob implements ShouldQueue
             $considerarFeriados = $this->dados['feriados'];
 
             $dataAtual = Carbon::today();
-            $dataFinal = Carbon::today()->addWeek();
-
+        //    $dataFinal = Carbon::today()->addWeek();
+            $dataFinal = Carbon::today()->addDays(30);
+            
             $disponibilidades = [];
 
             while ($dataAtual->lte($dataFinal)) {
