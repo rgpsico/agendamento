@@ -17,8 +17,7 @@ class GerarHorariosJob implements ShouldQueue
 
     protected $dados;
 
-    public $tries = 5;
-
+    public $tries = 3;
     public $timeout = 600;
 
     public function __construct(array $dados)
@@ -28,89 +27,126 @@ class GerarHorariosJob implements ShouldQueue
 
     public function handle()
     {
-        Log::info("Iniciando o job de geração de horários", $this->dados);
+        Log::info("Iniciando geração de horários...", ['dados' => $this->dados]);
 
         try {
+            // Extração de dados
             $servicoId = $this->dados['servico'];
             $professorId = $this->dados['professor_id'];
-            $tempoAtendimento = $this->dados['duracao'];
-            $intervalo = $this->dados['intervalo'];
-            $horaInicio = $this->dados['inicio'];
-            $horaFim = $this->dados['fim'];
-            $horaInicioAlmoco = $this->dados['almoco_inicio'];
-            $horaFimAlmoco = $this->dados['almoco_fim'];
-            $diasFolga = $this->dados['folga'];
-            $considerarFeriados = $this->dados['feriados'];
+            $tempoAtendimento = (int) $this->dados['duracao']; // em minutos
+            $intervalo = (int) $this->dados['intervalo']; // em minutos
+            
+            // Horários de trabalho
+            $horaInicioConfig = $this->dados['inicio']; 
+            $horaFimConfig = $this->dados['fim'];
+            $horaInicioAlmocoConfig = $this->dados['almoco_inicio'];
+            $horaFimAlmocoConfig = $this->dados['almoco_fim'];
+            
+            $diasFolga = $this->dados['folga'] ?? []; // Array de dias da semana (1=Seg, 7=Dom)
+            $considerarFeriados = $this->dados['feriados'] ?? false;
 
-          $dataAtual = Carbon::today();
-            $dataFinal = Carbon::today()->endOfMonth();
+            // 1. CORREÇÃO DA DATA:
+            // Se vier no formulário, usa. Se não, pega o mês ATUAL INTEIRO (do dia 1 ao fim).
+            if (isset($this->dados['data_inicio']) && isset($this->dados['data_fim'])) {
+                $dataAtual = Carbon::parse($this->dados['data_inicio']);
+                $dataFinal = Carbon::parse($this->dados['data_fim']);
+            } else {
+                // Fallback: Mês atual completo
+                $dataAtual = Carbon::now()->startOfMonth();
+                $dataFinal = Carbon::now()->endOfMonth();
+            }
 
+            // 2. PERFORMANCE: Carregar feriados uma vez só
+            $feriados = [];
+            if ($considerarFeriados) {
+                $feriados = Feriado::whereBetween('data', [
+                    $dataAtual->format('Y-m-d'), 
+                    $dataFinal->format('Y-m-d')
+                ])->pluck('data')->map(function($date) {
+                    return Carbon::parse($date)->format('Y-m-d');
+                })->toArray();
+            }
 
             $disponibilidades = [];
 
+            // Loop dos Dias
             while ($dataAtual->lte($dataFinal)) {
-            $diaDaSemana = $dataAtual->dayOfWeekIso;
+                $diaString = $dataAtual->format('Y-m-d');
+                $diaDaSemana = $dataAtual->dayOfWeekIso; // 1 (Segunda) a 7 (Domingo)
 
-    // Folga
-    if (in_array($diaDaSemana, $diasFolga)) {
-        $dataAtual->addDay();
-        continue;
-    }
+                // Verifica Folga
+                if (in_array($diaDaSemana, $diasFolga)) {
+                    $dataAtual->addDay();
+                    continue;
+                }
 
-    // Feriados
-    if ($considerarFeriados) {
-        if (Feriado::whereDate('data', $dataAtual)->exists()) {
-            $dataAtual->addDay();
-            continue;
-        }
-    }
+                // Verifica Feriado (array em memória, sem query no loop)
+                if ($considerarFeriados && in_array($diaString, $feriados)) {
+                    $dataAtual->addDay();
+                    continue;
+                }
 
-    $horaAtual = Carbon::parse($dataAtual->format('Y-m-d') . ' ' . $horaInicio);
-    $fimExpediente = Carbon::parse($dataAtual->format('Y-m-d') . ' ' . $horaFim);
-    $inicioAlmoco = Carbon::parse($dataAtual->format('Y-m-d') . ' ' . $horaInicioAlmoco);
-    $fimAlmoco = Carbon::parse($dataAtual->format('Y-m-d') . ' ' . $horaFimAlmoco);
+                // Configura horários do dia específico
+                $horaAtual = Carbon::parse($diaString . ' ' . $horaInicioConfig);
+                $fimExpediente = Carbon::parse($diaString . ' ' . $horaFimConfig);
+                $inicioAlmoco = Carbon::parse($diaString . ' ' . $horaInicioAlmocoConfig);
+                $fimAlmoco = Carbon::parse($diaString . ' ' . $horaFimAlmocoConfig);
 
-    while ($horaAtual->lt($fimExpediente)) {
+                // Loop dos Horários dentro do dia
+                while ($horaAtual->lt($fimExpediente)) {
+                    
+                    // Calcula fim do atendimento
+                    $horaFimAtendimento = $horaAtual->copy()->addMinutes($tempoAtendimento);
 
-        // Pula almoço
-        if ($horaAtual->between($inicioAlmoco, $fimAlmoco, true)) {
-            $horaAtual = $fimAlmoco->copy();
-            continue;
-        }
+                    // Verifica se o atendimento excede o expediente
+                    if ($horaFimAtendimento->gt($fimExpediente)) {
+                        break; 
+                    }
 
-        $horaFimAtendimento = $horaAtual->copy()->addMinutes($tempoAtendimento);
+                    // 3. LÓGICA DE ALMOÇO (Interseção de horários)
+                    // Se o atendimento termina DEPOIS que o almoço começa 
+                    // E começa ANTES do almoço terminar, existe conflito.
+                    $conflitaComAlmoco = ($horaFimAtendimento->gt($inicioAlmoco) && $horaAtual->lt($fimAlmoco));
 
-        if ($horaFimAtendimento->lte($fimExpediente)) {
-            $disponibilidades[] = [
-                'id_professor' => $professorId,
-                'id_servico' => $servicoId,
-                'id_dia' => $diaDaSemana,
-                'data' => $dataAtual->toDateString(),
-                'hora_inicio' => $horaAtual->format('H:i:s'),
-                'hora_fim' => $horaFimAtendimento->format('H:i:s'),
-                'created_at' => now(),
-                'updated_at' => now()
-            ];
-        }
+                    if ($conflitaComAlmoco) {
+                        // Pula direto para o fim do almoço
+                        $horaAtual = $fimAlmoco->copy();
+                        continue;
+                    }
 
-        $horaAtual->addMinutes($tempoAtendimento + $intervalo);
-    }
+                    // Adiciona na lista
+                    $disponibilidades[] = [
+                        'id_professor' => $professorId,
+                        'id_servico'   => $servicoId,
+                        'id_dia'       => $diaDaSemana,
+                        'data'         => $diaString,
+                        'hora_inicio'  => $horaAtual->format('H:i:s'),
+                        'hora_fim'     => $horaFimAtendimento->format('H:i:s'),
+                        'created_at'   => now(),
+                        'updated_at'   => now()
+                    ];
 
-    $dataAtual->addDay();
-}
+                    // Avança para o próximo horário (duração + intervalo)
+                    $horaAtual->addMinutes($tempoAtendimento + $intervalo);
+                }
 
-            // Insert em chunk
-            $chunkSize = 10;
-            foreach (array_chunk($disponibilidades, $chunkSize) as $chunk) {
-                Disponibilidade::insert($chunk);
+                $dataAtual->addDay();
             }
 
-            Log::info("Job finalizado com sucesso");
+            // 4. INSERT EM LOTE OTIMIZADO
+            if (count($disponibilidades) > 0) {
+                // Chunk maior para menos queries de insert
+                foreach (array_chunk($disponibilidades, 100) as $chunk) {
+                    Disponibilidade::insert($chunk);
+                }
+                Log::info(count($disponibilidades) . " horários gerados com sucesso.");
+            } else {
+                Log::warning("Nenhum horário gerado para o período.");
+            }
+
         } catch (\Throwable $e) {
-            Log::error("Erro ao processar job: " . $e->getMessage(), [
-                'trace' => $e->getTraceAsString()
-            ]);
-            throw $e; // importante para o worker saber que falhou
+            Log::error("Erro job horarios: " . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            throw $e;
         }
     }
 }
