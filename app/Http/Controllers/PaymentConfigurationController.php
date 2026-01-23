@@ -40,6 +40,31 @@ class PaymentConfigurationController extends Controller
         return view('admin.empresas.configuracao', compact('paymentConfig'));
     }
 
+    public function enabled()
+    {
+        $empresaId = Auth::user()->id;
+        $paymentConfig = PaymentConfiguration::getForEmpresa($empresaId);
+
+        $enabled = [];
+
+        if ($paymentConfig->pix_enabled) {
+            $enabled['pix'] = $paymentConfig->pix_config ?? [];
+        }
+
+        if ($paymentConfig->cartao_enabled) {
+            $enabled['cartao'] = $paymentConfig->cartao_config ?? [];
+        }
+
+        if ($paymentConfig->presencial_enabled) {
+            $enabled['presencial'] = $paymentConfig->presencial_config ?? [];
+        }
+
+        return response()->json([
+            'empresa_id' => $paymentConfig->empresa_id,
+            'enabled_methods' => $enabled,
+        ]);
+    }
+
     public function update(Request $request, $empresaId)
     {
 

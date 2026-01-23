@@ -28,6 +28,7 @@ use App\Http\Controllers\DisponibilidadeServicoController;
 use App\Http\Controllers\GoogleCalendarController;
 use App\Http\Controllers\ModalidadeController;
 use App\Http\Controllers\PagamentoController;
+use App\Http\Controllers\PaymentConfigurationController;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\TwilioController;
 use App\Http\Controllers\AsaasWalletController;
@@ -87,6 +88,7 @@ Route::prefix('permissions')->group(function () {
 
 Route::post('/login', [AuthControllerApi::class, 'login']);
 Route::middleware('auth:sanctum')->get('/me', [AuthControllerApi::class, 'me']);
+Route::middleware('auth:sanctum')->get('empresa/tipopagamento/enabled', [PaymentConfigurationController::class, 'enabled']);
 
 Route::post('acesso/verificar', [AcessoControllerApi::class, 'verificar'])->name('acesso.verificar');
 

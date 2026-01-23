@@ -136,6 +136,7 @@ Route::prefix('cliente')->middleware('auth')->group(function () {
 
     Route::group(['prefix' => '/empresa'], function () {
         Route::get('tipopagamento/config', [PaymentConfigurationController::class, 'index'])->name('empresa.pagamento.config.index');
+        Route::get('tipopagamento/enabled', [PaymentConfigurationController::class, 'enabled'])->name('empresa.tipopagamento.config.enabled');
         Route::put('tipopagamento/{empresaId}', [PaymentConfigurationController::class, 'update'])->name('empresa.tipopagamento.config.update');
         Route::put('tipopagamento', [PaymentConfigurationController::class, 'store'])->name('empresa.tipopagamento.config.store');
         Route::post('empresa/pagamento/test', [PaymentConfigurationController::class, 'test'])->name('empresa.pagamento.config.test');
@@ -252,4 +253,3 @@ Route::resource('site-templates', SiteTemplateController::class);
 Route::prefix('admin')->middleware('auth')->group(function () {
     Route::get('/relatorios', [\App\Http\Controllers\AnalyticsController::class, 'dashboard'])->name('admin.analytics.dashboard');
 });
-
