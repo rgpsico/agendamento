@@ -360,6 +360,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/conversations/aluno/mensagem', [ChatController::class, 'alunoenviandomensagemparaoprofessor']);
     
     Route::post('/conversations/professor/mensagem', [ChatController::class, 'professorenviandomensagemparaaluno']);
+    Route::post('/conversations/passeio/mensagem', [ChatController::class, 'enviarMensagemPasseio']);
 
     Route::get('/conversations', [ChatController::class, 'listByEmpresaAndUser']);
     

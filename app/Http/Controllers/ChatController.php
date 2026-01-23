@@ -364,6 +364,13 @@ class ChatController extends Controller
         ]);
 
         $this->enviarMensagemExterna($conversation->id, $cleanMessage, $alunoUserId);
+        $this->enviarMensagemPasseioPayload([
+            'conversation_id' => $conversation->id,
+            'user_id' => $alunoUserId,
+            'professor_id' => $validated['professor_id'],
+            'mensagem' => $cleanMessage,
+            'empresa_id' => $empresaId,
+        ]);
 
        return response()->json([
             'success' => true,
@@ -493,6 +500,13 @@ class ChatController extends Controller
         ]);
 
         $this->enviarMensagemExterna($conversation->id, $cleanMessage, $professorUserId);
+        $this->enviarMensagemPasseioPayload([
+            'conversation_id' => $conversation->id,
+            'user_id' => $validated['aluno_user_id'],
+            'professor_id' => $professorUserId,
+            'mensagem' => $cleanMessage,
+            'empresa_id' => $empresaId,
+        ]);
 
         return response()->json([
             'success' => true,
@@ -740,6 +754,87 @@ class ChatController extends Controller
                 'user_id' => $userId,
                 'error' => $e->getMessage(),
             ]);
+        }
+    }
+
+    /**
+     * Encaminha mensagem para o endpoint externo de passeio.
+     */
+    public function enviarMensagemPasseio(Request $request)
+    {
+        $validated = $request->validate([
+            'conversation_id' => 'required|integer|exists:conversations,id',
+            'user_id' => 'nullable|integer|exists:usuarios,id',
+            'professor_id' => 'required|integer|exists:usuarios,id',
+            'mensagem' => 'required|string',
+            'empresa_id' => 'required|integer|exists:empresa,id',
+        ]);
+
+        $userId = $validated['user_id'] ?? auth()->id();
+        if (!$userId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'user_id e obrigatorio quando nao autenticado.',
+            ], 422);
+        }
+
+        $payload = [
+            'conversation_id' => $validated['conversation_id'],
+            'user_id' => $userId,
+            'professor_id' => $validated['professor_id'],
+            'mensagem' => $this->sanitizeMessage($validated['mensagem']),
+            'empresa_id' => $validated['empresa_id'],
+        ];
+
+        $result = $this->enviarMensagemPasseioPayload($payload);
+        if (!$result['success']) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Falha ao enviar mensagem externa.',
+            ], 502);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $result['data'],
+        ]);
+    }
+
+    protected function enviarMensagemPasseioPayload(array $payload): array
+    {
+        try {
+            $response = Http::timeout(5)->post(
+                'https://www.comunidadeppg.com.br:3000/enviarmensagempasseio',
+                $payload
+            );
+
+            if (!$response->successful()) {
+                Log::warning('Falha ao enviar mensagem de passeio', [
+                    'status' => $response->status(),
+                    'payload' => $payload,
+                    'response' => $response->body(),
+                ]);
+
+                return [
+                    'success' => false,
+                    'data' => null,
+                ];
+            }
+
+            return [
+                'success' => true,
+                'data' => $response->json(),
+            ];
+        } catch (\Throwable $e) {
+            Log::warning('Erro ao enviar mensagem de passeio', [
+                'payload' => $payload,
+                'error' => $e->getMessage(),
+            ]);
+
+            return [
+                'success' => false,
+                'data' => null,
+            ];
         }
     }
 
