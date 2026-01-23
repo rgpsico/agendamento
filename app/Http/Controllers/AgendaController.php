@@ -64,7 +64,6 @@ class AgendaController extends Controller
         );
     }
 
-
     public function treino()
     {
         if (isset(Auth::user()->professor->id)) {
@@ -138,8 +137,8 @@ class AgendaController extends Controller
         );
     }
 
- public function edit($id)
-{
+    public function edit($id)
+    {
     $model = $this->model->find($id);
     $modalidades = Modalidade::all();
 
@@ -154,6 +153,8 @@ class AgendaController extends Controller
             'selectedModalidade' => $model->modalidade_id ?? null, // já manda a selecionada
         ]
     );
+    }
+
     public function agendamentosComCliente()
     {
         $user = Auth::user();
@@ -179,8 +180,6 @@ class AgendaController extends Controller
 
         return response()->json($query->get());
     }
-}
-
 
     public function destroy($id)
     {
