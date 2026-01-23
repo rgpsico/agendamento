@@ -175,7 +175,8 @@ class ChatController extends Controller
      */
     public function listarConversasAluno(Request $request)
     {
-        $validated = $request->validate([
+  
+    $validated = $request->validate([
             'user_id' => 'nullable|integer|exists:usuarios,id',
         ]);
 

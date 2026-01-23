@@ -355,13 +355,14 @@ Route::post('/fill-site-fields', [BotController::class, 'fillSiteFields'])->name
 Route::get('/professoresteste', [ChatController::class, 'listarProfessores']);
 Route::get('/alunosteste', [ChatController::class, 'listarAlunos']);
 
+Route::get('/listarconversasaluno', [ChatController::class, 'listarConversasAluno']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/conversations/aluno/mensagem', [ChatController::class, 'alunoenviandomensagemparaoprofessor']);
     
     Route::post('/conversations/professor/mensagem', [ChatController::class, 'professorenviandomensagemparaaluno']);
 
     Route::get('/conversations', [ChatController::class, 'listByEmpresaAndUser']);
-    Route::get('/listarconversasaluno', [ChatController::class, 'listarConversasAluno']);
+    
     
     Route::get('/mensagensPorConversa', [ChatController::class, 'mensagensDaConversa']);
     Route::apiResource('siteservicos', SiteServicoControllerApi::class);
