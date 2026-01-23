@@ -176,7 +176,6 @@ class ChatController extends Controller
     public function listarConversasAluno(Request $request)
     {
         $validated = $request->validate([
-            'empresa_id' => 'nullable|integer|exists:empresa,id',
             'user_id' => 'nullable|integer|exists:usuarios,id',
         ]);
 
@@ -199,10 +198,6 @@ class ChatController extends Controller
         $query = Conversation::with(['empresa.user'])
             ->where('user_id', $userId)
             ->orderByDesc('updated_at');
-
-        if (!empty($validated['empresa_id'])) {
-            $query->where('empresa_id', $validated['empresa_id']);
-        }
 
         $conversas = $query->get()->unique('empresa_id')->values();
 
