@@ -433,15 +433,19 @@ class ChatController extends Controller
      */
     public function professorenviandomensagemparaaluno(Request $request)
     {
+        
+       
         $validated = $request->validate([
             'mensagem' => 'required|string',
             'aluno_user_id' => 'required|integer|exists:usuarios,id',
             'conversation_id' => 'nullable|integer|exists:conversations,id',
-            'professor_user_id' => 'nullable|integer|exists:usuarios,id',
+            'professor_id' => 'nullable|integer|exists:usuarios,id',
             'empresa_id' => 'nullable|integer',
         ]);
 
-        $professorUserId = auth()->id() ?? $validated['professor_user_id'] ?? null;
+
+        $professorUserId = 1;
+
         if (!$professorUserId) {
             return response()->json([
                 'success' => false,
@@ -802,6 +806,7 @@ class ChatController extends Controller
 
     protected function enviarMensagemPasseioPayload(array $payload): array
     {
+       
         try {
             $response = Http::timeout(5)->post(
                 'https://www.comunidadeppg.com.br:3000/enviarmensagempasseio',
