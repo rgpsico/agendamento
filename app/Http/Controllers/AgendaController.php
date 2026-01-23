@@ -154,6 +154,31 @@ class AgendaController extends Controller
             'selectedModalidade' => $model->modalidade_id ?? null, // já manda a selecionada
         ]
     );
+    public function agendamentosComCliente()
+    {
+        $user = Auth::user();
+
+        $query = Agendamento::with([
+            'aluno.usuario',
+            'professor.usuario',
+            'modalidade',
+        ]);
+
+        if ($user->professor) {
+            $query->where('professor_id', $user->professor->id);
+        } elseif ($user->empresa) {
+            $empresaId = $user->empresa->id;
+            $query->whereHas('professor', function ($q) use ($empresaId) {
+                $q->where('empresa_id', $empresaId);
+            });
+        } else {
+            return response()->json([
+                'message' => 'Usuario sem perfil de professor ou empresa.',
+            ], 403);
+        }
+
+        return response()->json($query->get());
+    }
 }
 
 

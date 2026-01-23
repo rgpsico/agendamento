@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ConversationController;
+use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\AlunosController;
 use App\Http\Controllers\Api\AgendamentoControllerApi;
 use App\Http\Controllers\Api\AcessoControllerApi;
@@ -88,6 +89,7 @@ Route::prefix('permissions')->group(function () {
 
 Route::post('/login', [AuthControllerApi::class, 'login']);
 Route::middleware('auth:sanctum')->get('/me', [AuthControllerApi::class, 'me']);
+Route::middleware('auth:sanctum')->get('agendamentos/com-cliente', [AgendaController::class, 'agendamentosComCliente']);
 Route::middleware('auth:sanctum')->get('empresa/tipopagamento/enabled', [PaymentConfigurationController::class, 'enabled']);
 
 Route::post('acesso/verificar', [AcessoControllerApi::class, 'verificar'])->name('acesso.verificar');
