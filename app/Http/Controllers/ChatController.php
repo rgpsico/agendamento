@@ -171,6 +171,57 @@ class ChatController extends Controller
     }
 
     /**
+     * Lista contatos (nome/email) das conversas do aluno.
+     */
+    public function listarConversasAluno(Request $request)
+    {
+        $validated = $request->validate([
+            'empresa_id' => 'nullable|integer|exists:empresa,id',
+            'user_id' => 'nullable|integer|exists:usuarios,id',
+        ]);
+
+        $userId = $validated['user_id'] ?? auth()->id();
+        if (!$userId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'user_id e obrigatorio quando nao autenticado.',
+            ], 422);
+        }
+
+        $user = Usuario::with('aluno')->findOrFail($userId);
+        if (!$user->aluno) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Usuario informado nao e um aluno.',
+            ], 403);
+        }
+
+        $query = Conversation::with(['empresa.user'])
+            ->where('user_id', $userId)
+            ->orderByDesc('updated_at');
+
+        if (!empty($validated['empresa_id'])) {
+            $query->where('empresa_id', $validated['empresa_id']);
+        }
+
+        $conversas = $query->get()->unique('empresa_id')->values();
+
+        return response()->json($conversas->map(function ($conversa) {
+            $empresaUser = $conversa->empresa ? $conversa->empresa->user : null;
+
+            return [
+                'empresa_id' => $conversa->empresa_id,
+                'conversation_id' => $conversa->id,
+                'contato' => $empresaUser ? [
+                    'id' => $empresaUser->id,
+                    'nome' => $empresaUser->nome,
+                    'email' => $empresaUser->email,
+                ] : null,
+            ];
+        }));
+    }
+
+    /**
      * Lista conversas por professor (alunos vinculados) ou por empresa.
      */
     public function listByEmpresaOrProfessor(Request $request)
