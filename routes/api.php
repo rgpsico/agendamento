@@ -245,6 +245,7 @@ use App\Http\Controllers\Api\SiteServicoController;
 use App\Http\Controllers\Api\SiteServicoControllerApi;
 use App\Http\Controllers\BotController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\ChatAlunoController;
 use App\Http\Controllers\DespesaController;
 
 Route::middleware('auth:sanctum')->prefix('site')->group(function () {
@@ -356,6 +357,9 @@ Route::get('/professoresteste', [ChatController::class, 'listarProfessores']);
 Route::get('/alunosteste', [ChatController::class, 'listarAlunos']);
 
 Route::get('/listarconversasaluno', [ChatController::class, 'listarConversasAluno']);
+Route::get('/aluno/conversas', [ChatAlunoController::class, 'listarConversasDoAluno']);
+Route::get('/aluno/conversas/alunoeempresa', [ChatAlunoController::class, 'listarInteracoesAlunoEmpresa']);
+Route::get('/aluno/listarmensagembyidconversa', [ChatAlunoController::class, 'listarMensagensByIdConversa']);
 
 Route::post('/conversations/professor/mensagem', [ChatController::class, 'professorenviandomensagemparaaluno']);
     Route::post('/conversations/passeio/mensagem', [ChatController::class, 'enviarMensagemPasseio']);
@@ -399,6 +403,7 @@ Route::post('/track-event', [EventController::class, 'track']);
 use App\Http\Controllers\Api\ReceitaApiController;
 
 
+Route::post('/aluno/enviarmensagemaoprofessor', [ChatAlunoController::class, 'enviarMensagemParaProfessor']);
 
 
 
