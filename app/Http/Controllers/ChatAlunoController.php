@@ -268,6 +268,7 @@ class ChatAlunoController extends Controller
             'user_id' => 'required|integer|exists:usuarios,id',
         ]);
 
+        
         $alunoUser = Usuario::with('aluno')->find($validated['user_id']);
         if (!$alunoUser->aluno) {
             return response()->json([
