@@ -246,6 +246,7 @@ use App\Http\Controllers\Api\SiteServicoControllerApi;
 use App\Http\Controllers\BotController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ChatAlunoController;
+use App\Http\Controllers\ChatProfessorController;
 use App\Http\Controllers\DespesaController;
 
 Route::middleware('auth:sanctum')->prefix('site')->group(function () {
@@ -367,6 +368,7 @@ Route::post('/conversations/professor/mensagem', [ChatController::class, 'profes
     
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/aluno/listarmensagembyidconversa', [ChatAlunoController::class, 'listarMensagensByIdConversa']);
+    Route::get('/professor/listarmensagembyidconversa', [ChatProfessorController::class, 'listarMensagensByIdConversa']);
 
     Route::post('/conversations/aluno/mensagem', [ChatController::class, 'alunoenviandomensagemparaoprofessor']);
     
