@@ -366,6 +366,7 @@ Route::post('/conversations/professor/mensagem', [ChatController::class, 'profes
 
     
     Route::get('/listarmensagembyidconversaprof', [ChatProfessorController::class, 'listarMensagensByIdConversa']);
+Route::get('/conversations/aberta', [ChatProfessorController::class, 'verificarConversaAlunoEmpresa']);
 
     
 Route::middleware('auth:sanctum')->group(function () {

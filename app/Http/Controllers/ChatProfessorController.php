@@ -82,4 +82,46 @@ class ChatProfessorController extends Controller
             ],
         ]);
     }
+
+    /**
+     * Verifica se aluno e empresa possuem conversa aberta e retorna mensagens.
+     */
+    public function verificarConversaAlunoEmpresa(Request $request)
+    {
+        $validated = $request->validate([
+            'user_id' => 'required|integer|exists:usuarios,id',
+            'empresa_id' => 'required|integer|exists:empresa,id',
+        ]);
+
+        $conversation = Conversation::where('empresa_id', $validated['empresa_id'])
+            ->where('user_id', $validated['user_id'])
+            ->latest('created_at')
+            ->first();
+
+        if (!$conversation) {
+            return response()->noContent();
+        }
+
+        $conversation->load([
+            'messages' => function ($q) {
+                $q->orderBy('created_at', 'asc');
+            },
+        ]);
+
+        return response()->json([
+            'conversation_id' => $conversation->id,
+            'empresa_id' => $conversation->empresa_id,
+            'user_id' => $conversation->user_id,
+            'messages' => $conversation->messages->map(function ($msg) {
+                return [
+                    'id' => $msg->id,
+                    'from' => $msg->from,
+                    'to' => $msg->to,
+                    'role' => $msg->role,
+                    'body' => $msg->body,
+                    'created_at' => $msg->created_at->toDateTimeString(),
+                ];
+            }),
+        ]);
+    }
 }
