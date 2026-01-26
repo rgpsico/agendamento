@@ -159,14 +159,12 @@ class AgendaController extends Controller
     {
         $user = Auth::user();
 
-        $query = Agendamento::with([
-            'aluno.usuario',
-            'professor.usuario',
-            'modalidade',
-        ]);
+        $empresaId = null;
+        $query = Agendamento::query();
 
         if ($user->professor) {
             $query->where('professor_id', $user->professor->id);
+            $empresaId = $user->professor->empresa_id;
         } elseif ($user->empresa) {
             $empresaId = $user->empresa->id;
             $query->whereHas('professor', function ($q) use ($empresaId) {
@@ -177,6 +175,21 @@ class AgendaController extends Controller
                 'message' => 'Usuario sem perfil de professor ou empresa.',
             ], 403);
         }
+
+        if (!$empresaId) {
+            return response()->json([
+                'message' => 'Empresa nao encontrada para este usuario.',
+            ], 403);
+        }
+
+        $query->with([
+            'aluno.usuario',
+            'professor.usuario',
+            'modalidade',
+            'aluno.usuario.lastConversationWithEmpresa' => function ($q) use ($empresaId) {
+                $q->where('empresa_id', $empresaId);
+            },
+        ]);
 
         return response()->json($query->get());
     }

@@ -117,6 +117,12 @@ class Usuario extends Authenticatable
         return $this->hasOne(Empresa::class, 'user_id', 'id');
     }
 
+    public function lastConversationWithEmpresa()
+    {
+        return $this->hasOne(Conversation::class, 'user_id', 'id')
+            ->latest('created_at');
+    }
+
       public function perfis()
     {
         return $this->belongsToMany(Perfil::class, 'usuario_perfis')
