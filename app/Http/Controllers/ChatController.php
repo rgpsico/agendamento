@@ -444,7 +444,7 @@ class ChatController extends Controller
         ]);
 
 
-        $professorUserId = $validated['professor_id'];
+        $professorUserId = 1;
 
         if (!$professorUserId) {
             return response()->json([
