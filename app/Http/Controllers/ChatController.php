@@ -439,12 +439,12 @@ class ChatController extends Controller
             'mensagem' => 'required|string',
             'aluno_user_id' => 'required|integer|exists:usuarios,id',
             'conversation_id' => 'nullable|integer|exists:conversations,id',
-            'professor_id' => 'nullable|integer|exists:usuarios,id',
+            'professor_user_id' => 'nullable|integer|exists:usuarios,id',
             'empresa_id' => 'nullable|integer',
         ]);
 
 
-        $professorUserId = 1;
+        $professorUserId = $validated['professor_user_id'];
 
         if (!$professorUserId) {
             return response()->json([
