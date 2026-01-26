@@ -298,7 +298,6 @@ class ChatController extends Controller
      */
     public function alunoenviandomensagemparaoprofessor(Request $request)
     {
-        dd('aaa');
        
         $validated = $request->validate([
             'mensagem' => 'required|string',
@@ -445,7 +444,7 @@ class ChatController extends Controller
         ]);
 
 
-        $professorUserId = 1;
+        dd('aaa');
 
         if (!$professorUserId) {
             return response()->json([
