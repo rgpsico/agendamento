@@ -190,6 +190,7 @@ class AgendaController extends Controller
                 $q->where('empresa_id', $empresaId);
             },
         ]);
+        dd($query->get());
 
         return response()->json($query->get());
     }
