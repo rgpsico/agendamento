@@ -298,6 +298,7 @@ class ChatController extends Controller
      */
     public function alunoenviandomensagemparaoprofessor(Request $request)
     {
+        dd('aaa');
        
         $validated = $request->validate([
             'mensagem' => 'required|string',
