@@ -23,7 +23,7 @@ class ChatProfessorController extends Controller
             'empresa_id' => 'required|integer|exists:empresa,id'
         ]);
 
-        dd("aaa");
+      
         $professorUser = Usuario::with('professor.alunos')->findOrFail($validated['professor_user_id']);
         if (!$professorUser->professor) {
             return response()->json([
