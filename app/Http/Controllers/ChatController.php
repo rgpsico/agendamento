@@ -443,17 +443,16 @@ class ChatController extends Controller
             'empresa_id' => 'nullable|integer',
         ]);
 
+      
 
-        dd('aaa');
+        // if (!$professorUserId) {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'professor_user_id e obrigatorio quando nao autenticado.',
+        //     ], 422);
+        // }
 
-        if (!$professorUserId) {
-            return response()->json([
-                'success' => false,
-                'message' => 'professor_user_id e obrigatorio quando nao autenticado.',
-            ], 422);
-        }
-
-        $professorUser = Usuario::with('empresa')->find($professorUserId);
+        $professorUser = Usuario::with('empresa')->find($validated['professor_id']);
         $isProfessor = $professorUser && $professorUser->tipo_usuario === 'professor';
         $isEmpresa = $professorUser && $professorUser->empresa;
         if (!$professorUser || (!$isProfessor && !$isEmpresa)) {
@@ -464,7 +463,7 @@ class ChatController extends Controller
         }
 
         $professor = $isProfessor
-            ? Professor::where('usuario_id', $professorUserId)->first()
+            ? Professor::where('usuario_id', $validated['professor_id'])->first()
             : null;
         if ($isProfessor && !$professor) {
             return response()->json([
@@ -503,11 +502,11 @@ class ChatController extends Controller
             'body' => $cleanMessage,
         ]);
 
-        $this->enviarMensagemExterna($conversation->id, $cleanMessage, $professorUserId);
+        $this->enviarMensagemExterna($conversation->id, $cleanMessage, $validated['professor_id']);
         $this->enviarMensagemPasseioPayload([
             'conversation_id' => $conversation->id,
             'user_id' => $validated['aluno_user_id'],
-            'professor_id' => $professorUserId,
+            'professor_id' => $validated['professor_id'],
             'mensagem' => $cleanMessage,
             'empresa_id' => $empresaId,
         ]);
