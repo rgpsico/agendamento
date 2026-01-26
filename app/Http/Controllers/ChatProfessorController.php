@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Conversation;
+use App\Models\Message;
 use Illuminate\Http\Request;
 
 /**
@@ -40,6 +41,45 @@ class ChatProfessorController extends Controller
                     'created_at' => $msg->created_at->toDateTimeString(),
                 ];
             }),
+        ]);
+    }
+
+    /**
+     * Envia mensagem do professor para o aluno em uma conversa.
+     */
+    public function enviarmensagemaoaluno(Request $request)
+    {
+        $validated = $request->validate([
+            'user_id' => 'required|integer|exists:usuarios,id',
+            'empresa_id' => 'required|integer|exists:empresa,id',
+            'conversation_id' => 'required|integer|exists:conversations,id',
+            'mensagem' => 'required|string',
+        ]);
+
+        $conversation = Conversation::where('id', $validated['conversation_id'])
+            ->where('empresa_id', $validated['empresa_id'])
+            ->where('user_id', $validated['user_id'])
+            ->firstOrFail();
+
+        $message = Message::create([
+            'from' => 'professor',
+            'to' => 'aluno',
+            'conversation_id' => $conversation->id,
+            'role' => 'assistant',
+            'body' => trim($validated['mensagem']),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'conversation_id' => $conversation->id,
+            'message' => [
+                'id' => $message->id,
+                'from' => $message->from,
+                'to' => $message->to,
+                'role' => $message->role,
+                'body' => $message->body,
+                'created_at' => $message->created_at->toDateTimeString(),
+            ],
         ]);
     }
 }

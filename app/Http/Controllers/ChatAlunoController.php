@@ -8,6 +8,8 @@ use App\Models\Message;
 use App\Models\Professor;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Controlador do chat do aluno: lista conversas e interacoes com empresa.
@@ -165,6 +167,49 @@ class ChatAlunoController extends Controller
         }));
     }
 
+
+
+    protected function enviarMensagemPasseioPayload(array $payload): array
+    {
+       
+        try {
+            $response = Http::timeout(5)->post(
+                'https://www.comunidadeppg.com.br:3000/enviarmensagempasseio',
+                $payload
+            );
+
+            if (!$response->successful()) {
+                Log::warning('Falha ao enviar mensagem de passeio', [
+                    'status' => $response->status(),
+                    'payload' => $payload,
+                    'response' => $response->body(),
+                ]);
+
+                return [
+                    'success' => false,
+                    'data' => null,
+                ];
+            }
+
+            return [
+                'success' => true,
+                'data' => $response->json(),
+            ];
+        } catch (\Throwable $e) {
+            Log::warning('Erro ao enviar mensagem de passeio', [
+                'payload' => $payload,
+                'error' => $e->getMessage(),
+            ]);
+
+            return [
+                'success' => false,
+                'data' => null,
+            ];
+        }
+    }
+
+
+
     /**
      * Envia mensagem do aluno para o professor da empresa.
      */
@@ -233,6 +278,14 @@ class ChatAlunoController extends Controller
             'conversation_id' => $conversation->id,
             'role' => 'user',
             'body' => $cleanMessage,
+        ]);
+
+        $this->enviarMensagemPasseioPayload([
+            'conversation_id' => $conversation->id,
+            'user_id' => $alunoUser->id,
+            'professor_id' => $professor->usuario_id,
+            'mensagem' => $cleanMessage,
+            'empresa_id' => $validated['empresa_id'],
         ]);
 
         return response()->json([

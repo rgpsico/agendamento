@@ -408,6 +408,8 @@ use App\Http\Controllers\Api\ReceitaApiController;
 
 
 Route::post('/aluno/enviarmensagemaoprofessor', [ChatAlunoController::class, 'enviarMensagemParaProfessor']);
+Route::post('/aluno/enviarmensagemaoaluno', [ChatProfessorController::class, 'enviarmensagemaoaluno']);
+
 
 
 
