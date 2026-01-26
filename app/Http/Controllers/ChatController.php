@@ -443,16 +443,17 @@ class ChatController extends Controller
             'empresa_id' => 'nullable|integer',
         ]);
 
-      
 
-        // if (!$professorUserId) {
-        //     return response()->json([
-        //         'success' => false,
-        //         'message' => 'professor_user_id e obrigatorio quando nao autenticado.',
-        //     ], 422);
-        // }
+        $professorUserId = $validated['professor_id'];
 
-        $professorUser = Usuario::with('empresa')->find($validated['professor_id']);
+        if (!$professorUserId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'professor_user_id e obrigatorio quando nao autenticado.',
+            ], 422);
+        }
+
+        $professorUser = Usuario::with('empresa')->find($professorUserId);
         $isProfessor = $professorUser && $professorUser->tipo_usuario === 'professor';
         $isEmpresa = $professorUser && $professorUser->empresa;
         if (!$professorUser || (!$isProfessor && !$isEmpresa)) {
@@ -463,7 +464,7 @@ class ChatController extends Controller
         }
 
         $professor = $isProfessor
-            ? Professor::where('usuario_id', $validated['professor_id'])->first()
+            ? Professor::where('usuario_id', $professorUserId)->first()
             : null;
         if ($isProfessor && !$professor) {
             return response()->json([
@@ -502,11 +503,11 @@ class ChatController extends Controller
             'body' => $cleanMessage,
         ]);
 
-        $this->enviarMensagemExterna($conversation->id, $cleanMessage, $validated['professor_id']);
+        $this->enviarMensagemExterna($conversation->id, $cleanMessage, $professorUserId);
         $this->enviarMensagemPasseioPayload([
             'conversation_id' => $conversation->id,
             'user_id' => $validated['aluno_user_id'],
-            'professor_id' => $validated['professor_id'],
+            'professor_id' => $professorUserId,
             'mensagem' => $cleanMessage,
             'empresa_id' => $empresaId,
         ]);
