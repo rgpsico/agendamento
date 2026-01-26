@@ -17,6 +17,7 @@ class ChatProfessorController extends Controller
      */
     public function listarMensagensByIdConversa(Request $request)
     {
+        dd('aaa');
         $validated = $request->validate([
             'conversation_id' => 'required|integer|exists:conversations,id',
             'empresa_id' => 'required|integer|exists:empresa,id'
