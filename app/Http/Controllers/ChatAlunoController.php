@@ -37,13 +37,13 @@ class ChatAlunoController extends Controller
             ], 422);
         }
 
-        // $alunoUser = Usuario::with('aluno')->findOrFail($userId);
-        // if (!$alunoUser->aluno) {
-        //     return response()->json([
-        //         'success' => false,
-        //         'message' => 'Usuario informado nao e um aluno.',
-        //     ], 403);
-        // }
+        $alunoUser = Usuario::with('aluno')->findOrFail($userId);
+        if (!$alunoUser->aluno) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Usuario informado nao e um aluno.',
+            ], 403);
+        }
 
         $authUser = auth()->user();
         if ($authUser && $authUser->tipo_usuario === 'aluno' && (int) $authUser->id !== (int) $userId) {

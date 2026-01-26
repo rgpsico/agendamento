@@ -365,12 +365,12 @@ Route::post('/conversations/professor/mensagem', [ChatController::class, 'profes
     Route::post('/conversations/passeio/mensagem', [ChatController::class, 'enviarMensagemPasseio']);
 
     
+    Route::get('/professor/listarmensagembyidconversa', [ChatProfessorController::class, 'listarMensagensByIdConversa']);
+
     
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/aluno/listarmensagembyidconversa', [ChatAlunoController::class, 'listarMensagensByIdConversa']);
    
-    Route::get('/professor/listarmensagembyidconversa', [ChatProfessorController::class, 'listarMensagensByIdConversa']);
-
     Route::post('/conversations/aluno/mensagem', [ChatController::class, 'alunoenviandomensagemparaoprofessor']);
     
     Route::get('/conversations', [ChatController::class, 'listByEmpresaAndUser']);
