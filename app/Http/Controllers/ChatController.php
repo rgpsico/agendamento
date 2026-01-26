@@ -806,6 +806,8 @@ class ChatController extends Controller
 
     protected function enviarMensagemPasseioPayload(array $payload): array
     {
+
+    dd($payload);
        
         try {
             $response = Http::timeout(5)->post(
