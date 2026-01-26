@@ -24,7 +24,7 @@ class ChatProfessorController extends Controller
         ]);
 
       
-        $professorUser = Usuario::with('professor.alunos')->findOrFail($validated['professor_user_id']);
+        $professorUser = Usuario::with('professor.alunos')->findOrFail($validated['empresa_id']);
         if (!$professorUser->professor) {
             return response()->json([
                 'success' => false,
