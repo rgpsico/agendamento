@@ -222,7 +222,7 @@ class ChatAlunoController extends Controller
      */
     public function enviarMensagemParaProfessor(Request $request)
     {
-       dd('aaaaa');
+      
       
         $validated = $request->validate([
             'mensagem' => 'required|string',
