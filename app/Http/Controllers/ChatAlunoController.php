@@ -265,6 +265,7 @@ class ChatAlunoController extends Controller
             ], 404);
         }
 
+        dd($professor->usuario_id);
       $result = $this->firebasePushService->sendToUser(
             $professor->usuario_id,
             'Nova mensagem do aluno',
