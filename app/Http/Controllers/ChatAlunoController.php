@@ -267,12 +267,12 @@ class ChatAlunoController extends Controller
 
    
       $result = $this->firebasePushService->sendToUser(
-            1,
+            $validated['user_id'],
             'Nova mensagem do aluno',
             substr($validated['mensagem'], 0, 100),
             [
                 'type' => 'new_message',
-                'aluno_user_id' => 1,
+                'aluno_user_id' => 10,
                 'empresa_id' => $validated['empresa_id'],
             ]
         );
