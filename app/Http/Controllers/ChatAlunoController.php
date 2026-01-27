@@ -234,12 +234,12 @@ class ChatAlunoController extends Controller
 
         $alunoUser = Usuario::with('aluno')->find($validated['user_id']);
 
-        if (!$alunoUser->aluno) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Usuario informado nao e um aluno.',
-            ], 403);
-        }
+        // if (!$alunoUser->aluno) {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'Usuario informado nao e um aluno.',
+        //     ], 403);
+        // }
 
         $authUser = auth()->user();
         if ($authUser && $authUser->tipo_usuario === 'aluno' && (int) $authUser->id !== (int) $alunoUser->id) {
