@@ -10,12 +10,19 @@ use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use App\Services\FirebasePushService;
 
 /**
  * Controlador do chat do aluno: lista conversas e interacoes com empresa.
  */
 class ChatAlunoController extends Controller
 {
+    private FirebasePushService $firebasePushService;
+
+    public function __construct(FirebasePushService $firebasePushService)
+    {
+        $this->firebasePushService = $firebasePushService;
+    }
     /**
      * Lista todas as conversas do aluno.
      */
@@ -222,12 +229,11 @@ class ChatAlunoController extends Controller
             'empresa_id' => 'required|integer|exists:empresa,id',
             'user_id' => 'required|integer|exists:usuarios,id',
             'conversation_id' => 'nullable|integer',
-        ]);
-
-       
+        ]);      
        
 
         $alunoUser = Usuario::with('aluno')->find($validated['user_id']);
+
         if (!$alunoUser->aluno) {
             return response()->json([
                 'success' => false,
@@ -258,6 +264,9 @@ class ChatAlunoController extends Controller
                 'message' => 'Professor nao encontrado para a empresa informada.',
             ], 404);
         }
+
+        $this->firebasePushService->sendToUser($professor->usuario_id, 'Nova mensagem de aluno', 'TESTE AQUI');
+
 
         $conversation = !empty($validated['conversation_id'])
             ? Conversation::findOrFail($validated['conversation_id'])

@@ -22,45 +22,44 @@ class AuthControllerApi extends Controller
 
     
 
-    public function login(Request $request)
-{
-    $credentials = $request->only('email', 'password');
+        public function login(Request $request)
+        {
+            $credentials = $request->only('email', 'password');
 
-    if (!Auth::attempt($credentials)) {
-        return response()->json([
-            'error' => 'Invalid email/password'
-        ], 401);
-    }
+            if (!Auth::attempt($credentials)) {
+                return response()->json([
+                    'error' => 'Invalid email/password'
+                ], 401);
+            }
 
-    $user = Usuario::where('email', $request->email)->firstOrFail();
+            $user = Usuario::where('email', $request->email)->firstOrFail();
 
-    // Cria token de autenticação
-    $token = $user->createToken('authToken')->plainTextToken;
+            // Cria token de autenticação
+            $token = $user->createToken('authToken')->plainTextToken;
 
-    // 🔔 VINCULA O FCM TOKEN (SE VIER)
-    if ($request->filled('fcm_token')) {
-        \App\Models\DeviceToken::updateOrCreate(
-            [
-                'fcm_token' => $request->fcm_token
-            ],
-            [
-                'user_id'  => $user->id,
-                'platform' => $request->input('platform', 'android')
-            ]
-        );
-    }
+            // 🔔 VINCULA O FCM TOKEN (SE VIER)
+            if ($request->filled('fcm_token')) {
+                \App\Models\DeviceToken::updateOrCreate(
+                    [
+                        'fcm_token' => $request->fcm_token
+                    ],
+                    [
+                        'user_id'  => $user->id,
+                        'platform' => $request->input('platform', 'android')
+                    ]
+                );
+            }
 
-    $empresaId   = $user->empresa?->id;
-    $professorId = $user->professor?->id;
-    $alunoId     = $user->aluno?->id;
+            $empresaId   = $user->empresa?->id;
+            $professorId = $user->professor?->id;
+            $alunoId     = $user->aluno?->id;
 
-    return response()->json([
-        'token'        => $token,
-        'empresa_id'   => $empresaId,
-        'professor_id' => $professorId,
-        'aluno_id'     => $alunoId,
-          'user_id'     => $user->id
-    ], 200);
-}
-
+            return response()->json([
+                'token'        => $token,
+                'empresa_id'   => $empresaId,
+                'professor_id' => $professorId,
+                'aluno_id'     => $alunoId,
+                'user_id'     => $user->id
+            ], 200);
+        }
 }

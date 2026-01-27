@@ -2,10 +2,12 @@
 
 namespace App\Services;
 
+use App\Models\DeviceToken;
 use Google_Client;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class FirebasePushService
 {
@@ -117,6 +119,44 @@ class FirebasePushService
         }
 
         return $normalized;
+    }
+
+     public function sendToUser(int $userId, string $title, string $body, array $data = []): array
+    {
+        $results = [
+            'sent' => 0,
+            'failed' => 0,
+            'errors' => [],
+        ];
+
+        $tokens = DeviceToken::where('user_id', $userId)->pluck('fcm_token');
+
+        if ($tokens->isEmpty()) {
+            return $results;
+        }
+
+        foreach ($tokens as $token) {
+            try {
+                $response = $this->sendToToken($token, $title, $body, $data);
+                $results['sent']++;
+
+            } catch (\Throwable $e) {
+                $results['failed']++;
+                $results['errors'][] = [
+                    'token' => $token,
+                    'error' => $e->getMessage(),
+                ];
+
+                // Se quiser, marque token como inválido aqui
+                Log::warning('Push failed', [
+                    'user_id' => $userId,
+                    'token' => $token,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        return $results;
     }
 
     private function getAccessToken(): string
