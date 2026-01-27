@@ -53,6 +53,11 @@ use Modules\Alunoadmin\Http\Controllers\AlunoadminController;
 use App\Http\Controllers\Api\DeviceTokenController;
 
 
+
+Route::post('/device/token', [DeviceTokenController::class, 'store']);
+Route::delete('/device/token', [DeviceTokenController::class, 'destroy']);
+
+
 Route::post('pagamento/presencial', [PagamentoController::class, 'criarPagamentoPresencial'])->name('empresa.pagamento.prensencial');
 Route::post('pagamento/presencial-api', [PagamentoController::class, 'criarPagamentoPresencialApi'])
     ->name('empresa.pagamento.presencial.api');
@@ -79,8 +84,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 
-Route::post('/device/token', [DeviceTokenController::class, 'store']);
-Route::delete('/device/token', [DeviceTokenController::class, 'destroy']);
+
 
 
 
