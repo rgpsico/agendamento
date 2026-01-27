@@ -50,6 +50,8 @@ use App\Http\Controllers\EmailController;
 use App\Http\Controllers\ContatoController;
 use App\Http\Controllers\EmpresaController;
 use Modules\Alunoadmin\Http\Controllers\AlunoadminController;
+use App\Http\Controllers\Api\DeviceTokenController;
+
 
 Route::post('pagamento/presencial', [PagamentoController::class, 'criarPagamentoPresencial'])->name('empresa.pagamento.prensencial');
 Route::post('pagamento/presencial-api', [PagamentoController::class, 'criarPagamentoPresencialApi'])
@@ -74,6 +76,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+
+
+
+Route::post('/device/token', [DeviceTokenController::class, 'store']);
+Route::delete('/device/token', [DeviceTokenController::class, 'destroy']);
 
 
 
