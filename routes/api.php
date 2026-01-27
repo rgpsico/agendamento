@@ -54,8 +54,7 @@ use App\Http\Controllers\Api\DeviceTokenController;
 
 
 
-Route::post('/device/token', [DeviceTokenController::class, 'store']);
-Route::delete('/device/token', [DeviceTokenController::class, 'destroy']);
+
 
 
 Route::post('pagamento/presencial', [PagamentoController::class, 'criarPagamentoPresencial'])->name('empresa.pagamento.prensencial');
@@ -469,3 +468,7 @@ Route::apiResource('planos-alunos', PlanoAlunoController::class);
 
 
 Route::post('/deepseek/image', [DeepSeekController::class, 'analyzeImage']);
+
+
+Route::post('/device/token', [DeviceTokenController::class, 'store']);
+Route::delete('/device/token', [DeviceTokenController::class, 'destroy']);
