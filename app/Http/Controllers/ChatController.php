@@ -505,7 +505,7 @@ class ChatController extends Controller
             'body' => $cleanMessage,
         ]);
 
-          $this->firebasePushService->sendToUser(1 , 'Nova mensagem de aluno', 'TESTE AQUI');
+        $this->firebasePushService->sendToUser(1 , 'Nova mensagem de aluno', 'TESTE AQUI');
 
         $this->enviarMensagemExterna($conversation->id, $cleanMessage, $professorUserId);
         $this->enviarMensagemPasseioPayload([
