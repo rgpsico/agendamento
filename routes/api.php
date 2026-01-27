@@ -51,6 +51,7 @@ use App\Http\Controllers\ContatoController;
 use App\Http\Controllers\EmpresaController;
 use Modules\Alunoadmin\Http\Controllers\AlunoadminController;
 use App\Http\Controllers\Api\DeviceTokenController;
+use App\Http\Controllers\Api\PushTestController;
 
 
 
@@ -472,3 +473,4 @@ Route::post('/deepseek/image', [DeepSeekController::class, 'analyzeImage']);
 
 Route::post('/device/token', [DeviceTokenController::class, 'store']);
 Route::delete('/device/token', [DeviceTokenController::class, 'destroy']);
+Route::post('/push/test', [PushTestController::class, 'send']);
