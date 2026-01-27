@@ -434,7 +434,7 @@ class ChatController extends Controller
      */
     public function professorenviandomensagemparaaluno(Request $request)
     {
-        dd('aaaa');
+      
        
         $validated = $request->validate([
             'mensagem' => 'required|string',
@@ -444,8 +444,23 @@ class ChatController extends Controller
             'empresa_id' => 'nullable|integer',
         ]);
 
+       $professorUserId = $validated['professor_user_id'];
 
-        $professorUserId = $validated['professor_user_id'];
+        $quemrecebeanotificacao = $validated['aluno_user_id'];
+        
+      $result = $this->firebasePushService->sendToUser(
+            1,
+            'Nova mensagem do aluno',
+            substr($validated['mensagem'], 0, 100),
+            [
+                'type' => 'new_message',
+                'aluno_user_id' =>1,
+                'empresa_id' => $validated['empresa_id'],
+            ]
+        );
+
+
+    
 
         if (!$professorUserId) {
             return response()->json([
