@@ -234,12 +234,12 @@ class ChatAlunoController extends Controller
 
         $alunoUser = Usuario::with('aluno')->find($validated['user_id']);
 
-        // if (!$alunoUser->aluno) {
-        //     return response()->json([
-        //         'success' => false,
-        //         'message' => 'Usuario informado nao e um aluno.',
-        //     ], 403);
-        // }
+        if (!$alunoUser->aluno) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Usuario informado nao e um aluno.',
+            ], 403);
+        }
 
         $authUser = auth()->user();
         if ($authUser && $authUser->tipo_usuario === 'aluno' && (int) $authUser->id !== (int) $alunoUser->id) {
@@ -265,14 +265,15 @@ class ChatAlunoController extends Controller
             ], 404);
         }
 
-   
+     $quemrecebeanotificacao = $validated['user_id'];
+
       $result = $this->firebasePushService->sendToUser(
-            $validated['user_id'],
+            $quemrecebeanotificacao,
             'Nova mensagem do aluno',
             substr($validated['mensagem'], 0, 100),
             [
                 'type' => 'new_message',
-                'aluno_user_id' => 10,
+                'aluno_user_id' =>$quemrecebeanotificacao,
                 'empresa_id' => $validated['empresa_id'],
             ]
         );

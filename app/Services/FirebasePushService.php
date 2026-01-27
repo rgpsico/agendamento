@@ -121,7 +121,7 @@ class FirebasePushService
         return $normalized;
     }
 
-     public function sendToUser(int $userId, string $title, string $body, array $data = []): array
+     public function sendToUser(int $userIdquerecebeanotificacao, string $title, string $body, array $data = []): array
     {
         $results = [
             'sent' => 0,
@@ -129,7 +129,7 @@ class FirebasePushService
             'errors' => [],
         ];
 
-        $tokens = DeviceToken::where('user_id', $userId)->pluck('fcm_token');
+        $tokens = DeviceToken::where('user_id', $userIdquerecebeanotificacao)->pluck('fcm_token');
 
        
         if ($tokens->isEmpty()) {
