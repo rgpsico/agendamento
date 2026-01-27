@@ -131,6 +131,7 @@ class FirebasePushService
 
         $tokens = DeviceToken::where('user_id', $userId)->pluck('fcm_token');
 
+        dd($tokens);
         if ($tokens->isEmpty()) {
             return $results;
         }
