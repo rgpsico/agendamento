@@ -450,7 +450,7 @@ class ChatController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'professor_user_id e obrigatorio quando nao autenticado.',
-            ], 422);
+            ], 422);   
         }
 
         $professorUser = Usuario::with('empresa')->find($professorUserId);
