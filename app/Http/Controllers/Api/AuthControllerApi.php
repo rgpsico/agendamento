@@ -58,9 +58,9 @@ class AuthControllerApi extends Controller
         'token'        => $token,
         'empresa_id'   => $empresaId,
         'professor_id' => $professorId,
-        'aluno_id'     => $alunoId
+        'aluno_id'     => $alunoId,
+          'user_id'     => $user->id
     ], 200);
 }
 
 }
-    
