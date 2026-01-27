@@ -470,5 +470,5 @@ Route::apiResource('planos-alunos', PlanoAlunoController::class);
 Route::post('/deepseek/image', [DeepSeekController::class, 'analyzeImage']);
 
 
-Route::post('/device/token', [DeviceTokenController::class, 'store']);
+Route::post('/device123', [DeviceTokenController::class, 'store']);
 Route::delete('/device/token', [DeviceTokenController::class, 'destroy']);
