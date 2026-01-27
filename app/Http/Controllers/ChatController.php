@@ -22,20 +22,22 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
+use App\Services\FirebasePushService;
 /**
  * Controlador de chat: mensagens, controle humano e integracoes externas.
  */
 class ChatController extends Controller
 {
-    protected $deepSeekService, $twilioService;
+    protected $deepSeekService, $twilioService, $firebasePushService;
 
     /**
      * Injeta os servicos usados para IA e notificacoes.
      */
-    public function __construct(DeepSeekService $deepSeekService, TwilioService $twilioService)
+    public function __construct(DeepSeekService $deepSeekService, TwilioService $twilioService, FirebasePushService $firebasePushService)
     {
         $this->deepSeekService = $deepSeekService;
         $this->twilioService = $twilioService;
+        $this->firebasePushService = $firebasePushService;
     }
 
 
@@ -502,6 +504,8 @@ class ChatController extends Controller
             'role' => 'assistant',
             'body' => $cleanMessage,
         ]);
+
+          $this->firebasePushService->sendToUser( $professorUserId , 'Nova mensagem de aluno', 'TESTE AQUI');
 
         $this->enviarMensagemExterna($conversation->id, $cleanMessage, $professorUserId);
         $this->enviarMensagemPasseioPayload([
