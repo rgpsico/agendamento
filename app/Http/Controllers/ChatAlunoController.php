@@ -265,7 +265,16 @@ class ChatAlunoController extends Controller
             ], 404);
         }
 
-      
+        $this->firebasePushService->sendToUser(
+            $professor->usuario_id,
+            'Nova mensagem do aluno',
+            substr($validated['mensagem'], 0, 100),
+            [
+                'type' => 'new_message',
+                'aluno_user_id' => $alunoUser->id,
+                'empresa_id' => $validated['empresa_id'],
+            ]
+        );
 
 
         $conversation = !empty($validated['conversation_id'])
