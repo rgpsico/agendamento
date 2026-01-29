@@ -38,7 +38,7 @@ services:
       - agendamento_mysql_data:/var/lib/mysql
     networks:
       - agendamento_net
-
+  
   redis:
     image: redis:7-alpine
     container_name: agendamento_redis
@@ -72,6 +72,18 @@ services:
     depends_on:
       - redis
       - mysql
+    networks:
+      - agendamento_net
+  
+  socket:
+    image: node:20-alpine
+    container_name: agendamento_socket
+    working_dir: /app
+    volumes:
+      - ./socket:/app
+    command: sh -c "npm install && node index.js"
+    expose:
+      - "3000"
     networks:
       - agendamento_net
 
