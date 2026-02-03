@@ -300,7 +300,7 @@ class ChatController extends Controller
     /**
      * Marca a ultima conversa da empresa/professor como aberta.
      */
-    public function markConversationsOpenedByEmpresaAluno(Request $request)
+    public function markLastConversationOpened(Request $request)
     {
         $validated = $request->validate([
             'empresa_id' => 'nullable|integer|exists:empresa,id',
