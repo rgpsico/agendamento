@@ -16,7 +16,12 @@ class Conversation extends Model
         'mensagem',
         'tipo',
         'human_controlled',
-        'telefone'
+        'telefone',
+        'last_message_is_opened',
+    ];
+
+    protected $casts = [
+        'last_message_is_opened' => 'boolean',
     ];
 
 
