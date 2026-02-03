@@ -298,59 +298,22 @@ class ChatController extends Controller
     }
 
     /**
-     * Marca a ultima conversa da empresa/professor como aberta.
+     * Marca todas as conversas do aluno na empresa como abertas.
      */
-    public function markLastConversationOpened(Request $request)
+    public function markConversationsOpenedByEmpresaAluno(Request $request)
     {
         $validated = $request->validate([
-            'empresa_id' => 'nullable|integer|exists:empresa,id',
-            'professor_user_id' => 'nullable|integer|exists:usuarios,id',
+            'empresa_id' => 'required|integer|exists:empresa,id',
+            'aluno_user_id' => 'required|integer|exists:usuarios,id',
         ]);
 
-        $userId = $validated['professor_user_id'] ?? auth()->id();
-        $empresaId = $validated['empresa_id'] ?? null;
-
-        if (!$userId && !$empresaId) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Informe professor_user_id ou empresa_id.',
-            ], 422);
-        }
-
-        $user = $userId ? Usuario::with('professor.alunos', 'empresa')->findOrFail($userId) : null;
-
-        if (!$empresaId && $user && $user->empresa) {
-            $empresaId = $user->empresa->id;
-        }
-
-        $baseQuery = Conversation::query();
-
-        if ($empresaId) {
-            $baseQuery->where('empresa_id', $empresaId);
-        }
-
-        if ($user && $user->tipo_usuario === 'professor' && $user->professor) {
-            $alunoUserIds = $user->professor->alunos()->pluck('usuario_id')->filter()->all();
-            $userIds = array_unique(array_merge($alunoUserIds, [$user->id]));
-            $baseQuery->whereIn('user_id', $userIds);
-        }
-
-        $latestConversation = (clone $baseQuery)->orderByDesc('updated_at')->first();
-
-        if (!$latestConversation) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Nenhuma conversa encontrada para o filtro informado.',
-            ], 404);
-        }
-
-        (clone $baseQuery)->update(['last_message_is_opened' => false]);
-        $latestConversation->update(['last_message_is_opened' => 1]);
+        $updatedCount = Conversation::where('empresa_id', $validated['empresa_id'])
+            ->where('user_id', $validated['aluno_user_id'])
+            ->update(['last_message_is_opened' => true]);
 
         return response()->json([
             'success' => true,
-            'conversation_id' => $latestConversation->id,
-            'last_message_is_opened' => (bool) $latestConversation->last_message_is_opened,
+            'updated' => $updatedCount,
         ]);
     }
 
