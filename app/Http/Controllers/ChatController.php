@@ -345,7 +345,7 @@ class ChatController extends Controller
         }
 
         (clone $baseQuery)->update(['last_message_is_opened' => false]);
-        $latestConversation->update(['last_message_is_opened' => true]);
+        $latestConversation->update(['last_message_is_opened' => 1]);
 
         return response()->json([
             'success' => true,
