@@ -360,7 +360,10 @@ Route::post('/bots/{bot}/chat', [BotController::class, 'chat']);
 Route::get('/conversations/aberta', [ChatProfessorController::class, 'verificarConversaAlunoEmpresa']);
 Route::get('/conversations', [ChatController::class, 'listByEmpresaAndUser']);
 Route::get('/conversations/lista', [ChatController::class, 'listByEmpresaOrProfessor']);
+
 Route::post('/conversations/last/opened', [ChatController::class, 'markConversationsOpenedByEmpresaAluno']);
+
+
 Route::get('/conversations/{id}', [ConversationController::class, 'showapi'])->whereNumber('id');
 
 
