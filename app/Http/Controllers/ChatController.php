@@ -84,6 +84,7 @@ class ChatController extends Controller
 
             return response()->json([
                 'conversation_id' => $conversation->id,
+                'last_message_is_opened' => (bool) $conversation->last_message_is_opened,
                 'aluno' => [
                     'id' => $conversation->user->id,
                     'nome' => $conversation->user->nome,
@@ -157,6 +158,7 @@ class ChatController extends Controller
                     'nome' => $conversa->bot->nome,
                 ] : null,
                 'human_controlled' => (bool) $conversa->human_controlled,
+                'last_message_is_opened' => (bool) $conversa->last_message_is_opened,
                 'last_message' => $lastMessage ? [
                     'id' => $lastMessage->id,
                     'from' => $lastMessage->from,
@@ -280,6 +282,7 @@ class ChatController extends Controller
                     'nome' => $conversa->bot->nome,
                 ] : null,
                 'human_controlled' => (bool) $conversa->human_controlled,
+                'last_message_is_opened' => (bool) $conversa->last_message_is_opened,
                 'last_message' => $lastMessage ? [
                     'id' => $lastMessage->id,
                     'from' => $lastMessage->from,
