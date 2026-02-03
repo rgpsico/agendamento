@@ -361,7 +361,7 @@ Route::get('/conversations/aberta', [ChatProfessorController::class, 'verificarC
 Route::get('/conversations', [ChatController::class, 'listByEmpresaAndUser']);
 Route::get('/conversations/lista', [ChatController::class, 'listByEmpresaOrProfessor']);
 
-Route::post('/conversations/last/opened', [ChatController::class, 'markConversationsOpenedByEmpresaAluno']);
+Route::post('/conversations/last/opened', [ChatController::class, 'markLastConversationOpened']);
 
 
 Route::get('/conversations/{id}', [ConversationController::class, 'showapi'])->whereNumber('id');
