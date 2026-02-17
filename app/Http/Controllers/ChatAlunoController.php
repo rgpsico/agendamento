@@ -280,7 +280,7 @@ class ChatAlunoController extends Controller
 
         Log::info('Push result', $result);
 
-        dd($result);
+      
 
 
         $conversation = !empty($validated['conversation_id'])
