@@ -22,6 +22,7 @@ services:
       - ./docker/nginx/socket.conf:/etc/nginx/conf.d/socket.conf
     depends_on:
       - app
+      - socket
     networks:
       - agendamento_net
 
