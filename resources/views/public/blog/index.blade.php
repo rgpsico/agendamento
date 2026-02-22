@@ -368,7 +368,11 @@
     </footer>
 
     <script>
-        gsap.registerPlugin(ScrollTrigger);
+        if (!window.gsap) {
+            console.warn('GSAP não carregou. Animações desativadas.');
+        } else if (window.ScrollTrigger) {
+            gsap.registerPlugin(ScrollTrigger);
+        }
 
         window.addEventListener("load", () => {
             gsap.from("header", {
@@ -394,17 +398,18 @@
                 ease: "power3.out"
             });
 
-            gsap.from(".article-card", {
-                y: 60,
-                opacity: 0,
-                duration: 0.7,
-                stagger: 0.12,
-                ease: "power3.out",
-                scrollTrigger: {
-                    trigger: ".articles-grid",
-                    start: "top 80%"
-                }
-            });
+            if (window.gsap) {
+                gsap.from(".article-card", {
+                    y: 60,
+                    duration: 0.7,
+                    stagger: 0.12,
+                    ease: "power3.out",
+                    scrollTrigger: window.ScrollTrigger ? {
+                        trigger: ".articles-grid",
+                        start: "top 80%"
+                    } : null
+                });
+            }
         });
     </script>
 </body>
