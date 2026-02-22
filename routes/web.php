@@ -455,6 +455,3 @@ Route::prefix('admin')->group(function () {
 });
 
 
-Route::get('/blog123', [SiteArtigoPublicPageController::class, 'index'])->name('public.blog.index');
-Route::get('/blog/{slug}', [SiteArtigoPublicPageController::class, 'show'])->name('public.blog.show');
-
