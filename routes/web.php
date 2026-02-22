@@ -189,6 +189,7 @@ Route::prefix('admin/site/artigos')->middleware('auth')->name('admin.site.artigo
     Route::get('/', [SiteArtigoController::class, 'index'])->name('index');
     Route::get('create', [SiteArtigoController::class, 'create'])->name('create');
     Route::post('store', [SiteArtigoController::class, 'store'])->name('store');
+    Route::get('{artigo}/preview', [SiteArtigoController::class, 'preview'])->name('preview');
     Route::get('{artigo}/edit', [SiteArtigoController::class, 'edit'])->name('edit');
     Route::put('{artigo}', [SiteArtigoController::class, 'update'])->name('update');
     Route::delete('{artigo}', [SiteArtigoController::class, 'destroy'])->name('destroy');

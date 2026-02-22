@@ -62,6 +62,15 @@ class SiteArtigoController extends Controller
         ]);
     }
 
+    public function preview(SiteArtigo $artigo): View
+    {
+        $this->authorizeArtigo($artigo);
+
+        return view('admin.site.artigos.preview', [
+            'artigo' => $artigo,
+        ]);
+    }
+
     public function update(Request $request, SiteArtigo $artigo): RedirectResponse
     {
         $this->authorizeArtigo($artigo);

@@ -16,6 +16,15 @@
 
             <x-alert />
 
+            <div class="mb-3 d-flex flex-wrap gap-2">
+                <a href="{{ route('admin.site.artigos.preview', $artigo) }}" class="btn btn-info">
+                    <i class="fas fa-eye"></i> Ver artigo
+                </a>
+                <a href="{{ route('admin.site.artigos.index') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Voltar
+                </a>
+            </div>
+
             <form action="{{ route('admin.site.artigos.update', $artigo) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')

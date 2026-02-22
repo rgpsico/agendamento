@@ -55,6 +55,9 @@
                                         </td>
                                         <td>{{ $artigo->updated_at->format('d/m/Y H:i') }}</td>
                                         <td class="text-right">
+                                            <a href="{{ route('admin.site.artigos.preview', $artigo) }}" class="btn btn-sm btn-info mr-1">
+                                                Ver
+                                            </a>
                                             <a href="{{ route('admin.site.artigos.edit', $artigo) }}" class="btn btn-sm btn-warning mr-1">
                                                 Editar
                                             </a>
