@@ -41,7 +41,7 @@
                 </button>
                 <small class="text-muted ml-2" id="ia-status"></small>
             </div>
-            <textarea name="conteudo" id="conteudo" rows="8" class="form-control" required>{{ old('conteudo', optional($artigo)->conteudo) }}</textarea>
+            <textarea name="conteudo" id="conteudo" rows="8" class="form-control tinymce-editor" required>{{ old('conteudo', optional($artigo)->conteudo) }}</textarea>
         </div>
 
         <div class="row">
@@ -116,6 +116,42 @@
                     $gerarBotao.prop('disabled', false);
                 }
             });
+        });
+    });
+</script>
+
+<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if (!window.tinymce) return;
+
+        tinymce.init({
+            selector: 'textarea.tinymce-editor',
+            height: 420,
+            menubar: false,
+            plugins: 'lists link image table code fullscreen',
+            toolbar: 'undo redo | styles | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image table | code fullscreen',
+            automatic_uploads: true,
+            image_title: true,
+            file_picker_types: 'image',
+            file_picker_callback: function(callback, value, meta) {
+                if (meta.filetype !== 'image') return;
+
+                const input = document.createElement('input');
+                input.setAttribute('type', 'file');
+                input.setAttribute('accept', 'image/*');
+                input.onchange = function() {
+                    const file = this.files && this.files[0];
+                    if (!file) return;
+
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        callback(e.target.result, { title: file.name });
+                    };
+                    reader.readAsDataURL(file);
+                };
+                input.click();
+            }
         });
     });
 </script>
