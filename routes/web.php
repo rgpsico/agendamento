@@ -441,6 +441,7 @@ Route::get('/metrics', function () {
 
 
 use App\Http\Controllers\PlanoAlunoController;
+use App\Http\Controllers\SiteArtigoPublicPageController;
 
 Route::prefix('admin')->group(function () {
     Route::get('planos', [PlanoAlunoController::class, 'indexView'])->name('alunos.planos.index');
@@ -452,3 +453,8 @@ Route::prefix('admin')->group(function () {
     Route::put('planos/{plano}', [PlanoAlunoController::class, 'update'])->name('alunos.planos.update');
     Route::delete('planos/{plano}', [PlanoAlunoController::class, 'destroy'])->name('alunos.planos.destroy');
 });
+
+
+Route::get('/blog', [SiteArtigoPublicPageController::class, 'index'])->name('public.blog.index');
+Route::get('/blog/{slug}', [SiteArtigoPublicPageController::class, 'show'])->name('public.blog.show');
+
