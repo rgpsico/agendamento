@@ -4,6 +4,7 @@ use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\SiteArtigoPublicPageController;
 use App\Http\Controllers\SiteController;
 use Illuminate\Support\Facades\Route;
 
@@ -11,8 +12,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [SiteController::class, 'mostrarDominio']);
 
-Route::get('/blog', [\App\Http\Controllers\SiteArtigoPublicPageController::class, 'index'])->name('public.blog.index');
-Route::get('/blog/{slug}', [\App\Http\Controllers\SiteArtigoPublicPageController::class, 'show'])->name('public.blog.show');
+Route::get('/blog', [SiteArtigoPublicPageController::class, 'index'])->name('public.blog.index');
+Route::get('/blog/{slug}', [SiteArtigoPublicPageController::class, 'show'])->name('public.blog.show');
 
 
 
