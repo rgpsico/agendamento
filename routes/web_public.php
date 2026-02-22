@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [SiteController::class, 'mostrarDominio']);
 
+Route::get('/blog', [\App\Http\Controllers\SiteArtigoPublicPageController::class, 'index'])->name('public.blog.index');
+Route::get('/blog/{slug}', [\App\Http\Controllers\SiteArtigoPublicPageController::class, 'show'])->name('public.blog.show');
+
 
 
 
