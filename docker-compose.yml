@@ -1,0 +1,87 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: agendamento_app
+    restart: always
+    volumes:
+      - .:/var/www
+      - ./storage:/var/www/storage
+    depends_on:
+      - db
+      - redis
+    networks:
+      - agendamento
+
+  nginx:
+    image: nginx:alpine
+    container_name: agendamento_nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - .:/var/www
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./docker/certbot/conf:/etc/letsencrypt
+    depends_on:
+      - app
+    networks:
+      - agendamento
+
+  db:
+    image: mysql:8.0
+    container_name: agendamento_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - agendamento
+
+  redis:
+    image: redis:alpine
+    container_name: agendamento_redis
+    restart: always
+    networks:
+      - agendamento
+
+  horizon:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: agendamento_horizon
+    restart: always
+    command: php artisan horizon
+    volumes:
+      - .:/var/www
+    depends_on:
+      - db
+      - redis
+    networks:
+      - agendamento
+
+  scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: agendamento_scheduler
+    restart: always
+    command: sh -c "while true; do php artisan schedule:run; sleep 60; done"
+    volumes:
+      - .:/var/www
+    depends_on:
+      - db
+      - redis
+    networks:
+      - agendamento
+
+volumes:
+  db_data:
+
+networks:
+  agendamento:
+    driver: bridge
