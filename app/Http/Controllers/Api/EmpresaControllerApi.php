@@ -11,29 +11,55 @@ class EmpresaControllerApi extends Controller
 {
     public function index()
     {
-
         return $empresas = Empresa::with('endereco', 'galeria', 'avaliacao')->get();
     }
 
-    public function search(Request $request)
+   public function search(Request $request)
     {
-        $tipos = $request->input('tipo');
+        
+        $modalidades = $request->input('modalidades');   // ex: "1,2,3"
+        $nome        = $request->input('nome_empresa');
+        $bairros     = $request->input('bairros');       // ex: "Copacabana,Ipanema" ou array [1,2]
+       
+        $query = Empresa::with('modalidade', 'endereco', 'galeria', 'avaliacao', 'bairros')
+            ->where('status', 'ativo'); // só empresas ativas
 
-        $nome = $request->input('nome_empresa');
-
-        $query = Empresa::with('modalidade', 'endereco', 'galeria', 'avaliacao');
-
-        if ($tipos) {
-            $tipos = explode(',', $tipos); // divide a string em um array
-            $query = $query->whereIn('modalidade_id', $tipos); // filtra por todos os tipos
+        // 🔎 Filtro por modalidades
+        if ($modalidades) {
+           
+            $modalidades = is_array($modalidades) ? $modalidades : explode(',', $modalidades);
+            $query->whereIn('modalidade_id', $modalidades);
         }
 
+        // 🔎 Filtro por nome
         if ($nome) {
-            $query = $query->where('nome', 'like', "%{$nome}%"); // pesquisa por empresas cujo nome contém a string fornecida
+            $query->where('nome', 'like', "%{$nome}%");
         }
+
+        // 🔎 Filtro por bairros
+       if ($bairros) {
+            $bairros = is_array($bairros) ? $bairros : explode(',', $bairros);
+
+            $query->whereHas('bairros', function ($q) use ($bairros) {
+                $ids   = array_filter($bairros, fn($v) => is_numeric($v));
+                $nomes = array_filter($bairros, fn($v) => !is_numeric($v));
+
+                if ($ids) {
+                    $q->whereIn('id', $ids);
+                }
+                if ($nomes) {
+                    $q->orWhereIn('nome', $nomes); // OR aqui faz sentido para nomes, mas não entre ID e nome
+                }
+            });
+        }
+
+
+
 
         return $query->get();
     }
+
+
 
     public function verificarStatus($empresaId)
     {

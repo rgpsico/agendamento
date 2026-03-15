@@ -7,9 +7,11 @@ use App\Models\Agendamento;
 use App\Models\AlunoProfessor;
 use App\Models\Alunos;
 use App\Models\Empresa;
+use App\Models\Modalidade;
 use App\Models\PagamentoGateway;
 use App\Models\Pagamento;
 use App\Models\Professor;
+use App\Models\Servicos;
 use App\Services\AsaasService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -23,21 +25,25 @@ use Illuminate\Support\Facades\Log; // Import the Log facade
 use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\PagamentoComCartaoRequest;
 use App\Services\AgendamentoService;
+use App\Http\Requests\CriarPagamentoPresencialRequest;
+use App\Services\NotificationService;
 
 class PagamentoController extends Controller
 {
-    protected $aluno_professor;
-    protected $asaasService, $agendamentoService;
+    protected $aluno_professor, $baseUri;
+    protected $asaasService, $agendamentoService, $notificacaoService;
 
     public function __construct(
         AlunoProfessor $aluno_professor,
         AsaasService $asaasService,
-        AgendamentoService $agendamentoService
+        AgendamentoService $agendamentoService,
+        NotificationService $notificacaoService
 
     ) {
         $this->aluno_professor = $aluno_professor;
         $this->asaasService = $asaasService;
         $this->agendamentoService = $agendamentoService;
+        $this->baseUri = env('ASAAS_ENV') === 'production' ? env('ASAAS_URL') : env('ASAAS_SANDBOX_URL');
     }
 
     public function index()
@@ -133,12 +139,12 @@ class PagamentoController extends Controller
         ]);
 
         $apiKey = env('ASAAS_KEY'); // Retrieve Asaas API key from .env
-        $baseUrl = 'https://api.asaas.com/v3'; // Asaas API base URL
+
         $client = new Client();
 
         try {
             // Step 1: Create a payment
-            $paymentResponse = $client->post("$baseUrl/payments", [
+            $paymentResponse = $client->post($this->baseUri . "/payments", [
                 'headers' => [
                     'Authorization' => "Bearer $apiKey",
                     'Content-Type' => 'application/json',
@@ -420,7 +426,7 @@ class PagamentoController extends Controller
             $cliente = $asaasService->createCustomer($clienteData, $gateway->api_key, $gateway->mode);
             $customerId = $cliente['id'];
 
-            \Log::info('Cliente Asaas criado com sucesso: ' . json_encode($cliente));
+            Log::info('Cliente Asaas criado com sucesso: ' . json_encode($cliente));
 
             // Tentar obter o walletId com algumas tentativas, com intervalos entre elas
             $wallet = $this->getCustomerWallet($customerId);
@@ -429,18 +435,18 @@ class PagamentoController extends Controller
 
             // Se ainda não tiver walletId, tentar criar um manualmente (se houver endpoint para isso)
             if (!$walletId && method_exists($asaasService, 'createCustomerWallet')) {
-                \Log::info("Tentando criar wallet manualmente para o cliente: $customerId");
+                Log::info("Tentando criar wallet manualmente para o cliente: $customerId");
                 try {
                     $wallet = $asaasService->createCustomerWallet($customerId, $gateway->api_key, $gateway->mode);
                     $walletId = $wallet['walletId'] ?? null;
                 } catch (\Exception $e) {
-                    \Log::warning("Erro ao tentar criar wallet manualmente: " . $e->getMessage());
+                    Log::warning("Erro ao tentar criar wallet manualmente: " . $e->getMessage());
                 }
             }
 
             // Verificar se o walletId foi gerado
             if (!$walletId) {
-                \Log::warning('Wallet ID não encontrado após múltiplas tentativas para o cliente: ' . $customerId);
+                Log::warning('Wallet ID não encontrado após múltiplas tentativas para o cliente: ' . $customerId);
 
                 // Salvar o customerId mesmo sem walletId
                 $professor->update([
@@ -478,7 +484,7 @@ class PagamentoController extends Controller
                 'message' => 'Integração com Asaas concluída com sucesso!'
             ]);
         } catch (\Exception $e) {
-            \Log::error('Erro ao integrar com Asaas: ' . $e->getMessage());
+            Log::error('Erro ao integrar com Asaas: ' . $e->getMessage());
             $errorMessage = $e->getMessage();
 
             // Verificar se o erro é relacionado ao CPF/CNPJ já existente
@@ -515,7 +521,7 @@ class PagamentoController extends Controller
                         ]);
                     }
                 } catch (\Exception $ex) {
-                    \Log::error('Erro ao buscar cliente existente: ' . $ex->getMessage());
+                    Log::error('Erro ao buscar cliente existente: ' . $ex->getMessage());
                 }
             }
 
@@ -526,7 +532,7 @@ class PagamentoController extends Controller
     public function getCustomer($customerId)
     {
         // Obtém a URL e a chave de API do arquivo de configuração
-        $apiUrl = env('ASAAS_SANDBOX_URL');
+        $apiUrl =  $this->baseUri;
         $apiKey = env('ASAAS_KEY');
 
 
@@ -575,8 +581,8 @@ class PagamentoController extends Controller
         // 3. Criar cliente no Asaas
         $clienteResponse = Http::withHeaders([
             'accept' => 'application/json',
-            'access_token' => env("ASAAS_API_KEY"),
-        ])->post('https://sandbox.asaas.com/api/v3/customers', [
+            'access_token' => env("ASAAS_KEY"),
+        ])->post($this->baseUri . '/api/v3/customers', [
             'name' => $request->name,
             'email' => $request->email,
             'cpfCnpj' => $request->cpfCnpj,
@@ -608,8 +614,8 @@ class PagamentoController extends Controller
         // 5. Criar pagamento com split
         $pagamentoResponse = Http::withHeaders([
             'accept' => 'application/json',
-            'access_token' => env('ASAAS_API_KEY'),
-        ])->post('https://sandbox.asaas.com/api/v3/payments', [
+            'access_token' => env('ASAAS_KEY'),
+        ])->post($this->baseUri . '/api/v3/payments', [
             'customer' => $clienteId,
             'billingType' => 'CREDIT_CARD',
             'value' => $valorTotal,
@@ -666,71 +672,143 @@ class PagamentoController extends Controller
 
 
 
-    public function criarPagamentoPresencial(Request $request)
+    public function criarPagamentoPresencial(CriarPagamentoPresencialRequest $request)
     {
-        // Validação dos dados do agendamento
-        $validator = Validator::make($request->all(), [
-            'aluno_id' => 'required|exists:alunos,id',
-            'professor_id' => 'required|exists:professores,id',
-            'modalidade_id' => 'required|exists:modalidade,id',
-            'data_aula' => 'required|date_format:Y-m-d',
-            'hora_aula' => 'required|date_format:H:i',
-            'valor_aula' => 'required|numeric|min:0',
-            'status' => 'required|in:PENDING,RECEIVED',
-            'titulo' => 'required|string|max:255',
-        ]);
 
 
-
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
-
-
+        $tipo_de_horario = Servicos::where('id', $request->servico_id)->value('tipo_agendamento');
 
         // Verificar disponibilidade do professor
-        $disponibilidade = Agendamento::where('professor_id', $request->input('professor_id'))
-            ->where('data_da_aula', $request->input('data_aula'))
-            ->where('horario', $request->input('hora_aula'))
-            ->exists();
-
-
-
-        if ($disponibilidade) {
-
-            return redirect()->back()->with('error', 'O professor já possui um agendamento neste horário. Procure uma nova data ou horário diferente')->withInput();
+        if (Agendamento::verificarDisponibilidade($request, $tipo_de_horario)) {
+            return redirect()->back()
+                ->with('error', 'O professor já possui um agendamento neste horário. Procure uma nova data ou horário diferente')
+                ->withInput();
         }
 
-
         // Criar o agendamento
-        $agendamento = Agendamento::create([
-            'aluno_id' => $request->input('aluno_id'),
-            'professor_id' => $request->input('professor_id'),
-            'modalidade_id' => $request->input('modalidade_id'),
-            'data_da_aula' => $request->input('data_aula'),
-            'horario' => $request->input('hora_aula'),
-            'valor_aula' => $request->input('valor_aula'),
-        ]);
+        $agendamento = Agendamento::criarAgendamento($request->all());
 
         // Criar o registro de pagamento
-        $pagamento = Pagamento::create([
-            'agendamento_id' => $agendamento->id,
-            'aluno_id' => $request->input('aluno_id'),
-            'pagamento_gateway_id' => null, // Não usado para pagamento presencial
-            'asaas_payment_id' => null, // Não usado para pagamento presencial
-            'status' => $request->input('status', 'PENDING'), // PENDING ou RECEIVED
-            'valor' => $request->input('valor_aula'),
-            'metodo_pagamento' => 'PRESENCIAL',
-            'data_vencimento' => null, // Não aplicável
-            'url_boleto' => null, // Não aplicável
-            'qr_code_pix' => null, // Não aplicável
-            'resposta_api' => null, // Não aplicável
-        ]);
+        $pagamento = Pagamento::criarPagamentoPresencial($agendamento, $request->all());
+
+        // ➕ Vincular aluno ao professor se ainda não for aluno
+        $professorId = $request->input('professor_id');
+        $alunoId = $request->input('aluno_id');
+
+        $professor = Professor::find($professorId);
+
+        if ($professor && $alunoId) {
+            if (!$professor->alunos()->where('aluno_id', $alunoId)->exists()) {
+                $professor->alunos()->attach($alunoId);
+            }
+        }
+
+        // ➕ Enviar confirmação pelo canal configurado (WhatsApp, E-mail ou ambos)
+        $notificationService = app(\App\Services\NotificationService::class);
+
+        // Aqui você pode decidir o canal dinamicamente, por exemplo:
+        // $canais = ['whatsapp']; // só WhatsApp
+        // $canais = ['email'];    // só Email
+        // $canais = ['whatsapp', 'email']; // ambos
+        $canais = ['whatsapp', 'email'];
+
+        $notificationService->enviarAgendamento($agendamento, $pagamento, $canais);
 
         // Redirecionar para a página de confirmação
-        return redirect()->route('home.checkoutsucesso', ['id' => $request->input('professor_id')])
+        $empresaId = $professor->empresa->id;
+
+
+        // Lançar receita como pendente
+        app(\App\Services\FinanceiroReceitaService::class)->lancarReceita([
+            'descricao' => 'Receita pendente do agendamento do aluno #' . $agendamento->id,
+            'pagamento_id' => $pagamento->id,
+            'valor' => $pagamento->valor,
+            'data_recebimento'  => null,
+            'categoria_id' => $request->input('categoria_id') ?? null,
+            'usuario_id' => $request->input('aluno_id'),
+            'status' => 'pendente', // 👈 marca como pendente
+            'empresa_id' => $empresaId,
+        ]);
+
+        return redirect()->route('home.checkoutsucesso', ['id' => $professorId])
             ->with('success', 'Agendamento e pagamento presencial registrados com sucesso');
     }
+
+    public function criarPagamentoPresencialApi(CriarPagamentoPresencialRequest $request)
+    {
+        try {
+            $tipo_de_horario = Servicos::where('id', $request->servico_id)->value('tipo_agendamento');
+
+            if (Agendamento::verificarDisponibilidade($request, $tipo_de_horario)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'O professor jÃ¡ possui um agendamento neste horÃ¡rio. Procure uma nova data ou horÃ¡rio diferente',
+                ], 422);
+            }
+
+            $agendamento = Agendamento::criarAgendamento($request->all());
+            $pagamento = Pagamento::criarPagamentoPresencial($agendamento, $request->all());
+
+            if (!$agendamento || !$pagamento) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Falha ao criar agendamento ou pagamento.',
+                ], 500);
+            }
+
+            $professorId = $request->input('professor_id');
+            $alunoId = $request->input('aluno_id');
+
+            $professor = Professor::find($professorId);
+
+            if ($professor && $alunoId) {
+                if (!$professor->alunos()->where('aluno_id', $alunoId)->exists()) {
+                    $professor->alunos()->attach($alunoId);
+                }
+            }
+
+            $notificationService = app(\App\Services\NotificationService::class);
+            $canais = ['whatsapp'];
+            $notificationService->enviarAgendamento($agendamento, $pagamento, $canais);
+
+            if (!$professor || !$professor->empresa) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Professor não encontrado ou sem empresa vinculada.',
+                ], 422);
+            }
+
+            $empresaId = $professor->empresa->id;
+
+            app(\App\Services\FinanceiroReceitaService::class)->lancarReceita([
+                'descricao' => 'Receita pendente do agendamento do aluno #' . $agendamento->id,
+                'pagamento_id' => $pagamento->id,
+                'valor' => $pagamento->valor,
+                'data_recebimento'  => null,
+                'categoria_id' => $request->input('categoria_id') ?? null,
+                'usuario_id' => $request->input('aluno_id'),
+                'status' => 'pendente',
+                'empresa_id' => $empresaId,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'agendamento_id' => $agendamento->id,
+                'pagamento_id' => $pagamento->id,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Erro ao criar pagamento presencial via API', [
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao processar o pagamento presencial. '.$e->getMessage(),
+            ], 500);
+        }
+    }
+
+
 
 
     public function verRecibo($id)
@@ -1018,7 +1096,7 @@ class PagamentoController extends Controller
             ]);
 
             $result = $this->tratarResposta($response->getStatusCode(), json_decode($response->getBody(), true));
-            \Log::info('Resposta da busca de cliente por CPF/CNPJ: ' . json_encode($result));
+            Log::info('Resposta da busca de cliente por CPF/CNPJ: ' . json_encode($result));
 
             // Verificar se existe algum cliente na resposta
             if (isset($result['data']) && is_array($result['data']) && count($result['data']) > 0) {
@@ -1027,7 +1105,7 @@ class PagamentoController extends Controller
 
             return null;
         } catch (\Exception $e) {
-            \Log::error('Erro ao buscar cliente por CPF/CNPJ: ' . $e->getMessage());
+            Log::error('Erro ao buscar cliente por CPF/CNPJ: ' . $e->getMessage());
             throw $e;
         }
     }
@@ -1039,7 +1117,7 @@ class PagamentoController extends Controller
     {
         $client = new Client();
         // Verifique na documentação do Asaas se existe um endpoint específico para criar carteiras
-        $url = rtrim($this->url, '/') . "/api/v3/customers/{$customerId}/wallet";
+        $url = rtrim($this->baseUri, '/') . "/api/v3/customers/{$customerId}/wallet";
 
         try {
             $response = $client->request('POST', $url, [
@@ -1051,11 +1129,11 @@ class PagamentoController extends Controller
             ]);
 
             $wallet = $this->tratarResposta($response->getStatusCode(), json_decode($response->getBody(), true));
-            \Log::info('Resposta da criação de wallet: ' . json_encode($wallet));
+            Log::info('Resposta da criação de wallet: ' . json_encode($wallet));
 
             return $wallet;
         } catch (\Exception $e) {
-            \Log::error('Erro ao criar wallet: ' . $e->getMessage());
+            Log::error('Erro ao criar wallet: ' . $e->getMessage());
             throw $e;
         }
     }
@@ -1075,7 +1153,7 @@ class PagamentoController extends Controller
             $client->request('DELETE', $url . '/' . $payment['id'], [
                 'headers' => array_merge($this->headers, ['access_token' => $apiKey]),
             ]);
-            \Log::info('Cobrança excluída: ' . $payment['id']);
+            Log::info('Cobrança excluída: ' . $payment['id']);
         }
     }
 

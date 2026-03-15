@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Jobs\SendMassEmail;
 use App\Models\Agendamento;
 use App\Models\AlunoEndereco;
+use App\Models\AlunoProfessor;
 use App\Models\Alunos;
 use App\Models\Modalidade;
 use App\Models\Professor;
@@ -15,6 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Hash;
 
 
 class AlunosControllerApi extends Controller
@@ -35,6 +37,17 @@ class AlunosControllerApi extends Controller
         return response()->json($users);
     }
 
+    public function byEmpresa($empresaId)
+    {
+        $alunos = Alunos::with('usuario')
+            ->whereHas('professores', function ($query) use ($empresaId) {
+                $query->where('empresa_id', $empresaId);
+            })
+            ->get();
+
+        return response()->json($alunos);
+    }
+
     public function treinoEmail()
     {
         // Mail::raw('Texto do e-mail', function ($message) {
@@ -42,12 +55,60 @@ class AlunosControllerApi extends Controller
         // });
         SendMassEmail::dispatch()->onQueue('emails');
     }
-
-    // Criar um novo usuário
+    // Criar um novo usuario
     public function store(Request $request)
     {
-        $user = Usuario::create($request->all());
-        return response()->json($user, 201);
+        $validated = $request->validate([
+            'nome' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:usuarios,email',
+            'telefone' => 'required|string|max:20',
+            'data_nascimento' => 'required|date',
+            'password' => 'nullable|string|min:4',
+        //    'professor_id' => 'nullable|integer|exists:professores,id',
+            'endereco' => 'nullable|string|max:255',
+            'cidade' => 'nullable|string|max:100|required_with:endereco,estado,cep',
+            'estado' => 'nullable|string|max:2|required_with:endereco,cidade,cep',
+            'cep' => 'nullable|string|max:10|required_with:endereco,cidade,estado',
+        ]);
+
+        return DB::transaction(function () use ($validated) {
+            $usuario = Usuario::create([
+                'nome' => $validated['nome'],
+                'email' => $validated['email'],
+                'password' => Hash::make($validated['password'] ?? '124'),
+                'tipo_usuario' => 'Aluno',
+                'data_nascimento' => $validated['data_nascimento'],
+                'telefone' => $validated['telefone'],
+            ]);
+
+            $aluno = Alunos::create([
+                'usuario_id' => $usuario->id,
+            ]);
+
+            if (!empty($validated['professor_id'])) {
+                AlunoProfessor::firstOrCreate([
+                    'aluno_id' => $aluno->id,
+                    'professor_id' => $validated['professor_id'],
+                ]);
+            }
+
+            if (!empty($validated['endereco'])) {
+                AlunoEndereco::updateOrCreate(
+                    ['aluno_id' => $aluno->id],
+                    [
+                        'endereco' => $validated['endereco'],
+                        'cidade' => $validated['cidade'],
+                        'estado' => $validated['estado'],
+                        'cep' => $validated['cep'],
+                    ]
+                );
+            }
+
+            return response()->json([
+                'usuario' => $usuario,
+                'aluno' => $aluno,
+            ], 201);
+        });
     }
 
     // Mostrar um usuário específico

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Agendamento;
 use App\Models\Alunos;
 use App\Models\Aulas;
+use App\Models\Bairros;
 use App\Models\Configuracao;
 use App\Models\Disponibilidade;
 use App\Models\Empresa;
@@ -46,9 +47,11 @@ class HomeController extends Controller
 
     public function index()
     {
+       
+       
         $model = $this->model::with('modalidade', 'endereco', 'galeria', 'avaliacao')->where('status', 'ativo')->get();
         $modalidade = Modalidade::all();
-
+        $bairros = Bairros::all();
 
         // Adiciona configuração de agendamento para cada empresa
         foreach ($model as $empresa) {
@@ -64,7 +67,9 @@ class HomeController extends Controller
                 'view' => $this->view,
                 'route' => $this->route,
                 'model' =>  $model,
-                'modalidade' => $modalidade
+                'modalidade' => $modalidade,
+                'bairros' => $bairros,
+                'teste' => 'eeee'
             ]
         );
     }
@@ -230,11 +235,13 @@ class HomeController extends Controller
 
     public function registerAluno()
     {
+        $modalidade = Modalidade::all();
         return view(
             'public.registrar.registerAluno',
             [
                 'pageTitle' => $this->pageTitle,
                 'view' => $this->view,
+                'modalidade' => $modalidade,
                 'route' => $this->route
             ]
         );
@@ -242,17 +249,23 @@ class HomeController extends Controller
 
     public function login()
     {
+        $modalidade = Modalidade::all();
         $config = ConfiguracaoGeral::first();
+        
         return view(
             'public.registrar.login',
             [
                 'pageTitle' => $this->pageTitle,
+                'modalidade' => $modalidade,
                 'view' => $this->view,
-                'loginImage' => $config->login_image ? asset('storage/' . $config->login_image) : null,
+                'loginImage' => optional($config)->login_image 
+                    ? asset('storage/' . $config->login_image) 
+                    : null,
                 'route' => $this->route
             ]
         );
     }
+
 
     public function redirectToGoogle()
     {

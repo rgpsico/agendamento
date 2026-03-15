@@ -43,7 +43,7 @@ class DispararBoletosMensais extends Command
 
                 $response = Http::withHeaders([
                     'accept' => 'application/json',
-                    'access_token' => env('ASAAS_API_KEY'),
+                    'access_token' => env('ASAAS_KEY'),
                 ])->post(env('ASAAS_SANDBOX_URL') . '/v3/payments', [
                     'billingType' => 'BOLETO',
                     'customer' => $professor->asaas_customer_id,

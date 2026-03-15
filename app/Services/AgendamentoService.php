@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Models\Agendamento;
+
+
 use Illuminate\Support\Facades\Log;
 
 class AgendamentoService

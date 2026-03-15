@@ -9,22 +9,32 @@ class ConfiguracaoGeral extends Model
 {
     use HasFactory;
 
-    protected $table = 'configuracoes_geral';
-
-    use HasFactory;
-
+    protected $table = 'configuracoesgeral';
 
     protected $fillable = [
-        'agendamento_tipo',
-        'whatsapp_numero',
-        'login_image',
-        'register_image',
-        'home_mode',
-        'carousel_images',
-        'sistema_tipo',
-    ];
+    'nome_sistema',
+    'logo_header',
+    'logo_footer',
+    'modal_boas_vindas',
+    'login_image',
+    'register_image',
+    'home_mode',
+    'slider_images',
+    'home_image',
+    'home_title',
+    'sistema_tipo',
+    'instagram',
+    'whatsapp',
+    'tiktok',
+    'email',
+    'politica_privacidade',
+    'termos_condicoes',
+    'agendamento_tipo',
+    'whatsapp_numero',
+];
+
 
     protected $casts = [
-        'carousel_images' => 'array',
+        'slider_images' => 'array',
     ];
 }

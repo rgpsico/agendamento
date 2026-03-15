@@ -16,11 +16,14 @@ use Illuminate\Support\Facades\Auth;
 
 class ProfessoresAsaasController extends Controller
 {
-    protected $asaasService;
+    protected $asaasService, $baseUri, $apiKey, $waaletAsaas;
 
     public function __construct(AsaasService $asaasService)
     {
         $this->asaasService = $asaasService;
+        $this->baseUri = env('ASAAS_ENV') === 'production' ? env('ASAAS_URL') : env('ASAAS_SANDBOX_URL');
+        $this->apiKey = env('ASAAS_ENV') === 'production' ? env('ASAAS_KEY') : env('ASAAS_KEY_SANDBOX');
+        $this->waaletAsaas = env('ASAAS_ENV') === 'production' ? env('ASAAS_WALLET_ID') : env('ASAAS_WALLET_ID_SANDBOX');
     }
 
 
@@ -29,6 +32,7 @@ class ProfessoresAsaasController extends Controller
     public function createSubaccount(Request $request)
     {
         // Buscar o professor do usuário logado
+
         $professor = Auth::user()->professor;
 
         if (!$professor) {
@@ -82,15 +86,15 @@ class ProfessoresAsaasController extends Controller
                 'postalCode' => $validatedData['postalCode'],
                 'personType' => 'FISICA', // Assumindo pessoa física
                 'notificationDisabled' => false,
-                'walletId' => env('ASAAS_WALLET_ID')
+                'walletId' => $this->waaletAsaas
             ];
-
 
             // Fazer requisição para API do Asaas
             $response = Http::withHeaders([
-                'access_token' => env('ASAAS_KEY'),
+                'access_token' => $this->apiKey,
                 'Content-Type' => 'application/json',
-            ])->post('https://sandbox.asaas.com/api/v3/accounts', $subaccountData);
+            ])->post($this->baseUri . '/accounts', $subaccountData);
+
 
             // Verificar se a requisição foi bem-sucedida
             if (!$response->successful()) {
@@ -145,8 +149,6 @@ class ProfessoresAsaasController extends Controller
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
 
-
-
             return response()->json([
                 'success' => false,
                 'message' => 'Dados inválidos',
@@ -155,19 +157,20 @@ class ProfessoresAsaasController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            // Tenta decodificar a mensagem de erro caso seja JSON
             $errorMessage = $e->getMessage();
             $decodedMessage = json_decode(str_replace('Erro na API do Asaas: ', '', $errorMessage), true);
 
             $errorDetails = [];
 
             if (isset($decodedMessage['errors'])) {
-                // Se vierem múltiplos erros da API do Asaas, formatamos
                 foreach ($decodedMessage['errors'] as $error) {
                     $errorDetails[$error['code']] = $error['description'];
-                    $decodedMessage  =  $errorDetails[$error['code']];
                 }
             }
+
+            $finalErrorMessage = !empty($errorDetails)
+                ? implode('; ', $errorDetails)
+                : ($decodedMessage['message'] ?? 'Erro interno do servidor');
 
             Log::error('Erro ao criar subconta', [
                 'error' => $e->getMessage(),
@@ -177,11 +180,12 @@ class ProfessoresAsaasController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => $errorDetails[$error['code']] ? $decodedMessage : 'Erro interno do servidor',
-                'errors' => $errorDetails[$error['code']] ?: (config('app.debug') ? $e->getMessage() : ['message' => 'Erro ao processar solicitação'])
+                'message' => $finalErrorMessage,
+                'errors' => $errorDetails ?: (config('app.debug') ? $e->getMessage() : 'Erro ao processar solicitação')
             ], 422);
         }
     }
+
 
     public function getSubaccountStatus($id)
     {

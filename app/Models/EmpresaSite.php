@@ -13,6 +13,7 @@ class EmpresaSite extends Model
 
     protected $fillable = [
         'empresa_id',
+        'template_id', // ✅ novo campo
         'titulo',
         'slug',
         'dominio_personalizado',
@@ -25,6 +26,11 @@ class EmpresaSite extends Model
         'sobre_descricao',
         'sobre_imagem',
         'sobre_itens',
+        'whatsapp',
+        'vhost_criado',
+        'atendimento_com_ia',
+        'atendimento_com_whatsapp',
+        'bot_id'
     ];
 
     protected $casts = [
@@ -33,15 +39,17 @@ class EmpresaSite extends Model
         'ativo' => 'boolean',
     ];
 
-    // // ✅ ADICIONAR: Método para customizar Route Model Binding
-    // public function resolveRouteBinding($value, $field = null)
-    // {
-    //     // Tentar encontrar o registro
-    //     $result = $this->where($field ?? $this->getRouteKeyName(), $value)->first();
-        
-    //     // Se não encontrar, retornar null ao invés de dar erro 404
-    //     return $result;
-    // }
+
+    public function trackingCodes()
+    {
+        return $this->hasMany(TrackingCode::class, 'site_id');
+    }
+
+    public function configuracao()
+    {
+        return $this->hasOne(\App\Models\SiteConfiguracao::class, 'site_id');
+    }
+
 
     // Relacionamentos
     public function empresa()
@@ -49,9 +57,19 @@ class EmpresaSite extends Model
         return $this->belongsTo(Empresa::class, 'empresa_id', 'id');
     }
 
+    public function template()
+    {
+        return $this->belongsTo(SiteTemplate::class, 'template_id');
+    }
+
     public function servicos()
     {
-        return $this->hasMany(SiteServico::class, 'site_id');
+        return $this->hasMany(Servicos::class, 'empresa_id', 'empresa_id');
+    }
+
+    public function siteServicos()
+    {
+        return $this->hasMany(SiteServico::class, 'site_id', 'id');
     }
 
     public function depoimentos()
@@ -59,8 +77,33 @@ class EmpresaSite extends Model
         return $this->hasMany(SiteDepoimento::class, 'site_id');
     }
 
+    public function artigos()
+    {
+        return $this->hasMany(SiteArtigo::class, 'site_id');
+    }
+
     public function contatos()
     {
         return $this->hasMany(SiteContato::class, 'site_id');
+    }
+
+    public function endereco()
+    {
+        return $this->belongsTo(EmpresaEndereco::class, 'empresa_id', 'empresa_id');
+    }
+
+    public function visualizacoes()
+    {
+        return $this->hasMany(SiteVisualizacao::class, 'empresa_site_id');
+    }
+
+    public function cliquesWhatsapp()
+    {
+        return $this->hasMany(SiteCliqueWhatsapp::class, 'empresa_site_id');
+    }
+
+    public function visitantes()
+    {
+        return $this->hasMany(SiteVisitante::class, 'empresa_site_id');
     }
 }

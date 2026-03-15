@@ -116,4 +116,30 @@ class Usuario extends Authenticatable
     {
         return $this->hasOne(Empresa::class, 'user_id', 'id');
     }
+
+    public function lastConversationWithEmpresa()
+    {
+        return $this->hasOne(Conversation::class, 'user_id', 'id')
+            ->latest('created_at');
+    }
+
+      public function perfis()
+    {
+        return $this->belongsToMany(Perfil::class, 'usuario_perfis')
+                    ->withPivot('meta')
+                    ->withTimestamps();
+    }
+
+    
+
+    // Exemplo de helper para pegar meta de um perfil
+    public function metaPerfil($perfilNome, $chave)
+    {
+        $perfil = $this->perfis()->where('nome', $perfilNome)->first();
+        if ($perfil && $perfil->pivot->meta) {
+            $meta = json_decode($perfil->pivot->meta, true);
+            return $meta[$chave] ?? null;
+        }
+        return null;
+    }
 }

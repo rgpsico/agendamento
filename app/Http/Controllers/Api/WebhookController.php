@@ -21,17 +21,29 @@ use Illuminate\Support\Facades\Http;
 
 class WebhookController extends Controller
 {
+    protected $url;
+
+    public function __construct()
+    {
+
+        $this->url = env('APP_ENV') === 'production'
+            ? env('ASAAS_URL', 'https://api.asaas.com')
+            : env('ASAAS_SANDBOX_URL', 'https://sandbox.asaas.com');
+    }
+
 
 
     public function handleAsaasWebhook(Request $request)
     {
 
+    
         // Log para confirmar que o webhook foi chamado
         Log::warning('Asaas webhook aqui', ['payload' => $request->all()]);
 
         // Obter o payload do webhook
         $payload = $request->all();
         $resultadoEnvio = $this->enviarDadosParaEndpoint($payload);
+       
         // Verificar o token de autenticação
         $asaasToken = $request->header('asaas-access-token');
         if ($asaasToken !== '123456@') {
@@ -45,7 +57,6 @@ class WebhookController extends Controller
             ]);
             return response()->json(['error' => 'Token inválido'], 401);
         }
-
 
         if (!is_array($payload) || !isset($payload['event']) || !isset($payload['payment'])) {
 
@@ -79,6 +90,7 @@ class WebhookController extends Controller
             ]);
         }
 
+
         // Processar eventos de pagamento
         switch ($payload['event']) {
             case 'PAYMENT_CONFIRMED':
@@ -110,7 +122,11 @@ class WebhookController extends Controller
         }
 
 
-        if ($payload['event'] === 'PAYMENT_RECEIVED' && $payload['payment']['billingType'] === 'BOLETO') {
+          if($payload['event'] === 'PAYMENT_RECEIVED' && ( $payload['payment']['billingType'] === 'PIX' 
+                                                        || $payload['payment']['billingType'] === 'BOLETO')
+                                                        )
+            {
+          
             $payment = $payload['payment'];
             $customerId = $payment['customer']; // Ex.: cus_000006746814
             $paymentId = $payment['id']; // Ex.: pay_ybk2slp8gh48i0iy
@@ -160,6 +176,7 @@ class WebhookController extends Controller
 
             return response()->json(['received' => true], 200);
         }
+          return response()->json(['tipo diferente' => true], 200);
     }
 
     /**
@@ -256,10 +273,10 @@ class WebhookController extends Controller
             $client = new \GuzzleHttp\Client();
 
             // Create payment
-            $createResponse = $client->request('POST', env('ASAAS_SANDBOX_URL') . '/v3/payments', [
+            $createResponse = $client->request('POST', $this->url . '/v3/payments', [
                 'headers' => [
                     'accept' => 'application/json',
-                    'access_token' => env('ASAAS_API_KEY'),
+                    'access_token' => env('ASAAS_KEY'),
                     'content-type' => 'application/json',
                 ],
                 'json' => $paymentData
@@ -276,10 +293,10 @@ class WebhookController extends Controller
             $paymentId = $paymentCreated['id'];
 
             // Step 2: Get QR Code
-            $qrResponse = $client->request('GET', env('ASAAS_SANDBOX_URL') . "/v3/payments/{$paymentId}/pixQrCode", [
+            $qrResponse = $client->request('GET', $this->url . "/v3/payments/{$paymentId}/pixQrCode", [
                 'headers' => [
                     'accept' => 'application/json',
-                    'access_token' => env('ASAAS_API_KEY'),
+                    'access_token' => env('ASAAS_KEY'),
                 ],
             ]);
 
@@ -292,10 +309,10 @@ class WebhookController extends Controller
             if ($request->input('auto_pay', false)) {
                 sleep(2); // Simula tempo para processar
 
-                $payResponse = $client->request('POST', env('ASAAS_SANDBOX_URL') . "/v3/payments/{$paymentId}/receiveInCash", [
+                $payResponse = $client->request('POST', $this->url . "/v3/payments/{$paymentId}/receiveInCash", [
                     'headers' => [
                         'accept' => 'application/json',
-                        'access_token' => env('ASAAS_API_KEY'),
+                        'access_token' => env('ASAAS_KEY'),
                         'content-type' => 'application/json',
                     ],
                     'json' => [
@@ -404,10 +421,10 @@ class WebhookController extends Controller
 
             // Make request to Asaas API using Guzzle
             $client = new \GuzzleHttp\Client();
-            $response = $client->request('POST', env('ASAAS_SANDBOX_URL') . '/v3/payments', [
+            $response = $client->request('POST', $this->url . '/v3/payments', [
                 'headers' => [
                     'accept' => 'application/json',
-                    'access_token' => env('ASAAS_API_KEY'),
+                    'access_token' => env('ASAAS_KEY'),
                     'content-type' => 'application/json',
                 ],
                 'json' => $paymentData
@@ -737,10 +754,10 @@ class WebhookController extends Controller
                 $requestData['scheduleDate'] = $scheduleDate;
             }
 
-            $response = $client->request('POST', env('ASAAS_SANDBOX_URL') . "/v3/pix/qrCodes/pay", [
+            $response = $client->request('POST', $this->url . "/v3/pix/qrCodes/pay", [
                 'headers' => [
                     'accept' => 'application/json',
-                    'access_token' => env('ASAAS_API_KEY'),
+                    'access_token' => env('ASAAS_KEY'),
                     'content-type' => 'application/json',
                 ],
                 'json' => $requestData,
@@ -818,10 +835,10 @@ class WebhookController extends Controller
         try {
             // Fazer uma chamada à API da Asaas para simular o pagamento (endpoint específico do sandbox)
             $client = new \GuzzleHttp\Client();
-            $response = $client->request('POST', env('ASAAS_SANDBOX_URL') . "/v3/payments/{$paymentId}/simulate", [
+            $response = $client->request('POST', $this->url . "/v3/payments/{$paymentId}/simulate", [
                 'headers' => [
                     'accept' => 'application/json',
-                    'access_token' => env('ASAAS_API_KEY'),
+                    'access_token' => env('ASAAS_KEY'),
                 ],
             ]);
 
@@ -1017,7 +1034,7 @@ class WebhookController extends Controller
             'key' => 'nullable|string', // Opcional para todos os tipos
         ]);
 
-        $apiKey = env('ASAAS_API_KEY');
+        $apiKey = env('ASAAS_KEY');
 
         if (!$apiKey) {
             return response()->json([
@@ -1176,7 +1193,7 @@ class WebhookController extends Controller
 
         // Call Asaas API to create PIX key
         $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . env('ASAAS_API_KEY'),
+            'Authorization' => 'Bearer ' . env('ASAAS_KEY'),
             'Content-Type' => 'application/json',
         ])->post('https://api.asaas.com/v3/pix/addressKeys', $asaasData);
 
@@ -1210,7 +1227,7 @@ class WebhookController extends Controller
 
         // Chamada à API do Asaas para criar a chave PIX
         $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . env('ASAAS_API_KEY'),
+            'Authorization' => 'Bearer ' . env('ASAAS_KEY'),
             'Content-Type' => 'application/json',
         ])->post('https://api.asaas.com/v3/pix/addressKeys', [
             'walletId' => $validated['wallet_id'],
@@ -1262,10 +1279,10 @@ class WebhookController extends Controller
         try {
             // Make a request to the Asaas API status endpoint using Guzzle
             $client = new \GuzzleHttp\Client();
-            $response = $client->request('GET', env('ASAAS_SANDBOX_URL') . "/v3/payments/{$paymentId}/status", [
+            $response = $client->request('GET', $this->url . "/v3/payments/{$paymentId}/status", [
                 'headers' => [
                     'accept' => 'application/json',
-                    'access_token' => env('ASAAS_API_KEY'),
+                    'access_token' => env('ASAAS_KEY'),
                 ],
             ]);
 

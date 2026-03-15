@@ -6,6 +6,7 @@ use App\Http\Requests\PaymentRequest;
 use App\Models\Agendamento;
 use App\Models\Alunos;
 use App\Models\Empresa;
+use App\Models\Modalidade;
 use App\Models\Professor;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
@@ -25,6 +26,7 @@ class AgendaController extends Controller
 
     public function index()
     {
+        
         if (isset(Auth::user()->professor->id)) {
             $professor_id = Auth::user()->professor->id; // suponho que o professor esteja logado.
 
@@ -62,7 +64,6 @@ class AgendaController extends Controller
         );
     }
 
-
     public function treino()
     {
         if (isset(Auth::user()->professor->id)) {
@@ -93,17 +94,22 @@ class AgendaController extends Controller
 
     public function create()
     {
+       
+       $modalidades = Modalidade::all();
 
         return view(
             $this->view . '.create',
-            ['pageTitle' => $this->pageTitle]
+            ['pageTitle' => $this->pageTitle,
+            'modalidades' => $modalidades,
+               'selectedModalidade' => isset($model) ? $model->modalidade_id : null
+            ]
         );
     }
 
     public function store(PaymentRequest $request)
     {
 
-        dd($request->all());
+  
         // Se a validação falhar, o usuário será redirecionado de volta ao formulário com erros de validação.
 
         // Crie o novo usuário
@@ -133,19 +139,60 @@ class AgendaController extends Controller
 
     public function edit($id)
     {
+    $model = $this->model->find($id);
+    $modalidades = Modalidade::all();
 
-        $model = $this->model->find($id);
+    return view(
+        $this->view . '.create',
+        [
+            'pageTitle'   => $this->pageTitle,
+            'model'       => $model,
+            'view'        => $this->view,
+            'route'       => $this->route,
+            'modalidades' => $modalidades,
+            'selectedModalidade' => $model->modalidade_id ?? null, // já manda a selecionada
+        ]
+    );
+    }
 
+    public function agendamentosComCliente()
+    {
+        $user = Auth::user();
 
-        return view(
-            $this->view . '.create',
-            [
-                'pageTitle' => $this->pageTitle,
-                'model' => $model,
-                'view' => $this->view,
-                'route' => $this->route
-            ]
-        );
+        $empresaId = null;
+        $query = Agendamento::query();
+
+        if ($user->professor) {
+            $query->where('professor_id', $user->professor->id);
+            $empresaId = $user->professor->empresa_id;
+        } elseif ($user->empresa) {
+            $empresaId = $user->empresa->id;
+            $query->whereHas('professor', function ($q) use ($empresaId) {
+                $q->where('empresa_id', $empresaId);
+            });
+        } else {
+            return response()->json([
+                'message' => 'Usuario sem perfil de professor ou empresa.',
+            ], 403);
+        }
+
+        if (!$empresaId) {
+            return response()->json([
+                'message' => 'Empresa nao encontrada para este usuario.',
+            ], 403);
+        }
+
+        $query->with([
+            'aluno.usuario',
+            'professor.usuario',
+            'modalidade',
+            'aluno.usuario.lastConversationWithEmpresa' => function ($q) use ($empresaId) {
+                $q->where('empresa_id', $empresaId);
+            },
+        ]);
+      
+
+        return response()->json($query->get());
     }
 
     public function destroy($id)

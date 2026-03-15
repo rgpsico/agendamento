@@ -72,8 +72,16 @@ class SiteDepoimentoController extends Controller
 
     public function destroy(SiteDepoimento $depoimento)
     {
+        // Verifica se existe imagem associada
+        if ($depoimento->imagem && Storage::exists($depoimento->imagem)) {
+            Storage::delete($depoimento->imagem);
+        }
+
+        // Exclui o depoimento
         $depoimento->delete();
 
-        return redirect()->route('admin.site.depoimentos.index')->with('success', 'Depoimento removido com sucesso!');
+        return redirect()
+            ->route('admin.site.depoimentos.index')
+            ->with('success', 'Depoimento e imagem removidos com sucesso!');
     }
 }

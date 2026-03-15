@@ -18,6 +18,47 @@ class AgendamentoControllerApi extends Controller
         return response()->json($users);
     }
 
+    public function byProfessor($professorId)
+    {
+        $agendamentos = Agendamento::with('aluno.usuario')
+            ->where('professor_id', $professorId)
+            ->get();
+        return response()->json($agendamentos);
+    }
+
+    public function byEmpresa($empresaId)
+    {
+        $agendamentos = Agendamento::with('aluno.usuario')
+            ->whereHas('professor', function ($query) use ($empresaId) {
+                $query->where('empresa_id', $empresaId);
+            })
+            ->get();
+
+        return response()->json($agendamentos);
+    }
+
+    public function byDia(Request $request)
+    {
+        $data = $request->query('data', Carbon::today()->toDateString());
+        $horario = $request->query('horario');
+        $status = $request->query('status');
+
+        $query = Agendamento::with('aluno.usuario')
+            ->whereDate('data_da_aula', $data);
+
+        if ($horario) {
+            $query->where('horario', '>=', $horario);
+        }
+
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        $agendamentos = $query->orderBy('horario')->get();
+
+        return response()->json($agendamentos);
+    }
+
     // Criar um novo usuário
     public function store(Request $request)
     {
@@ -53,13 +94,34 @@ class AgendamentoControllerApi extends Controller
     // Deletar um usuário específico
     public function destroy($id)
     {
-        $user = Aulas::find($id);
-        if ($user) {
-            $user->delete();
-            return response()->json(['success' => 'Usuário deletado com sucesso'], 200);
-        } else {
-            return response()->json(['error' => 'Usuário não encontrado'], 404);
+        $agendamento = Agendamento::find($id);
+        if (!$agendamento) {
+            return response()->json(['error' => 'Agendamento nao encontrado'], 404);
         }
+
+        $user = Auth::user();
+        if (!$user) {
+            
+            return response()->json(['error' => 'Nao autenticado'], 401);
+        }
+
+        $aluno = $user->aluno;
+        $professor = $user->professor;
+
+        if ($aluno && $agendamento->aluno_id !== $aluno->id) {
+            return response()->json(['error' => 'Sem permissao para cancelar este agendamento'], 403);
+        }
+
+        if ($professor && $agendamento->professor_id !== $professor->id) {
+            return response()->json(['error' => 'Sem permissao para cancelar este agendamento'], 403);
+        }
+
+        if (!$aluno && !$professor) {
+            return response()->json(['error' => 'Sem permissao para cancelar este agendamento'], 403);
+        }
+
+        $agendamento->delete();
+        return response()->json(['success' => 'Agendamento deletado com sucesso'], 200);
     }
 
     public function getAgendamentos()

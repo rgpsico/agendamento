@@ -334,13 +334,14 @@ class AsaasService
      */
     public function createSubaccount($request)
     {
-        dd("aaa");
+
         DB::beginTransaction();
 
         try {
             // Busca o usuário relacionado ao professor
-            $professor = Professor::with('usuario')->findOrFail($request->professor_id);
+            $professor = Professor::with('usuario')->where('professores.id', $request->professor_id)->first();
             $usuario = $professor->usuario;
+
 
             // Dados completos para o Asaas
             $subaccountData = [

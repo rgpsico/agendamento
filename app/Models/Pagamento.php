@@ -31,6 +31,24 @@ class Pagamento extends Model
         'updated_at' => 'datetime',
     ];
 
+    public static function criarPagamentoPresencial($agendamento, $dados)
+    {
+        return self::create([
+            'agendamento_id' => $agendamento->id,
+            'aluno_id' => $dados['aluno_id'],
+            'pagamento_gateway_id' => null, // Não usado para pagamento presencial
+            'asaas_payment_id' => null, // Não usado para pagamento presencial
+            'status' => $dados['status'] ?? 'PENDING', // PENDING ou RECEIVED
+            'valor' => $dados['valor_aula'],
+            'metodo_pagamento' => 'PRESENCIAL',
+            'data_vencimento' => null,
+            'url_boleto' => null,
+            'qr_code_pix' => null,
+            'resposta_api' => null,
+        ]);
+    }
+
+
     public function agendamento()
     {
         return $this->belongsTo(Agendamento::class);

@@ -3,6 +3,8 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+
+use App\Models\SiteTemplate;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -13,7 +15,25 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
 
-        $this->call(FeriadosSeeder::class);
+        //   $this->call([
+        //     LocalizacaoSeeder::class,
+        // ]);
+
+        
+           $this->call([
+            SiteTemplateSeeder::class,
+        ]);
+      
+         
+         $this->call(FeriadosSeeder::class);
+   
+
+        // $this->call(SiteTemplateSeeder::class);
+
+
+        //  $this->call(RolesAndPermissionsSeeder::class);
+
+
         //$this->call(MigrateRolesSeeder::class);
         // \App\Models\Usuario::factory(10)->create();
 
