@@ -14,7 +14,7 @@ class SiteTemplateSeeder extends Seeder
                 'titulo' => 'Público',
                 'slug' => 'publico',
                 'descricao' => 'Template padrão público',
-                'preview_image' => 'templates/publico.png', // caso tenha preview
+                'preview_image' => 'templates/publico.png',
                 'path_view' => 'site.publico',
             ],
             [
@@ -44,10 +44,11 @@ class SiteTemplateSeeder extends Seeder
                 'descricao' => 'Template escuro e sofisticado focado em conversão',
                 'preview_image' => 'templates/minimalista.png',
                 'path_view' => 'site.minimalista',
-            ],            [
+            ],
+            [
                 'titulo' => 'Novo Preview',
                 'slug' => 'novo-preview',
-                'descricao' => 'Template de preview moderno com anima��es GSAP',
+                'descricao' => 'Template de preview moderno com animações GSAP',
                 'preview_image' => 'templates/novo-preview.png',
                 'path_view' => 'site.novo_preview',
             ],
@@ -55,10 +56,9 @@ class SiteTemplateSeeder extends Seeder
 
         foreach ($templates as $template) {
             SiteTemplate::updateOrCreate(
-                ['slug' => $template['slug']], // evita duplicar
+                ['slug' => $template['slug']],
                 $template
             );
         }
     }
 }
-
