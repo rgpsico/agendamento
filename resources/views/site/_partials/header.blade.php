@@ -58,6 +58,7 @@
                     });
 
                     setGoogleTranslateLanguage(lang, true);
+                    setTimeout(cleanupGoogleTranslateArtifacts, 250);
                 });
             });
         }
@@ -73,23 +74,6 @@
             if (html) {
                 html.classList.remove('translated-ltr', 'translated-rtl');
             }
-        }
-
-        function watchGoogleTranslateArtifacts() {
-            cleanupGoogleTranslateArtifacts();
-
-            if (!document.body) {
-                return;
-            }
-
-            const observer = new MutationObserver(() => {
-                cleanupGoogleTranslateArtifacts();
-            });
-
-            observer.observe(document.body, {
-                attributes: true,
-                attributeFilter: ['class', 'style']
-            });
         }
 
         function googleTranslateElementInit() {
@@ -112,11 +96,13 @@
             document.querySelectorAll('.lang-btn').forEach((btn) => {
                 btn.classList.toggle('active', btn.dataset.lang === activeLang);
             });
+
+            setTimeout(cleanupGoogleTranslateArtifacts, 300);
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             bindTranslateButtons();
-            watchGoogleTranslateArtifacts();
+            cleanupGoogleTranslateArtifacts();
         });
     </script>
     <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
