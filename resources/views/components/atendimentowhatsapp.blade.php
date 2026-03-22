@@ -1,13 +1,13 @@
 
 
-<?php if($numero): ?>
+@if($numero)
 <a href="https://wa.me/{{ $numero }}?text={{ $mensagem }}" 
    target="_blank" 
    class="whatsapp-chat-btn"
    title="Atendimento via WhatsApp">
     <i class="fab fa-whatsapp"></i>
 </a>
-<?php endif; ?>
+@endif
 
 <style>
 .whatsapp-chat-btn {
