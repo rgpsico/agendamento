@@ -231,6 +231,22 @@
             box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
         }
 
+        /* Hide Google Translate top banner/frame and prevent page jump */
+        .goog-te-banner-frame.skiptranslate,
+        iframe.goog-te-banner-frame {
+            display: none !important;
+            visibility: hidden !important;
+        }
+
+        body {
+            top: 0 !important;
+        }
+
+        .goog-tooltip,
+        .goog-te-balloon-frame {
+            display: none !important;
+        }
+
         #google_translate_element .goog-te-combo,
         #google_translate_element_mobile .goog-te-combo {
             background: rgba(255, 255, 255, 0.1);
