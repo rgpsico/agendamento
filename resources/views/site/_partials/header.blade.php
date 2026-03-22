@@ -62,6 +62,36 @@
             });
         }
 
+        function cleanupGoogleTranslateArtifacts() {
+            const body = document.body;
+            if (body) {
+                body.classList.remove('translated-ltr', 'translated-rtl', 'VIpgJd-ZVi9od-ORHb');
+                body.style.top = '0px';
+            }
+
+            const html = document.documentElement;
+            if (html) {
+                html.classList.remove('translated-ltr', 'translated-rtl');
+            }
+        }
+
+        function watchGoogleTranslateArtifacts() {
+            cleanupGoogleTranslateArtifacts();
+
+            if (!document.body) {
+                return;
+            }
+
+            const observer = new MutationObserver(() => {
+                cleanupGoogleTranslateArtifacts();
+            });
+
+            observer.observe(document.body, {
+                attributes: true,
+                attributeFilter: ['class', 'style']
+            });
+        }
+
         function googleTranslateElementInit() {
             const translateConfig = {
                 pageLanguage: 'pt',
@@ -84,7 +114,10 @@
             });
         }
 
-        document.addEventListener('DOMContentLoaded', bindTranslateButtons);
+        document.addEventListener('DOMContentLoaded', () => {
+            bindTranslateButtons();
+            watchGoogleTranslateArtifacts();
+        });
     </script>
     <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
