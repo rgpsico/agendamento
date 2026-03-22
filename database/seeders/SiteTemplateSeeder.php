@@ -44,6 +44,12 @@ class SiteTemplateSeeder extends Seeder
                 'descricao' => 'Template escuro e sofisticado focado em conversÃ£o',
                 'preview_image' => 'templates/minimalista.png',
                 'path_view' => 'site.minimalista',
+            ],            [
+                'titulo' => 'Novo Preview',
+                'slug' => 'novo-preview',
+                'descricao' => 'Template de preview moderno com animações GSAP',
+                'preview_image' => 'templates/novo-preview.png',
+                'path_view' => 'site.novo_preview',
             ],
         ];
 
@@ -55,3 +61,4 @@ class SiteTemplateSeeder extends Seeder
         }
     }
 }
+

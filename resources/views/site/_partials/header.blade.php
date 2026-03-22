@@ -64,6 +64,8 @@
         }
 
         function cleanupGoogleTranslateArtifacts() {
+
+            
             const body = document.body;
             if (body) {
                 body.classList.remove('translated-ltr', 'translated-rtl', 'VIpgJd-ZVi9od-ORHb');
