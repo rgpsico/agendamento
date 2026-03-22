@@ -20,6 +20,48 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/TextPlugin.min.js"></script>
 
     <script type="text/javascript">
+        function setGoogleTranslateLanguage(lang, shouldReload = false) {
+            const combos = document.querySelectorAll('.goog-te-combo');
+            let translated = false;
+
+            combos.forEach((combo) => {
+                if (!combo) {
+                    return;
+                }
+
+                combo.value = lang;
+                combo.dispatchEvent(new Event('change'));
+                translated = true;
+            });
+
+            const cookieValue = '/pt/' + lang;
+            document.cookie = 'googtrans=' + cookieValue + ';path=/';
+            document.cookie = 'googtrans=' + cookieValue + ';path=/;domain=' + window.location.hostname;
+
+            if (shouldReload && !translated) {
+                window.location.reload();
+            }
+        }
+
+        function bindTranslateButtons() {
+            const buttons = document.querySelectorAll('.lang-btn');
+            if (!buttons.length) {
+                return;
+            }
+
+            buttons.forEach((button) => {
+                button.addEventListener('click', function () {
+                    const lang = this.dataset.lang || 'pt';
+
+                    document.querySelectorAll('.lang-btn').forEach((btn) => {
+                        btn.classList.toggle('active', btn.dataset.lang === lang);
+                    });
+
+                    setGoogleTranslateLanguage(lang, true);
+                });
+            });
+        }
+
         function googleTranslateElementInit() {
             const translateConfig = {
                 pageLanguage: 'pt',
@@ -34,7 +76,15 @@
             if (document.getElementById('google_translate_element_mobile')) {
                 new google.translate.TranslateElement(translateConfig, 'google_translate_element_mobile');
             }
+
+            const saved = document.cookie.match(/(?:^|;\s*)googtrans=\/pt\/([a-z-]+)/i);
+            const activeLang = saved?.[1] || 'pt';
+            document.querySelectorAll('.lang-btn').forEach((btn) => {
+                btn.classList.toggle('active', btn.dataset.lang === activeLang);
+            });
         }
+
+        document.addEventListener('DOMContentLoaded', bindTranslateButtons);
     </script>
     <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
@@ -140,14 +190,49 @@
             box-shadow: 0 15px 40px rgba(37, 211, 102, 0.6);
         }
 
-        #google_translate_element {
-            color: white;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+        .hidden-translate {
+            width: 0;
+            height: 0;
+            overflow: hidden;
+            opacity: 0;
+            pointer-events: none;
+            position: absolute;
         }
 
-        #google_translate_element .goog-te-combo {
+        .translate-switcher {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .lang-btn {
+            width: 2rem;
+            height: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 9999px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+            font-size: 1rem;
+            line-height: 1;
+        }
+
+        .lang-btn:hover {
+            transform: translateY(-1px) scale(1.05);
+            background: rgba(255, 255, 255, 0.22);
+        }
+
+        .lang-btn.active {
+            border-color: #fff;
+            background: rgba(255, 255, 255, 0.35);
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
+        }
+
+        #google_translate_element .goog-te-combo,
+        #google_translate_element_mobile .goog-te-combo {
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.3);
             color: white;
@@ -157,7 +242,8 @@
             backdrop-filter: blur(6px);
         }
 
-        #google_translate_element .goog-te-combo option {
+        #google_translate_element .goog-te-combo option,
+        #google_translate_element_mobile .goog-te-combo option {
             color: #0f172a;
         }
 
@@ -273,4 +359,3 @@
 }
     </style>
 </head>
-

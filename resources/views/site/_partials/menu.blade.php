@@ -13,7 +13,12 @@
                     <a href="#about" class="nav-link text-white hover:text-gray-200">Sobre</a>
                     <a href="#testimonials" class="nav-link text-white hover:text-gray-200">Depoimentos</a>
                     <a href="#contact" class="nav-link text-white hover:text-gray-200">Contato</a>
-                    <div id="google_translate_element"></div>
+                    <div class="translate-switcher" aria-label="Selecionar idioma">
+                        <button type="button" class="lang-btn active" data-lang="pt" aria-label="Português" title="Português">🇧🇷</button>
+                        <button type="button" class="lang-btn" data-lang="en" aria-label="English" title="English">🇺🇸</button>
+                        <button type="button" class="lang-btn" data-lang="es" aria-label="Español" title="Español">🇪🇸</button>
+                    </div>
+                    <div id="google_translate_element" class="hidden-translate"></div>
                 </div>
                 <button class="md:hidden focus:outline-none mobile-menu-btn" id="mobileMenuBtn">
                     <i class="fas fa-bars text-white text-2xl"></i>
@@ -38,7 +43,12 @@
                 <a href="#contact" class="block text-white text-lg mobile-nav-link">Contato</a>
             </div>
             <div class="mt-8">
-                <div id="google_translate_element_mobile" class="text-white"></div>
+                <div class="translate-switcher" aria-label="Selecionar idioma">
+                    <button type="button" class="lang-btn active" data-lang="pt" aria-label="Português" title="Português">🇧🇷</button>
+                    <button type="button" class="lang-btn" data-lang="en" aria-label="English" title="English">🇺🇸</button>
+                    <button type="button" class="lang-btn" data-lang="es" aria-label="Español" title="Español">🇪🇸</button>
+                </div>
+                <div id="google_translate_element_mobile" class="hidden-translate"></div>
             </div>
         </div>
     </div>
