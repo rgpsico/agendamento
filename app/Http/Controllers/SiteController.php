@@ -67,7 +67,7 @@ class SiteController extends Controller
     public function editSite($idsite)
     {
 
-
+    
         $site = EmpresaSite::with('configuracao')->findOrFail($idsite);
 
         if (!$site->configuracao) {
@@ -408,6 +408,7 @@ class SiteController extends Controller
     {
 
 
+   
         // Validação
         $validated = $request->validate([
             'titulo' => 'required|string|max:255',
@@ -504,11 +505,12 @@ class SiteController extends Controller
         // Atualiza dados do site
         $site->update($data);
 
-
+  
         //  AtualizarConfiguracoesJob::dispatch($data, $site);
 
-        if (!empty($site->dominio_personalizado) && $site->gerar_vhost) {
-            $this->criarOuAtualizarVirtualHost($site->dominio_personalizado);
+        if (!empty($request->dominio_personalizado)) {
+  
+            $this->criarOuAtualizarVirtualHost($request->dominio_personalizado);
         }
 
         // --- Serviços ---
@@ -627,6 +629,7 @@ class SiteController extends Controller
 
     protected function criarOuAtualizarVirtualHost($dominio)
     {
+    
         // Validar domínio
         if (!filter_var('http://' . $dominio, FILTER_VALIDATE_URL)) {
             throw new \Exception('Domínio inválido.');
