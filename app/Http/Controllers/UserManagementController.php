@@ -1,12 +1,13 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Perfil;
 use App\Models\Usuario;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
 use Illuminate\Http\Request;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class UserManagementController extends Controller
 {
@@ -16,38 +17,39 @@ class UserManagementController extends Controller
     }
 
     public function index()
-{
-    $usuarios = Usuario::with('perfis')->get(); // mudou roles -> perfis
-    return view('admin.usuarios.index', compact('usuarios'));
-}
-
-
-    public function getPermissions(Usuario $user)
     {
+        $usuarios = Usuario::with('perfis')->get();
+
+        return view('admin.usuarios.index', compact('usuarios'));
+    }
+
+    public function getPermissions($id)
+    {
+        $user = Usuario::findOrFail($id);
+
         return response()->json([
             'roles' => $user->roles,
-            'directPermissions' => $user->permissions
+            'directPermissions' => $user->permissions,
         ]);
     }
-    
-    public function updatePermissions(Request $request, Usuario $user)
+
+    public function updatePermissions(Request $request, $id)
     {
-        // Sincronizar roles
+        $user = Usuario::findOrFail($id);
+
         $user->syncRoles($request->roles ?? []);
-        
-        // Sincronizar permissões diretas
         $user->syncPermissions($request->permissions ?? []);
-        
+
         return response()->json(['success' => true]);
     }
 
     public function create()
     {
-        $perfis = Perfil::all();          // Pega todos os perfis cadastrados
-        $permissions = Permission::all(); // Mantém as permissões diretas
+        $perfis = Perfil::all();
+        $permissions = Permission::all();
+
         return view('admin.usuarios.create', compact('perfis', 'permissions'));
     }
-
 
     public function store(Request $request)
     {
@@ -55,26 +57,28 @@ class UserManagementController extends Controller
             'nome' => 'required|string|max:255',
             'email' => 'required|email|unique:usuarios,email',
             'password' => 'required|string|min:6',
-            'perfis' => 'array', // substitui 'roles'
+            'perfis' => 'array',
             'permissions' => 'array',
             'empresa_id' => 'nullable|exists:empresa,id',
         ]);
 
-        // Cria usuário base
         $usuario = Usuario::create([
             'nome' => $request->nome,
             'email' => $request->email,
             'password' => bcrypt($request->password),
-            'tipo_usuario' => 'Professor', // ou outro valor padrão
+            'tipo_usuario' => 'Professor',
         ]);
 
-        // Vincula perfis com meta
         if ($request->perfis) {
             foreach ($request->perfis as $perfilNome) {
                 $perfil = Perfil::where('nome', $perfilNome)->first();
-                if (!$perfil) continue;
+
+                if (! $perfil) {
+                    continue;
+                }
 
                 $meta = [];
+
                 if ($perfilNome === 'professor' && $request->empresa_id) {
                     $meta['empresa_id'] = $request->empresa_id;
                 }
@@ -83,42 +87,41 @@ class UserManagementController extends Controller
             }
         }
 
-        // Vincula permissões diretas
         $usuario->syncPermissions($request->permissions ?? []);
 
-        return redirect()->route('admin.usuarios.index')
-                        ->with('success', 'Usuário criado com sucesso!');
+        return redirect()
+            ->route('admin.usuarios.index')
+            ->with('success', 'Usuário criado com sucesso!');
     }
 
-
-    public function edit(Usuario $user)
+    public function edit($id)
     {
-        // Pega todos os roles, permissões e perfis
+        $user = Usuario::with('perfis', 'roles', 'permissions')->findOrFail($id);
         $roles = Role::all();
         $permissions = Permission::all();
-        $perfis = Perfil::all(); // <-- trazer todos os perfis
+        $perfis = Perfil::all();
 
         return view('admin.usuarios.edit', [
             'user' => $user,
             'roles' => $roles,
             'permissions' => $permissions,
-            'perfis' => $perfis, // <-- enviar para a view
+            'perfis' => $perfis,
             'userRoles' => $user->roles->pluck('name')->toArray(),
             'userPermissions' => $user->getDirectPermissions()->pluck('name')->toArray(),
-            'userPerfis' => $user->perfis->pluck('id')->toArray() // <-- ids dos perfis que o usuário já possui
+            'userPerfis' => $user->perfis->pluck('id')->toArray(),
         ]);
     }
 
-
-   public function update(Request $request, Usuario $user)
+    public function update(Request $request, $id)
     {
+        $user = Usuario::findOrFail($id);
+
         $request->validate([
             'nome' => 'required|string|max:255',
             'email' => 'required|email|unique:usuarios,email,' . $user->id,
-         //   'password' => 'nullable|string|min:6|confirmed',
             'roles' => 'array',
             'permissions' => 'array',
-            'perfis' => 'array'
+            'perfis' => 'array',
         ]);
 
         $user->update([
@@ -127,20 +130,26 @@ class UserManagementController extends Controller
             'password' => $request->password ? bcrypt($request->password) : $user->password,
         ]);
 
-        // Atualizar roles e permissões
         $user->syncRoles($request->roles ?? []);
         $user->syncPermissions($request->permissions ?? []);
-
-        // Atualizar perfis
         $user->perfis()->sync($request->perfis ?? []);
 
-        return redirect()->route('admin.usuarios.index')->with('success', 'Usuário atualizado com sucesso!');
+        return redirect()
+            ->route('admin.usuarios.index')
+            ->with('success', 'Usuário atualizado com sucesso!');
     }
 
     public function destroy($id)
     {
         $usuario = Usuario::findOrFail($id);
         $usuario->delete();
-        return response()->json(['message' => 'Usuário excluído com sucesso']);
+
+        if (request()->expectsJson()) {
+            return response()->json(['message' => 'Usuário excluído com sucesso']);
+        }
+
+        return redirect()
+            ->route('admin.usuarios.index')
+            ->with('success', 'Usuário excluído com sucesso!');
     }
 }

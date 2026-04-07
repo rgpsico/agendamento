@@ -1,21 +1,18 @@
-<x-admin.layout title="Virtual Hosts">
-    <x-modal-delete />
-    <x-modal-editar-vhost />
+<x-admin.layout title="Usuários">
     <div class="page-wrapper">
         <div class="content container-fluid">
-
             <div class="page-header">
-                <div class="row">
+                <div class="row align-items-center">
                     <div class="col-sm-6">
-                        <h3 class="page-title">Gerenciar Virtual Hosts</h3>
+                        <h3 class="page-title">Gerenciar Usuários</h3>
                         <ul class="breadcrumb">
                             <li class="breadcrumb-item"><a href="">Admin</a></li>
-                            <li class="breadcrumb-item active">Virtual Hosts</li>
+                            <li class="breadcrumb-item active">Usuários</li>
                         </ul>
                     </div>
                     <div class="col-sm-6 text-end">
-                        <a href="{{ route('virtualhosts.create') }}" class="btn btn-success">
-                            <i class="fe fe-plus"></i> Criar Virtual Host
+                        <a href="{{ route('admin.usuarios.create') }}" class="btn btn-primary">
+                            <i class="fe fe-plus"></i> Novo Usuário
                         </a>
                     </div>
                 </div>
@@ -31,30 +28,53 @@
                                 <table class="datatable table table-hover table-center mb-0">
                                     <thead>
                                         <tr>
-                                            <th>Arquivo</th>
-                                            <th>ServerName</th>
-                                            <th class="text-center">Ação</th>
+                                            <th>ID</th>
+                                            <th>Nome</th>
+                                            <th>E-mail</th>
+                                            <th>Tipo</th>
+                                            <th>Perfis</th>
+                                            <th class="text-center">Ações</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($vhosts as $vhost)
-                                            <tr class="linha_{{ $loop->index }}">
-                                                <td>{{ $vhost['file'] }}</td>
-                                                <td>{{ $vhost['servername'] }}</td>
+                                        @forelse ($usuarios as $usuario)
+                                            <tr>
+                                                <td>{{ $usuario->id }}</td>
+                                                <td>{{ $usuario->nome }}</td>
+                                                <td>{{ $usuario->email }}</td>
+                                                <td>{{ $usuario->tipo_usuario ?? '-' }}</td>
+                                                <td>
+                                                    @if($usuario->perfis->isNotEmpty())
+                                                        {{ $usuario->perfis->pluck('nome')->implode(', ') }}
+                                                    @else
+                                                        -
+                                                    @endif
+                                                </td>
                                                 <td class="text-center">
                                                     <div class="actions">
-                                                        <a class="btn btn-sm bg-info-light bt_editar"
-                                                           data-file="{{ $vhost['file'] }}">
+                                                        <a href="{{ route('admin.usuarios.edit', $usuario->id) }}"
+                                                           class="btn btn-sm bg-info-light">
                                                             <i class="fe fe-pencil"></i> Editar
                                                         </a>
-                                                        <a class="btn btn-sm bg-danger-light bt_excluir"
-                                                           data-file="{{ $vhost['file'] }}">
-                                                            <i class="fe fe-trash"></i> Excluir
-                                                        </a>
+
+                                                        <form action="{{ route('admin.usuarios.destroy', $usuario->id) }}"
+                                                              method="POST"
+                                                              class="d-inline"
+                                                              onsubmit="return confirm('Deseja excluir este usuário?');">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="btn btn-sm bg-danger-light">
+                                                                <i class="fe fe-trash"></i> Excluir
+                                                            </button>
+                                                        </form>
                                                     </div>
                                                 </td>
                                             </tr>
-                                        @endforeach
+                                        @empty
+                                            <tr>
+                                                <td colspan="6" class="text-center">Nenhum usuário encontrado.</td>
+                                            </tr>
+                                        @endforelse
                                     </tbody>
                                 </table>
                             </div>
@@ -64,43 +84,4 @@
             </div>
         </div>
     </div>
-
-<!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<!-- DataTables -->
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
-<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-
-<script>
-$(document).ready(function() {
-    $(".datatable").DataTable();
-
-    // Excluir
-    $(document).on("click", ".bt_excluir", function() {
-        var file = $(this).data('file');
-        if(confirm('Deseja excluir o vhost ' + file + '?')) {
-            $.ajax({
-                url: '{{ route("virtualhosts.destroy", ":file") }}'.replace(':file', file),
-                type: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function(res) {
-                    alert('Vhost excluído com sucesso');
-                    location.reload();
-                },
-                error: function(err) {
-                    console.log(err);
-                }
-            });
-        }
-    });
-
-    // Editar
-    $(document).on("click", ".bt_editar", function() {
-        var file = $(this).data('file');
-        window.location.href = '{{ route("virtualhosts.edit", ":file") }}'.replace(':file', file);
-    });
-});
-</script>
 </x-admin.layout>
