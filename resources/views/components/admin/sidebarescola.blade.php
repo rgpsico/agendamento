@@ -305,7 +305,6 @@
                         </li>
                         @endmasterUser
                         
-                        @masterUser
                         <li class="submenu">
                      
                             <a href="#">
@@ -319,10 +318,9 @@
                                 <li><a href="{{ route('admin.permissions.index') }}">Permissões</a></li>
                                 <li><a href="{{ route('admin.roles.index') }}">Papéis</a></li>
                             </ul>
-                       
+                        
                     </li>
-
-
+                        
                         <li class="submenu">
                             <a href="#">
                                 <i class="fas fa-cogs" style="font-size: 18px;"></i>
