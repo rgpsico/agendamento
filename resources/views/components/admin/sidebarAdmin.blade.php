@@ -21,6 +21,7 @@
                     </a>
                 </li>
 
+                @masterUser
                 <li class="submenu">
                     <a href="" class="">
                         <i class="fe bbicon"></i>
@@ -33,7 +34,9 @@
                   
                     </ul>
                 </li>
-            
+                @endmasterUser
+             
+                @masterUser
                 <li class="submenu">
                     <a href="" class="">
                         <i class="fe fe-activity"></i>
@@ -44,10 +47,10 @@
                         <li><a href="">Sistema</a></li>
                     </ul>
                 </li>
+                @endmasterUser
 
             </ul>
                 
                 
     </div>
 </div>
-

@@ -142,4 +142,9 @@ class Usuario extends Authenticatable
         }
         return null;
     }
+
+    public function isMasterUser(): bool
+    {
+        return in_array($this->email, config('master_users.emails', []), true);
+    }
 }

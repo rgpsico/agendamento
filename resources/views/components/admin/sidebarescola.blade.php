@@ -276,7 +276,7 @@
                         </li>
                     @endisset
                    
-                      @can('admin-access') 
+                      @if((auth()->check() && auth()->user()->can('admin-access')) || (auth()->check() && auth()->user()->isMasterUser()))
                         <!-- Gestão de Empresas -->
                         <li class="submenu">
                             <a href="#">
@@ -289,9 +289,9 @@
                                 <li><a href="#">Cadastrar</a></li>
                             </ul>
                         </li>
-                      @endcan
+                      @endif
                         <!-- Modalidades -->
-                      
+                      @masterUser
                         <li class="submenu">
                             <a href="#">
                                 <i class="fas fa-swimmer"></i>
@@ -303,7 +303,9 @@
                               
                             </ul>
                         </li>
+                        @endmasterUser
                         
+                        @masterUser
                         <li class="submenu">
                      
                             <a href="#">
@@ -333,6 +335,7 @@
                             
                             </ul>
                         </li>
+                        @endmasterUser
 
 
 <!-- Adicione este CSS dentro da tag <style> existente ou crie uma nova -->

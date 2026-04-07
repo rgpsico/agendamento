@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\URL; // <--- 1. ADICIONE ISSO
 
 class AppServiceProvider extends ServiceProvider
@@ -24,7 +25,11 @@ class AppServiceProvider extends ServiceProvider
         if ($this->app->environment('production') || env('APP_ENV') === 'production') {
             URL::forceScheme('https'); // <--- 2. ADICIONE ISSO
         }
-        
+
+        Blade::if('masterUser', function () {
+            return auth()->check() && auth()->user()->isMasterUser();
+        });
+
         // DICA: Se estiver testando e o APP_ENV for local,
         // você pode remover o 'if' temporariamente para testar:
         // URL::forceScheme('https'); 
