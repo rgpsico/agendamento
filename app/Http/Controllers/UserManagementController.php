@@ -18,7 +18,23 @@ class UserManagementController extends Controller
 
     public function index()
     {
-        $usuarios = Usuario::with('perfis')->get();
+        $empresaId = auth()->user()->empresa->id ?? null;
+
+        $usuarios = Usuario::with(['perfis', 'professor', 'empresa'])->get();
+
+        if ($empresaId) {
+            $usuarios = $usuarios->filter(function ($usuario) use ($empresaId) {
+                $isDonoDaEmpresa = optional($usuario->empresa)->id === $empresaId;
+                $isProfessorDaEmpresa = optional($usuario->professor)->empresa_id === $empresaId;
+                $temPerfilNaEmpresa = $usuario->perfis->contains(function ($perfil) use ($empresaId) {
+                    $meta = json_decode($perfil->pivot->meta ?? '[]', true);
+
+                    return (int) ($meta['empresa_id'] ?? 0) === (int) $empresaId;
+                });
+
+                return $isDonoDaEmpresa || $isProfessorDaEmpresa || $temPerfilNaEmpresa;
+            })->values();
+        }
 
         return view('admin.usuarios.index', compact('usuarios'));
     }
