@@ -192,7 +192,7 @@
                         <!-- Alunos -->
                         <li>
                             <a href="{{ route('alunos.index') }}">
-                                <i class="fe fe-users"></i><span>Alunos</span>
+                                <i class="fe fe-users"></i><span>Clientes</span>
                             </a>
                         </li>
                     @endisset
