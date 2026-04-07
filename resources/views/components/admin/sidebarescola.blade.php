@@ -320,7 +320,8 @@
                             </ul>
                         
                     </li>
-                        
+
+                        @masterUser
                         <li class="submenu">
                             <a href="#">
                                 <i class="fas fa-cogs" style="font-size: 18px;"></i>
