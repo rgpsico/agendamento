@@ -28,10 +28,10 @@ class DatabaseSeeder extends Seeder
          $this->call(FeriadosSeeder::class);
    
 
-        // $this->call(SiteTemplateSeeder::class);
+         $this->call(SiteTemplateSeeder::class);
 
 
-        //  $this->call(RolesAndPermissionsSeeder::class);
+          $this->call(RolesAndPermissionsSeeder::class);
 
 
         //$this->call(MigrateRolesSeeder::class);

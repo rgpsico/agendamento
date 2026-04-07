@@ -236,13 +236,18 @@ class HomeController extends Controller
     public function registerAluno()
     {
         $modalidade = Modalidade::all();
+        $config = ConfiguracaoGeral::first();
+
         return view(
             'public.registrar.registerAluno',
             [
                 'pageTitle' => $this->pageTitle,
                 'view' => $this->view,
                 'modalidade' => $modalidade,
-                'route' => $this->route
+                'route' => $this->route,
+                'registerImage' => optional($config)->register_image
+                    ? asset('storage/' . $config->register_image)
+                    : asset('admin/img/register.png'),
             ]
         );
     }
