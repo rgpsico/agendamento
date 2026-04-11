@@ -10,6 +10,7 @@ use App\Models\SiteDepoimento;
 use App\Models\SiteServico;
 use App\Models\TrackingCode;
 use App\Models\SiteTemplate;
+use App\Models\UserEvent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -23,6 +24,31 @@ class SiteController extends Controller
     public function landing()
     {
         return view('site.landing');
+    }
+
+    public function lead(Request $request)
+    {
+        $data = $request->validate([
+            'nome' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'whatsapp' => 'required|string|max:30',
+        ]);
+
+        $lead = UserEvent::create([
+            'user_id' => null,
+            'event_type' => 'site.landing.lead',
+            'payload' => $data,
+            'ip' => $request->ip(),
+            'user_agent' => (string) $request->userAgent(),
+            'source' => 'landing',
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Lead recebido com sucesso.',
+            'data' => $lead->payload,
+            'id' => $lead->id,
+        ], 201);
     }
 
     public function lista(Request $request)

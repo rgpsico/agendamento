@@ -469,7 +469,7 @@
 
       try {
         const token = document.querySelector('input[name="_token"]').value;
-        await fetch('', {
+        await fetch('{{ route("site.landing.lead") }}', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

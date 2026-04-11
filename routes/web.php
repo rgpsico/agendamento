@@ -117,6 +117,7 @@ Route::prefix('admin')->group(function () {
 Route::get('/site/{slug}', [SiteController::class, 'mostrar'])->name('site.publico');
 
 Route::get('/landing', [SiteController::class, 'landing'])->name('site.landing');
+Route::post('/landing/lead', [SiteController::class, 'lead'])->name('site.landing.lead');
 
 
 Route::prefix('admin/site/ssl')->middleware(['auth'])->name('admin.site.dominios.')->group(function () {
@@ -455,5 +456,4 @@ Route::prefix('admin')->group(function () {
     Route::put('planos/{plano}', [PlanoAlunoController::class, 'update'])->name('alunos.planos.update');
     Route::delete('planos/{plano}', [PlanoAlunoController::class, 'destroy'])->name('alunos.planos.destroy');
 });
-
 
