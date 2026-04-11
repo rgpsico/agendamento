@@ -50,7 +50,7 @@ class DeepSeekService
                 ['role' => 'user', 'content' => $userPrompt],
             ],
             'temperature' => 0.7,
-            'max_tokens' => (int) $bot->token_deepseek,
+            'max_tokens' => max(1, min(8192, (int) ($bot->token_deepseek ?: 1000))),
         ]);
 
         // 4. Verifica se a resposta foi bem-sucedida
@@ -194,8 +194,9 @@ class DeepSeekService
 
 
         if (preg_match('/horário|hora|disponível|quando/i', $question)) {
-            // Verifica se o serviço NÃO é do tipo "DIA"
-            if ($service->tipo_agendamento !== 'DIA') {
+            // Verifica se algum serviço NÃO é do tipo "DIA"
+            $firstService = $services->first();
+            if ($firstService && $firstService->tipo_agendamento !== 'DIA') {
                 $systemPrompt = "Responda de forma curta e natural. Apenas informe os horários disponíveis para o cliente.\n";
                 $systemPrompt .= $this->montarPromptHorarios($empresa_id, '', $bot);
             }
@@ -286,7 +287,7 @@ class DeepSeekService
                 ['role' => 'user', 'content' => $conversationContext],
             ],
             'temperature' => 0.7,
-            'max_tokens' => (int) $bot->token_deepseek,
+            'max_tokens' => max(1, min(8192, (int) ($bot->token_deepseek ?: 1000))),
         ]);
 
         if (!$response->successful()) {
