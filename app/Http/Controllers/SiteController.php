@@ -20,6 +20,11 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 class SiteController extends Controller
 {
 
+    public function landing()
+    {
+        return view('site.landing');
+    }
+
     public function lista(Request $request)
     {
         $empresaId = Auth::user()->empresa->id;

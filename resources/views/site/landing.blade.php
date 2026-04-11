@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Teste Grátis — Sistema para Estúdios de Pilates</title>
+  <meta name="description" content="Gerencie seu estúdio de Pilates sem complicação. Agenda, cobranças e alunos em um só lugar. Teste grátis por 14 dias.">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --green-dark:  #1a7a4a;
+      --green-mid:   #22a060;
+      --green-light: #d6f5e3;
+      --green-pale:  #f0faf5;
+      --white:       #ffffff;
+      --gray-text:   #4a5568;
+      --gray-subtle: #e2e8f0;
+      --radius:      14px;
+      --shadow:      0 4px 24px rgba(34, 160, 96, 0.12);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--green-pale);
+      color: var(--gray-text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .top-strip {
+      background: var(--green-dark);
+      color: var(--white);
+      text-align: center;
+      font-size: 0.78rem;
+      font-weight: 500;
+      padding: 10px 16px;
+      letter-spacing: 0.02em;
+    }
+
+    .hero {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 20px 40px;
+    }
+
+    .hero-inner {
+      max-width: 860px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: center;
+    }
+
+    .hero-copy { display: flex; flex-direction: column; gap: 20px; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--green-light);
+      color: var(--green-dark);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 6px 14px;
+      border-radius: 100px;
+      width: fit-content;
+    }
+
+    .badge::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green-mid);
+      animation: pulse 1.8s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.5; transform: scale(1.4); }
+    }
+
+    h1 {
+      font-size: clamp(1.85rem, 4vw, 2.6rem);
+      font-weight: 800;
+      color: #1a202c;
+      line-height: 1.2;
+    }
+
+    h1 span { color: var(--green-mid); }
+
+    .subtitle {
+      font-size: 1rem;
+      line-height: 1.65;
+      color: var(--gray-text);
+    }
+
+    .benefits { display: flex; flex-direction: column; gap: 12px; }
+
+    .benefit-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .benefit-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--green-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 1.1rem;
+    }
+
+    .benefit-text strong {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #1a202c;
+    }
+
+    .benefit-text span {
+      font-size: 0.82rem;
+      color: var(--gray-text);
+    }
+
+    .form-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 36px 32px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--gray-subtle);
+    }
+
+    .form-card h2 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #1a202c;
+      margin-bottom: 6px;
+    }
+
+    .form-card > div > p {
+      font-size: 0.83rem;
+      color: var(--gray-text);
+      margin-bottom: 24px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .input-wrap { position: relative; }
+
+    .input-wrap svg {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #a0aec0;
+      pointer-events: none;
+    }
+
+    input {
+      width: 100%;
+      padding: 13px 14px 13px 42px;
+      border: 1.5px solid var(--gray-subtle);
+      border-radius: 10px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.9rem;
+      color: #1a202c;
+      background: #f8fafc;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+
+    input::placeholder { color: #a0aec0; }
+
+    input:focus {
+      border-color: var(--green-mid);
+      box-shadow: 0 0 0 3px rgba(34, 160, 96, 0.15);
+      background: var(--white);
+    }
+
+    .btn-cta {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, var(--green-mid), var(--green-dark));
+      color: var(--white);
+      font-family: 'Poppins', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(34, 160, 96, 0.35);
+    }
+
+    .btn-cta:active { transform: translateY(0); }
+
+    .btn-cta.loading { opacity: 0.75; pointer-events: none; }
+
+    .btn-cta .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2.5px solid rgba(255,255,255,0.4);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+
+    .btn-cta.loading .spinner { display: block; }
+    .btn-cta.loading .btn-label { display: none; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .privacy-note {
+      text-align: center;
+      font-size: 0.75rem;
+      color: #a0aec0;
+      margin-top: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+
+    .success-state {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 14px;
+      padding: 12px 0;
+    }
+
+    .success-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--green-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+    }
+
+    .success-state h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #1a202c;
+    }
+
+    .success-state p {
+      font-size: 0.85rem;
+      color: var(--gray-text);
+      margin-bottom: 0;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px 16px 28px;
+      font-size: 0.78rem;
+      color: #a0aec0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    footer svg { color: var(--green-mid); flex-shrink: 0; }
+
+    @media (max-width: 680px) {
+      .hero { padding: 36px 16px 28px; }
+
+      .hero-inner {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+
+      .form-card { order: -1; padding: 28px 22px; }
+
+      .form-card h2 { font-size: 1.1rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-strip">
+    Oferta por tempo limitado — 14 dias totalmente grátis, sem cartão de crédito
+  </div>
+
+  <main class="hero">
+    <div class="hero-inner">
+
+      <div class="hero-copy">
+        <span class="badge">Grátis por 14 dias</span>
+
+        <h1>
+          Gerencie seu estúdio de Pilates
+          <span>sem complicação</span>
+        </h1>
+
+        <p class="subtitle">
+          Agenda online, cobranças automáticas e controle de alunos — tudo em um só lugar.
+          Configure em minutos e foque no que você faz de melhor.
+        </p>
+
+        <div class="benefits">
+          <div class="benefit-item">
+            <div class="benefit-icon">📅</div>
+            <div class="benefit-text">
+              <strong>Agenda inteligente</strong>
+              <span>Alunos agendam sozinhos, você só confirma.</span>
+            </div>
+          </div>
+
+          <div class="benefit-item">
+            <div class="benefit-icon">💳</div>
+            <div class="benefit-text">
+              <strong>Cobranças no automático</strong>
+              <span>Lembretes de pagamento e controle financeiro sem planilhas.</span>
+            </div>
+          </div>
+
+          <div class="benefit-item">
+            <div class="benefit-icon">🤖</div>
+            <div class="benefit-text">
+              <strong>Atendimento pelo WhatsApp</strong>
+              <span>Bot responde dúvidas e agendamentos 24 horas por dia.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <div id="form-content">
+          <h2>Comece seu teste grátis agora</h2>
+          <p>Preencha abaixo e receba seu acesso em instantes.</p>
+
+          <form id="lead-form" novalidate>
+            @csrf
+            <div class="form-group">
+
+              <div class="input-wrap">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+                <input type="text" id="nome" name="nome" placeholder="Seu nome" autocomplete="name" required />
+              </div>
+
+              <div class="input-wrap">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <rect width="20" height="16" x="2" y="4" rx="2"/>
+                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                </svg>
+                <input type="email" id="email" name="email" placeholder="Seu melhor e-mail" autocomplete="email" required />
+              </div>
+
+              <div class="input-wrap">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.15 12 19.79 19.79 0 0 1 1.08 3.18 2 2 0 0 1 3.07 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.27 8.91a16 16 0 0 0 5.82 5.82l1.06-1.06a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                </svg>
+                <input type="tel" id="whatsapp" name="whatsapp" placeholder="WhatsApp (ex: 11 99999-9999)" autocomplete="tel" required />
+              </div>
+            </div>
+
+            <button type="submit" class="btn-cta" id="btn-submit">
+              <span class="btn-label">Quero testar agora →</span>
+              <div class="spinner"></div>
+            </button>
+          </form>
+
+          <p class="privacy-note">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+            Seus dados estão seguros. Sem spam, prometemos.
+          </p>
+        </div>
+
+        <div class="success-state" id="success-state">
+          <div class="success-icon">✅</div>
+          <h3>Tudo certo! Acesso enviado.</h3>
+          <p>
+            Verifique seu e-mail e WhatsApp.<br/>
+            Em breve nossa equipe entrará em contato.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer>
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+    </svg>
+    Sem cartão de crédito. Cancele quando quiser.
+  </footer>
+
+  <script>
+    const whatsappInput = document.getElementById('whatsapp');
+    whatsappInput.addEventListener('input', function () {
+      let v = this.value.replace(/\D/g, '').slice(0, 11);
+      if (v.length > 6) {
+        v = v.replace(/^(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
+      } else if (v.length > 2) {
+        v = v.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
+      } else if (v.length > 0) {
+        v = v.replace(/^(\d{0,2})/, '($1');
+      }
+      this.value = v;
+    });
+
+    const form    = document.getElementById('lead-form');
+    const btn     = document.getElementById('btn-submit');
+    const content = document.getElementById('form-content');
+    const success = document.getElementById('success-state');
+
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const nome     = document.getElementById('nome').value.trim();
+      const email    = document.getElementById('email').value.trim();
+      const whatsapp = whatsappInput.value.trim();
+
+      if (!nome || !email || !whatsapp) { shake(form); return; }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        shake(document.getElementById('email').parentElement);
+        document.getElementById('email').focus();
+        return;
+      }
+
+      btn.classList.add('loading');
+
+      try {
+        const token = document.querySelector('input[name="_token"]').value;
+        await fetch('{{ route("site.landing.lead") }}', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': token,
+          },
+          body: JSON.stringify({ nome, email, whatsapp }),
+        });
+      } catch (_) {}
+
+      setTimeout(() => {
+        btn.classList.remove('loading');
+        content.style.display = 'none';
+        success.style.display = 'flex';
+      }, 1200);
+    });
+
+    function shake(el) {
+      el.style.animation = 'none';
+      el.offsetHeight;
+      el.style.animation = 'shake 0.35s ease';
+    }
+
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        20%       { transform: translateX(-6px); }
+        40%       { transform: translateX(6px); }
+        60%       { transform: translateX(-4px); }
+        80%       { transform: translateX(4px); }
+      }
+    `;
+    document.head.appendChild(style);
+  </script>
+
+</body>
+</html>

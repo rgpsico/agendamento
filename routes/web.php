@@ -116,6 +116,8 @@ Route::prefix('admin')->group(function () {
 
 Route::get('/site/{slug}', [SiteController::class, 'mostrar'])->name('site.publico');
 
+Route::get('/landing', [SiteController::class, 'landing'])->name('site.landing');
+
 
 Route::prefix('admin/site/ssl')->middleware(['auth'])->name('admin.site.dominios.')->group(function () {
     Route::get('/', [SiteController::class, 'editarDominio'])->name('index');
