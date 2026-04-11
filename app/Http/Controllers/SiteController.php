@@ -13,6 +13,7 @@ use App\Models\SiteTemplate;
 use App\Models\UserEvent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
@@ -42,6 +43,18 @@ class SiteController extends Controller
             'user_agent' => (string) $request->userAgent(),
             'source' => 'landing',
         ]);
+
+        Mail::raw(
+            "Novo lead recebido pela landing.\n\n" .
+            "Nome: {$data['nome']}\n" .
+            "Email: {$data['email']}\n" .
+            "WhatsApp: {$data['whatsapp']}\n" .
+            "IP: {$request->ip()}\n",
+            function ($message) use ($data) {
+                $message->to('rogerneves@gmail.com')
+                    ->subject('Novo lead da landing: ' . $data['nome']);
+            }
+        );
 
         return response()->json([
             'success' => true,
