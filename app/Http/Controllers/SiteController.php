@@ -51,7 +51,7 @@ class SiteController extends Controller
             "WhatsApp: {$data['whatsapp']}\n" .
             "IP: {$request->ip()}\n",
             function ($message) use ($data) {
-                $message->to('rogerneves@gmail.com')
+                $message->to('rogernevesn@gmail.com')
                     ->subject('Novo lead da landing: ' . $data['nome']);
             }
         );
