@@ -6,6 +6,7 @@
   body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 0; }
   .container { max-width: 560px; margin: 40px auto; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
   .header { background: linear-gradient(135deg, #6366f1, #8b5cf6); padding: 32px; text-align: center; }
+  .header img { max-height: 60px; max-width: 200px; object-fit: contain; margin-bottom: 16px; display: block; margin-left: auto; margin-right: auto; }
   .header h1 { color: #fff; margin: 0; font-size: 22px; }
   .header p { color: rgba(255,255,255,0.8); margin: 6px 0 0; font-size: 14px; }
   .body { padding: 32px; }
@@ -21,6 +22,7 @@
 <body>
 <div class="container">
   <div class="header">
+    <img src="https://pilatesgestao.com.br/storage/configuracoes/gvtHA9Jdrl01kIpsvtlZBDc8WkrPPgMOuBCZv5Yp.jpg" alt="Pilates Gestão">
     <h1>🎯 Novo Lead Recebido</h1>
     <p>Pilates Gestão — Landing Page</p>
   </div>
