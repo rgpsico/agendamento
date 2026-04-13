@@ -498,6 +498,7 @@ class SiteController extends Controller
             'tracking_codes.*.type' => 'required|in:analytics,ads,pixel,other',
             'tracking_codes.*.script' => 'nullable|string',
             'tracking_codes.*.status' => 'boolean',
+            'dominio_personalizado' => 'nullable|string|max:255', // ← ADD
         ]);
 
 
@@ -520,7 +521,8 @@ class SiteController extends Controller
                 : null,
             'atendimento_com_ia' => $request->input('atendimento_com_ia') == 'on' ? 1 : 0,
             'atendimento_com_whatsapp' => $request->input('atendimento_com_whatsapp') == 'on' ? 1 : 0,
-        ];
+            'dominio_personalizado'  => $request->dominio_personalizado, // ← ADD
+            ];
 
 
         // Upload logo
