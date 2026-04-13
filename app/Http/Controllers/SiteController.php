@@ -674,7 +674,6 @@ class SiteController extends Controller
 
 
  
-
 protected function criarOuAtualizarVirtualHost($dominio): int
 {
     // Validar domínio
@@ -682,7 +681,6 @@ protected function criarOuAtualizarVirtualHost($dominio): int
         throw new \Exception('Domínio inválido.');
     }
 
-    dd(env('NPM_EMAIL'), env('NPM_PASSWORD'), env('NPM_URL'));
     // Autentica no NPM
     $auth = Http::post(env('NPM_URL') . '/api/tokens', [
         'identity' => env('NPM_EMAIL'),
@@ -697,7 +695,7 @@ protected function criarOuAtualizarVirtualHost($dominio): int
 
     // Busca proxy hosts existentes
     $hostsResponse = Http::withToken($token)
-        ->get(env('NPM_URL') . '/api/proxy-hosts');
+        ->get(env('NPM_URL') . '/api/nginx/proxy-hosts');
 
     if (!$hostsResponse->successful()) {
         throw new \Exception('Erro ao buscar proxy hosts: ' . $hostsResponse->body());
@@ -728,7 +726,7 @@ protected function criarOuAtualizarVirtualHost($dominio): int
 
     if ($existente) {
         $response = Http::withToken($token)
-            ->put(env('NPM_URL') . '/api/proxy-hosts/' . $existente['id'], $payload);
+            ->put(env('NPM_URL') . '/api/nginx/proxy-hosts/' . $existente['id'], $payload);
 
         if (!$response->successful()) {
             throw new \Exception('Erro ao atualizar proxy host: ' . $response->body());
@@ -737,7 +735,7 @@ protected function criarOuAtualizarVirtualHost($dominio): int
         return $existente['id'];
     } else {
         $response = Http::withToken($token)
-            ->post(env('NPM_URL') . '/api/proxy-hosts', $payload);
+            ->post(env('NPM_URL') . '/api/nginx/proxy-hosts', $payload);
 
         if (!$response->successful()) {
             throw new \Exception('Erro ao criar proxy host: ' . $response->body());
@@ -746,6 +744,7 @@ protected function criarOuAtualizarVirtualHost($dominio): int
         return $response->json('id');
     }
 }
+
 
 
     public function atualizarConfiguracoes(Request $request, EmpresaSite $site)
