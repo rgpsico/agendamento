@@ -686,6 +686,11 @@ protected function criarOuAtualizarVirtualHost($dominio)
         'secret'   => env('NPM_PASSWORD'),
     ]);
 
+
+     if (!$auth->successful()) {
+        throw new \Exception('Erro NPM: ' . $auth->status() . ' - ' . $auth->body());
+    }
+
     if (!$auth->successful()) {
         throw new \Exception('Erro ao autenticar no NPM.');
     }
