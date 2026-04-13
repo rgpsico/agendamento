@@ -10,12 +10,13 @@ services:
     working_dir: /var/www
     networks:
       - agendamento_net
+      - proxy_net
 
   nginx:
     image: nginx:latest
     container_name: agendamento_nginx
-    ports:
-      - "8082:80"
+    expose:
+      - "80"          # ← não expõe pro host, só pro NPM
     volumes:
       - .:/var/www
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
@@ -23,6 +24,7 @@ services:
       - app
     networks:
       - agendamento_net
+      - proxy_net     # ← NPM precisa enxergar esse container
 
   mysql:
     image: mysql:8.0
@@ -38,12 +40,10 @@ services:
       - agendamento_mysql_data:/var/lib/mysql
     networks:
       - agendamento_net
-  
+
   redis:
     image: redis:7-alpine
     container_name: agendamento_redis
-    # ports:
-    #   - "6379:6379" # opcional
     volumes:
       - agendamento_redis_data:/data
     command: redis-server --appendonly yes
@@ -74,7 +74,7 @@ services:
       - mysql
     networks:
       - agendamento_net
-  
+
   socket:
     image: node:20-alpine
     container_name: agendamento_socket
@@ -87,10 +87,30 @@ services:
     networks:
       - agendamento_net
 
+  # ─── Nginx Proxy Manager ───────────────────────────────────────────
+  npm:
+    image: jc21/nginx-proxy-manager:latest
+    container_name: nginx_proxy_manager
+    restart: always
+    ports:
+      - "80:80"       # HTTP (todos os domínios)
+      - "443:443"     # HTTPS (todos os domínios)
+      - "81:81"       # Painel admin do NPM
+    volumes:
+      - npm_data:/data
+      - npm_letsencrypt:/etc/letsencrypt
+    networks:
+      - proxy_net
+
 networks:
   agendamento_net:
+    driver: bridge
+  proxy_net:
+    name: proxy_net
     driver: bridge
 
 volumes:
   agendamento_mysql_data:
   agendamento_redis_data:
+  npm_data:
+  npm_letsencrypt:
