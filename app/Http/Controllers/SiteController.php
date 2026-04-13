@@ -13,6 +13,7 @@ use App\Models\SiteTemplate;
 use App\Models\UserEvent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -670,25 +671,58 @@ class SiteController extends Controller
 
 
 
-    protected function criarOuAtualizarVirtualHost($dominio)
-    {
-    
-        // Validar domínio
-        if (!filter_var('http://' . $dominio, FILTER_VALIDATE_URL)) {
-            throw new \Exception('Domínio inválido.');
-        }
+ 
 
-        $scriptPath = '/usr/local/bin/criar-vhost.sh';
-
-        $process = new Process(["sudo", $scriptPath, $dominio]);
-        $process->run();
-
-        if (!$process->isSuccessful()) {
-            throw new ProcessFailedException($process);
-        }
-
-        return true;
+protected function criarOuAtualizarVirtualHost($dominio)
+{
+    // Validar domínio
+    if (!filter_var('http://' . $dominio, FILTER_VALIDATE_URL)) {
+        throw new \Exception('Domínio inválido.');
     }
+
+    // Autentica no NPM
+    $auth = Http::post(env('NPM_URL') . '/api/tokens', [
+        'identity' => env('NPM_EMAIL'),
+        'secret'   => env('NPM_PASSWORD'),
+    ]);
+
+    if (!$auth->successful()) {
+        throw new \Exception('Erro ao autenticar no NPM.');
+    }
+
+    $token = $auth->json('token');
+
+    // Verifica se já existe proxy pra esse domínio
+    $hosts = Http::withToken($token)
+        ->get(env('NPM_URL') . '/api/proxy-hosts')
+        ->json();
+
+    $existente = collect($hosts)->first(fn($h) =>
+        in_array($dominio, $h['domain_names'] ?? [])
+    );
+
+    $payload = [
+        'domain_names'            => [$dominio],
+        'forward_scheme'          => 'http',
+        'forward_host'            => 'agendamento_nginx',
+        'forward_port'            => 80,
+        'ssl_forced'              => true,
+        'certificate_id'          => 'new',
+        'meta'                    => ['letsencrypt_agree' => true],
+        'allow_websocket_upgrade' => true,
+        'advanced_config'         => '',
+    ];
+
+    if ($existente) {
+        Http::withToken($token)
+            ->put(env('NPM_URL') . '/api/proxy-hosts/' . $existente['id'], $payload);
+    } else {
+        Http::withToken($token)
+            ->post(env('NPM_URL') . '/api/proxy-hosts', $payload);
+    }
+
+    return true;
+}
 
 
 
