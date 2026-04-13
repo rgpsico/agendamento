@@ -681,7 +681,7 @@ protected function criarOuAtualizarVirtualHost($dominio): int
     if (!filter_var('http://' . $dominio, FILTER_VALIDATE_URL)) {
         throw new \Exception('Domínio inválido.');
     }
-
+dd((env('NPM_URL') . '/api/proxy-hosts'));
     // Autentica no NPM
     $auth = Http::post(env('NPM_URL') . '/api/tokens', [
         'identity' => env('NPM_EMAIL'),
@@ -703,7 +703,7 @@ protected function criarOuAtualizarVirtualHost($dominio): int
     }
 
     $hosts = $hostsResponse->json();
-dd((env('NPM_URL') . '/api/proxy-hosts'));
+
     if (!is_array($hosts)) {
         $hosts = [];
     }
