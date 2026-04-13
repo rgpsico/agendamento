@@ -703,7 +703,7 @@ protected function criarOuAtualizarVirtualHost($dominio): int
     }
 
     $hosts = $hostsResponse->json();
-
+dd((env('NPM_URL') . '/api/proxy-hosts'));
     if (!is_array($hosts)) {
         $hosts = [];
     }
