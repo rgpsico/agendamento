@@ -551,7 +551,7 @@ class SiteController extends Controller
         $site->update($data);
 
   
-        //  AtualizarConfiguracoesJob::dispatch($data, $site);
+          AtualizarConfiguracoesJob::dispatch($data, $site);
 
         if (!empty($request->dominio_personalizado)) {
               $this->criarOuAtualizarVirtualHost($request->dominio_personalizado);
