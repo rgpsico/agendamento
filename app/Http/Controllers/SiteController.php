@@ -498,7 +498,7 @@ class SiteController extends Controller
             'tracking_codes.*.script' => 'nullable|string',
             'tracking_codes.*.status' => 'boolean',
             'dominio_personalizado' => 'nullable|string|max:255', // ← ADD
-             'gerar_vhost'             => $request->boolean('gerar_vhost'), // ← ADD
+          
         ]);
 
 
