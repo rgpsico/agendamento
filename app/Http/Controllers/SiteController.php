@@ -675,7 +675,7 @@ class SiteController extends Controller
 
  
 
-protected function criarOuAtualizarVirtualHost($dominio)
+protected function criarOuAtualizarVirtualHost($dominio): int
 {
     // Validar domínio
     if (!filter_var('http://' . $dominio, FILTER_VALIDATE_URL)) {
@@ -688,22 +688,27 @@ protected function criarOuAtualizarVirtualHost($dominio)
         'secret'   => env('NPM_PASSWORD'),
     ]);
 
-
-     if (!$auth->successful()) {
-        throw new \Exception('Erro NPM: ' . $auth->status() . ' - ' . $auth->body());
-    }
-
     if (!$auth->successful()) {
-        throw new \Exception('Erro ao autenticar no NPM.');
+        throw new \Exception('Erro NPM auth: ' . $auth->status() . ' - ' . $auth->body());
     }
 
     $token = $auth->json('token');
 
-    // Verifica se já existe proxy pra esse domínio
-    $hosts = Http::withToken($token)
-        ->get(env('NPM_URL') . '/api/proxy-hosts')
-        ->json();
+    // Busca proxy hosts existentes
+    $hostsResponse = Http::withToken($token)
+        ->get(env('NPM_URL') . '/api/proxy-hosts');
 
+    if (!$hostsResponse->successful()) {
+        throw new \Exception('Erro ao buscar proxy hosts: ' . $hostsResponse->body());
+    }
+
+    $hosts = $hostsResponse->json();
+
+    if (!is_array($hosts)) {
+        $hosts = [];
+    }
+
+    // Verifica se já existe proxy pra esse domínio
     $existente = collect($hosts)->first(fn($h) =>
         in_array($dominio, $h['domain_names'] ?? [])
     );
@@ -721,16 +726,25 @@ protected function criarOuAtualizarVirtualHost($dominio)
     ];
 
     if ($existente) {
-        Http::withToken($token)
+        $response = Http::withToken($token)
             ->put(env('NPM_URL') . '/api/proxy-hosts/' . $existente['id'], $payload);
+
+        if (!$response->successful()) {
+            throw new \Exception('Erro ao atualizar proxy host: ' . $response->body());
+        }
+
+        return $existente['id'];
     } else {
-        Http::withToken($token)
+        $response = Http::withToken($token)
             ->post(env('NPM_URL') . '/api/proxy-hosts', $payload);
+
+        if (!$response->successful()) {
+            throw new \Exception('Erro ao criar proxy host: ' . $response->body());
+        }
+
+        return $response->json('id');
     }
-
-    return true;
 }
-
 
 
     public function atualizarConfiguracoes(Request $request, EmpresaSite $site)
