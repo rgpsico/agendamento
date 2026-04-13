@@ -698,9 +698,9 @@ protected function criarOuAtualizarVirtualHost($dominio): int
     $hostsResponse = Http::withToken($token)
         ->get(env('NPM_URL') . '/api/proxy-hosts');
 
-    // if (!$hostsResponse->successful()) {
-    //     throw new \Exception('Erro ao buscar proxy hosts: ' . $hostsResponse->body());
-    // }
+    if (!$hostsResponse->successful()) {
+        throw new \Exception('Erro ao buscar proxy hosts: ' . $hostsResponse->body());
+    }
 
     $hosts = $hostsResponse->json();
 
