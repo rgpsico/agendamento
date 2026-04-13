@@ -682,6 +682,7 @@ protected function criarOuAtualizarVirtualHost($dominio): int
         throw new \Exception('Domínio inválido.');
     }
 
+    dd(env('NPM_EMAIL'), env('NPM_PASSWORD'), env('NPM_URL'));
     // Autentica no NPM
     $auth = Http::post(env('NPM_URL') . '/api/tokens', [
         'identity' => env('NPM_EMAIL'),
