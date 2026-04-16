@@ -771,7 +771,7 @@ protected function criarOuAtualizarVirtualHost($dominio): int
         // Se marcou gerar VHost e domínio válido
         if (!empty($site->dominio_personalizado) && $site->gerar_vhost) {
             try {
-                $this->criarOuAtualizarVirtualHost($site->dominio_personalizado);
+             //   $this->criarOuAtualizarVirtualHost($site->dominio_personalizado);
             } catch (\Exception $e) {
                 return redirect()->back()->withErrors(['erro' => 'Erro ao criar Virtual Host: ' . $e->getMessage()]);
             }
