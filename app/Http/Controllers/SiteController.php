@@ -214,8 +214,8 @@ class SiteController extends Controller
         // Domínio padrão do sistema
         $dominioPrincipal = 'agendamento.rjpasseios.com.br';
 
-        if ($host === $dominioPrincipal) {
-            return redirect()->route('home.index'); // ou return app(HomeController::class)->index();
+        if ($host === $dominioPrincipal || app()->environment('local')) {
+            return view('home_landing');
         }
 
         // Caso seja domínio personalizado
