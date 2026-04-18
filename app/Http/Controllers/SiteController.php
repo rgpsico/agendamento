@@ -187,6 +187,8 @@ class SiteController extends Controller
      */
     public function mostrar($slug)
     {
+
+    
         $site = EmpresaSite::where('slug', $slug)
             ->with([
                 'servicos',
