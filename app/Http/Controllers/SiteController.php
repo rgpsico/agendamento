@@ -187,8 +187,6 @@ class SiteController extends Controller
      */
     public function mostrar($slug)
     {
-
-    
         $site = EmpresaSite::where('slug', $slug)
             ->with([
                 'servicos',
@@ -216,8 +214,8 @@ class SiteController extends Controller
         // Domínio padrão do sistema
         $dominioPrincipal = 'agendamento.rjpasseios.com.br';
 
-        if ($host === $dominioPrincipal || app()->environment('local')) {
-            return view('home_landing');
+        if ($host === $dominioPrincipal) {
+            return redirect()->route('home.index'); // ou return app(HomeController::class)->index();
         }
 
         // Caso seja domínio personalizado

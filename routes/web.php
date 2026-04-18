@@ -46,6 +46,8 @@ use App\Http\Controllers\ReceitaRecorrenteController;
 
 
 
+Route::get('/', [HomeController::class, 'home'])->name('home');
+
 Route::get('/create', [UserManagementController::class, 'create'])->name('register.professor');
 
 Route::post('/pagamentos/presencial', [PagamentoController::class, 'criarPagamentoPresencial'])->name('empresa.pagamento.presencial');

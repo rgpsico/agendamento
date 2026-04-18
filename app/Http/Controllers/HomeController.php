@@ -45,6 +45,11 @@ class HomeController extends Controller
         $this->professor = $professor;
     }
 
+    public function home()
+    {
+        return view('home_landing');
+    }
+    
     public function index()
     {
        
