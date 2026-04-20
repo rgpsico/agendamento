@@ -119,6 +119,7 @@
                                             <th>Contato</th>
                                             <th>Origem</th>
                                             <th>Status</th>
+                                            <th class="text-center">Temp.</th>
                                             <th>E-mail enviado</th>
                                             <th class="text-center">Ações</th>
                                         </tr>
@@ -136,12 +137,6 @@
                                                     <a href="{{ route('admin.leads.show', $lead) }}">
                                                         {{ $lead->nome }}
                                                     </a>
-                                                    @if($lead->temperatura !== 'frio')
-                                                        @php $t = \App\Models\Lead::$temperaturaConfig[$lead->temperatura]; @endphp
-                                                        <span class="badge bg-{{ $t['color'] }} ms-1">
-                                                            {{ $t['icon'] }} {{ $t['label'] }}
-                                                        </span>
-                                                    @endif
                                                     @if($lead->empresa)
                                                         <br><small class="text-muted">{{ $lead->empresa }}</small>
                                                     @endif
@@ -156,6 +151,12 @@
                                                 <td>
                                                     <span class="badge bg-{{ $lead->status_color }}">
                                                         {{ $lead->status_label }}
+                                                    </span>
+                                                </td>
+                                                <td class="text-center">
+                                                    @php $t = \App\Models\Lead::$temperaturaConfig[$lead->temperatura]; @endphp
+                                                    <span class="badge bg-{{ $t['color'] }}" title="{{ $t['label'] }}">
+                                                        {{ $t['icon'] }} {{ $t['label'] }}
                                                     </span>
                                                 </td>
                                                 <td>
