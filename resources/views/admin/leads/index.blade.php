@@ -62,12 +62,8 @@
                             <label class="form-label">E-mail</label>
                             <select name="email_status" class="form-control">
                                 <option value="">Todos</option>
-                                <option value="nao_enviado" {{ request('email_status') === 'nao_enviado' ? 'selected' : '' }}>
-                                    Não enviado
-                                </option>
-                                <option value="enviado" {{ request('email_status') === 'enviado' ? 'selected' : '' }}>
-                                    Já enviado
-                                </option>
+                                <option value="nao_enviado" {{ request('email_status') === 'nao_enviado' ? 'selected' : '' }}>Não enviado</option>
+                                <option value="enviado" {{ request('email_status') === 'enviado' ? 'selected' : '' }}>Já enviado</option>
                             </select>
                         </div>
                         <div class="col-md-3 d-flex gap-2 align-items-end">
@@ -82,124 +78,126 @@
                 </div>
             </div>
 
-            {{-- Ação em massa --}}
+            {{-- Form de envio em massa — FORA da tabela para evitar forms aninhados --}}
             <form action="{{ route('admin.leads.enviar.emails') }}" method="POST" id="formEmails">
                 @csrf
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-body">
+                <div id="idsContainer"></div>
+            </form>
 
-                                {{-- Barra de ação selecionados --}}
-                                <div id="barraSelecionados" class="d-none mb-3 p-2 bg-light rounded d-flex align-items-center gap-3">
-                                    <span class="text-muted small">
-                                        <strong id="qtdSelecionados">0</strong> lead(s) selecionado(s)
-                                    </span>
-                                    <button type="submit" class="btn btn-primary btn-sm"
-                                            onclick="return confirm('Disparar e-mail para os leads selecionados?')">
-                                        <i class="fe fe-send"></i> Disparar e-mails
-                                    </button>
-                                </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
 
-                                <div class="table-responsive">
-                                    <table class="table table-hover table-center mb-0">
-                                        <thead>
+                            {{-- Barra de ação --}}
+                            <div id="barraSelecionados" class="d-none mb-3 p-2 bg-light rounded d-flex align-items-center gap-3">
+                                <span class="text-muted small">
+                                    <strong id="qtdSelecionados">0</strong> lead(s) selecionado(s)
+                                </span>
+                                <button type="button" class="btn btn-primary btn-sm" id="btnDispararEmails">
+                                    <i class="fe fe-send"></i> Disparar e-mails
+                                </button>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-hover table-center mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:40px;">
+                                                <input type="checkbox" id="checkAll" title="Marcar todos">
+                                            </th>
+                                            <th>Nome</th>
+                                            <th>Contato</th>
+                                            <th>Origem</th>
+                                            <th>Status</th>
+                                            <th>E-mail enviado</th>
+                                            <th class="text-center">Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse ($leads as $lead)
                                             <tr>
-                                                <th style="width:40px;">
-                                                    <input type="checkbox" id="checkAll" title="Marcar todos">
-                                                </th>
-                                                <th>Nome</th>
-                                                <th>Contato</th>
-                                                <th>Origem</th>
-                                                <th>Status</th>
-                                                <th>E-mail enviado</th>
-                                                <th class="text-center">Ações</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @forelse ($leads as $lead)
-                                                <tr>
-                                                    <td>
-                                                        <input type="checkbox" name="ids[]"
-                                                               value="{{ $lead->id }}"
-                                                               class="check-lead"
-                                                               {{ $lead->email ? '' : 'disabled title=Sem e-mail' }}>
-                                                    </td>
-                                                    <td>
-                                                        <a href="{{ route('admin.leads.show', $lead) }}">
-                                                            {{ $lead->nome }}
-                                                        </a>
-                                                        @if($lead->empresa)
-                                                            <br><small class="text-muted">{{ $lead->empresa }}</small>
-                                                        @endif
-                                                    </td>
-                                                    <td>
-                                                        {{ $lead->email ?? '-' }}
-                                                        @if($lead->telefone)
-                                                            <br><small>{{ $lead->telefone }}</small>
-                                                        @endif
-                                                    </td>
-                                                    <td>{{ $lead->origem_label }}</td>
-                                                    <td>
-                                                        <span class="badge bg-{{ $lead->status_color }}">
-                                                            {{ $lead->status_label }}
+                                                <td>
+                                                    <input type="checkbox"
+                                                           value="{{ $lead->id }}"
+                                                           class="check-lead"
+                                                           {{ $lead->email ? '' : 'disabled title="Sem e-mail"' }}>
+                                                </td>
+                                                <td>
+                                                    <a href="{{ route('admin.leads.show', $lead) }}">
+                                                        {{ $lead->nome }}
+                                                    </a>
+                                                    @if($lead->empresa)
+                                                        <br><small class="text-muted">{{ $lead->empresa }}</small>
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    {{ $lead->email ?? '-' }}
+                                                    @if($lead->telefone)
+                                                        <br><small>{{ $lead->telefone }}</small>
+                                                    @endif
+                                                </td>
+                                                <td>{{ $lead->origem_label }}</td>
+                                                <td>
+                                                    <span class="badge bg-{{ $lead->status_color }}">
+                                                        {{ $lead->status_label }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    @if($lead->email_enviado_em)
+                                                        <span class="badge bg-success"
+                                                              title="{{ $lead->email_enviado_em->format('d/m/Y H:i') }}">
+                                                            <i class="fe fe-check"></i>
+                                                            {{ $lead->email_enviado_em->format('d/m/Y') }}
                                                         </span>
-                                                    </td>
-                                                    <td>
-                                                        @if($lead->email_enviado_em)
-                                                            <span class="badge bg-success" title="{{ $lead->email_enviado_em->format('d/m/Y H:i') }}">
-                                                                <i class="fe fe-check"></i>
-                                                                {{ $lead->email_enviado_em->format('d/m/Y') }}
-                                                            </span>
-                                                        @else
-                                                            <span class="text-muted small">—</span>
+                                                    @else
+                                                        <span class="text-muted small">—</span>
+                                                    @endif
+                                                </td>
+                                                <td class="text-center">
+                                                    <div class="actions">
+                                                        @if($lead->whatsapp_url)
+                                                            <a href="{{ $lead->whatsapp_url }}" target="_blank"
+                                                               class="btn btn-sm btn-success" title="WhatsApp">
+                                                                <i class="fab fa-whatsapp"></i>
+                                                            </a>
                                                         @endif
-                                                    </td>
-                                                    <td class="text-center">
-                                                        <div class="actions">
-                                                            @if($lead->whatsapp_url)
-                                                                <a href="{{ $lead->whatsapp_url }}" target="_blank"
-                                                                   class="btn btn-sm btn-success" title="WhatsApp">
-                                                                    <i class="fab fa-whatsapp"></i>
-                                                                </a>
-                                                            @endif
-                                                            <a href="{{ route('admin.leads.show', $lead) }}"
-                                                               class="btn btn-sm bg-success-light" title="Ver">
-                                                                <i class="fe fe-eye"></i>
-                                                            </a>
-                                                            <a href="{{ route('admin.leads.edit', $lead) }}"
-                                                               class="btn btn-sm bg-info-light" title="Editar">
-                                                                <i class="fe fe-pencil"></i>
-                                                            </a>
-                                                            <form action="{{ route('admin.leads.destroy', $lead) }}"
-                                                                  method="POST" class="d-inline"
-                                                                  onsubmit="return confirm('Deseja excluir este lead?');">
-                                                                @csrf
-                                                                @method('DELETE')
-                                                                <button type="submit" class="btn btn-sm bg-danger-light" title="Excluir">
-                                                                    <i class="fe fe-trash"></i>
-                                                                </button>
-                                                            </form>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            @empty
-                                                <tr>
-                                                    <td colspan="7" class="text-center">Nenhum lead encontrado.</td>
-                                                </tr>
-                                            @endforelse
-                                        </tbody>
-                                    </table>
-                                </div>
+                                                        <a href="{{ route('admin.leads.show', $lead) }}"
+                                                           class="btn btn-sm bg-success-light" title="Ver">
+                                                            <i class="fe fe-eye"></i>
+                                                        </a>
+                                                        <a href="{{ route('admin.leads.edit', $lead) }}"
+                                                           class="btn btn-sm bg-info-light" title="Editar">
+                                                            <i class="fe fe-pencil"></i>
+                                                        </a>
+                                                        <form action="{{ route('admin.leads.destroy', $lead) }}"
+                                                              method="POST" class="d-inline"
+                                                              onsubmit="return confirm('Deseja excluir este lead?');">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="btn btn-sm bg-danger-light" title="Excluir">
+                                                                <i class="fe fe-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="7" class="text-center">Nenhum lead encontrado.</td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
 
-                                <div class="mt-3">
-                                    {{ $leads->links() }}
-                                </div>
+                            <div class="mt-3">
+                                {{ $leads->links() }}
                             </div>
                         </div>
                     </div>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 
@@ -256,26 +254,43 @@
     </div>
 
     <script>
-        const checkAll   = document.getElementById('checkAll');
-        const checks     = document.querySelectorAll('.check-lead:not([disabled])');
-        const barra      = document.getElementById('barraSelecionados');
-        const qtdSpan    = document.getElementById('qtdSelecionados');
+        const checkAll  = document.getElementById('checkAll');
+        const barra     = document.getElementById('barraSelecionados');
+        const qtdSpan   = document.getElementById('qtdSelecionados');
+        const btnDisparar = document.getElementById('btnDispararEmails');
+        const formEmails  = document.getElementById('formEmails');
+        const idsContainer = document.getElementById('idsContainer');
+
+        function getSelecionados() {
+            return [...document.querySelectorAll('.check-lead:checked')].map(c => c.value);
+        }
 
         function atualizarBarra() {
-            const selecionados = document.querySelectorAll('.check-lead:checked').length;
-            qtdSpan.textContent = selecionados;
-            barra.classList.toggle('d-none', selecionados === 0);
-            barra.classList.toggle('d-flex', selecionados > 0);
+            const qtd = getSelecionados().length;
+            qtdSpan.textContent = qtd;
+            barra.classList.toggle('d-none', qtd === 0);
+            barra.classList.toggle('d-flex', qtd > 0);
         }
 
         checkAll.addEventListener('change', function () {
-            checks.forEach(c => c.checked = this.checked);
+            document.querySelectorAll('.check-lead:not([disabled])').forEach(c => c.checked = this.checked);
             atualizarBarra();
         });
 
-        checks.forEach(c => c.addEventListener('change', function () {
-            checkAll.checked = [...checks].every(c => c.checked);
+        document.querySelectorAll('.check-lead').forEach(c => c.addEventListener('change', function () {
+            const todos = [...document.querySelectorAll('.check-lead:not([disabled])')];
+            checkAll.checked = todos.every(c => c.checked);
             atualizarBarra();
         }));
+
+        btnDisparar.addEventListener('click', function () {
+            const ids = getSelecionados();
+            if (!ids.length) return;
+            if (!confirm('Disparar e-mail para ' + ids.length + ' lead(s) selecionado(s)?')) return;
+
+            // Injeta os IDs no form separado e submete
+            idsContainer.innerHTML = ids.map(id => `<input type="hidden" name="ids[]" value="${id}">`).join('');
+            formEmails.submit();
+        });
     </script>
 </x-admin.layout>
