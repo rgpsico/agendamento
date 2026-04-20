@@ -290,6 +290,22 @@
                             </ul>
                         </li>
                       @endif
+
+                        @masterUser
+                        <!-- CRM -->
+                        <li class="submenu">
+                            <a href="#">
+                                <i class="fas fa-funnel-dollar" style="font-size: 18px;"></i>
+                                <span>CRM - Leads</span>
+                                <span class="menu-arrow"></span>
+                            </a>
+                            <ul>
+                                <li><a href="{{ route('admin.leads.index') }}">Listar Leads</a></li>
+                                <li><a href="{{ route('admin.leads.create') }}">Novo Lead</a></li>
+                            </ul>
+                        </li>
+                        @endmasterUser
+
                         <!-- Modalidades -->
                       @masterUser
                         <li class="submenu">
