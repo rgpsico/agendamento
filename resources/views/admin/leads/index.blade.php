@@ -116,6 +116,12 @@
                                                 <td>{{ $lead->created_at->format('d/m/Y') }}</td>
                                                 <td class="text-center">
                                                     <div class="actions">
+                                                        @if($lead->whatsapp_url)
+                                                            <a href="{{ $lead->whatsapp_url }}" target="_blank"
+                                                               class="btn btn-sm btn-success" title="Enviar WhatsApp">
+                                                                <i class="fab fa-whatsapp"></i>
+                                                            </a>
+                                                        @endif
                                                         <a href="{{ route('admin.leads.show', $lead) }}"
                                                            class="btn btn-sm bg-success-light" title="Ver">
                                                             <i class="fe fe-eye"></i>

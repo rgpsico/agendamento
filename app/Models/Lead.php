@@ -64,4 +64,18 @@ class Lead extends Model
     {
         return self::$origens[$this->origem] ?? $this->origem;
     }
+
+    public function getWhatsappUrlAttribute(): ?string
+    {
+        if (empty($this->telefone)) return null;
+
+        $numero = preg_replace('/\D/', '', $this->telefone);
+
+        // Adiciona DDI 55 (Brasil) se não tiver
+        if (strlen($numero) <= 11) {
+            $numero = '55' . $numero;
+        }
+
+        return 'https://wa.me/' . $numero;
+    }
 }
