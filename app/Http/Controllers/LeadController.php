@@ -160,6 +160,65 @@ class LeadController extends Controller
         return redirect()->route('admin.leads.index')->with('success', $msg);
     }
 
+    public function importText(Request $request)
+    {
+        $request->validate([
+            'conteudo' => 'required|string',
+        ]);
+
+        $lines    = explode("\n", trim($request->conteudo));
+        $header   = null;
+        $imported = 0;
+        $errors   = [];
+
+        foreach ($lines as $line) {
+            $line = trim($line);
+            if (empty($line)) continue;
+
+            $row = str_getcsv($line);
+
+            if ($header === null) {
+                $header = array_map(fn($h) => strtolower(trim($h)), $row);
+                continue;
+            }
+
+            if (count($row) < count($header)) {
+                $row = array_pad($row, count($header), null);
+            }
+
+            $data = array_combine($header, array_map('trim', $row));
+
+            $nome = $data['nome']
+                ?? $data['nome_negocio']
+                ?? $data['nome do negocio']
+                ?? $data['negocio']
+                ?? null;
+
+            if (empty($nome)) {
+                $errors[] = "Linha ignorada: nome vazio.";
+                continue;
+            }
+
+            Lead::create([
+                'nome'      => $nome,
+                'telefone'  => $data['telefone'] ?? $data['whatsapp'] ?? null,
+                'email'     => $data['email'] ?? $data['e-mail'] ?? null,
+                'interesse' => $data['interesse'] ?? $data['tipo'] ?? null,
+                'origem'    => $data['origem'] ?? 'manual',
+                'status'    => 'novo',
+            ]);
+
+            $imported++;
+        }
+
+        $msg = "{$imported} lead(s) importado(s) com sucesso.";
+        if (count($errors)) {
+            $msg .= ' ' . count($errors) . ' linha(s) ignorada(s).';
+        }
+
+        return redirect()->route('admin.leads.index')->with('success', $msg);
+    }
+
     public function templateCsv()
     {
         $headers = [

@@ -156,37 +156,66 @@
     </div>
 
     {{-- Modal Import --}}
-    <div class="modal fade" id="modalImport" tabindex="-1" aria-labelledby="modalImportLabel" aria-hidden="true">
-        <div class="modal-dialog">
+    <div class="modal fade" id="modalImport" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalImportLabel">
-                        <i class="fe fe-upload"></i> Importar Leads via CSV
-                    </h5>
+                    <h5 class="modal-title"><i class="fe fe-upload"></i> Importar Leads</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form action="{{ route('admin.leads.import') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <div class="modal-body">
-                        <p class="text-muted small mb-3">
-                            O arquivo CSV deve ter as colunas: <strong>nome, telefone, email, interesse, origem</strong>.<br>
-                            Baixe o <a href="{{ route('admin.leads.template') }}">template CSV</a> para usar como modelo.
-                        </p>
-                        <div class="mb-3">
-                            <label class="form-label">Arquivo CSV <span class="text-danger">*</span></label>
-                            <input type="file" name="arquivo" class="form-control" accept=".csv,.txt" required>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs mb-3" id="importTabs">
+                        <li class="nav-item">
+                            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabColar">
+                                Colar CSV
+                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabArquivo">
+                                Upload de Arquivo
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content">
+                        {{-- Aba: colar texto --}}
+                        <div class="tab-pane fade show active" id="tabColar">
+                            <form action="{{ route('admin.leads.import.text') }}" method="POST">
+                                @csrf
+                                <p class="text-muted small mb-2">
+                                    Cole o conteúdo CSV abaixo. Colunas aceitas:
+                                    <code>id, nome_negocio, telefone, email, tipo, origem</code>
+                                </p>
+                                <textarea name="conteudo" class="form-control font-monospace" rows="14"
+                                          placeholder="id,nome_negocio,telefone,email,tipo&#10;1,Peninsula Pilates Studio,(21) 99835-6116,pilatespeninsula@gmail.com,Pilates" required></textarea>
+                                <div class="mt-3 text-end">
+                                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="submit" class="btn btn-success ms-2">
+                                        <i class="fe fe-check"></i> Importar
+                                    </button>
+                                </div>
+                            </form>
                         </div>
-                        <div class="alert alert-info small mb-0">
-                            <strong>Dica:</strong> Se tiver o PDF de prospecção, abra no Excel/Sheets, copie a tabela e salve como CSV.
+
+                        {{-- Aba: upload arquivo --}}
+                        <div class="tab-pane fade" id="tabArquivo">
+                            <form action="{{ route('admin.leads.import') }}" method="POST" enctype="multipart/form-data">
+                                @csrf
+                                <p class="text-muted small mb-2">
+                                    Selecione um arquivo <strong>.csv</strong>.
+                                    <a href="{{ route('admin.leads.template') }}">Baixar template</a>
+                                </p>
+                                <input type="file" name="arquivo" class="form-control" accept=".csv,.txt" required>
+                                <div class="mt-3 text-end">
+                                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="submit" class="btn btn-success ms-2">
+                                        <i class="fe fe-upload"></i> Importar
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-success">
-                            <i class="fe fe-upload"></i> Importar
-                        </button>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>
