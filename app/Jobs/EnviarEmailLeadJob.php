@@ -24,6 +24,11 @@ class EnviarEmailLeadJob implements ShouldQueue
     {
         if (empty($this->lead->email)) return;
 
+        if (empty($this->lead->token)) {
+            $this->lead->update(['token' => \Illuminate\Support\Str::uuid()]);
+            $this->lead->refresh();
+        }
+
         Mail::to($this->lead->email)->send(new LeadProspeccaoMail($this->lead));
 
         $this->lead->update(['email_enviado_em' => now()]);
