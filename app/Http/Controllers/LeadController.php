@@ -55,7 +55,7 @@ class LeadController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'nome'           => 'required|string|max:255',
             'email'          => 'nullable|email|max:255',
             'telefone'       => 'nullable|string|max:20',
@@ -67,7 +67,7 @@ class LeadController extends Controller
             'responsavel_id' => 'nullable|exists:usuarios,id',
         ]);
 
-        Lead::create($request->validated());
+        Lead::create($validated);
 
         return redirect()->route('admin.leads.index')->with('success', 'Lead cadastrado com sucesso!');
     }
@@ -91,7 +91,7 @@ class LeadController extends Controller
 
     public function update(Request $request, Lead $lead)
     {
-        $request->validate([
+        $validated = $request->validate([
             'nome'           => 'required|string|max:255',
             'email'          => 'nullable|email|max:255',
             'telefone'       => 'nullable|string|max:20',
@@ -103,7 +103,7 @@ class LeadController extends Controller
             'responsavel_id' => 'nullable|exists:usuarios,id',
         ]);
 
-        $lead->update($request->validated());
+        $lead->update($validated);
 
         return redirect()->route('admin.leads.index')->with('success', 'Lead atualizado com sucesso!');
     }
