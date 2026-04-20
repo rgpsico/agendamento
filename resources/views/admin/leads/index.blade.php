@@ -11,7 +11,13 @@
                             <li class="breadcrumb-item active">Leads</li>
                         </ul>
                     </div>
-                    <div class="col-sm-6 text-end">
+                    <div class="col-sm-6 text-end d-flex gap-2 justify-content-end">
+                        <a href="{{ route('admin.leads.template') }}" class="btn btn-outline-secondary">
+                            <i class="fe fe-download"></i> Template CSV
+                        </a>
+                        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalImport">
+                            <i class="fe fe-upload"></i> Importar CSV
+                        </button>
                         <a href="{{ route('admin.leads.create') }}" class="btn btn-primary">
                             <i class="fe fe-plus"></i> Novo Lead
                         </a>
@@ -145,6 +151,42 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Modal Import --}}
+    <div class="modal fade" id="modalImport" tabindex="-1" aria-labelledby="modalImportLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalImportLabel">
+                        <i class="fe fe-upload"></i> Importar Leads via CSV
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form action="{{ route('admin.leads.import') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="modal-body">
+                        <p class="text-muted small mb-3">
+                            O arquivo CSV deve ter as colunas: <strong>nome, telefone, email, interesse, origem</strong>.<br>
+                            Baixe o <a href="{{ route('admin.leads.template') }}">template CSV</a> para usar como modelo.
+                        </p>
+                        <div class="mb-3">
+                            <label class="form-label">Arquivo CSV <span class="text-danger">*</span></label>
+                            <input type="file" name="arquivo" class="form-control" accept=".csv,.txt" required>
+                        </div>
+                        <div class="alert alert-info small mb-0">
+                            <strong>Dica:</strong> Se tiver o PDF de prospecção, abra no Excel/Sheets, copie a tabela e salve como CSV.
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fe fe-upload"></i> Importar
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

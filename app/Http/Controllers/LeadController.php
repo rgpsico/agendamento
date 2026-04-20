@@ -107,4 +107,74 @@ class LeadController extends Controller
 
         return redirect()->route('admin.leads.index')->with('success', 'Lead excluído com sucesso!');
     }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'arquivo' => 'required|file|mimes:csv,txt|max:2048',
+        ]);
+
+        $file    = $request->file('arquivo');
+        $handle  = fopen($file->getRealPath(), 'r');
+        $header  = null;
+        $imported = 0;
+        $errors  = [];
+
+        while (($row = fgetcsv($handle, 1000, ',')) !== false) {
+            // Pula linha de cabeçalho
+            if ($header === null) {
+                $header = array_map('strtolower', array_map('trim', $row));
+                continue;
+            }
+
+            if (count($row) < 2) continue;
+
+            $data = array_combine($header, array_map('trim', $row));
+
+            $nome = $data['nome'] ?? $data['nome do negocio'] ?? $data['negocio'] ?? null;
+
+            if (empty($nome)) {
+                $errors[] = "Linha ignorada: nome vazio.";
+                continue;
+            }
+
+            Lead::create([
+                'nome'      => $nome,
+                'telefone'  => $data['telefone'] ?? $data['whatsapp'] ?? $data['whatsapp / telefone'] ?? null,
+                'email'     => $data['email'] ?? $data['e-mail'] ?? null,
+                'interesse' => $data['interesse'] ?? $data['tipo'] ?? null,
+                'origem'    => $data['origem'] ?? 'manual',
+                'status'    => 'novo',
+            ]);
+
+            $imported++;
+        }
+
+        fclose($handle);
+
+        $msg = "{$imported} lead(s) importado(s) com sucesso.";
+        if (count($errors)) {
+            $msg .= ' ' . count($errors) . ' linha(s) ignorada(s).';
+        }
+
+        return redirect()->route('admin.leads.index')->with('success', $msg);
+    }
+
+    public function templateCsv()
+    {
+        $headers = [
+            'Content-Type'        => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="template_leads.csv"',
+        ];
+
+        $callback = function () {
+            $handle = fopen('php://output', 'w');
+            fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF)); // BOM UTF-8
+            fputcsv($handle, ['nome', 'telefone', 'email', 'interesse', 'origem']);
+            fputcsv($handle, ['Peninsula Pilates Studio', '(21) 99835-6116', 'pilatespeninsula@gmail.com', 'Pilates', 'manual']);
+            fclose($handle);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
 }
