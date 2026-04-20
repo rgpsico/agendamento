@@ -16,6 +16,7 @@ class Lead extends Model
         'interesse',
         'observacoes',
         'responsavel_id',
+        'trial_usuario_id',
         'email_enviado_em',
         'token',
         'morno_em',

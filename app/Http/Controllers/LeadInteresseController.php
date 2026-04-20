@@ -2,8 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\LeadAcessoTrialMail;
 use App\Models\Lead;
+use App\Models\Usuario;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class LeadInteresseController extends Controller
 {
@@ -34,7 +39,8 @@ class LeadInteresseController extends Controller
         $lead = Lead::where('token', $token)->firstOrFail();
 
         $request->validate([
-            'whatsapp' => 'required|string|max:20',
+            'whatsapp'    => 'required|string|max:20',
+            'quer_trial'  => 'nullable|boolean',
         ]);
 
         $lead->update([
@@ -43,6 +49,25 @@ class LeadInteresseController extends Controller
             'status'              => 'em_contato',
         ]);
 
-        return view('leads.interesse-confirmado', compact('lead'));
+        $senhaClear  = null;
+        $usuarioTrial = null;
+
+        if ($request->boolean('quer_trial') && !$lead->trial_usuario_id) {
+            $senhaClear = Str::random(8);
+
+            $usuarioTrial = Usuario::create([
+                'nome'         => $lead->nome,
+                'email'        => $lead->email,
+                'password'     => Hash::make($senhaClear),
+                'tipo_usuario' => 'trial',
+                'telefone'     => $request->whatsapp,
+            ]);
+
+            $lead->update(['trial_usuario_id' => $usuarioTrial->id]);
+
+            Mail::to($lead->email)->send(new LeadAcessoTrialMail($lead, $senhaClear));
+        }
+
+        return view('leads.interesse-confirmado', compact('lead', 'senhaClear', 'usuarioTrial'));
     }
 }

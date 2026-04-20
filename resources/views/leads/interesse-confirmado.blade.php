@@ -23,11 +23,24 @@
                         Obrigado, <strong>{{ $lead->nome }}</strong>!<br>
                         Nossa equipe entrará em contato com você em breve pelo WhatsApp.
                     </p>
-                    <hr>
-                    <p class="small text-muted mb-0">
-                        Plataforma de Agendamento Online<br>
-                        {{ config('app.url') }}
-                    </p>
+
+                    @if($senhaClear)
+                        <div class="mt-3 p-3 rounded text-start" style="background:#f0f4ff; border:2px dashed #2a5298;">
+                            <p class="fw-bold mb-2">🎉 Seu acesso de teste foi criado!</p>
+                            <p class="mb-1">📧 <strong>Login:</strong> {{ $lead->email }}</p>
+                            <p class="mb-1">🔑 <strong>Senha:</strong> <code class="fs-5">{{ $senhaClear }}</code></p>
+                            <p class="mb-0 small text-muted">Estas credenciais também foram enviadas para o seu e-mail.</p>
+                        </div>
+                        <a href="{{ config('app.url') }}" class="btn btn-primary rounded-pill px-4 mt-3">
+                            Acessar agora →
+                        </a>
+                    @else
+                        <hr>
+                        <p class="small text-muted mb-0">
+                            Plataforma de Agendamento Online<br>
+                            {{ config('app.url') }}
+                        </p>
+                    @endif
                 </div>
             </div>
         </div>
