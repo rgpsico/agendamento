@@ -28,7 +28,9 @@ class LeadInteresseController extends Controller
         $lead = Lead::where('token', $token)->firstOrFail();
 
         if ($lead->interessado_em) {
-            return view('leads.interesse-confirmado', compact('lead'));
+            $senhaClear   = null;
+            $usuarioTrial = null;
+            return view('leads.interesse-confirmado', compact('lead', 'senhaClear', 'usuarioTrial'));
         }
 
         return view('leads.interesse', compact('lead'));
