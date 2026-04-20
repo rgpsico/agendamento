@@ -41,7 +41,7 @@
         </p>
 
         <a href="{{ route('lead.rastrear', $lead->token) }}" class="cta">
-            Quero conhecer a plataforma → TESTE
+            Quero conhecer a plataforma →
         </a>
 
         <p style="font-size:13px; color:#666;">
