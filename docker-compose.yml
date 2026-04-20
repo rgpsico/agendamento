@@ -59,15 +59,7 @@ services:
       - .:/var/www
       - ./custom.ini:/usr/local/etc/php/conf.d/custom.ini
     working_dir: /var/www
-    command:
-      - php
-      - artisan
-      - queue:work
-      - redis
-      - --sleep=3
-      - --tries=3
-      - --max-time=3600
-      - --timeout=90
+    command: ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/laravel-worker.conf"]
     restart: unless-stopped
     depends_on:
       - redis

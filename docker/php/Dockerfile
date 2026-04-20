@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libxml2-dev \
     libicu-dev \
+    supervisor \
     && docker-php-ext-install \
         pdo_mysql \
         mbstring \
@@ -25,5 +26,9 @@ RUN pecl install redis \
 
 # Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+# Supervisor config
+COPY docker/php/supervisord.conf /etc/supervisor/conf.d/laravel-worker.conf
+RUN mkdir -p /var/log/supervisor
 
 WORKDIR /var/www
