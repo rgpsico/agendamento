@@ -43,7 +43,7 @@ use App\Http\Controllers\DespesasRecorrenteController;
 
 use App\Http\Controllers\FinanceiroCategoriaController;
 use App\Http\Controllers\ReceitaRecorrenteController;
-use App\Http\Controllers\Admin\LeadController;
+use App\Http\Controllers\LeadController;
 
 
 

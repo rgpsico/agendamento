@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cmd /c \"cd c:\\\\\\\\laragon\\\\\\\\www\\\\\\\\agendamento && composer dump-autoload\")",
+      "Bash(cmd /c \"cd /d c:\\\\\\\\laragon\\\\\\\\www\\\\\\\\agendamento && php composer.phar dump-autoload 2>&1 || C:\\\\\\\\laragon\\\\\\\\bin\\\\\\\\php\\\\\\\\php8.2.28\\\\\\\\php.exe C:\\\\\\\\laragon\\\\\\\\bin\\\\\\\\composer\\\\\\\\composer.phar dump-autoload 2>&1\")",
+      "Bash(cmd /c \"where composer 2>&1 & where php 2>&1\")",
+      "Bash(cmd /c \"C:\\\\\\\\laragon\\\\\\\\bin\\\\\\\\php\\\\\\\\php8.2.28\\\\\\\\php.exe --version 2>&1\")",
+      "Read(//c/laragon/bin/php//**)",
+      "Read(//c/laragon/bin/**)"
+    ]
+  }
+}
