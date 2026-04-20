@@ -4,7 +4,8 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Blade;
-use Illuminate\Support\Facades\URL; // <--- 1. ADICIONE ISSO
+use Illuminate\Support\Facades\URL;
+use Illuminate\Pagination\Paginator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,6 +26,8 @@ class AppServiceProvider extends ServiceProvider
         if ($this->app->environment('production') || env('APP_ENV') === 'production') {
             URL::forceScheme('https'); // <--- 2. ADICIONE ISSO
         }
+
+        Paginator::useBootstrapFive();
 
         Blade::if('masterUser', function () {
             return auth()->check() && auth()->user()->isMasterUser();

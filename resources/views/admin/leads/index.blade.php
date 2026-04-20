@@ -192,7 +192,7 @@
                             </div>
 
                             <div class="mt-3">
-                                {{ $leads->links() }}
+                                {{ $leads->links('pagination::bootstrap-5') }}
                             </div>
                         </div>
                     </div>
