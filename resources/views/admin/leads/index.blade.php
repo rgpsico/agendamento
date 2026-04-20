@@ -66,6 +66,14 @@
                                 <option value="enviado" {{ request('email_status') === 'enviado' ? 'selected' : '' }}>Já enviado</option>
                             </select>
                         </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Interesse</label>
+                            <select name="quente" class="form-control">
+                                <option value="">Todos</option>
+                                <option value="1" {{ request('quente') === '1' ? 'selected' : '' }}>🔥 Leads Quentes</option>
+                                <option value="0" {{ request('quente') === '0' ? 'selected' : '' }}>Sem interesse</option>
+                            </select>
+                        </div>
                         <div class="col-md-3 d-flex gap-2 align-items-end">
                             <button type="submit" class="btn btn-secondary w-100">
                                 <i class="fe fe-search"></i> Filtrar
@@ -127,6 +135,12 @@
                                                     <a href="{{ route('admin.leads.show', $lead) }}">
                                                         {{ $lead->nome }}
                                                     </a>
+                                                    @if($lead->is_lead_quente)
+                                                        <span class="badge bg-danger ms-1"
+                                                              title="Interessado em {{ $lead->interessado_em->format('d/m/Y H:i') }}">
+                                                            🔥 Quente
+                                                        </span>
+                                                    @endif
                                                     @if($lead->empresa)
                                                         <br><small class="text-muted">{{ $lead->empresa }}</small>
                                                     @endif

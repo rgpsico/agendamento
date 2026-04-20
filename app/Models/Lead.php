@@ -17,11 +17,29 @@ class Lead extends Model
         'observacoes',
         'responsavel_id',
         'email_enviado_em',
+        'token',
+        'interessado_em',
+        'whatsapp_confirmado',
     ];
 
     protected $casts = [
         'email_enviado_em' => 'datetime',
+        'interessado_em'   => 'datetime',
     ];
+
+    protected static function booted(): void
+    {
+        static::creating(function (Lead $lead) {
+            if (empty($lead->token)) {
+                $lead->token = \Illuminate\Support\Str::uuid();
+            }
+        });
+    }
+
+    public function getIsLeadQuenteAttribute(): bool
+    {
+        return !is_null($this->interessado_em);
+    }
 
     public static array $origens = [
         'manual'       => 'Manual',

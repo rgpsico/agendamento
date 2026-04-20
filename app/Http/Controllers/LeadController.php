@@ -21,6 +21,12 @@ class LeadController extends Controller
             $query->where('origem', $request->origem);
         }
 
+        if ($request->quente === '1') {
+            $query->whereNotNull('interessado_em');
+        } elseif ($request->quente === '0') {
+            $query->whereNull('interessado_em');
+        }
+
         if ($request->email_status === 'nao_enviado') {
             $query->whereNull('email_enviado_em');
         } elseif ($request->email_status === 'enviado') {

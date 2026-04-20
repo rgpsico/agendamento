@@ -44,6 +44,7 @@ use App\Http\Controllers\DespesasRecorrenteController;
 use App\Http\Controllers\FinanceiroCategoriaController;
 use App\Http\Controllers\ReceitaRecorrenteController;
 use App\Http\Controllers\LeadController;
+use App\Http\Controllers\LeadInteresseController;
 
 
 
@@ -83,6 +84,9 @@ Route::prefix('admin/roles')->name('admin.roles.')->group(function () {
     Route::put('/{role}', [RoleController::class, 'update'])->name('update');
     Route::delete('/{role}', [RoleController::class, 'destroy'])->name('destroy');
 });
+
+Route::get('/interesse/{token}', [LeadInteresseController::class, 'show'])->name('lead.interesse');
+Route::post('/interesse/{token}', [LeadInteresseController::class, 'store'])->name('lead.interesse.store');
 
 Route::prefix('admin/crm/leads')->middleware(['auth'])->name('admin.leads.')->group(function () {
     Route::get('/', [LeadController::class, 'index'])->name('index');
