@@ -18,12 +18,14 @@ class Lead extends Model
         'responsavel_id',
         'email_enviado_em',
         'token',
+        'morno_em',
         'interessado_em',
         'whatsapp_confirmado',
     ];
 
     protected $casts = [
         'email_enviado_em' => 'datetime',
+        'morno_em'         => 'datetime',
         'interessado_em'   => 'datetime',
     ];
 
@@ -40,6 +42,25 @@ class Lead extends Model
     {
         return !is_null($this->interessado_em);
     }
+
+    public function getIsLeadMornoAttribute(): bool
+    {
+        return !is_null($this->morno_em) && is_null($this->interessado_em);
+    }
+
+    // frio | morno | quente
+    public function getTemperaturaAttribute(): string
+    {
+        if ($this->interessado_em) return 'quente';
+        if ($this->morno_em)      return 'morno';
+        return 'frio';
+    }
+
+    public static array $temperaturaConfig = [
+        'frio'   => ['label' => 'Frio',   'color' => 'secondary', 'icon' => '🧊'],
+        'morno'  => ['label' => 'Morno',  'color' => 'warning',   'icon' => '🌡️'],
+        'quente' => ['label' => 'Quente', 'color' => 'danger',    'icon' => '🔥'],
+    ];
 
     public static array $origens = [
         'manual'       => 'Manual',

@@ -21,10 +21,12 @@ class LeadController extends Controller
             $query->where('origem', $request->origem);
         }
 
-        if ($request->quente === '1') {
+        if ($request->temperatura === 'quente') {
             $query->whereNotNull('interessado_em');
-        } elseif ($request->quente === '0') {
-            $query->whereNull('interessado_em');
+        } elseif ($request->temperatura === 'morno') {
+            $query->whereNotNull('morno_em')->whereNull('interessado_em');
+        } elseif ($request->temperatura === 'frio') {
+            $query->whereNull('morno_em');
         }
 
         if ($request->email_status === 'nao_enviado') {

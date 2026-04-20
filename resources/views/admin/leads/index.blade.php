@@ -67,11 +67,12 @@
                             </select>
                         </div>
                         <div class="col-md-2">
-                            <label class="form-label">Interesse</label>
-                            <select name="quente" class="form-control">
+                            <label class="form-label">Temperatura</label>
+                            <select name="temperatura" class="form-control">
                                 <option value="">Todos</option>
-                                <option value="1" {{ request('quente') === '1' ? 'selected' : '' }}>🔥 Leads Quentes</option>
-                                <option value="0" {{ request('quente') === '0' ? 'selected' : '' }}>Sem interesse</option>
+                                <option value="quente" {{ request('temperatura') === 'quente' ? 'selected' : '' }}>🔥 Quente</option>
+                                <option value="morno"  {{ request('temperatura') === 'morno'  ? 'selected' : '' }}>🌡️ Morno</option>
+                                <option value="frio"   {{ request('temperatura') === 'frio'   ? 'selected' : '' }}>🧊 Frio</option>
                             </select>
                         </div>
                         <div class="col-md-3 d-flex gap-2 align-items-end">
@@ -135,10 +136,10 @@
                                                     <a href="{{ route('admin.leads.show', $lead) }}">
                                                         {{ $lead->nome }}
                                                     </a>
-                                                    @if($lead->is_lead_quente)
-                                                        <span class="badge bg-danger ms-1"
-                                                              title="Interessado em {{ $lead->interessado_em->format('d/m/Y H:i') }}">
-                                                            🔥 Quente
+                                                    @if($lead->temperatura !== 'frio')
+                                                        @php $t = \App\Models\Lead::$temperaturaConfig[$lead->temperatura]; @endphp
+                                                        <span class="badge bg-{{ $t['color'] }} ms-1">
+                                                            {{ $t['icon'] }} {{ $t['label'] }}
                                                         </span>
                                                     @endif
                                                     @if($lead->empresa)
