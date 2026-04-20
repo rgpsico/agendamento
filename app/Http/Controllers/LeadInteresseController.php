@@ -7,17 +7,23 @@ use Illuminate\Http\Request;
 
 class LeadInteresseController extends Controller
 {
+    public function rastrear(string $token)
+    {
+        $lead = Lead::where('token', $token)->firstOrFail();
+
+        if (!$lead->morno_em) {
+            $lead->update(['morno_em' => now()]);
+        }
+
+        return redirect()->route('lead.interesse', $token);
+    }
+
     public function show(string $token)
     {
         $lead = Lead::where('token', $token)->firstOrFail();
 
         if ($lead->interessado_em) {
             return view('leads.interesse-confirmado', compact('lead'));
-        }
-
-        // Vira morno na primeira vez que abre o link
-        if (!$lead->morno_em) {
-            $lead->update(['morno_em' => now()]);
         }
 
         return view('leads.interesse', compact('lead'));

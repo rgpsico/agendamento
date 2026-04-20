@@ -40,7 +40,7 @@
             Sem mensalidades abusivas. Simples de usar. Suporte humanizado.
         </p>
 
-        <a href="{{ route('lead.interesse', $lead->token) }}" class="cta">
+        <a href="{{ route('lead.rastrear', $lead->token) }}" class="cta">
             Quero conhecer a plataforma →
         </a>
 
