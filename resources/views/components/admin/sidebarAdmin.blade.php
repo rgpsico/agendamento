@@ -40,11 +40,28 @@
                 <li class="submenu">
                     <a href="" class="">
                         <i class="fe fe-activity"></i>
-                        <span> Configuração</span> 
+                        <span> Configuração</span>
                         <span class="menu-arrow"></span>
                     </a>
                     <ul style="display: none;">
                         <li><a href="">Sistema</a></li>
+                    </ul>
+                </li>
+                @endmasterUser
+
+                @masterUser
+                <li class="menu-title">
+                    <span>CRM</span>
+                </li>
+                <li class="submenu">
+                    <a href="" class="">
+                        <i class="fe fe-users"></i>
+                        <span> Leads</span>
+                        <span class="menu-arrow"></span>
+                    </a>
+                    <ul style="display: none;">
+                        <li><a href="{{ route('admin.leads.index') }}">Listar Leads</a></li>
+                        <li><a href="{{ route('admin.leads.create') }}">Novo Lead</a></li>
                     </ul>
                 </li>
                 @endmasterUser

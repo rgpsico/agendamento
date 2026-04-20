@@ -43,6 +43,7 @@ use App\Http\Controllers\DespesasRecorrenteController;
 
 use App\Http\Controllers\FinanceiroCategoriaController;
 use App\Http\Controllers\ReceitaRecorrenteController;
+use App\Http\Controllers\Admin\LeadController;
 
 
 
@@ -81,6 +82,16 @@ Route::prefix('admin/roles')->name('admin.roles.')->group(function () {
     Route::get('/{role}/edit', [RoleController::class, 'edit'])->name('edit');
     Route::put('/{role}', [RoleController::class, 'update'])->name('update');
     Route::delete('/{role}', [RoleController::class, 'destroy'])->name('destroy');
+});
+
+Route::prefix('admin/crm/leads')->middleware(['auth'])->name('admin.leads.')->group(function () {
+    Route::get('/', [LeadController::class, 'index'])->name('index');
+    Route::get('/criar', [LeadController::class, 'create'])->name('create');
+    Route::post('/', [LeadController::class, 'store'])->name('store');
+    Route::get('/{lead}', [LeadController::class, 'show'])->name('show');
+    Route::get('/{lead}/editar', [LeadController::class, 'edit'])->name('edit');
+    Route::put('/{lead}', [LeadController::class, 'update'])->name('update');
+    Route::delete('/{lead}', [LeadController::class, 'destroy'])->name('destroy');
 });
 
 

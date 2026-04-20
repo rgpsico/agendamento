@@ -23,6 +23,8 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 class SiteController extends Controller
 {
 
+
+
     public function landing()
     {
         return view('site.landing');
