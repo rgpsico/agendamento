@@ -31,12 +31,12 @@
             <div class="card mb-3">
                 <div class="card-body">
                     <form method="GET" action="{{ route('admin.leads.index') }}" class="row g-2 align-items-end">
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="form-label">Buscar</label>
                             <input type="text" name="busca" class="form-control" placeholder="Nome, e-mail ou telefone..."
                                    value="{{ request('busca') }}">
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <label class="form-label">Status</label>
                             <select name="status" class="form-control">
                                 <option value="">Todos</option>
@@ -47,7 +47,7 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <label class="form-label">Origem</label>
                             <select name="origem" class="form-control">
                                 <option value="">Todas</option>
@@ -58,7 +58,19 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-md-2 d-flex gap-2">
+                        <div class="col-md-2">
+                            <label class="form-label">E-mail</label>
+                            <select name="email_status" class="form-control">
+                                <option value="">Todos</option>
+                                <option value="nao_enviado" {{ request('email_status') === 'nao_enviado' ? 'selected' : '' }}>
+                                    Não enviado
+                                </option>
+                                <option value="enviado" {{ request('email_status') === 'enviado' ? 'selected' : '' }}>
+                                    Já enviado
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 d-flex gap-2 align-items-end">
                             <button type="submit" class="btn btn-secondary w-100">
                                 <i class="fe fe-search"></i> Filtrar
                             </button>
@@ -70,94 +82,124 @@
                 </div>
             </div>
 
-            <div class="row">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="datatable table table-hover table-center mb-0">
-                                    <thead>
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>Nome</th>
-                                            <th>Contato</th>
-                                            <th>Origem</th>
-                                            <th>Status</th>
-                                            <th>Responsável</th>
-                                            <th>Cadastro</th>
-                                            <th class="text-center">Ações</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse ($leads as $lead)
-                                            <tr>
-                                                <td>{{ $lead->id }}</td>
-                                                <td>
-                                                    <a href="{{ route('admin.leads.show', $lead) }}">
-                                                        {{ $lead->nome }}
-                                                    </a>
-                                                    @if($lead->empresa)
-                                                        <br><small class="text-muted">{{ $lead->empresa }}</small>
-                                                    @endif
-                                                </td>
-                                                <td>
-                                                    {{ $lead->email ?? '-' }}
-                                                    @if($lead->telefone)
-                                                        <br><small>{{ $lead->telefone }}</small>
-                                                    @endif
-                                                </td>
-                                                <td>{{ $lead->origem_label }}</td>
-                                                <td>
-                                                    <span class="badge bg-{{ $lead->status_color }}">
-                                                        {{ $lead->status_label }}
-                                                    </span>
-                                                </td>
-                                                <td>{{ $lead->responsavel?->nome ?? '-' }}</td>
-                                                <td>{{ $lead->created_at->format('d/m/Y') }}</td>
-                                                <td class="text-center">
-                                                    <div class="actions">
-                                                        @if($lead->whatsapp_url)
-                                                            <a href="{{ $lead->whatsapp_url }}" target="_blank"
-                                                               class="btn btn-sm btn-success" title="Enviar WhatsApp">
-                                                                <i class="fab fa-whatsapp"></i>
-                                                            </a>
-                                                        @endif
-                                                        <a href="{{ route('admin.leads.show', $lead) }}"
-                                                           class="btn btn-sm bg-success-light" title="Ver">
-                                                            <i class="fe fe-eye"></i>
-                                                        </a>
-                                                        <a href="{{ route('admin.leads.edit', $lead) }}"
-                                                           class="btn btn-sm bg-info-light" title="Editar">
-                                                            <i class="fe fe-pencil"></i>
-                                                        </a>
-                                                        <form action="{{ route('admin.leads.destroy', $lead) }}"
-                                                              method="POST" class="d-inline"
-                                                              onsubmit="return confirm('Deseja excluir este lead?');">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="submit" class="btn btn-sm bg-danger-light" title="Excluir">
-                                                                <i class="fe fe-trash"></i>
-                                                            </button>
-                                                        </form>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        @empty
-                                            <tr>
-                                                <td colspan="8" class="text-center">Nenhum lead encontrado.</td>
-                                            </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
+            {{-- Ação em massa --}}
+            <form action="{{ route('admin.leads.enviar.emails') }}" method="POST" id="formEmails">
+                @csrf
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
 
-                            <div class="mt-3">
-                                {{ $leads->links() }}
+                                {{-- Barra de ação selecionados --}}
+                                <div id="barraSelecionados" class="d-none mb-3 p-2 bg-light rounded d-flex align-items-center gap-3">
+                                    <span class="text-muted small">
+                                        <strong id="qtdSelecionados">0</strong> lead(s) selecionado(s)
+                                    </span>
+                                    <button type="submit" class="btn btn-primary btn-sm"
+                                            onclick="return confirm('Disparar e-mail para os leads selecionados?')">
+                                        <i class="fe fe-send"></i> Disparar e-mails
+                                    </button>
+                                </div>
+
+                                <div class="table-responsive">
+                                    <table class="table table-hover table-center mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th style="width:40px;">
+                                                    <input type="checkbox" id="checkAll" title="Marcar todos">
+                                                </th>
+                                                <th>Nome</th>
+                                                <th>Contato</th>
+                                                <th>Origem</th>
+                                                <th>Status</th>
+                                                <th>E-mail enviado</th>
+                                                <th class="text-center">Ações</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @forelse ($leads as $lead)
+                                                <tr>
+                                                    <td>
+                                                        <input type="checkbox" name="ids[]"
+                                                               value="{{ $lead->id }}"
+                                                               class="check-lead"
+                                                               {{ $lead->email ? '' : 'disabled title=Sem e-mail' }}>
+                                                    </td>
+                                                    <td>
+                                                        <a href="{{ route('admin.leads.show', $lead) }}">
+                                                            {{ $lead->nome }}
+                                                        </a>
+                                                        @if($lead->empresa)
+                                                            <br><small class="text-muted">{{ $lead->empresa }}</small>
+                                                        @endif
+                                                    </td>
+                                                    <td>
+                                                        {{ $lead->email ?? '-' }}
+                                                        @if($lead->telefone)
+                                                            <br><small>{{ $lead->telefone }}</small>
+                                                        @endif
+                                                    </td>
+                                                    <td>{{ $lead->origem_label }}</td>
+                                                    <td>
+                                                        <span class="badge bg-{{ $lead->status_color }}">
+                                                            {{ $lead->status_label }}
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        @if($lead->email_enviado_em)
+                                                            <span class="badge bg-success" title="{{ $lead->email_enviado_em->format('d/m/Y H:i') }}">
+                                                                <i class="fe fe-check"></i>
+                                                                {{ $lead->email_enviado_em->format('d/m/Y') }}
+                                                            </span>
+                                                        @else
+                                                            <span class="text-muted small">—</span>
+                                                        @endif
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <div class="actions">
+                                                            @if($lead->whatsapp_url)
+                                                                <a href="{{ $lead->whatsapp_url }}" target="_blank"
+                                                                   class="btn btn-sm btn-success" title="WhatsApp">
+                                                                    <i class="fab fa-whatsapp"></i>
+                                                                </a>
+                                                            @endif
+                                                            <a href="{{ route('admin.leads.show', $lead) }}"
+                                                               class="btn btn-sm bg-success-light" title="Ver">
+                                                                <i class="fe fe-eye"></i>
+                                                            </a>
+                                                            <a href="{{ route('admin.leads.edit', $lead) }}"
+                                                               class="btn btn-sm bg-info-light" title="Editar">
+                                                                <i class="fe fe-pencil"></i>
+                                                            </a>
+                                                            <form action="{{ route('admin.leads.destroy', $lead) }}"
+                                                                  method="POST" class="d-inline"
+                                                                  onsubmit="return confirm('Deseja excluir este lead?');">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" class="btn btn-sm bg-danger-light" title="Excluir">
+                                                                    <i class="fe fe-trash"></i>
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="7" class="text-center">Nenhum lead encontrado.</td>
+                                                </tr>
+                                            @endforelse
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div class="mt-3">
+                                    {{ $leads->links() }}
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
 
@@ -170,40 +212,29 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <ul class="nav nav-tabs mb-3" id="importTabs">
+                    <ul class="nav nav-tabs mb-3">
                         <li class="nav-item">
-                            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabColar">
-                                Colar CSV
-                            </button>
+                            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabColar">Colar CSV</button>
                         </li>
                         <li class="nav-item">
-                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabArquivo">
-                                Upload de Arquivo
-                            </button>
+                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabArquivo">Upload de Arquivo</button>
                         </li>
                     </ul>
-
                     <div class="tab-content">
-                        {{-- Aba: colar texto --}}
                         <div class="tab-pane fade show active" id="tabColar">
                             <form action="{{ route('admin.leads.import.text') }}" method="POST">
                                 @csrf
                                 <p class="text-muted small mb-2">
-                                    Cole o conteúdo CSV abaixo. Colunas aceitas:
-                                    <code>id, nome_negocio, telefone, email, tipo, origem</code>
+                                    Cole o CSV abaixo. Colunas aceitas: <code>id, nome_negocio, telefone, email, tipo, origem</code>
                                 </p>
                                 <textarea name="conteudo" class="form-control font-monospace" rows="14"
-                                          placeholder="id,nome_negocio,telefone,email,tipo&#10;1,Peninsula Pilates Studio,(21) 99835-6116,pilatespeninsula@gmail.com,Pilates" required></textarea>
+                                          placeholder="id,nome_negocio,telefone,email,tipo" required></textarea>
                                 <div class="mt-3 text-end">
                                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                    <button type="submit" class="btn btn-success ms-2">
-                                        <i class="fe fe-check"></i> Importar
-                                    </button>
+                                    <button type="submit" class="btn btn-success ms-2"><i class="fe fe-check"></i> Importar</button>
                                 </div>
                             </form>
                         </div>
-
-                        {{-- Aba: upload arquivo --}}
                         <div class="tab-pane fade" id="tabArquivo">
                             <form action="{{ route('admin.leads.import') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
@@ -214,9 +245,7 @@
                                 <input type="file" name="arquivo" class="form-control" accept=".csv,.txt" required>
                                 <div class="mt-3 text-end">
                                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                    <button type="submit" class="btn btn-success ms-2">
-                                        <i class="fe fe-upload"></i> Importar
-                                    </button>
+                                    <button type="submit" class="btn btn-success ms-2"><i class="fe fe-upload"></i> Importar</button>
                                 </div>
                             </form>
                         </div>
@@ -225,4 +254,28 @@
             </div>
         </div>
     </div>
+
+    <script>
+        const checkAll   = document.getElementById('checkAll');
+        const checks     = document.querySelectorAll('.check-lead:not([disabled])');
+        const barra      = document.getElementById('barraSelecionados');
+        const qtdSpan    = document.getElementById('qtdSelecionados');
+
+        function atualizarBarra() {
+            const selecionados = document.querySelectorAll('.check-lead:checked').length;
+            qtdSpan.textContent = selecionados;
+            barra.classList.toggle('d-none', selecionados === 0);
+            barra.classList.toggle('d-flex', selecionados > 0);
+        }
+
+        checkAll.addEventListener('change', function () {
+            checks.forEach(c => c.checked = this.checked);
+            atualizarBarra();
+        });
+
+        checks.forEach(c => c.addEventListener('change', function () {
+            checkAll.checked = [...checks].every(c => c.checked);
+            atualizarBarra();
+        }));
+    </script>
 </x-admin.layout>

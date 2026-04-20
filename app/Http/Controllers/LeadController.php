@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\EnviarEmailLeadJob;
 use App\Models\Lead;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
@@ -18,6 +19,12 @@ class LeadController extends Controller
 
         if ($request->filled('origem')) {
             $query->where('origem', $request->origem);
+        }
+
+        if ($request->email_status === 'nao_enviado') {
+            $query->whereNull('email_enviado_em');
+        } elseif ($request->email_status === 'enviado') {
+            $query->whereNotNull('email_enviado_em');
         }
 
         if ($request->filled('busca')) {
@@ -99,6 +106,33 @@ class LeadController extends Controller
         $lead->update($request->validated());
 
         return redirect()->route('admin.leads.index')->with('success', 'Lead atualizado com sucesso!');
+    }
+
+    public function enviarEmails(Request $request)
+    {
+        $request->validate([
+            'ids'   => 'required|array|min:1',
+            'ids.*' => 'exists:leads,id',
+        ]);
+
+        $leads = Lead::whereIn('id', $request->ids)
+                     ->whereNotNull('email')
+                     ->get();
+
+        $despachados = 0;
+        $semEmail    = count($request->ids) - $leads->count();
+
+        foreach ($leads as $lead) {
+            EnviarEmailLeadJob::dispatch($lead)->onQueue('default');
+            $despachados++;
+        }
+
+        $msg = "{$despachados} e-mail(s) adicionado(s) à fila para envio.";
+        if ($semEmail > 0) {
+            $msg .= " {$semEmail} lead(s) ignorado(s) por não ter e-mail cadastrado.";
+        }
+
+        return redirect()->back()->with('success', $msg);
     }
 
     public function destroy(Lead $lead)

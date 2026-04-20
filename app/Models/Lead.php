@@ -16,6 +16,11 @@ class Lead extends Model
         'interesse',
         'observacoes',
         'responsavel_id',
+        'email_enviado_em',
+    ];
+
+    protected $casts = [
+        'email_enviado_em' => 'datetime',
     ];
 
     public static array $origens = [
