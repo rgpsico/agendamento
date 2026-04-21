@@ -49,27 +49,42 @@ class LeadInteresseController extends Controller
         ]);
 
         if (!$lead->trial_usuario_id) {
-            $usuarioExistente = Usuario::where('email', $lead->email)->first();
+            $senhaClear = Str::random(8);
 
-            if ($usuarioExistente) {
-                $lead->update(['trial_usuario_id' => $usuarioExistente->id]);
-            } else {
-                $senhaClear = Str::random(8);
-
-                $usuarioTrial = Usuario::create([
+            $usuario = Usuario::updateOrCreate(
+                ['email' => $lead->email],
+                [
                     'nome'         => $lead->nome,
-                    'email'        => $lead->email,
                     'password'     => Hash::make($senhaClear),
                     'tipo_usuario' => 'trial',
                     'telefone'     => $request->whatsapp,
-                ]);
+                ]
+            );
 
-                $lead->update(['trial_usuario_id' => $usuarioTrial->id]);
+            $lead->update(['trial_usuario_id' => $usuario->id]);
 
-                Mail::to($lead->email)->send(new LeadAcessoTrialMail($lead, $senhaClear));
-            }
+            Mail::to($lead->email)->send(new LeadAcessoTrialMail($lead, $senhaClear));
         }
 
         return view('leads.interesse-confirmado', compact('lead'));
+    }
+
+    public function reenviar(string $token)
+    {
+        $lead = Lead::where('token', $token)->firstOrFail();
+
+        if (!$lead->email || !$lead->trial_usuario_id) {
+            return back()->with('erro', 'Não foi possível reenviar. Complete o formulário primeiro.');
+        }
+
+        $senhaClear = Str::random(8);
+
+        Usuario::where('id', $lead->trial_usuario_id)->update([
+            'password' => Hash::make($senhaClear),
+        ]);
+
+        Mail::to($lead->email)->send(new LeadAcessoTrialMail($lead, $senhaClear));
+
+        return back()->with('reenviado', true);
     }
 }

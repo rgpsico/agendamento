@@ -24,12 +24,26 @@
                         Nossa equipe entrará em contato com você em breve pelo WhatsApp.
                     </p>
 
+                    @if(session('reenviado'))
+                        <div class="alert alert-success mt-3">
+                            ✅ Novo e-mail enviado! Verifique sua caixa de entrada.
+                        </div>
+                    @endif
+
                     <div class="mt-3 p-3 rounded" style="background:#f0f4ff; border:1.5px solid #2a5298;">
                         <p class="fw-semibold mb-1">📧 Verifique seu e-mail!</p>
                         <p class="small text-muted mb-0">
                             Enviamos para <strong>{{ $lead->email }}</strong> um login e senha temporários para você testar o sistema gratuitamente.
                         </p>
                     </div>
+
+                    <form action="{{ route('lead.interesse.reenviar', $lead->token) }}" method="POST" class="mt-3">
+                        @csrf
+                        <button type="submit" class="btn btn-outline-secondary btn-sm w-100">
+                            Não recebi o e-mail — reenviar
+                        </button>
+                    </form>
+
                     <hr>
                     <p class="small text-muted mb-0">
                         Plataforma de Agendamento Online<br>

@@ -88,6 +88,7 @@ Route::prefix('admin/roles')->name('admin.roles.')->group(function () {
 Route::get('/lead/rastrear/{token}', [LeadInteresseController::class, 'rastrear'])->name('lead.rastrear');
 Route::get('/interesse/{token}', [LeadInteresseController::class, 'show'])->name('lead.interesse');
 Route::post('/interesse/{token}', [LeadInteresseController::class, 'store'])->name('lead.interesse.store');
+Route::post('/interesse/{token}/reenviar', [LeadInteresseController::class, 'reenviar'])->name('lead.interesse.reenviar');
 
 Route::prefix('admin/crm/leads')->middleware(['auth'])->name('admin.leads.')->group(function () {
     Route::get('/', [LeadController::class, 'index'])->name('index');
