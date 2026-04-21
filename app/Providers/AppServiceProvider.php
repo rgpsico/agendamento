@@ -35,7 +35,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Horizon::auth(function ($request) {
-            return auth()->check() && auth()->user()->isMasterUser();
+            return auth()->check();
         });
 
         // DICA: Se estiver testando e o APP_ENV for local,
