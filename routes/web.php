@@ -85,6 +85,10 @@ Route::prefix('admin/roles')->name('admin.roles.')->group(function () {
     Route::delete('/{role}', [RoleController::class, 'destroy'])->name('destroy');
 });
 
+
+
+
+
 Route::get('/lead/rastrear/{token}', [LeadInteresseController::class, 'rastrear'])->name('lead.rastrear');
 Route::get('/interesse/{token}', [LeadInteresseController::class, 'show'])->name('lead.interesse');
 Route::post('/interesse/{token}', [LeadInteresseController::class, 'store'])->name('lead.interesse.store');
