@@ -42,20 +42,12 @@
                             <input type="email" class="form-control" value="{{ $lead->email }}" disabled>
                         </div>
 
-                        <div class="mb-3 p-3 rounded" style="background:#f0f4ff; border:1.5px solid #2a5298;">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="quer_trial" value="1" id="querTrial">
-                                <label class="form-check-label fw-semibold" for="querTrial">
-                                    🚀 Quero testar o sistema gratuitamente
-                                </label>
-                            </div>
-                            <small class="text-muted d-block mt-1 ms-4">
-                                Vou receber um login e senha por e-mail para explorar a plataforma.
-                            </small>
+                        <div class="alert alert-info small mb-3">
+                            🚀 Ao confirmar, você receberá um <strong>login e senha temporários</strong> por e-mail para testar o sistema gratuitamente.
                         </div>
 
                         <button type="submit" class="btn btn-primary w-100 rounded-pill">
-                            Confirmar interesse →
+                            Confirmar e receber acesso →
                         </button>
                     </form>
 

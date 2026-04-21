@@ -28,9 +28,7 @@ class LeadInteresseController extends Controller
         $lead = Lead::where('token', $token)->firstOrFail();
 
         if ($lead->interessado_em) {
-            $senhaClear   = null;
-            $usuarioTrial = null;
-            return view('leads.interesse-confirmado', compact('lead', 'senhaClear', 'usuarioTrial'));
+            return view('leads.interesse-confirmado', compact('lead'));
         }
 
         return view('leads.interesse', compact('lead'));
@@ -41,8 +39,7 @@ class LeadInteresseController extends Controller
         $lead = Lead::where('token', $token)->firstOrFail();
 
         $request->validate([
-            'whatsapp'    => 'required|string|max:20',
-            'quer_trial'  => 'nullable|boolean',
+            'whatsapp' => 'required|string|max:20',
         ]);
 
         $lead->update([
@@ -51,10 +48,7 @@ class LeadInteresseController extends Controller
             'status'              => 'em_contato',
         ]);
 
-        $senhaClear  = null;
-        $usuarioTrial = null;
-
-        if ($request->boolean('quer_trial') && !$lead->trial_usuario_id) {
+        if (!$lead->trial_usuario_id) {
             $senhaClear = Str::random(8);
 
             $usuarioTrial = Usuario::create([
@@ -70,6 +64,6 @@ class LeadInteresseController extends Controller
             Mail::to($lead->email)->send(new LeadAcessoTrialMail($lead, $senhaClear));
         }
 
-        return view('leads.interesse-confirmado', compact('lead', 'senhaClear', 'usuarioTrial'));
+        return view('leads.interesse-confirmado', compact('lead'));
     }
 }

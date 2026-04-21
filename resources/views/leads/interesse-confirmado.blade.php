@@ -24,23 +24,17 @@
                         Nossa equipe entrará em contato com você em breve pelo WhatsApp.
                     </p>
 
-                    @if($senhaClear)
-                        <div class="mt-3 p-3 rounded text-start" style="background:#f0f4ff; border:2px dashed #2a5298;">
-                            <p class="fw-bold mb-2">🎉 Seu acesso de teste foi criado!</p>
-                            <p class="mb-1">📧 <strong>Login:</strong> {{ $lead->email }}</p>
-                            <p class="mb-1">🔑 <strong>Senha:</strong> <code class="fs-5">{{ $senhaClear }}</code></p>
-                            <p class="mb-0 small text-muted">Estas credenciais também foram enviadas para o seu e-mail.</p>
-                        </div>
-                        <a href="{{ config('app.url') }}" class="btn btn-primary rounded-pill px-4 mt-3">
-                            Acessar agora →
-                        </a>
-                    @else
-                        <hr>
+                    <div class="mt-3 p-3 rounded" style="background:#f0f4ff; border:1.5px solid #2a5298;">
+                        <p class="fw-semibold mb-1">📧 Verifique seu e-mail!</p>
                         <p class="small text-muted mb-0">
-                            Plataforma de Agendamento Online<br>
-                            {{ config('app.url') }}
+                            Enviamos para <strong>{{ $lead->email }}</strong> um login e senha temporários para você testar o sistema gratuitamente.
                         </p>
-                    @endif
+                    </div>
+                    <hr>
+                    <p class="small text-muted mb-0">
+                        Plataforma de Agendamento Online<br>
+                        {{ config('app.url') }}
+                    </p>
                 </div>
             </div>
         </div>
