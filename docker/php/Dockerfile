@@ -17,9 +17,10 @@ RUN apt-get update && apt-get install -y \
         intl \
         bcmath \
         gd \
-        pcntl \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+RUN docker-php-ext-install pcntl
 
 # Instala a extensão Redis via PECL (phpredis)
 RUN pecl install redis \
