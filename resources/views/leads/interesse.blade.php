@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quero conhecer a plataforma</title>
+    <title>Acesso gratuito — Plataforma de Agendamento</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); min-height: 100vh; display: flex; align-items: center; }
         .card { border: none; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,.18); }
         .logo-area { background: #2a5298; border-radius: 16px 16px 0 0; padding: 32px; text-align: center; }
-        .logo-area h1 { color: #fff; font-size: 22px; margin: 0; }
-        .logo-area p { color: rgba(255,255,255,.8); margin: 6px 0 0; font-size: 14px; }
-        .btn-primary { background: #2a5298; border-color: #2a5298; padding: 12px; font-size: 16px; }
-        .btn-primary:hover { background: #1e3c72; border-color: #1e3c72; }
+        .logo-area h1 { color: #fff; font-size: 24px; margin: 0; }
+        .logo-area p { color: rgba(255,255,255,.85); margin: 8px 0 0; font-size: 15px; }
+        .beneficios li { padding: 4px 0; }
+        .btn-cta { background: #2a5298; border: none; padding: 14px; font-size: 17px; font-weight: bold; border-radius: 50px; }
+        .btn-cta:hover { background: #1e3c72; }
     </style>
 </head>
 <body>
@@ -21,38 +22,27 @@
         <div class="col-md-5">
             <div class="card">
                 <div class="logo-area">
-                    <h1>🚀 Que ótimo!</h1>
-                    <p>Olá, <strong>{{ $lead->nome }}</strong>! Deixe seu WhatsApp e entraremos em contato.</p>
+                    <h1>Olá, {{ $lead->nome }}! 👋</h1>
+                    <p>Preparamos um acesso gratuito para você testar nossa plataforma.</p>
                 </div>
                 <div class="card-body p-4">
+                    <ul class="beneficios list-unstyled mb-4">
+                        <li>✅ Agendamentos online 24h</li>
+                        <li>✅ Gestão de alunos e horários</li>
+                        <li>✅ Lembretes automáticos por WhatsApp</li>
+                        <li>✅ Pagamentos integrados</li>
+                        <li>✅ Seu site profissional em minutos</li>
+                    </ul>
+
                     <form action="{{ route('lead.interesse.store', $lead->token) }}" method="POST">
                         @csrf
-
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Seu WhatsApp <span class="text-danger">*</span></label>
-                            <input type="text" name="whatsapp" class="form-control form-control-lg @error('whatsapp') is-invalid @enderror"
-                                   placeholder="(21) 99999-9999" required autofocus>
-                            @error('whatsapp')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">E-mail</label>
-                            <input type="email" class="form-control" value="{{ $lead->email }}" disabled>
-                        </div>
-
-                        <div class="alert alert-info small mb-3">
-                            🚀 Ao confirmar, você receberá um <strong>login e senha temporários</strong> por e-mail para testar o sistema gratuitamente.
-                        </div>
-
-                        <button type="submit" class="btn btn-primary w-100 rounded-pill">
-                            Confirmar e receber acesso →
+                        <button type="submit" class="btn btn-cta btn-primary w-100">
+                            Quero meu acesso gratuito →
                         </button>
                     </form>
 
                     <p class="text-muted text-center small mt-3 mb-0">
-                        Entraremos em contato em até 24 horas.
+                        Você receberá login e senha por e-mail em instantes.
                     </p>
                 </div>
             </div>

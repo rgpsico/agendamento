@@ -38,14 +38,9 @@ class LeadInteresseController extends Controller
     {
         $lead = Lead::where('token', $token)->firstOrFail();
 
-        $request->validate([
-            'whatsapp' => 'required|string|max:20',
-        ]);
-
         $lead->update([
-            'whatsapp_confirmado' => $request->whatsapp,
-            'interessado_em'      => now(),
-            'status'              => 'em_contato',
+            'interessado_em' => now(),
+            'status'         => 'em_contato',
         ]);
 
         if (!$lead->trial_usuario_id) {
@@ -57,7 +52,7 @@ class LeadInteresseController extends Controller
                     'nome'         => $lead->nome,
                     'password'     => Hash::make($senhaClear),
                     'tipo_usuario' => 'trial',
-                    'telefone'     => $request->whatsapp,
+                    'telefone'     => $lead->telefone,
                 ]
             );
 
