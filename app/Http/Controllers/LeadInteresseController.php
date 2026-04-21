@@ -49,19 +49,25 @@ class LeadInteresseController extends Controller
         ]);
 
         if (!$lead->trial_usuario_id) {
-            $senhaClear = Str::random(8);
+            $usuarioExistente = Usuario::where('email', $lead->email)->first();
 
-            $usuarioTrial = Usuario::create([
-                'nome'         => $lead->nome,
-                'email'        => $lead->email,
-                'password'     => Hash::make($senhaClear),
-                'tipo_usuario' => 'trial',
-                'telefone'     => $request->whatsapp,
-            ]);
+            if ($usuarioExistente) {
+                $lead->update(['trial_usuario_id' => $usuarioExistente->id]);
+            } else {
+                $senhaClear = Str::random(8);
 
-            $lead->update(['trial_usuario_id' => $usuarioTrial->id]);
+                $usuarioTrial = Usuario::create([
+                    'nome'         => $lead->nome,
+                    'email'        => $lead->email,
+                    'password'     => Hash::make($senhaClear),
+                    'tipo_usuario' => 'trial',
+                    'telefone'     => $request->whatsapp,
+                ]);
 
-            Mail::to($lead->email)->send(new LeadAcessoTrialMail($lead, $senhaClear));
+                $lead->update(['trial_usuario_id' => $usuarioTrial->id]);
+
+                Mail::to($lead->email)->send(new LeadAcessoTrialMail($lead, $senhaClear));
+            }
         }
 
         return view('leads.interesse-confirmado', compact('lead'));
