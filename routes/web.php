@@ -101,6 +101,7 @@ Route::prefix('admin/crm/leads')->middleware(['auth'])->name('admin.leads.')->gr
     Route::get('/{lead}/editar', [LeadController::class, 'edit'])->name('edit');
     Route::put('/{lead}', [LeadController::class, 'update'])->name('update');
     Route::delete('/{lead}', [LeadController::class, 'destroy'])->name('destroy');
+    Route::post('/{lead}/resetar', [LeadController::class, 'resetar'])->name('resetar');
 });
 
 

@@ -15,6 +15,13 @@
                         <a href="{{ route('admin.leads.edit', $lead) }}" class="btn btn-primary">
                             <i class="fe fe-pencil"></i> Editar
                         </a>
+                        <form action="{{ route('admin.leads.resetar', $lead) }}" method="POST"
+                              class="d-inline" onsubmit="return confirm('Resetar lead ao início do funil? Isso apaga e-mail enviado, temperatura e acesso trial.');">
+                            @csrf
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fe fe-rotate-ccw"></i> Resetar
+                            </button>
+                        </form>
                         <form action="{{ route('admin.leads.destroy', $lead) }}" method="POST"
                               class="d-inline" onsubmit="return confirm('Deseja excluir este lead?');">
                             @csrf

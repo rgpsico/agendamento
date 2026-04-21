@@ -143,6 +143,21 @@ class LeadController extends Controller
         return redirect()->back()->with('success', $msg);
     }
 
+    public function resetar(Lead $lead)
+    {
+        $lead->update([
+            'status'              => 'novo',
+            'email_enviado_em'    => null,
+            'morno_em'            => null,
+            'interessado_em'      => null,
+            'whatsapp_confirmado' => null,
+            'trial_usuario_id'    => null,
+        ]);
+
+        return redirect()->route('admin.leads.show', $lead)
+                         ->with('success', 'Lead resetado ao início do funil.');
+    }
+
     public function destroy(Lead $lead)
     {
         $lead->delete();
