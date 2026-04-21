@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Pagination\Paginator;
+use Laravel\Horizon\Horizon;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -30,6 +31,10 @@ class AppServiceProvider extends ServiceProvider
         Paginator::useBootstrapFive();
 
         Blade::if('masterUser', function () {
+            return auth()->check() && auth()->user()->isMasterUser();
+        });
+
+        Horizon::auth(function ($request) {
             return auth()->check() && auth()->user()->isMasterUser();
         });
 
