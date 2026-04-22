@@ -551,6 +551,14 @@ class DeepSeekService
             'valor_aula'    => $servico->preco,
         ]);
 
+        // Vincula o aluno ao professor (evita duplicata)
+        \Illuminate\Support\Facades\DB::table('aluno_professor')->insertOrIgnore([
+            'aluno_id'    => $alunoId,
+            'professor_id' => $professorId,
+            'created_at'  => now(),
+            'updated_at'  => now(),
+        ]);
+
         return [
             'sucesso'  => true,
             'mensagem' => 'Agendamento criado com sucesso!',
