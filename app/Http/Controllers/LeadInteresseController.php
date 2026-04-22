@@ -51,7 +51,7 @@ class LeadInteresseController extends Controller
                 [
                     'nome'         => $lead->nome,
                     'password'     => Hash::make($senhaClear),
-                    'tipo_usuario' => 'trial',
+                    'tipo_usuario' => 'Professor',
                     'telefone'     => $lead->telefone,
                 ]
             );
