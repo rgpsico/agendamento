@@ -47,7 +47,8 @@ class BotController extends Controller
         $conversasHoje = Conversation::whereDate('created_at', today())->count();
 
         // Serviços cadastrados
-        $services = Servicos::all();
+        $empresaId = auth()->user()->empresa->id ?? null;
+        $services = Servicos::where('empresa_id', $empresaId)->get();
 
         // Consumo de tokens nos últimos 7 dias
         $labels = [];
@@ -82,7 +83,8 @@ class BotController extends Controller
 
     public function create()
     {
-        $services = Servicos::all(); // exemplo: professores, horários
+        $empresaId = auth()->user()->empresa->id ?? null;
+        $services = Servicos::where('empresa_id', $empresaId)->get();
         return view('admin.bot.create', compact('services'));
     }
 
@@ -140,7 +142,8 @@ class BotController extends Controller
     public function edit($id)
     {
         $bot = Bot::with('services')->findOrFail($id);
-        $services = Servicos::all();
+        $empresaId = auth()->user()->empresa->id ?? null;
+        $services = Servicos::where('empresa_id', $empresaId)->get();
         return view('admin.bot.edit', compact('bot', 'services'));
     }
 
