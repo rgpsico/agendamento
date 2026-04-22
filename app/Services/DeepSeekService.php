@@ -400,49 +400,50 @@ class DeepSeekService
             return ['sucesso' => false, 'erro' => 'Serviço não pertence a este bot.'];
         }
 
-        // Verifica se o horário ainda está disponível
         $carbon      = Carbon::parse($data);
         $diaSemanaId = $carbon->isoWeekday();
+        $horarioFormatado = Carbon::parse($horario)->format('H:i');
 
+        // Busca a disponibilidade pelo dia da semana + horário (igual ao verificar_disponibilidade)
         $disponivel = Disponibilidade::where('id_servico', $servicoId)
             ->where('id_dia', $diaSemanaId)
-            ->where('data', $carbon->format('Y-m-d'))
-            ->whereRaw("TIME_FORMAT(hora_inicio, '%H:%i') = ?", [Carbon::parse($horario)->format('H:i')])
+            ->whereRaw("TIME_FORMAT(hora_inicio, '%H:%i') = ?", [$horarioFormatado])
             ->first();
 
         if (!$disponivel) {
-            return ['sucesso' => false, 'erro' => 'Horário não encontrado na disponibilidade do serviço.'];
+            return ['sucesso' => false, 'erro' => 'Horário não encontrado na grade de disponibilidade do serviço.'];
         }
 
+        // Verifica se já existe agendamento nessa data+horário específicos
         $jaAgendado = Agendamento::where('servico_id', $servicoId)
             ->where('data_da_aula', $carbon->format('Y-m-d'))
-            ->whereRaw("TIME_FORMAT(horario, '%H:%i') = ?", [Carbon::parse($horario)->format('H:i')])
+            ->whereRaw("TIME_FORMAT(horario, '%H:%i') = ?", [$horarioFormatado])
             ->exists();
 
         if ($jaAgendado) {
             return ['sucesso' => false, 'erro' => 'Este horário já foi agendado por outro cliente.'];
         }
 
-        // Pega o professor da disponibilidade
         $professorId  = $disponivel->id_professor;
         $modalidadeId = Professor::find($professorId)?->modalidade_id ?? null;
 
         Agendamento::create([
-            'aluno_id'     => $alunoId,
-            'professor_id' => $professorId,
-            'modalidade_id'=> $modalidadeId,
-            'servico_id'   => $servicoId,
-            'data_da_aula' => $carbon->format('Y-m-d'),
-            'horario'      => Carbon::parse($horario)->format('H:i:s'),
-            'valor_aula'   => $servico->preco,
+            'aluno_id'      => $alunoId,
+            'professor_id'  => $professorId,
+            'modalidade_id' => $modalidadeId,
+            'servico_id'    => $servicoId,
+            'data_da_aula'  => $carbon->format('Y-m-d'),
+            'horario'       => $horarioFormatado . ':00',
+            'valor_aula'    => $servico->preco,
         ]);
 
         return [
             'sucesso'  => true,
-            'mensagem' => "Agendamento criado com sucesso!",
+            'mensagem' => 'Agendamento criado com sucesso!',
             'servico'  => $servico->titulo,
             'data'     => $carbon->format('d/m/Y'),
-            'horario'  => Carbon::parse($horario)->format('H:i'),
+            'dia'      => $carbon->locale('pt_BR')->dayName,
+            'horario'  => $horarioFormatado,
         ];
     }
 
