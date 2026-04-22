@@ -55,6 +55,7 @@ class DisponibilidadeControllerApi extends Controller
         // Obtém todas as disponibilidades do serviço selecionado naquele dia
         $schedules = Disponibilidade::where('id_dia', $day)
             ->where('id_servico', $servico_id)
+            ->when($professor_id, fn($q) => $q->where('id_professor', $professor_id))
             ->get();
 
         // Debug: Ver as disponibilidades
@@ -64,14 +65,8 @@ class DisponibilidadeControllerApi extends Controller
 
         foreach ($schedules as $schedule) {
             $start = Carbon::parse($schedule->hora_inicio)->format('H:i');
-            
-            // Debug: Ver cada comparação
-            \Log::info('Comparando:', [
-                'horario_disponivel' => $start,
-                'esta_agendado' => in_array($start, $horariosAgendados)
-            ]);
-            
-            if (!in_array($start, $horariosAgendados)) {
+
+            if (!in_array($start, $horariosAgendados) && !in_array($start, $timeslots)) {
                 $timeslots[] = $start;
             }
         }
