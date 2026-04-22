@@ -53,8 +53,8 @@
             @endphp
             <div class="header-left">
                 <a href="{{ route('home.index') }}" class="logo">
-                    <img src="https://rjpasseios.com.br/wp-content/uploads/2024/12/cropped-logo-1.png" width="150"
-                        height="150" alt="Logo Rjpasseios"> </a>
+                    <x-logo-tipo imagem="{{ $avatar }}" largura="154" altura="80" />
+                </a>
                 <a href="{{ route('home.index') }}" class="logo logo-small">
                     <img src="{{ asset('admin/img/logo-small.png') }}" alt="Logo" width="30" height="30">
                 </a>
