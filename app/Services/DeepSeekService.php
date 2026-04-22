@@ -155,9 +155,12 @@ class DeepSeekService
         $systemPrompt .= "- SEMPRE chame `listar_servicos` antes de falar sobre serviços.\n";
         $systemPrompt .= "- SEMPRE chame `verificar_disponibilidade` antes de informar horários.\n";
         $systemPrompt .= "- Para agendar: primeiro chame `buscar_aluno_por_telefone`, depois mostre o resumo, depois aguarde confirmação.\n";
+        $systemPrompt .= "- Se o aluno não for encontrado, colete nome completo e e-mail e chame `cadastrar_aluno` antes de prosseguir.\n";
         $systemPrompt .= "\n## Fluxo de agendamento — siga EXATAMENTE esta ordem\n";
         $systemPrompt .= "1. Chame `verificar_disponibilidade` para confirmar o horário.\n";
         $systemPrompt .= "2. Chame `buscar_aluno_por_telefone` para identificar o aluno.\n";
+        $systemPrompt .= "   2a. Se `encontrado: false`, peça o nome completo e o e-mail do cliente.\n";
+        $systemPrompt .= "   2b. Com esses dados, chame `cadastrar_aluno` e use o `aluno_id` retornado.\n";
         $systemPrompt .= "3. Apresente o resumo e pergunte: 'Confirma?' Aguarde o cliente responder.\n";
         $systemPrompt .= "4. Quando o cliente confirmar (sim, pode, confirmo, ok, etc), chame IMEDIATAMENTE `criar_agendamento`. NÃO responda antes de chamar a tool.\n";
         $systemPrompt .= "5. Só após receber `sucesso: true` da tool, diga que o agendamento foi confirmado.\n";
@@ -326,6 +329,31 @@ class DeepSeekService
             [
                 'type' => 'function',
                 'function' => [
+                    'name'        => 'cadastrar_aluno',
+                    'description' => 'Cria o cadastro de um novo aluno (usuário + perfil). Use quando buscar_aluno_por_telefone retornar encontrado: false. Exige nome completo, telefone e e-mail.',
+                    'parameters'  => [
+                        'type'       => 'object',
+                        'properties' => [
+                            'nome' => [
+                                'type'        => 'string',
+                                'description' => 'Nome completo do aluno',
+                            ],
+                            'telefone' => [
+                                'type'        => 'string',
+                                'description' => 'Telefone do aluno (pode conter formatação)',
+                            ],
+                            'email' => [
+                                'type'        => 'string',
+                                'description' => 'E-mail do aluno',
+                            ],
+                        ],
+                        'required' => ['nome', 'telefone', 'email'],
+                    ],
+                ],
+            ],
+            [
+                'type' => 'function',
+                'function' => [
                     'name'        => 'criar_agendamento',
                     'description' => 'Cria um agendamento para o aluno. Use somente após confirmar o aluno (buscar_aluno_por_telefone) e o horário disponível (verificar_disponibilidade), e após o cliente confirmar explicitamente.',
                     'parameters'  => [
@@ -365,6 +393,11 @@ class DeepSeekService
                 $bot
             ),
             'buscar_aluno_por_telefone' => $this->toolBuscarAlunoPorTelefone($args['telefone']),
+            'cadastrar_aluno'           => $this->toolCadastrarAluno(
+                $args['nome'] ?? '',
+                $args['telefone'] ?? '',
+                $args['email'] ?? ''
+            ),
             'criar_agendamento'         => $this->toolCriarAgendamento(
                 (int) $args['aluno_id'],
                 (int) $args['servico_id'],
@@ -409,8 +442,9 @@ class DeepSeekService
 
         if (!$usuario) {
             return [
-                'encontrado' => false,
-                'mensagem'   => 'Nenhum aluno encontrado com esse telefone. Verifique o número ou entre em contato para realizar o cadastro.',
+                'encontrado'       => false,
+                'precisa_cadastrar' => true,
+                'mensagem'         => 'Nenhum aluno encontrado com esse telefone. Peça o nome completo e o e-mail do cliente e chame `cadastrar_aluno` para criar o cadastro.',
             ];
         }
 
@@ -428,6 +462,41 @@ class DeepSeekService
             'aluno_id'   => $aluno->id,
             'nome'       => $usuario->nome,
             'telefone'   => $usuario->telefone,
+        ];
+    }
+
+    private function toolCadastrarAluno(string $nome, string $telefone, string $email): array
+    {
+        if (empty($nome) || empty($telefone) || empty($email)) {
+            return ['cadastrado' => false, 'erro' => 'Nome, telefone e e-mail são obrigatórios.'];
+        }
+
+        $telefoneNormalizado = preg_replace('/\D/', '', $telefone);
+
+        if (Usuario::where('email', $email)->exists()) {
+            return [
+                'cadastrado' => false,
+                'erro'       => 'Já existe um cadastro com esse e-mail. Verifique ou tente outro e-mail.',
+            ];
+        }
+
+        $usuario = Usuario::create([
+            'nome'         => $nome,
+            'email'        => $email,
+            'telefone'     => $telefoneNormalizado,
+            'password'     => bcrypt(\Illuminate\Support\Str::random(12)),
+            'tipo_usuario' => 'Aluno',
+        ]);
+
+        $aluno = Alunos::create([
+            'usuario_id' => $usuario->id,
+        ]);
+
+        return [
+            'cadastrado' => true,
+            'aluno_id'   => $aluno->id,
+            'nome'       => $usuario->nome,
+            'mensagem'   => 'Cadastro realizado com sucesso! Prossiga com o agendamento.',
         ];
     }
 
