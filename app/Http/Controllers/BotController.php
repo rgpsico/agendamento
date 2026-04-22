@@ -283,25 +283,29 @@ class BotController extends Controller
 
 
             // 3️⃣ Passa a conversa completa para o DeepSeek (incluindo a mensagem atual)
-            $reply = $this->deepSeekService->getDeepSeekResponseWithPrompt(
+            $result = $this->deepSeekService->getDeepSeekResponseWithPrompt(
                 $bot,
                 $userMessage,
                 $conversation,
                 $empresa_id
             );
 
+            $reply    = $result['reply'];
+            $debugLog = $result['debug'] ?? [];
+
             // 4️⃣ Salva a resposta do bot na conversa
             $conversation->messages()->create([
                 'from' => 'bot',
-                'to' => 'user',
+                'to'   => 'user',
+                'role' => 'assistant',
                 'body' => $reply,
-                'tipo' => 'bot'
             ]);
 
-            // 5️⃣ Retorna a resposta com o conversation_id
+            // 5️⃣ Retorna a resposta com o conversation_id e debug
             return response()->json([
                 'conversation_id' => $conversation->id,
-                'reply' => $reply
+                'reply'           => $reply,
+                'debug'           => $debugLog,
             ]);
         } catch (\Exception $e) {
             return response()->json([

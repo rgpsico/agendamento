@@ -145,7 +145,7 @@ class DeepSeekService
     }
 
 
-    public function getDeepSeekResponseWithPrompt(Bot $bot, string $question, Conversation $conversation, int $empresa_id, int $contextMessages = 10): string
+    public function getDeepSeekResponseWithPrompt(Bot $bot, string $question, Conversation $conversation, int $empresa_id, int $contextMessages = 10): array
     {
         // 1. System prompt — tools são a fonte de verdade sobre serviços
         $systemPrompt  = $bot->prompt . "\n";
@@ -181,6 +181,7 @@ class DeepSeekService
         $totalTokens  = 0;
         $promptTokens = 0;
         $completionTokens = 0;
+        $debugLog     = [];
 
         for ($i = 0; $i < $maxIteracoes; $i++) {
             $data   = $this->callDeepSeekApiWithTools($messages, $tools, $bot);
@@ -199,6 +200,12 @@ class DeepSeekService
                     $nome      = $toolCall['function']['name'];
                     $args      = json_decode($toolCall['function']['arguments'], true) ?? [];
                     $resultado = $this->executarTool($nome, $args, $bot);
+
+                    $debugLog[] = [
+                        'tool'      => $nome,
+                        'arguments' => $args,
+                        'result'    => $resultado,
+                    ];
 
                     $messages[] = [
                         'role'         => 'tool',
@@ -225,10 +232,16 @@ class DeepSeekService
 
             TokenUsage::registrarUso($bot->id, $empresa_id, $totalTokens, $promptTokens, $completionTokens);
 
-            return $cleanResponse;
+            return [
+                'reply' => $cleanResponse,
+                'debug' => $debugLog,
+            ];
         }
 
-        return 'Desculpe, não consegui processar sua solicitação no momento.';
+        return [
+            'reply' => 'Desculpe, não consegui processar sua solicitação no momento.',
+            'debug' => $debugLog,
+        ];
     }
 
     private function definirTools(): array
