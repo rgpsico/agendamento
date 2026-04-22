@@ -395,9 +395,15 @@ class DeepSeekService
     private function toolCriarAgendamento(int $alunoId, int $servicoId, string $data, string $horario, Bot $bot): array
     {
         // Valida se o serviço pertence ao bot
-        $servico = $bot->services()->where('servicos.id', $servicoId)->first();
+        $servicosDoBot = $bot->services()->get()->keyBy('id');
+        $servico = $servicosDoBot->get($servicoId);
+
         if (!$servico) {
-            return ['sucesso' => false, 'erro' => 'Serviço não pertence a este bot.'];
+            $idsDisponiveis = $servicosDoBot->keys()->join(', ');
+            return [
+                'sucesso' => false,
+                'erro'    => "Serviço ID {$servicoId} não encontrado. IDs disponíveis neste bot: [{$idsDisponiveis}]. Use listar_servicos para obter o ID correto.",
+            ];
         }
 
         $carbon      = Carbon::parse($data);
