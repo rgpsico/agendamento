@@ -7,7 +7,10 @@
       "Bash(cmd /c \"C:\\\\\\\\laragon\\\\\\\\bin\\\\\\\\php\\\\\\\\php8.2.28\\\\\\\\php.exe --version 2>&1\")",
       "Read(//c/laragon/bin/php//**)",
       "Read(//c/laragon/bin/**)",
-      "Bash(xargs grep *)"
+      "Bash(xargs grep *)",
+      "Bash(php artisan *)",
+      "Bash(php -l app/Services/DeepSeekService.php)",
+      "PowerShell(php -l \"c:\\\\laragon\\\\www\\\\agendamento\\\\app\\\\Services\\\\DeepSeekService.php\")"
     ]
   }
 }
