@@ -147,11 +147,16 @@ class DeepSeekService
 
     public function getDeepSeekResponseWithPrompt(Bot $bot, string $question, Conversation $conversation, int $empresa_id, int $contextMessages = 10): string
     {
-        // 1. System prompt enxuto — dados vêm pelas tools
+        // 1. System prompt — tools são a fonte de verdade sobre serviços
         $systemPrompt  = $bot->prompt . "\n";
         $systemPrompt .= "Tom: " . ($bot->tom ?? 'amigável') . ". Segmento: " . ($bot->segmento ?? '') . ".\n";
-        $systemPrompt .= "Você tem acesso a ferramentas para consultar serviços e horários em tempo real. Use-as sempre que o cliente perguntar sobre serviços ou disponibilidade.\n";
-        $systemPrompt .= "Sempre responda em português.";
+        $systemPrompt .= "\n## Regras obrigatórias sobre ferramentas\n";
+        $systemPrompt .= "- Você tem acesso a ferramentas (tools) que são a ÚNICA fonte de verdade sobre os serviços, horários e clientes.\n";
+        $systemPrompt .= "- SEMPRE chame `listar_servicos` antes de falar sobre qualquer serviço. NUNCA assuma ou invente serviços.\n";
+        $systemPrompt .= "- SEMPRE chame `verificar_disponibilidade` antes de informar horários. NUNCA invente horários.\n";
+        $systemPrompt .= "- Para agendar, SEMPRE identifique o aluno via `buscar_aluno_por_telefone` primeiro.\n";
+        $systemPrompt .= "- Só confirme um agendamento após o cliente confirmar explicitamente e só então chame `criar_agendamento`.\n";
+        $systemPrompt .= "- Sempre responda em português.";
 
         // 2. Histórico da conversa
         $history = $conversation->messages()
