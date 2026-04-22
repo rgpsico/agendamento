@@ -267,7 +267,7 @@ class BotController extends Controller
             : null;
 
         if (!$conversation) {
-            $conversation = \App\Models\Conversation::createWithBot($bot, $userId, $empresa_id);
+            $conversation = \App\Models\Conversation::createWithBot($bot, null, $userId, $empresa_id);
         }
 
         try {

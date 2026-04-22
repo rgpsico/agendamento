@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Usuario;
 
 class Conversation extends Model
 {
@@ -27,12 +28,14 @@ class Conversation extends Model
 
     public static function createWithBot(Bot $bot, $phone = null, $userId = null, $empresaId = 1)
     {
+        $userIdValido = $userId && Usuario::where('id', $userId)->exists() ? $userId : null;
+
         return self::create([
             'empresa_id' => $empresaId,
-            'bot_id' => $bot->id,
-            'user_id' => $userId,
-            'mensagem' => 'Início da conversa',
-            'telefone' => $phone,
+            'bot_id'     => $bot->id,
+            'user_id'    => $userIdValido,
+            'mensagem'   => 'Início da conversa',
+            'telefone'   => $phone,
             'human_controlled' => false,
         ]);
     }
