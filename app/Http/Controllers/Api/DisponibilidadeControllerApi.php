@@ -56,6 +56,7 @@ class DisponibilidadeControllerApi extends Controller
         $schedules = Disponibilidade::where('id_dia', $day)
             ->where('id_servico', $servico_id)
             ->when($professor_id, fn($q) => $q->where('id_professor', $professor_id))
+            ->when($data_selecionada, fn($q) => $q->where('data', $data_selecionada))
             ->get();
 
         // Debug: Ver as disponibilidades

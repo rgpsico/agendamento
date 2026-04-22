@@ -3,11 +3,14 @@
 namespace App\Services;
 
 use App\Models\Agendamento;
+use App\Models\Alunos;
 use App\Models\Bot;
 use App\Models\Conversation;
 use App\Models\Disponibilidade;
+use App\Models\Professor;
 use App\Models\Servicos;
 use App\Models\TokenUsage;
+use App\Models\Usuario;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
 
@@ -259,16 +262,70 @@ class DeepSeekService
                     ],
                 ],
             ],
+            [
+                'type' => 'function',
+                'function' => [
+                    'name'        => 'buscar_aluno_por_telefone',
+                    'description' => 'Busca um aluno já cadastrado pelo número de telefone. Use quando precisar identificar o cliente para fazer um agendamento.',
+                    'parameters'  => [
+                        'type'       => 'object',
+                        'properties' => [
+                            'telefone' => [
+                                'type'        => 'string',
+                                'description' => 'Telefone do aluno. Pode conter espaços, traços ou parênteses — serão normalizados.',
+                            ],
+                        ],
+                        'required' => ['telefone'],
+                    ],
+                ],
+            ],
+            [
+                'type' => 'function',
+                'function' => [
+                    'name'        => 'criar_agendamento',
+                    'description' => 'Cria um agendamento para o aluno. Use somente após confirmar o aluno (buscar_aluno_por_telefone) e o horário disponível (verificar_disponibilidade), e após o cliente confirmar explicitamente.',
+                    'parameters'  => [
+                        'type'       => 'object',
+                        'properties' => [
+                            'aluno_id' => [
+                                'type'        => 'integer',
+                                'description' => 'ID do aluno obtido em buscar_aluno_por_telefone',
+                            ],
+                            'servico_id' => [
+                                'type'        => 'integer',
+                                'description' => 'ID do serviço',
+                            ],
+                            'data' => [
+                                'type'        => 'string',
+                                'description' => 'Data no formato YYYY-MM-DD',
+                            ],
+                            'horario' => [
+                                'type'        => 'string',
+                                'description' => 'Horário no formato HH:MM',
+                            ],
+                        ],
+                        'required' => ['aluno_id', 'servico_id', 'data', 'horario'],
+                    ],
+                ],
+            ],
         ];
     }
 
     private function executarTool(string $nome, array $args, Bot $bot): array
     {
         return match ($nome) {
-            'listar_servicos'          => $this->toolListarServicos($bot),
+            'listar_servicos'           => $this->toolListarServicos($bot),
             'verificar_disponibilidade' => $this->toolVerificarDisponibilidade(
                 (int) $args['servico_id'],
                 $args['data'],
+                $bot
+            ),
+            'buscar_aluno_por_telefone' => $this->toolBuscarAlunoPorTelefone($args['telefone']),
+            'criar_agendamento'         => $this->toolCriarAgendamento(
+                (int) $args['aluno_id'],
+                (int) $args['servico_id'],
+                $args['data'],
+                $args['horario'],
                 $bot
             ),
             default => ['erro' => "Ferramenta desconhecida: {$nome}"],
@@ -292,6 +349,95 @@ class DeepSeekService
                 'duracao_minutos'  => $s->tempo_de_aula,
                 'tipo_agendamento' => $s->tipo_agendamento,
             ])->values()->toArray(),
+        ];
+    }
+
+    private function toolBuscarAlunoPorTelefone(string $telefone): array
+    {
+        // Normaliza: remove tudo que não é dígito
+        $telefoneNormalizado = preg_replace('/\D/', '', $telefone);
+
+        // Busca pelo número completo ou pelos últimos 9 dígitos (sem DDD)
+        $usuario = Usuario::where(function ($q) use ($telefoneNormalizado) {
+            $q->whereRaw("REGEXP_REPLACE(telefone, '[^0-9]', '') = ?", [$telefoneNormalizado])
+              ->orWhereRaw("RIGHT(REGEXP_REPLACE(telefone, '[^0-9]', ''), 9) = ?", [substr($telefoneNormalizado, -9)]);
+        })->first();
+
+        if (!$usuario) {
+            return [
+                'encontrado' => false,
+                'mensagem'   => 'Nenhum aluno encontrado com esse telefone. Verifique o número ou entre em contato para realizar o cadastro.',
+            ];
+        }
+
+        $aluno = Alunos::where('usuario_id', $usuario->id)->first();
+
+        if (!$aluno) {
+            return [
+                'encontrado' => false,
+                'mensagem'   => 'Usuário encontrado mas não possui perfil de aluno.',
+            ];
+        }
+
+        return [
+            'encontrado' => true,
+            'aluno_id'   => $aluno->id,
+            'nome'       => $usuario->nome,
+            'telefone'   => $usuario->telefone,
+        ];
+    }
+
+    private function toolCriarAgendamento(int $alunoId, int $servicoId, string $data, string $horario, Bot $bot): array
+    {
+        // Valida se o serviço pertence ao bot
+        $servico = $bot->services()->where('servicos.id', $servicoId)->first();
+        if (!$servico) {
+            return ['sucesso' => false, 'erro' => 'Serviço não pertence a este bot.'];
+        }
+
+        // Verifica se o horário ainda está disponível
+        $carbon      = Carbon::parse($data);
+        $diaSemanaId = $carbon->isoWeekday();
+
+        $disponivel = Disponibilidade::where('id_servico', $servicoId)
+            ->where('id_dia', $diaSemanaId)
+            ->where('data', $carbon->format('Y-m-d'))
+            ->whereRaw("TIME_FORMAT(hora_inicio, '%H:%i') = ?", [Carbon::parse($horario)->format('H:i')])
+            ->first();
+
+        if (!$disponivel) {
+            return ['sucesso' => false, 'erro' => 'Horário não encontrado na disponibilidade do serviço.'];
+        }
+
+        $jaAgendado = Agendamento::where('servico_id', $servicoId)
+            ->where('data_da_aula', $carbon->format('Y-m-d'))
+            ->whereRaw("TIME_FORMAT(horario, '%H:%i') = ?", [Carbon::parse($horario)->format('H:i')])
+            ->exists();
+
+        if ($jaAgendado) {
+            return ['sucesso' => false, 'erro' => 'Este horário já foi agendado por outro cliente.'];
+        }
+
+        // Pega o professor da disponibilidade
+        $professorId  = $disponivel->id_professor;
+        $modalidadeId = Professor::find($professorId)?->modalidade_id ?? null;
+
+        Agendamento::create([
+            'aluno_id'     => $alunoId,
+            'professor_id' => $professorId,
+            'modalidade_id'=> $modalidadeId,
+            'servico_id'   => $servicoId,
+            'data_da_aula' => $carbon->format('Y-m-d'),
+            'horario'      => Carbon::parse($horario)->format('H:i:s'),
+            'valor_aula'   => $servico->preco,
+        ]);
+
+        return [
+            'sucesso'  => true,
+            'mensagem' => "Agendamento criado com sucesso!",
+            'servico'  => $servico->titulo,
+            'data'     => $carbon->format('d/m/Y'),
+            'horario'  => Carbon::parse($horario)->format('H:i'),
         ];
     }
 
