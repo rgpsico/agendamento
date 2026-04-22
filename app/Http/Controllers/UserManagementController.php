@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Perfil;
+use App\Models\Professor;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Permission;
@@ -70,19 +71,27 @@ class UserManagementController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nome' => 'required|string|max:255',
-            'email' => 'required|email|unique:usuarios,email',
-            'password' => 'required|string|min:6',
-            'perfis' => 'array',
+            'nome'        => 'required|string|max:255',
+            'email'       => 'required|email|unique:usuarios,email',
+            'password'    => 'required|string|min:6',
+            'perfis'      => 'array',
             'permissions' => 'array',
-            'empresa_id' => 'nullable|exists:empresa,id',
         ]);
 
+        $empresaId = auth()->user()->empresa->id ?? null;
+
         $usuario = Usuario::create([
-            'nome' => $request->nome,
-            'email' => $request->email,
-            'password' => bcrypt($request->password),
+            'nome'         => $request->nome,
+            'email'        => $request->email,
+            'password'     => bcrypt($request->password),
             'tipo_usuario' => 'Professor',
+        ]);
+
+        Professor::create([
+            'usuario_id' => $usuario->id,
+            'empresa_id' => $empresaId,
+            'sobre'      => '',
+            'avatar'     => '',
         ]);
 
         if ($request->perfis) {
@@ -93,11 +102,7 @@ class UserManagementController extends Controller
                     continue;
                 }
 
-                $meta = [];
-
-                if ($perfilNome === 'professor' && $request->empresa_id) {
-                    $meta['empresa_id'] = $request->empresa_id;
-                }
+                $meta = $empresaId ? ['empresa_id' => $empresaId] : [];
 
                 $usuario->perfis()->attach($perfil->id, ['meta' => json_encode($meta)]);
             }

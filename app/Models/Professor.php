@@ -15,10 +15,11 @@ class Professor extends Model
 
     protected $fillable = [
         'usuario_id',
+        'empresa_id',
         'especialidade',
         'sobre',
         'avatar',
-        'asaas_customer_id', 
+        'asaas_customer_id',
         'asaas_wallet_id',
         'asaas_pix_key'
     ];

@@ -30,12 +30,6 @@
                     </select>
                 </div>
 
-                <div class="form-group" id="empresa_div" style="display:none;">
-                    <label>Empresa</label>
-                    <input type="text" name="empresa_id" class="form-control" 
-                           value="{{ auth()->user()->metaPerfil('professor', 'empresa_id') ?? '' }}">
-                </div>
-
                 <div class="form-group">
                     <label>Permissões Diretas</label>
                     <select name="permissions[]" class="form-control" multiple>
@@ -50,17 +44,4 @@
         </div>
     </div>
 
-    <script>
-        const perfisSelect = document.getElementById('perfis');
-        const empresaDiv = document.getElementById('empresa_div');
-
-        perfisSelect.addEventListener('change', function() {
-            const selected = Array.from(this.selectedOptions).map(opt => opt.value);
-            if (selected.includes('professor')) {
-                empresaDiv.style.display = 'block';
-            } else {
-                empresaDiv.style.display = 'none';
-            }
-        });
-    </script>
 </x-admin.layout>
