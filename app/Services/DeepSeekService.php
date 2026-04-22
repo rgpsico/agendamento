@@ -150,12 +150,21 @@ class DeepSeekService
         // 1. System prompt — tools são a fonte de verdade sobre serviços
         $systemPrompt  = $bot->prompt . "\n";
         $systemPrompt .= "Tom: " . ($bot->tom ?? 'amigável') . ". Segmento: " . ($bot->segmento ?? '') . ".\n";
-        $systemPrompt .= "\n## Regras obrigatórias sobre ferramentas\n";
-        $systemPrompt .= "- Você tem acesso a ferramentas (tools) que são a ÚNICA fonte de verdade sobre os serviços, horários e clientes.\n";
-        $systemPrompt .= "- SEMPRE chame `listar_servicos` antes de falar sobre qualquer serviço. NUNCA assuma ou invente serviços.\n";
-        $systemPrompt .= "- SEMPRE chame `verificar_disponibilidade` antes de informar horários. NUNCA invente horários.\n";
-        $systemPrompt .= "- Para agendar, SEMPRE identifique o aluno via `buscar_aluno_por_telefone` primeiro.\n";
-        $systemPrompt .= "- Só confirme um agendamento após o cliente confirmar explicitamente e só então chame `criar_agendamento`.\n";
+        $systemPrompt .= "\n## Regras OBRIGATÓRIAS — leia com atenção\n";
+        $systemPrompt .= "- As ferramentas (tools) são a ÚNICA fonte de verdade. NUNCA invente ou assuma dados.\n";
+        $systemPrompt .= "- SEMPRE chame `listar_servicos` antes de falar sobre serviços.\n";
+        $systemPrompt .= "- SEMPRE chame `verificar_disponibilidade` antes de informar horários.\n";
+        $systemPrompt .= "- Para agendar: primeiro chame `buscar_aluno_por_telefone`, depois mostre o resumo, depois aguarde confirmação.\n";
+        $systemPrompt .= "\n## Fluxo de agendamento — siga EXATAMENTE esta ordem\n";
+        $systemPrompt .= "1. Chame `verificar_disponibilidade` para confirmar o horário.\n";
+        $systemPrompt .= "2. Chame `buscar_aluno_por_telefone` para identificar o aluno.\n";
+        $systemPrompt .= "3. Apresente o resumo e pergunte: 'Confirma?' Aguarde o cliente responder.\n";
+        $systemPrompt .= "4. Quando o cliente confirmar (sim, pode, confirmo, ok, etc), chame IMEDIATAMENTE `criar_agendamento`. NÃO responda antes de chamar a tool.\n";
+        $systemPrompt .= "5. Só após receber `sucesso: true` da tool, diga que o agendamento foi confirmado.\n";
+        $systemPrompt .= "6. Se receber `sucesso: false`, informe o erro exato retornado pela tool. NUNCA diga que deu certo se a tool retornou erro.\n";
+        $systemPrompt .= "\n## PROIBIDO\n";
+        $systemPrompt .= "- PROIBIDO confirmar agendamento sem ter chamado `criar_agendamento` e recebido `sucesso: true`.\n";
+        $systemPrompt .= "- PROIBIDO inventar confirmação de agendamento.\n";
         $systemPrompt .= "- Sempre responda em português.";
 
         // 2. Histórico da conversa
@@ -176,12 +185,13 @@ class DeepSeekService
         $messages[] = ['role' => 'user', 'content' => $question];
 
         // 3. Loop de function calling
-        $tools        = $this->definirTools();
-        $maxIteracoes = 5;
-        $totalTokens  = 0;
-        $promptTokens = 0;
-        $completionTokens = 0;
-        $debugLog     = [];
+        $tools               = $this->definirTools();
+        $maxIteracoes        = 5;
+        $totalTokens         = 0;
+        $promptTokens        = 0;
+        $completionTokens    = 0;
+        $debugLog            = [];
+        $agendamentoExecutado = false;
 
         for ($i = 0; $i < $maxIteracoes; $i++) {
             $data   = $this->callDeepSeekApiWithTools($messages, $tools, $bot);
@@ -200,6 +210,10 @@ class DeepSeekService
                     $nome      = $toolCall['function']['name'];
                     $args      = json_decode($toolCall['function']['arguments'], true) ?? [];
                     $resultado = $this->executarTool($nome, $args, $bot);
+
+                    if ($nome === 'criar_agendamento') {
+                        $agendamentoExecutado = true;
+                    }
 
                     $debugLog[] = [
                         'tool'      => $nome,
@@ -220,6 +234,18 @@ class DeepSeekService
             // Resposta final em texto
             $responseText  = $choice['message']['content'] ?? 'Sem resposta';
             $cleanResponse = preg_replace('/[\x{10000}-\x{10FFFF}]/u', '', $responseText);
+
+            // Guarda: se a resposta indica agendamento confirmado mas a tool nunca foi chamada,
+            // injeta correção e força nova iteração
+            $indicaAgendamento = preg_match('/agendamento.*(confirmado|realizado|criado|registrado|sucesso)/i', $cleanResponse);
+            if ($indicaAgendamento && !$agendamentoExecutado) {
+                $messages[] = ['role' => 'assistant', 'content' => $cleanResponse];
+                $messages[] = [
+                    'role'    => 'user',
+                    'content' => '[SISTEMA] Você informou que o agendamento foi confirmado, mas a ferramenta `criar_agendamento` não foi chamada. Chame-a agora para registrar o agendamento no banco de dados.',
+                ];
+                continue;
+            }
 
             $bot->logs()->create([
                 'bot_id'            => $bot->id,
