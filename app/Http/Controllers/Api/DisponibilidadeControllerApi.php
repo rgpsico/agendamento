@@ -29,15 +29,8 @@ class DisponibilidadeControllerApi extends Controller
         $professor_id = $request->input('professor_id');
         $servico_id = $request->input('servico_id');
 
-        // Debug: Vamos ver o que está sendo enviado
-        \Log::info('Parâmetros recebidos:', [
-            'day' => $day,
-            'data_selecionada' => $data_selecionada,
-            'professor_id' => $professor_id,
-            'servico_id' => $servico_id
-        ]);
-
-        // Obtém todos os horários já agendados para o professor e a data selecionada
+        // Obtém todos os horários já agendados para o professor nessa data
+        // Filtra pelo professor (e opcionalmente pelo serviço) para não mostrar slots ocupados
         $horariosAgendados = DB::table('agendamentos')
             ->where('data_da_aula', $data_selecionada)
             ->where('professor_id', $professor_id)
@@ -47,20 +40,11 @@ class DisponibilidadeControllerApi extends Controller
             })
             ->toArray();
 
-        
-
-        // Debug: Ver os horários agendados
-        \Log::info('Horários agendados:', $horariosAgendados);
-
-        // Obtém todas as disponibilidades do serviço selecionado naquele dia
+        // Obtém todas as disponibilidades do serviço selecionado naquele dia da semana
         $schedules = Disponibilidade::where('id_dia', $day)
             ->where('id_servico', $servico_id)
             ->when($professor_id, fn($q) => $q->where('id_professor', $professor_id))
-            ->when($data_selecionada, fn($q) => $q->where('data', $data_selecionada))
             ->get();
-
-        // Debug: Ver as disponibilidades
-        \Log::info('Disponibilidades encontradas:', $schedules->toArray());
 
         $timeslots = [];
 
@@ -71,9 +55,6 @@ class DisponibilidadeControllerApi extends Controller
                 $timeslots[] = $start;
             }
         }
-
-        // Debug: Ver resultado final
-        \Log::info('Horários disponíveis finais:', $timeslots);
 
         return response()->json($timeslots);
     }

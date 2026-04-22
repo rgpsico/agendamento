@@ -150,6 +150,9 @@ class DeepSeekService
         // 1. System prompt — tools são a fonte de verdade sobre serviços
         $systemPrompt  = $bot->prompt . "\n";
         $systemPrompt .= "Tom: " . ($bot->tom ?? 'amigável') . ". Segmento: " . ($bot->segmento ?? '') . ".\n";
+        $systemPrompt .= "\n## Data e hora atual\n";
+        $systemPrompt .= "Hoje é " . now()->locale('pt_BR')->isoFormat('dddd, D [de] MMMM [de] YYYY') . " (" . now()->format('Y-m-d') . ").\n";
+        $systemPrompt .= "Use SEMPRE o ano correto (" . now()->year . ") ao passar datas para as ferramentas. NUNCA use um ano passado.\n";
         $systemPrompt .= "\n## Regras OBRIGATÓRIAS — leia com atenção\n";
         $systemPrompt .= "- As ferramentas (tools) são a ÚNICA fonte de verdade. NUNCA invente ou assuma dados.\n";
         $systemPrompt .= "- SEMPRE chame `listar_servicos` antes de falar sobre serviços.\n";
@@ -515,6 +518,15 @@ class DeepSeekService
         }
 
         $carbon      = Carbon::parse($data);
+
+        // Rejeita datas no passado (ano errado enviado pela IA, por exemplo)
+        if ($carbon->isPast() && !$carbon->isToday()) {
+            return [
+                'sucesso' => false,
+                'erro'    => "Data inválida: '{$data}' é uma data passada. Hoje é " . now()->format('Y-m-d') . ". Use uma data futura com o ano correto (" . now()->year . ").",
+            ];
+        }
+
         $diaSemanaId = $carbon->isoWeekday();
         $horarioFormatado = Carbon::parse($horario)->format('H:i');
 
