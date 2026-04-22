@@ -26,9 +26,16 @@ class DisponibilidadeController extends Controller
     public function storeper(Request $request)
     {
         $id_professor = $request->professor_id;
+        $id_servico   = $request->servico_id;
 
-        // Deleta as disponibilidades atuais para evitar duplicações
-        Disponibilidade::where('id_professor', $id_professor)->delete();
+        // Deleta apenas registros do escopo correto para não apagar dados de outros serviços
+        $delete = Disponibilidade::where('id_professor', $id_professor);
+        if ($id_servico) {
+            $delete->where('id_servico', $id_servico);
+        } else {
+            $delete->whereNull('id_servico');
+        }
+        $delete->delete();
 
         // Percorre os dias e salva múltiplos horários por dia
         foreach ($request->start as $dia => $horariosInicio) {
@@ -38,9 +45,10 @@ class DisponibilidadeController extends Controller
                 if ($horaInicio && $horaFim) {
                     Disponibilidade::create([
                         'id_professor' => $id_professor,
-                        'id_dia' => $dia,
-                        'hora_inicio' => $horaInicio,
-                        'hora_fim' => $horaFim,
+                        'id_servico'   => $id_servico ?: null,
+                        'id_dia'       => $dia,
+                        'hora_inicio'  => $horaInicio,
+                        'hora_fim'     => $horaFim,
                     ]);
                 }
             }
