@@ -787,13 +787,16 @@ class ChatController extends Controller
      */
     private function getBotResponse($mensagem, $conversation, $userId)
     {
-        $botResponseText = $this->deepSeekService->getDeepSeekResponseWithPrompt(
+        $botResponse = $this->deepSeekService->getDeepSeekResponseWithPrompt(
             $conversation->bot,
             $mensagem,
             $conversation,
             $conversation->empresa_id
         );
 
+        $botResponseText = is_array($botResponse)
+            ? ($botResponse['reply'] ?? '')
+            : $botResponse;
 
         $respostaBot = $this->sanitizeMessage($botResponseText);
 
