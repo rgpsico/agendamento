@@ -9,12 +9,14 @@ use App\Models\Bairros;
 use App\Models\Configuracao;
 use App\Models\Disponibilidade;
 use App\Models\Empresa;
+use App\Models\EmpresaSite;
 use App\Models\Modalidade;
 use App\Models\PagamentoGateway;
 use App\Models\Professor;
 use App\Models\Usuario;
 use App\Models\ConfiguracaoGeral;
 use App\Models\PaymentConfiguration;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Str;
@@ -45,8 +47,26 @@ class HomeController extends Controller
         $this->professor = $professor;
     }
 
-    public function home()
+    public function home(Request $request)
     {
+        $site = EmpresaSite::resolveByHost($request->getHost());
+
+        if ($site) {
+            $site->loadMissing([
+                'servicos',
+                'depoimentos',
+                'contatos',
+                'empresa.endereco',
+                'empresa.modalidade',
+                'template',
+                'trackingCodes',
+            ]);
+
+            $viewTemplate = $site->template->path_view ?? 'site.publico';
+
+            return view($viewTemplate, compact('site'));
+        }
+
         return view('home_landing');
     }
     

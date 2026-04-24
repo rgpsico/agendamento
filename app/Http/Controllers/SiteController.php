@@ -212,18 +212,17 @@ class SiteController extends Controller
 
     public function mostrarDominio(Request $request)
     {
-        dd('aaa');
-        $host = $request->getHost();
+    
+        $resolvedSite = EmpresaSite::resolveByHost($request->getHost());
 
         // Domínio padrão do sistema
-        $dominioPrincipal = 'agendamento.rjpasseios.com.br';
 
-        if ($host === $dominioPrincipal) {
-            return redirect()->route('home.index'); // ou return app(HomeController::class)->index();
+        if (!$resolvedSite) {
+            return view('home_landing');
         }
 
         // Caso seja domínio personalizado
-        $site = EmpresaSite::where('dominio_personalizado', $host)
+        $site = EmpresaSite::whereKey($resolvedSite->id)
             ->with(['servicos', 'depoimentos', 'contatos', 'template'])
             ->firstOrFail();
 
@@ -315,7 +314,7 @@ class SiteController extends Controller
             'autoatendimento_ia' => $validated['autoatendimento_ia'] ?? false,
             'bot_id' => $validated['atendimento_com_ia'] == 'on' ? $validated['bot_id'] : null,
 
-            'dominio_personalizado' => $validated['dominio_personalizado'],
+            'dominio_personalizado' => EmpresaSite::normalizeHost($validated['dominio_personalizado'] ?? null),
             'gerar_vhost' => $validated['gerar_vhost'] ?? false,
         ]);
 
@@ -525,7 +524,7 @@ class SiteController extends Controller
                 : null,
             'atendimento_com_ia' => $request->input('atendimento_com_ia') == 'on' ? 1 : 0,
             'atendimento_com_whatsapp' => $request->input('atendimento_com_whatsapp') == 'on' ? 1 : 0,
-            'dominio_personalizado'  => $request->dominio_personalizado, // ← ADD
+            'dominio_personalizado'  => EmpresaSite::normalizeHost($request->dominio_personalizado), // ← ADD
             ];
 
 

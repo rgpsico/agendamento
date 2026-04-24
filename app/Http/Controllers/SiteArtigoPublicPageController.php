@@ -44,14 +44,10 @@ class SiteArtigoPublicPageController extends Controller
 
     private function resolveSite(Request $request): ?EmpresaSite
     {
-        $host = $request->getHost();
-        $dominioPrincipal = 'agendamento.rjpasseios.com.br';
+        $site = EmpresaSite::resolveByHost($request->getHost());
 
-        if ($host && $host !== $dominioPrincipal) {
-            $site = EmpresaSite::where('dominio_personalizado', $host)->first();
-            if ($site) {
-                return $site;
-            }
+        if ($site) {
+            return $site;
         }
 
         if ($request->filled('site_id')) {

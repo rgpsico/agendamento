@@ -39,6 +39,38 @@ class EmpresaSite extends Model
         'ativo' => 'boolean',
     ];
 
+    public static function normalizeHost(?string $host): ?string
+    {
+        if (!$host) {
+            return null;
+        }
+
+        $host = strtolower(trim($host));
+        $host = preg_replace('#^https?://#', '', $host);
+        $host = explode('/', $host)[0];
+        $host = explode(':', $host)[0];
+
+        return rtrim($host, '.');
+    }
+
+    public static function resolveByHost(?string $host): ?self
+    {
+        $host = static::normalizeHost($host);
+
+        if (!$host) {
+            return null;
+        }
+
+        $hosts = array_values(array_unique([
+            $host,
+            preg_replace('/^www\./', '', $host),
+        ]));
+
+        return static::query()
+            ->whereIn('dominio_personalizado', $hosts)
+            ->first();
+    }
+
 
     public function trackingCodes()
     {
