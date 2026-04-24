@@ -189,6 +189,7 @@ class SiteController extends Controller
      */
     public function mostrar($slug)
     {
+       
         $site = EmpresaSite::where('slug', $slug)
             ->with([
                 'servicos',
@@ -211,6 +212,7 @@ class SiteController extends Controller
 
     public function mostrarDominio(Request $request)
     {
+        dd('aaa');
         $host = $request->getHost();
 
         // Domínio padrão do sistema
