@@ -130,6 +130,7 @@
                                 <option value="passeio" {{ $sistemaTipo == 'passeio' ? 'selected' : '' }}>Passeio</option>
                                 <option value="estetica" {{ $sistemaTipo == 'estetica' ? 'selected' : '' }}>Estética</option>
                                 <option value="manicure" {{ $sistemaTipo == 'manicure' ? 'selected' : '' }}>Manicure</option>
+                                <option value="pilates" {{ $sistemaTipo == 'pilates' ? 'selected' : '' }}>Pilates</option>
                             </select>
                         </div>
                         <button type="submit" class="btn btn-primary mt-3">Salvar</button>

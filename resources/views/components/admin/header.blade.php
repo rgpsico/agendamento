@@ -58,13 +58,31 @@
                 $user = Auth::user(); // pega o usuário autenticado
                 $empresa = $user->empresa ?? '';
                 $avatar = $empresa->avatar ?? '';
+                $configuracaoGeral = \App\Models\ConfiguracaoGeral::first();
+                $isPilates = ($configuracaoGeral->sistema_tipo ?? null) === 'pilates';
+                $adminLogoLarge = null;
+                $adminLogoSmall = asset('admin/img/logo-small.png');
+
+                if ($isPilates) {
+                    if (file_exists(public_path('admin/img/pilates_logo.png'))) {
+                        $adminLogoLarge = asset('admin/img/pilates_logo.png');
+                        $adminLogoSmall = asset('admin/img/pilates_logo.png');
+                    } elseif (file_exists(public_path('admin/img/pilates_logo.jpg'))) {
+                        $adminLogoLarge = asset('admin/img/pilates_logo.jpg');
+                        $adminLogoSmall = asset('admin/img/pilates_logo.jpg');
+                    }
+                }
             @endphp
             <div class="header-left">
                 <a href="{{ route('home.index') }}" class="logo">
-                    <x-logo-tipo imagem="{{ $avatar }}" largura="154" altura="80" />
+                    @if ($adminLogoLarge)
+                        <img src="{{ $adminLogoLarge }}" alt="Logo" width="154" height="80" style="object-fit: contain;">
+                    @else
+                        <x-logo-tipo imagem="{{ $avatar }}" largura="154" altura="80" />
+                    @endif
                 </a>
                 <a href="{{ route('home.index') }}" class="logo logo-small">
-                    <img src="{{ asset('admin/img/logo-small.png') }}" alt="Logo" width="30" height="30">
+                    <img src="{{ $adminLogoSmall }}" alt="Logo" width="30" height="30">
                 </a>
             </div>
             <!-- /Logo -->
