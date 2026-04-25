@@ -47,6 +47,7 @@ use App\Http\Controllers\LeadController;
 use App\Http\Controllers\LeadInteresseController;
 use App\Http\Controllers\CRM\CampanhaController as CRMCampanhaController;
 use App\Http\Controllers\CRM\DashboardCRMController;
+use App\Http\Controllers\CRM\FormularioCampanhaController;
 use App\Http\Controllers\CRM\LeadController as CRMLeadController;
 use App\Http\Controllers\CRM\PipelineController;
 use App\Http\Controllers\CRM\RelatorioController as CRMRelatorioController;
@@ -99,6 +100,8 @@ Route::get('/lead/rastrear/{token}', [LeadInteresseController::class, 'rastrear'
 Route::get('/interesse/{token}', [LeadInteresseController::class, 'show'])->name('lead.interesse');
 Route::post('/interesse/{token}', [LeadInteresseController::class, 'store'])->name('lead.interesse.store');
 Route::post('/interesse/{token}/reenviar', [LeadInteresseController::class, 'reenviar'])->name('lead.interesse.reenviar');
+Route::get('/campanha/{token}', [FormularioCampanhaController::class, 'show'])->name('public.campanhas.formulario.show');
+Route::post('/campanha/{token}', [FormularioCampanhaController::class, 'store'])->name('public.campanhas.formulario.store');
 
 Route::prefix('admin/crm/leads')->middleware(['auth'])->name('admin.leads.')->group(function () {
     Route::get('/', [LeadController::class, 'index'])->name('index');
@@ -122,6 +125,8 @@ Route::prefix('crm')->middleware(['auth', 'tenant'])->name('crm.')->group(functi
 
     Route::resource('leads', CRMLeadController::class);
     Route::resource('campanhas', CRMCampanhaController::class)->only(['index', 'store', 'update']);
+    Route::get('formularios', [FormularioCampanhaController::class, 'index'])->name('formularios.index');
+    Route::patch('campanhas/{campanha}/formulario', [FormularioCampanhaController::class, 'update'])->name('campanhas.formulario.update');
     Route::post('tarefas', [CRMTarefaController::class, 'store'])->name('tarefas.store');
     Route::patch('tarefas/{tarefa}/concluir', [CRMTarefaController::class, 'concluir'])->name('tarefas.concluir');
     Route::get('relatorios', [CRMRelatorioController::class, 'index'])->name('relatorios.index');

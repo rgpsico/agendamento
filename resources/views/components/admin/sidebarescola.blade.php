@@ -222,6 +222,7 @@
                                 <li><a href="{{ route('crm.pipeline.index') }}">Pipeline</a></li>
                                 <li><a href="{{ route('crm.leads.index') }}">Leads</a></li>
                                 <li><a href="{{ route('crm.campanhas.index') }}">Campanhas</a></li>
+                                <li><a href="{{ route('crm.formularios.index') }}">Formularios</a></li>
                                 <li><a href="{{ route('crm.relatorios.index') }}">Relatorios</a></li>
                             </ul>
                         </li>
