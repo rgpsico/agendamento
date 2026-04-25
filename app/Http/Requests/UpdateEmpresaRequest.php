@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Carbon;
 
 class UpdateEmpresaRequest extends FormRequest
 {
@@ -36,5 +37,20 @@ class UpdateEmpresaRequest extends FormRequest
             'bairros' => 'nullable|array|max:5',
             'bairros.*' => 'exists:loc_bairros,id',
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        if (! $this->filled('data_vencimento')) {
+            return;
+        }
+
+        $data = $this->input('data_vencimento');
+
+        if (preg_match('/^\d{2}\/\d{2}\/\d{4}$/', $data)) {
+            $this->merge([
+                'data_vencimento' => Carbon::createFromFormat('d/m/Y', $data)->format('Y-m-d'),
+            ]);
+        }
     }
 }

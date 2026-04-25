@@ -147,7 +147,7 @@ class Empresa extends Model
             'descricao' => $data['descricao'],
             'telefone' => $data['telefone'],
             'cnpj' => $data['cnpj'],
-            'data_vencimento' => $data['data_vencimento'] ?? today()->format('Y-m-d'),
+            'data_vencimento' => $data['data_vencimento'] ?? $this->data_vencimento,
             'valor_aula_de' => $data['valor_aula_de'],
             'valor_aula_ate' => $data['valor_aula_ate'],
             'modalidade_id' => $data['modalidade_id'],

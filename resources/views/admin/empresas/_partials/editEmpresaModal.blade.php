@@ -53,7 +53,7 @@
                         <div class="col-md-6">
                             <div class="form-group mb-3">
                                 <label for="data_vencimento" class="form-label">Data Vencimento</label>
-                                <input type="text" class="form-control" id="data_vencimento_empresa" name="data_vencimento" required>
+                                <input type="date" class="form-control" id="data_vencimento_empresa" name="data_vencimento">
                             </div>
                         </div>
                     </div>

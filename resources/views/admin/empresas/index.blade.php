@@ -145,10 +145,9 @@
                                                     <td>{{ $empresa->email }}</td>
                                                     <td>{{ $empresa->telefone }}</td>
                                                     <td>{{ $empresa->modalidade->nome ?? 'N/A' }}</td>
-                                                    <td>{{ \Carbon\Carbon::parse($empresa->data_vencimento)->format('d/m/Y') }}
-                                                    </td>
+                                                    <td>{{ $empresa->data_vencimento ? $empresa->data_vencimento->format('d/m/Y') : '-' }}</td>
                                                     <td class="text-center">
-                                                        @if (\Carbon\Carbon::parse($empresa->data_vencimento)->isFuture())
+                                                        @if ($empresa->data_vencimento && $empresa->data_vencimento->isFuture())
                                                             <span
                                                                 class="badge rounded-pill bg-success inv-badge">Ativo</span>
                                                         @else
@@ -170,7 +169,7 @@
                                                                     data-valor_aula_de="{{ $empresa->valor_aula_de }}"
                                                                     data-valor_aula_ate="{{ $empresa->valor_aula_ate }}"
                                                                     data-modalidade_id="{{ $empresa->modalidade_id ?? '' }}"
-                                                                    data-data_vencimento="{{ $empresa->data_vencimento }}"
+                                                                    data-data_vencimento="{{ $empresa->data_vencimento ? $empresa->data_vencimento->format('Y-m-d') : '' }}"
                                                                     data-cep="{{ $empresa->endereco->cep ?? '' }}"
                                                                     data-endereco="{{ $empresa->endereco->endereco ?? '' }}"
                                                                     data-numero="{{ $empresa->endereco->numero ?? '' }}"
@@ -327,17 +326,7 @@
         $('.editEmpresaBtn').click(function() {
             let empresaId = $(this).data('id');
             let modalidadeId = $(this).data('modalidade_id');
-              let data_vencimento = $(this).data('data_vencimento'); // exemplo: "2025-08-21 12:30:00"
-
-            let somenteData = data_vencimento.split(' ')[0]; // "2025-09-10"
-
-            // quebra em [ano, mes, dia]
-            let [ano, mes, dia] = somenteData.split('-');
-
-            // monta no formato brasileiro
-            let dataBr = `${dia}/${mes}/${ano}`;
-
-         
+            let dataVencimento = $(this).attr('data-data_vencimento') || '';
 
 
             // Preencher campos do formulário
@@ -348,7 +337,7 @@
             $('#descricao').val($(this).data('descricao'));
             $('#telefone').val($(this).data('telefone'));
             $('#cnpj').val($(this).data('cnpj'));
-            $('#data_vencimento_empresa').val(dataBr);
+            $('#data_vencimento_empresa').val(dataVencimento);
             $('#valor_aula_de').val($(this).data('valor_aula_de'));
             $('#valor_aula_ate').val($(this).data('valor_aula_ate'));
             $('#modalidade_id').val($(this).data('modalidade_id'));
@@ -374,15 +363,6 @@
         $('#editEmpresaForm').submit(function(e) {
             e.preventDefault();
 
-            let dataInput = $(this).find('[name="data_vencimento"]'); // ajuste o name do input
-
-            if (dataInput.length && dataInput.val()) {
-                let dataBr = dataInput.val(); // exemplo: "10/09/2025"
-                let [dia, mes, ano] = dataBr.split('/'); // quebra por "/"
-                let dataUsa = `${ano}-${mes}-${dia}`; // monta "2025-09-10"
-
-                dataInput.val(dataUsa); // substitui no campo
-            }
             let formData = new FormData(this);
 
             $.ajax({
