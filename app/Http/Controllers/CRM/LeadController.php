@@ -74,6 +74,17 @@ class LeadController extends Controller
         return view('crm.leads.show', compact('lead'));
     }
 
+    public function whatsapp(Lead $lead)
+    {
+        $this->authorize('update', $lead);
+
+        $lead->update(['whatsapp_enviado_em' => now()]);
+
+        abort_unless($lead->whatsapp_url, 404);
+
+        return redirect()->away($lead->whatsapp_url);
+    }
+
     public function edit(Lead $lead)
     {
         $this->authorize('update', $lead);

@@ -4,7 +4,12 @@
             <div class="page-header d-flex justify-content-between align-items-center">
                 <div><h3 class="page-title">{{ $lead->nome }}</h3><ul class="breadcrumb"><li class="breadcrumb-item">CRM</li><li class="breadcrumb-item active">Perfil</li></ul></div>
                 <div class="d-flex gap-2">
-                    @if($lead->whatsapp_url)<a href="{{ $lead->whatsapp_url }}" target="_blank" class="btn btn-success">WhatsApp</a>@endif
+                    @if($lead->whatsapp_url)
+                        <form method="POST" action="{{ route('crm.leads.whatsapp', $lead) }}" target="_blank" class="d-inline">
+                            @csrf
+                            <button type="submit" class="btn btn-success">WhatsApp</button>
+                        </form>
+                    @endif
                     <a href="{{ route('agenda.create') }}" class="btn btn-outline-primary">Agendar experimental</a>
                     <form method="POST" action="{{ route('crm.pipeline.move', $lead) }}">@csrf @method('PATCH')<input type="hidden" name="pipeline_status" value="matriculado"><button class="btn btn-primary">Converter em aluno</button></form>
                 </div>
@@ -22,6 +27,7 @@
                             <p><strong>Origem:</strong> {{ $lead->origem_label }}</p>
                             <p><strong>Interesse:</strong> {{ $lead->interesse ?? '-' }}</p>
                             <p><strong>Status:</strong> {{ $lead->pipeline_status_label }}</p>
+                            <p><strong>WhatsApp:</strong> {{ $lead->whatsapp_enviado_em ? 'Enviado em ' . $lead->whatsapp_enviado_em->format('d/m/Y H:i') : 'Pendente' }}</p>
                             <p><strong>Campanha:</strong> {{ $lead->campanha->nome ?? '-' }}</p>
                             <p><strong>Responsavel:</strong> {{ $lead->responsavel->nome ?? '-' }}</p>
                             <p class="mb-0"><strong>Observacoes:</strong><br>{{ $lead->observacoes ?? '-' }}</p>

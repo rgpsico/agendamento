@@ -23,6 +23,7 @@ class Lead extends Model
         'campanha_id',
         'trial_usuario_id',
         'email_enviado_em',
+        'whatsapp_enviado_em',
         'token',
         'morno_em',
         'interessado_em',
@@ -31,6 +32,7 @@ class Lead extends Model
 
     protected $casts = [
         'email_enviado_em' => 'datetime',
+        'whatsapp_enviado_em' => 'datetime',
         'morno_em' => 'datetime',
         'interessado_em' => 'datetime',
         'valor_estimado' => 'decimal:2',
@@ -194,7 +196,23 @@ class Lead extends Model
         return $referencia ? $referencia->diffForHumans(null, true) : '-';
     }
 
+    public function getWhatsappMensagemPadraoAttribute(): string
+    {
+        $primeiroNome = trim(explode(' ', trim($this->nome))[0] ?? $this->nome);
+        $nome = $primeiroNome !== '' ? $primeiroNome : $this->nome;
+
+        return "Bom dia, {$nome}! Tudo bem? 😊\n\n"
+            . "Vi que você trabalha com Pilates e entrei em contato porque tenho um sistema que pode facilitar bastante sua rotina.\n\n"
+            . "Ele ajuda a organizar seus horários, automatiza agendamentos e ainda conta com um robô que responde seus alunos e um site pronto pra você divulgar seu trabalho.\n\n"
+            . "Quero te liberar um acesso de teste já configurado, pra você só entrar e usar.";
+    }
+
     public function getWhatsappUrlAttribute(): ?string
+    {
+        return $this->whatsapp_url_com_mensagem;
+    }
+
+    public function getWhatsappUrlComMensagemAttribute(): ?string
     {
         if (empty($this->telefone)) {
             return null;
@@ -206,6 +224,6 @@ class Lead extends Model
             $numero = '55' . $numero;
         }
 
-        return 'https://wa.me/' . $numero;
+        return 'https://wa.me/' . $numero . '?text=' . rawurlencode($this->whatsapp_mensagem_padrao);
     }
 }

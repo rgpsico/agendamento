@@ -32,23 +32,37 @@
             <div class="card">
                 <div class="card-body table-responsive">
                     <table class="table table-hover">
-                        <thead><tr><th>Nome</th><th>Contato</th><th>Origem</th><th>Status</th><th>Valor</th><th>Campanha</th><th class="text-end">Acoes</th></tr></thead>
+                        <thead><tr><th>Nome</th><th>Contato</th><th>WhatsApp</th><th>Origem</th><th>Status</th><th>Valor</th><th>Campanha</th><th class="text-end">Acoes</th></tr></thead>
                         <tbody>
                             @forelse($leads as $lead)
                                 <tr>
                                     <td><a href="{{ route('crm.leads.show', $lead) }}"><strong>{{ $lead->nome }}</strong></a><div class="text-muted small">{{ $lead->interesse }}</div></td>
                                     <td>{{ $lead->telefone ?? '-' }}<div class="text-muted small">{{ $lead->email }}</div></td>
+                                    <td>
+                                        @if($lead->whatsapp_enviado_em)
+                                            <span class="badge bg-success">Enviado</span>
+                                            <div class="text-muted small">{{ $lead->whatsapp_enviado_em->format('d/m/Y H:i') }}</div>
+                                        @else
+                                            <span class="badge bg-secondary">Pendente</span>
+                                        @endif
+                                    </td>
                                     <td>{{ $lead->origem_label }}</td>
                                     <td><span class="badge bg-primary">{{ $lead->pipeline_status_label }}</span></td>
                                     <td>R$ {{ number_format((float) $lead->valor_estimado, 2, ',', '.') }}</td>
                                     <td>{{ $lead->campanha->nome ?? '-' }}</td>
                                     <td class="text-end">
+                                        @if($lead->whatsapp_url)
+                                            <form method="POST" action="{{ route('crm.leads.whatsapp', $lead) }}" target="_blank" class="d-inline">
+                                                @csrf
+                                                <button type="submit" class="btn btn-sm btn-success">WhatsApp</button>
+                                            </form>
+                                        @endif
                                         <a class="btn btn-sm btn-outline-primary" href="{{ route('crm.leads.show', $lead) }}">Ver</a>
                                         <a class="btn btn-sm btn-outline-secondary" href="{{ route('crm.leads.edit', $lead) }}">Editar</a>
                                     </td>
                                 </tr>
                             @empty
-                                <tr><td colspan="7" class="text-center">Nenhum lead encontrado.</td></tr>
+                                <tr><td colspan="8" class="text-center">Nenhum lead encontrado.</td></tr>
                             @endforelse
                         </tbody>
                     </table>
