@@ -45,6 +45,12 @@ use App\Http\Controllers\FinanceiroCategoriaController;
 use App\Http\Controllers\ReceitaRecorrenteController;
 use App\Http\Controllers\LeadController;
 use App\Http\Controllers\LeadInteresseController;
+use App\Http\Controllers\CRM\CampanhaController as CRMCampanhaController;
+use App\Http\Controllers\CRM\DashboardCRMController;
+use App\Http\Controllers\CRM\LeadController as CRMLeadController;
+use App\Http\Controllers\CRM\PipelineController;
+use App\Http\Controllers\CRM\RelatorioController as CRMRelatorioController;
+use App\Http\Controllers\CRM\TarefaController as CRMTarefaController;
 
 
 
@@ -107,6 +113,18 @@ Route::prefix('admin/crm/leads')->middleware(['auth'])->name('admin.leads.')->gr
     Route::put('/{lead}', [LeadController::class, 'update'])->name('update');
     Route::delete('/{lead}', [LeadController::class, 'destroy'])->name('destroy');
     Route::post('/{lead}/resetar', [LeadController::class, 'resetar'])->name('resetar');
+});
+
+Route::prefix('crm')->middleware(['auth'])->name('crm.')->group(function () {
+    Route::get('/', DashboardCRMController::class)->name('dashboard');
+    Route::get('/pipeline', [PipelineController::class, 'index'])->name('pipeline.index');
+    Route::patch('/pipeline/{lead}/mover', [PipelineController::class, 'move'])->name('pipeline.move');
+
+    Route::resource('leads', CRMLeadController::class);
+    Route::resource('campanhas', CRMCampanhaController::class)->only(['index', 'store', 'update']);
+    Route::post('tarefas', [CRMTarefaController::class, 'store'])->name('tarefas.store');
+    Route::patch('tarefas/{tarefa}/concluir', [CRMTarefaController::class, 'concluir'])->name('tarefas.concluir');
+    Route::get('relatorios', [CRMRelatorioController::class, 'index'])->name('relatorios.index');
 });
 
 
@@ -484,4 +502,3 @@ Route::prefix('admin')->group(function () {
     Route::put('planos/{plano}', [PlanoAlunoController::class, 'update'])->name('alunos.planos.update');
     Route::delete('planos/{plano}', [PlanoAlunoController::class, 'destroy'])->name('alunos.planos.destroy');
 });
-

@@ -31,6 +31,13 @@ class RolesAndPermissionsSeeder extends Seeder
 
             'settings.view',
             'settings.update',
+
+            'crm.leads.view',
+            'crm.leads.create',
+            'crm.leads.edit',
+            'crm.leads.move',
+            'crm.leads.delete',
+            'crm.reports.view',
         ];
 
         foreach ($permissions as $permission) {
@@ -54,10 +61,18 @@ class RolesAndPermissionsSeeder extends Seeder
             'users.edit',
             'roles.view',
             'settings.view',
+            'crm.leads.view',
+            'crm.leads.create',
+            'crm.leads.edit',
+            'crm.leads.move',
+            'crm.reports.view',
         ]);
 
         $user->syncPermissions([
             'settings.view',
+            'crm.leads.view',
+            'crm.leads.create',
+            'crm.leads.edit',
         ]);
 
         /**

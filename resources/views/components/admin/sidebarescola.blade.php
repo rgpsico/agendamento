@@ -211,6 +211,23 @@
                     </li>
 
                     @isset(Auth::user()->empresa->id)
+                        <li class="submenu">
+                            <a href="#">
+                                <i class="fas fa-chart-line" style="font-size: 18px;"></i>
+                                <span>CRM</span>
+                                <span class="menu-arrow"></span>
+                            </a>
+                            <ul>
+                                <li><a href="{{ route('crm.dashboard') }}">Dashboard</a></li>
+                                <li><a href="{{ route('crm.pipeline.index') }}">Pipeline</a></li>
+                                <li><a href="{{ route('crm.leads.index') }}">Leads</a></li>
+                                <li><a href="{{ route('crm.campanhas.index') }}">Campanhas</a></li>
+                                <li><a href="{{ route('crm.relatorios.index') }}">Relatorios</a></li>
+                            </ul>
+                        </li>
+                    @endisset
+
+                    @isset(Auth::user()->empresa->id)
                         <!-- Fotos -->
                         <li>
                             <a href="{{ route('empresa.fotos', ['userId' => Auth::user()->id]) }}">
