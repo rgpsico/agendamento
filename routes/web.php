@@ -115,7 +115,7 @@ Route::prefix('admin/crm/leads')->middleware(['auth'])->name('admin.leads.')->gr
     Route::post('/{lead}/resetar', [LeadController::class, 'resetar'])->name('resetar');
 });
 
-Route::prefix('crm')->middleware(['auth'])->name('crm.')->group(function () {
+Route::prefix('crm')->middleware(['auth', 'tenant'])->name('crm.')->group(function () {
     Route::get('/', DashboardCRMController::class)->name('dashboard');
     Route::get('/pipeline', [PipelineController::class, 'index'])->name('pipeline.index');
     Route::patch('/pipeline/{lead}/mover', [PipelineController::class, 'move'])->name('pipeline.move');

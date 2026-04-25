@@ -47,7 +47,7 @@
                                 <div class="mb-3">
                                     <div class="d-flex justify-content-between">
                                         <strong>{{ $etapa['label'] }}</strong>
-                                        <span>{{ $etapa['count'] }} leads · {{ $etapa['percent'] }}%</span>
+                                        <span>{{ $etapa['count'] }} leads - {{ $etapa['percent'] }}%</span>
                                     </div>
                                     <div class="progress mt-1">
                                         <div class="progress-bar" style="width: {{ $etapa['percent'] }}%"></div>

@@ -6,7 +6,6 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Pagination\Paginator;
-use Laravel\Horizon\Horizon;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -34,9 +33,11 @@ class AppServiceProvider extends ServiceProvider
             return auth()->check() && auth()->user()->isMasterUser();
         });
 
-        Horizon::auth(function ($request) {
-            return auth()->check();
-        });
+        if (class_exists(\Laravel\Horizon\Horizon::class)) {
+            \Laravel\Horizon\Horizon::auth(function ($request) {
+                return auth()->check();
+            });
+        }
 
         // DICA: Se estiver testando e o APP_ENV for local,
         // você pode remover o 'if' temporariamente para testar:
