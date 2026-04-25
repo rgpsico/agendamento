@@ -7,11 +7,17 @@
             
             <div class="row">
                 <div class="col-md-12">
+                    @php
+                        $bannerArquivo = $empresa->banners ? public_path('banner/' . $empresa->banners) : null;
+                        $bannerUrl = $bannerArquivo && is_file($bannerArquivo)
+                            ? asset('banner/' . $empresa->banners)
+                            : asset('images/placeholder-image.svg');
+                    @endphp
                     <div class="profile-header">
                         <div class="row align-items-center">
                             <div class="col-auto profile-image">
                                 <a href="#">
-                                    <img class="rounded-circle" alt="User Image" src="{{ asset('banner/' . $empresa->banners) }}">
+                                    <img class="rounded-circle" alt="User Image" src="{{ $bannerUrl }}">
                                 </a>
                             </div>
                             <div class="col ml-md-n2 profile-user-info">

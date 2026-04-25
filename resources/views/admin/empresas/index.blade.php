@@ -130,13 +130,19 @@
                                         </thead>
                                         <tbody>
                                             @forelse($empresas as $empresa)
+                                                @php
+                                                    $avatarArquivo = $empresa->avatar ? public_path('avatar/' . $empresa->avatar) : null;
+                                                    $avatarUrl = $avatarArquivo && is_file($avatarArquivo)
+                                                        ? asset('avatar/' . $empresa->avatar)
+                                                        : asset('images/placeholder-image.svg');
+                                                @endphp
                                                 <tr>
                                                     <td>{{ $empresa->id }}</td>
                                                     <td>
                                                         <h2 class="table-avatar">
                                                             <a href="#" class="avatar avatar-sm me-2">
                                                                 <img class="avatar-img rounded-circle"
-                                                                    src="{{ $empresa->avatar ? asset('avatar/' . $empresa->avatar) : asset('admin/img/patients/patient15.jpg') }}"
+                                                                    src="{{ $avatarUrl }}"
                                                                     alt="User Image">
                                                             </a>
                                                             <a href="#">{{ $empresa->nome }}</a>

@@ -107,8 +107,14 @@
             </div>
             <div class="card-body">
                 <div class="booking-doc-info">
+                    @php
+                        $avatarArquivo = $model->avatar ? public_path('avatar/' . $model->avatar) : null;
+                        $avatarUrl = $avatarArquivo && is_file($avatarArquivo)
+                            ? asset('avatar/' . $model->avatar)
+                            : asset('images/placeholder-image.svg');
+                    @endphp
                     <a href="#" class="booking-doc-img">
-                        <img src="{{ asset('avatar/' . $model->avatar) }}" alt="Usuário">
+                        <img src="{{ $avatarUrl }}" alt="Usuario">
                     </a>
                     <div class="booking-info">
                         <h4><a href="#">{{$model->nome}}</a></h4>

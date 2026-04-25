@@ -49,6 +49,13 @@
                 </div>
 
                 <div class="card-body p-4">
+                    @php
+                        $placeholderImage = asset('images/placeholder-image.svg');
+                        $avatarArquivo = isset($model) && $model->avatar ? public_path('avatar/' . $model->avatar) : null;
+                        $avatarPreviewUrl = $avatarArquivo && is_file($avatarArquivo) ? asset('avatar/' . $model->avatar) : $placeholderImage;
+                        $bannerArquivo = isset($model) && $model->banners ? public_path('banner/' . $model->banners) : null;
+                        $bannerPreviewUrl = $bannerArquivo && is_file($bannerArquivo) ? asset('banner/' . $model->banners) : $placeholderImage;
+                    @endphp
                     <!-- Progress Bar -->
                     <div class="mb-4">
                         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -139,8 +146,8 @@
                                         <input type="file" class="form-control" id="avatar" name="avatar" accept="image/*">
                                         <small class="text-muted">Formatos aceitos: JPG, PNG (máx. 2MB)</small>
                                         <div class="mt-2">
-                                            <img id="avatarPreview" src="{{ isset($model->avatar) ? asset('avatar/' . $model->avatar) : '' }}"
-                                                class="img-fluid rounded" style="max-width: 150px; display: {{ isset($model->avatar) ? 'block' : 'none' }};">
+                                            <img id="avatarPreview" src="{{ $avatarPreviewUrl }}"
+                                                class="img-fluid rounded" style="max-width: 150px; display: block;">
                                         </div>
                                     </div>
                                 </div>
@@ -151,11 +158,8 @@
                                         <input type="file" class="form-control" id="banner" name="banner" accept="image/*">
                                         <small class="text-muted">Formatos aceitos: JPG, PNG (máx. 5MB)</small>
                                         <div class="mt-2">
-                                                @isset($model->banners)
-                                                           <img id="bannerPreview" src="{{asset('banner/' . $model->banners)}}"
-                                                class="img-fluid rounded" style="max-width: 300px; display: {{ isset($model->banners) ? 'block' : 'none' }};">
-                               
-                                                @endisset
+                                                <img id="bannerPreview" src="{{ $bannerPreviewUrl }}"
+                                                class="img-fluid rounded" style="max-width: 300px; display: block;">
                                               </div>
                                     </div>
                                 </div>

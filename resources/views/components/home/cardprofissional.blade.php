@@ -257,14 +257,16 @@
     $(document).ready(function() {
         // Aplica a máscara de telefone
    
-    function handleImageError (imageElement) {
-        var defaultImage = 'https://picsum.photos/536/354';
-        $(imageElement).attr('src', defaultImage).css('opacity', '0').fadeTo(300, 1);
-    }
-
        //  $('.phone-input').inputmask('(99) 99999-9999');
     });
 </script>
+
+@php
+    $avatarArquivo = $value->avatar ? public_path('avatar/' . $value->avatar) : null;
+    $avatarUrl = $avatarArquivo && is_file($avatarArquivo)
+        ? asset('avatar/' . $value->avatar)
+        : asset('images/placeholder-image.svg');
+@endphp
 
 <div class="card">
     <div class="card-body">
@@ -272,7 +274,7 @@
             <div class="doc-info-left">
                 <div class="doctor-img">
                     <a href="{{ route('home.show', ['id' => $value->user_id]) }}">                        
-                        <img src="{{ asset('avatar/' . $value->avatar) }}" class="img-fluid" alt="Usuario Image">
+                        <img src="{{ $avatarUrl }}" class="img-fluid" alt="Usuario Image">
                     </a>
                 </div>              
                 <div class="doc-info-cont">

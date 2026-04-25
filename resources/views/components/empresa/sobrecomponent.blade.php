@@ -1,4 +1,10 @@
 <div class="tab-pane fade show active" id="per_details_tab">
+    @php
+        $avatarArquivo = $empresa->avatar ? public_path('avatar/' . $empresa->avatar) : null;
+        $avatarUrl = $avatarArquivo && is_file($avatarArquivo)
+            ? asset('avatar/' . $empresa->avatar)
+            : asset('images/placeholder-image.svg');
+    @endphp
     <!-- Personal Details -->
     <div class="row">
         <div class="col-lg-12">
@@ -16,15 +22,8 @@
                 <div class="card-body">
                     <div class="row mb-4">
                         <div class="col-md-3 text-center mb-4 mb-md-0">
-                            @if (!empty($empresa->avatar))
-                                <img src="{{ asset('/avatar/' . $empresa->avatar) }}" class="img-fluid rounded-circle"
-                                    style="width: 150px; height: 150px; object-fit: cover;" alt="Perfil da Empresa">
-                            @else
-                                <div class="rounded-circle bg-light d-flex align-items-center justify-content-center"
-                                    style="width: 150px; height: 150px; margin: 0 auto;">
-                                    <i class="fa fa-building text-secondary" style="font-size: 60px;"></i>
-                                </div>
-                            @endif
+                            <img src="{{ $avatarUrl }}" class="img-fluid rounded-circle"
+                                style="width: 150px; height: 150px; object-fit: cover;" alt="Perfil da Empresa">
                             <h5 class="mt-3">{{ $empresa->nome }}</h5>
                             <span class="badge bg-success">Ativa</span>
                         </div>
