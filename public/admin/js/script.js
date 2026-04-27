@@ -35,11 +35,33 @@ Version      : 1.3
                 $(this).next('ul').slideUp(350);
             }
         });
-        $('#sidebar-menu ul li.submenu a.active')
-            .parents('li:last')
-            .children('a:first')
-            .addClass('active')
-            .trigger('click');
+        var currentUrl = window.location.href.split(/[?#]/)[0].replace(/\/$/, '');
+        var $activeLink = $();
+
+        $('#sidebar-menu a').each(function () {
+            var linkUrl = this.href ? this.href.split(/[?#]/)[0].replace(/\/$/, '') : '';
+
+            if (linkUrl && linkUrl === currentUrl) {
+                $activeLink = $(this);
+                return false;
+            }
+        });
+
+        if ($activeLink.length) {
+            $activeLink.addClass('active');
+        }
+
+        $('#sidebar-menu ul li.submenu a.active').each(function () {
+            $(this)
+                .parents('ul')
+                .show()
+                .prev('a')
+                .addClass('active subdrop');
+
+            $(this)
+                .parents('li.submenu')
+                .addClass('active');
+        });
     }
 
     // Sidebar Initiate
