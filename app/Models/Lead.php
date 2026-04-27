@@ -13,6 +13,7 @@ class Lead extends Model
         'email',
         'telefone',
         'empresa',
+        'bairro',
         'origem',
         'status',
         'pipeline_status',

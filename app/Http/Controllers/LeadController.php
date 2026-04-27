@@ -12,6 +12,7 @@ class LeadController extends Controller
     public function index(Request $request)
     {
         $query = Lead::with('responsavel');
+        $perPage = $this->perPage($request);
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
@@ -19,6 +20,18 @@ class LeadController extends Controller
 
         if ($request->filled('origem')) {
             $query->where('origem', $request->origem);
+        }
+
+        if ($request->filled('bairro')) {
+            $query->where('bairro', $request->bairro);
+        }
+
+        if ($request->filled('data_inicio')) {
+            $query->whereDate('created_at', '>=', $request->data_inicio);
+        }
+
+        if ($request->filled('data_fim')) {
+            $query->whereDate('created_at', '<=', $request->data_fim);
         }
 
         if ($request->temperatura === 'quente') {
@@ -49,12 +62,23 @@ class LeadController extends Controller
             });
         }
 
-        $leads = $query->latest()->paginate(20)->withQueryString();
+        if ($request->ordem === 'antigos') {
+            $query->oldest();
+        } else {
+            $query->latest();
+        }
+
+        $leads = $query->paginate($perPage)->withQueryString();
 
         return view('admin.leads.index', [
             'leads'      => $leads,
             'statusList' => Lead::$statusList,
             'origens'    => Lead::$origens,
+            'bairros'    => Lead::whereNotNull('bairro')
+                ->where('bairro', '<>', '')
+                ->distinct()
+                ->orderBy('bairro')
+                ->pluck('bairro'),
         ]);
     }
 
@@ -74,6 +98,7 @@ class LeadController extends Controller
             'email'          => 'nullable|email|max:255',
             'telefone'       => 'nullable|string|max:20',
             'empresa'        => 'nullable|string|max:255',
+            'bairro'         => 'nullable|string|max:255',
             'origem'         => 'required|string',
             'status'         => 'required|string',
             'interesse'      => 'nullable|string|max:255',
@@ -110,6 +135,7 @@ class LeadController extends Controller
             'email'          => 'nullable|email|max:255',
             'telefone'       => 'nullable|string|max:20',
             'empresa'        => 'nullable|string|max:255',
+            'bairro'         => 'nullable|string|max:255',
             'origem'         => 'required|string',
             'status'         => 'required|string',
             'interesse'      => 'nullable|string|max:255',
@@ -215,6 +241,7 @@ class LeadController extends Controller
                 'nome'      => $nome,
                 'telefone'  => $data['telefone'] ?? $data['whatsapp'] ?? $data['whatsapp / telefone'] ?? null,
                 'email'     => $data['email'] ?? $data['e-mail'] ?? null,
+                'bairro'    => $data['bairro'] ?? null,
                 'interesse' => $data['interesse'] ?? $data['tipo'] ?? null,
                 'origem'    => $data['origem'] ?? 'manual',
                 'status'    => 'novo',
@@ -276,6 +303,7 @@ class LeadController extends Controller
                 'nome'      => $nome,
                 'telefone'  => $data['telefone'] ?? $data['whatsapp'] ?? null,
                 'email'     => $data['email'] ?? $data['e-mail'] ?? null,
+                'bairro'    => $data['bairro'] ?? null,
                 'interesse' => $data['interesse'] ?? $data['tipo'] ?? null,
                 'origem'    => $data['origem'] ?? 'manual',
                 'status'    => 'novo',
@@ -302,11 +330,22 @@ class LeadController extends Controller
         $callback = function () {
             $handle = fopen('php://output', 'w');
             fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF)); // BOM UTF-8
-            fputcsv($handle, ['nome', 'telefone', 'email', 'interesse', 'origem']);
-            fputcsv($handle, ['Peninsula Pilates Studio', '(21) 99835-6116', 'pilatespeninsula@gmail.com', 'Pilates', 'manual']);
+            fputcsv($handle, ['nome', 'telefone', 'email', 'bairro', 'interesse', 'origem']);
+            fputcsv($handle, ['Peninsula Pilates Studio', '(21) 99835-6116', 'pilatespeninsula@gmail.com', 'Barra da Tijuca', 'Pilates', 'manual']);
             fclose($handle);
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    private function perPage(Request $request): int
+    {
+        if ($request->per_page === 'all') {
+            return max(Lead::count(), 1);
+        }
+
+        return in_array((int) $request->per_page, [20, 100, 200], true)
+            ? (int) $request->per_page
+            : 20;
     }
 }

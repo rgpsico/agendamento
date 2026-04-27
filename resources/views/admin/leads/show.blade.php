@@ -67,6 +67,10 @@
                                     <p class="mb-0">{{ $lead->telefone ?? '-' }}</p>
                                 </div>
                                 <div class="col-md-6 mb-3">
+                                    <label class="text-muted small">Bairro</label>
+                                    <p class="mb-0">{{ $lead->bairro ?? '-' }}</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
                                     <label class="text-muted small">Origem</label>
                                     <p class="mb-0">{{ $lead->origem_label }}</p>
                                 </div>

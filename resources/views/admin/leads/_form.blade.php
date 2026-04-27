@@ -30,6 +30,13 @@
     </div>
 
     <div class="col-md-6 mb-3">
+        <label class="form-label">Bairro</label>
+        <input type="text" name="bairro" class="form-control @error('bairro') is-invalid @enderror"
+               value="{{ old('bairro', $lead?->bairro) }}">
+        @error('bairro') <div class="invalid-feedback">{{ $message }}</div> @enderror
+    </div>
+
+    <div class="col-md-6 mb-3">
         <label class="form-label">Origem <span class="text-danger">*</span></label>
         <select name="origem" class="form-control @error('origem') is-invalid @enderror" required>
             @foreach($origens as $key => $label)

@@ -59,6 +59,17 @@
                             </select>
                         </div>
                         <div class="col-md-2">
+                            <label class="form-label">Bairro</label>
+                            <select name="bairro" class="form-control">
+                                <option value="">Todos</option>
+                                @foreach($bairros as $bairro)
+                                    <option value="{{ $bairro }}" {{ request('bairro') === $bairro ? 'selected' : '' }}>
+                                        {{ $bairro }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-2">
                             <label class="form-label">E-mail</label>
                             <select name="email_status" class="form-control">
                                 <option value="">Todos</option>
@@ -81,6 +92,30 @@
                                 <option value="quente" {{ request('temperatura') === 'quente' ? 'selected' : '' }}>🔥 Quente</option>
                                 <option value="morno"  {{ request('temperatura') === 'morno'  ? 'selected' : '' }}>🌡️ Morno</option>
                                 <option value="frio"   {{ request('temperatura') === 'frio'   ? 'selected' : '' }}>🧊 Frio</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Mostrar</label>
+                            <select name="per_page" class="form-control">
+                                <option value="20" {{ request('per_page', '20') === '20' ? 'selected' : '' }}>20</option>
+                                <option value="100" {{ request('per_page') === '100' ? 'selected' : '' }}>100</option>
+                                <option value="200" {{ request('per_page') === '200' ? 'selected' : '' }}>200</option>
+                                <option value="all" {{ request('per_page') === 'all' ? 'selected' : '' }}>Todos</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Data inicial</label>
+                            <input type="date" name="data_inicio" class="form-control" value="{{ request('data_inicio') }}">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Data final</label>
+                            <input type="date" name="data_fim" class="form-control" value="{{ request('data_fim') }}">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Ordenar</label>
+                            <select name="ordem" class="form-control">
+                                <option value="novos" {{ request('ordem', 'novos') === 'novos' ? 'selected' : '' }}>Novos primeiro</option>
+                                <option value="antigos" {{ request('ordem') === 'antigos' ? 'selected' : '' }}>Antigos primeiro</option>
                             </select>
                         </div>
                         <div class="col-md-3 d-flex gap-2 align-items-end">
@@ -125,6 +160,8 @@
                                             </th>
                                             <th>Nome</th>
                                             <th>Contato</th>
+                                            <th>Bairro</th>
+                                            <th>Cadastrado em</th>
                                             <th>Origem</th>
                                             <th>Status</th>
                                             <th class="text-center">Temp.</th>
@@ -156,6 +193,8 @@
                                                         <br><small>{{ $lead->telefone }}</small>
                                                     @endif
                                                 </td>
+                                                <td>{{ $lead->bairro ?? '-' }}</td>
+                                                <td>{{ $lead->created_at?->format('d/m/Y') ?? '-' }}</td>
                                                 <td>{{ $lead->origem_label }}</td>
                                                 <td>
                                                     <span class="badge bg-{{ $lead->status_color }}">
@@ -220,7 +259,7 @@
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="9" class="text-center">Nenhum lead encontrado.</td>
+                                                <td colspan="11" class="text-center">Nenhum lead encontrado.</td>
                                             </tr>
                                         @endforelse
                                     </tbody>
@@ -259,10 +298,10 @@
                             <form action="{{ route('admin.leads.import.text') }}" method="POST">
                                 @csrf
                                 <p class="text-muted small mb-2">
-                                    Cole o CSV abaixo. Colunas aceitas: <code>id, nome_negocio, telefone, email, tipo, origem</code>
+                                    Cole o CSV abaixo. Colunas aceitas: <code>id, nome_negocio, telefone, email, bairro, tipo, origem</code>
                                 </p>
                                 <textarea name="conteudo" class="form-control font-monospace" rows="14"
-                                          placeholder="id,nome_negocio,telefone,email,tipo" required></textarea>
+                                          placeholder="id,nome_negocio,telefone,email,bairro,tipo" required></textarea>
                                 <div class="mt-3 text-end">
                                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
                                     <button type="submit" class="btn btn-success ms-2"><i class="fe fe-check"></i> Importar</button>
