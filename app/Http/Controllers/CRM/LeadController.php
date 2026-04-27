@@ -35,6 +35,14 @@ class LeadController extends Controller
             $query->where('origem', $request->origem);
         }
 
+        if ($request->filled('whatsapp')) {
+            if ($request->whatsapp === 'enviado') {
+                $query->whereNotNull('whatsapp_enviado_em');
+            } elseif ($request->whatsapp === 'pendente') {
+                $query->whereNull('whatsapp_enviado_em');
+            }
+        }
+
         $leads = $query->latest()->paginate(20)->withQueryString();
 
         return view('crm.leads.index', [

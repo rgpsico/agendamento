@@ -11,17 +11,24 @@
             <div class="card mb-3">
                 <div class="card-body">
                     <form class="row g-2" method="GET">
-                        <div class="col-md-4"><input name="busca" class="form-control" value="{{ request('busca') }}" placeholder="Buscar por nome, e-mail ou telefone"></div>
-                        <div class="col-md-3">
+                        <div class="col-md-3"><input name="busca" class="form-control" value="{{ request('busca') }}" placeholder="Buscar por nome, e-mail ou telefone"></div>
+                        <div class="col-md-2">
                             <select name="pipeline_status" class="form-control">
                                 <option value="">Todos os status</option>
                                 @foreach($statuses as $key => $label)<option value="{{ $key }}" @selected(request('pipeline_status') === $key)>{{ $label }}</option>@endforeach
                             </select>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <select name="origem" class="form-control">
                                 <option value="">Todas as origens</option>
                                 @foreach($origens as $key => $label)<option value="{{ $key }}" @selected(request('origem') === $key)>{{ $label }}</option>@endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select name="whatsapp" class="form-control">
+                                <option value="">WhatsApp - todos</option>
+                                <option value="enviado" @selected(request('whatsapp') === 'enviado')>Mensagem enviada</option>
+                                <option value="pendente" @selected(request('whatsapp') === 'pendente')>Ainda nao enviado</option>
                             </select>
                         </div>
                         <div class="col-md-2"><button class="btn btn-secondary w-100">Filtrar</button></div>
