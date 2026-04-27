@@ -60,10 +60,16 @@
                                             <tr role="row" class="odd">
                                                 <td class="sorting_1">
                                                     <h2 class="table-avatar">
-                                                         <a href="{{route('alunos.show',['id' => $agendamento->aluno->id])}}">{{$agendamento->aluno->usuario->nome ?? ''}}</a>
+                                                        @if($agendamento->aluno)
+                                                            <a href="{{ route('alunos.show', ['id' => $agendamento->aluno->id]) }}">
+                                                                {{ $agendamento->aluno->usuario->nome ?? 'Aluno sem usuario' }}
+                                                            </a>
+                                                        @else
+                                                            <span class="text-muted">Aluno removido</span>
+                                                        @endif
                                                     </h2>
                                                 </td>
-                                                <td>{{$agendamento->modalidade->nome}}</td>
+                                                <td>{{ $agendamento->modalidade?->nome ?? 'Sem modalidade' }}</td>
                                                 <td>{{ date('d/m/Y', strtotime($agendamento->data_da_aula)) }}</td>
 
                                                 <td>

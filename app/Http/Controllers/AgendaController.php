@@ -31,7 +31,7 @@ class AgendaController extends Controller
             $professor_id = Auth::user()->professor->id; // suponho que o professor esteja logado.
 
             // Obtenha o professor junto com seus agendamentos
-            $professor = Professor::with('agendamentos.aluno', 'agendamentos.modalidade')->find($professor_id);
+            $professor = Professor::with('agendamentos.aluno.usuario', 'agendamentos.modalidade')->find($professor_id);
         }
         return view(
             $this->view . '.index',
