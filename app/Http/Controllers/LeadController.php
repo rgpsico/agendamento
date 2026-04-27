@@ -35,6 +35,12 @@ class LeadController extends Controller
             $query->whereNotNull('email_enviado_em');
         }
 
+        if ($request->whatsapp_status === 'nao_enviado') {
+            $query->whereNull('whatsapp_enviado_em');
+        } elseif ($request->whatsapp_status === 'enviado') {
+            $query->whereNotNull('whatsapp_enviado_em');
+        }
+
         if ($request->filled('busca')) {
             $query->where(function ($q) use ($request) {
                 $q->where('nome', 'like', '%' . $request->busca . '%')
@@ -143,11 +149,21 @@ class LeadController extends Controller
         return redirect()->back()->with('success', $msg);
     }
 
+    public function whatsapp(Lead $lead)
+    {
+        abort_unless($lead->whatsapp_url, 404);
+
+        $lead->update(['whatsapp_enviado_em' => now()]);
+
+        return redirect()->away($lead->whatsapp_url);
+    }
+
     public function resetar(Lead $lead)
     {
         $lead->update([
             'status'              => 'novo',
             'email_enviado_em'    => null,
+            'whatsapp_enviado_em' => null,
             'morno_em'            => null,
             'interessado_em'      => null,
             'whatsapp_confirmado' => null,

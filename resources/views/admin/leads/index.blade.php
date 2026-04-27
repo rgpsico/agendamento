@@ -67,6 +67,14 @@
                             </select>
                         </div>
                         <div class="col-md-2">
+                            <label class="form-label">WhatsApp</label>
+                            <select name="whatsapp_status" class="form-control">
+                                <option value="">Todos</option>
+                                <option value="nao_enviado" {{ request('whatsapp_status') === 'nao_enviado' ? 'selected' : '' }}>Nao enviado</option>
+                                <option value="enviado" {{ request('whatsapp_status') === 'enviado' ? 'selected' : '' }}>Ja enviado</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
                             <label class="form-label">Temperatura</label>
                             <select name="temperatura" class="form-control">
                                 <option value="">Todos</option>
@@ -121,6 +129,7 @@
                                             <th>Status</th>
                                             <th class="text-center">Temp.</th>
                                             <th>E-mail enviado</th>
+                                            <th>WhatsApp enviado</th>
                                             <th class="text-center">Ações</th>
                                         </tr>
                                     </thead>
@@ -170,10 +179,21 @@
                                                         <span class="text-muted small">—</span>
                                                     @endif
                                                 </td>
+                                                <td>
+                                                    @if($lead->whatsapp_enviado_em)
+                                                        <span class="badge bg-success"
+                                                              title="{{ $lead->whatsapp_enviado_em->format('d/m/Y H:i') }}">
+                                                            <i class="fe fe-check"></i>
+                                                            {{ $lead->whatsapp_enviado_em->format('d/m/Y') }}
+                                                        </span>
+                                                    @else
+                                                        <span class="text-muted small">---</span>
+                                                    @endif
+                                                </td>
                                                 <td class="text-center">
                                                     <div class="actions">
                                                         @if($lead->whatsapp_url)
-                                                            <a href="{{ $lead->whatsapp_url }}" target="_blank"
+                                                            <a href="{{ route('admin.leads.whatsapp', $lead) }}" target="_blank"
                                                                class="btn btn-sm btn-success" title="WhatsApp">
                                                                 <i class="fab fa-whatsapp"></i>
                                                             </a>
@@ -200,7 +220,7 @@
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="7" class="text-center">Nenhum lead encontrado.</td>
+                                                <td colspan="9" class="text-center">Nenhum lead encontrado.</td>
                                             </tr>
                                         @endforelse
                                     </tbody>

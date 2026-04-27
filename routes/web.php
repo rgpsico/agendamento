@@ -111,6 +111,7 @@ Route::prefix('admin/crm/leads')->middleware(['auth'])->name('admin.leads.')->gr
     Route::post('/importar', [LeadController::class, 'import'])->name('import');
     Route::post('/importar-texto', [LeadController::class, 'importText'])->name('import.text');
     Route::post('/enviar-emails', [LeadController::class, 'enviarEmails'])->name('enviar.emails');
+    Route::get('/{lead}/whatsapp', [LeadController::class, 'whatsapp'])->name('whatsapp');
     Route::get('/{lead}', [LeadController::class, 'show'])->name('show');
     Route::get('/{lead}/editar', [LeadController::class, 'edit'])->name('edit');
     Route::put('/{lead}', [LeadController::class, 'update'])->name('update');
