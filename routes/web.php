@@ -499,6 +499,11 @@ Route::get('/metrics', function () {
 use App\Http\Controllers\PlanoAlunoController;
 use App\Http\Controllers\SiteArtigoPublicPageController;
 
+// Páginas legais
+Route::view('/termos', 'legal.termos')->name('legal.termos');
+Route::view('/privacidade', 'legal.privacidade')->name('legal.privacidade');
+Route::view('/lgpd', 'legal.lgpd')->name('legal.lgpd');
+
 Route::prefix('admin')->group(function () {
     Route::get('planos', [PlanoAlunoController::class, 'indexView'])->name('alunos.planos.index');
     Route::get('planos/create', [PlanoAlunoController::class, 'create'])->name('alunos.planos.create');

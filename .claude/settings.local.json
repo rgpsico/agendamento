@@ -10,7 +10,10 @@
       "Bash(xargs grep *)",
       "Bash(php artisan *)",
       "Bash(php -l app/Services/DeepSeekService.php)",
-      "PowerShell(php -l \"c:\\\\laragon\\\\www\\\\agendamento\\\\app\\\\Services\\\\DeepSeekService.php\")"
+      "PowerShell(php -l \"c:\\\\laragon\\\\www\\\\agendamento\\\\app\\\\Services\\\\DeepSeekService.php\")",
+      "PowerShell(& \"C:\\\\laragon\\\\bin\\\\php\\\\php8.3.14\\\\php.exe\" \"c:\\\\laragon\\\\www\\\\agendamento\\\\artisan\" view:clear)",
+      "PowerShell(& \"C:\\\\laragon\\\\bin\\\\php\\\\php8.3.14\\\\php.exe\" \"c:\\\\laragon\\\\www\\\\agendamento\\\\artisan\" route:clear)",
+      "PowerShell(& \"C:\\\\laragon\\\\bin\\\\php\\\\php8.3.14\\\\php.exe\" \"c:\\\\laragon\\\\www\\\\agendamento\\\\artisan\" config:clear)"
     ]
   }
 }
