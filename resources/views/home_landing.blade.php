@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AgendaPro — Plataforma Completa de Agendamento e Gestão</title>
-    <meta name="description" content="Gerencie agendamentos, alunos, pagamentos e muito mais em uma única plataforma. Ideal para escolas, estúdios e prestadores de serviço.">
+    <title>PilatesGestão — Sistema completo para estúdios de Pilates</title>
+    <meta name="description" content="O sistema feito para estúdios de Pilates: agenda, alunos, mensalidades automáticas, financeiro e site próprio. Pare de gerenciar no caderno e no WhatsApp.">
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -24,6 +24,7 @@
             --radius: 16px;
             --shadow: 0 8px 32px rgba(102, 126, 234, 0.15);
             --shadow-hover: 0 16px 48px rgba(102, 126, 234, 0.25);
+            --whatsapp: #25d366;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -129,7 +130,7 @@
             font-size: 1.1rem;
             color: rgba(255,255,255,0.88);
             line-height: 1.7;
-            max-width: 520px;
+            max-width: 540px;
         }
         .hero-btns { margin-top: 2rem; display: flex; gap: 1rem; flex-wrap: wrap; }
         .btn-hero-primary {
@@ -155,23 +156,16 @@
             transition: all 0.25s;
         }
         .btn-hero-outline:hover { background: rgba(255,255,255,0.15); border-color: #fff; color: #fff; }
-        .hero-stats {
+        .hero-trust {
             display: flex;
-            gap: 2.5rem;
-            margin-top: 3rem;
+            gap: 1.5rem;
+            margin-top: 2rem;
             flex-wrap: wrap;
+            color: rgba(255,255,255,0.85);
+            font-size: 0.85rem;
         }
-        .hero-stat strong {
-            display: block;
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: #fff;
-        }
-        .hero-stat span {
-            font-size: 0.8rem;
-            color: rgba(255,255,255,0.75);
-            font-weight: 500;
-        }
+        .hero-trust span { display: flex; align-items: center; gap: 0.4rem; }
+        .hero-trust i { color: #b9f6ca; }
         .hero-mockup {
             background: rgba(255,255,255,0.12);
             border: 1px solid rgba(255,255,255,0.2);
@@ -361,43 +355,25 @@
         }
         .payment-badge:hover { border-color: var(--primary); color: var(--primary); box-shadow: 0 2px 12px rgba(102,126,234,0.15); }
 
-        /* TESTIMONIALS */
-        .testimonial-card {
+        /* DIFERENCIAIS (substitui depoimentos) */
+        .diff-card {
             background: #fff;
             border: 1px solid var(--border);
             border-radius: var(--radius);
             padding: 2rem;
             height: 100%;
-            position: relative;
-        }
-        .testimonial-card::before {
-            content: '"';
-            position: absolute;
-            top: 1rem;
-            left: 1.5rem;
-            font-size: 4rem;
-            color: var(--primary);
-            opacity: 0.15;
-            font-family: Georgia, serif;
-            line-height: 1;
-        }
-        .testimonial-card p { font-size: 0.9rem; color: var(--text-gray); line-height: 1.7; margin-bottom: 1.25rem; font-style: italic; }
-        .testimonial-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--gradient);
             display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-weight: 700;
-            font-size: 0.9rem;
-            flex-shrink: 0;
+            flex-direction: column;
+            gap: 1rem;
         }
-        .testimonial-name { font-size: 0.9rem; font-weight: 700; }
-        .testimonial-role { font-size: 0.78rem; color: var(--text-light); }
-        .stars { color: #f6a623; font-size: 0.8rem; margin-bottom: 0.75rem; }
+        .diff-card .diff-icon {
+            width: 48px; height: 48px; border-radius: 12px;
+            background: var(--gradient-light);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--primary); font-size: 1.3rem;
+        }
+        .diff-card h5 { font-size: 1.05rem; font-weight: 700; }
+        .diff-card p { font-size: 0.9rem; color: var(--text-gray); line-height: 1.65; }
 
         /* PRICING */
         .price-card {
@@ -510,6 +486,21 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.15);
         }
         .btn-cta-white:hover { transform: translateY(-3px); box-shadow: 0 8px 32px rgba(0,0,0,0.2); color: var(--primary-dark); }
+        .btn-cta-wpp {
+            background: var(--whatsapp);
+            color: #fff;
+            font-weight: 700;
+            border-radius: 50px;
+            padding: 1rem 2rem;
+            border: none;
+            font-size: 1rem;
+            text-decoration: none;
+            display: inline-block;
+            margin-left: 0.75rem;
+            transition: all 0.25s;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+        .btn-cta-wpp:hover { transform: translateY(-3px); color: #fff; opacity: 0.95; }
 
         /* FOOTER */
         footer {
@@ -526,6 +517,50 @@
         footer .footer-divider { border-color: rgba(255,255,255,0.08); margin: 2rem 0 1.5rem; }
         footer .footer-bottom { font-size: 0.8rem; color: rgba(255,255,255,0.4); }
 
+        /* WHATSAPP FLOATING BUTTON */
+        .wpp-float {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--whatsapp);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            text-decoration: none;
+            box-shadow: 0 6px 24px rgba(37, 211, 102, 0.5);
+            z-index: 9999;
+            transition: all 0.25s;
+            animation: wpp-pulse 2.4s infinite;
+        }
+        .wpp-float:hover { transform: scale(1.08); color: #fff; }
+        .wpp-float-label {
+            position: absolute;
+            right: 70px;
+            background: #fff;
+            color: var(--text-dark);
+            font-size: 0.82rem;
+            font-weight: 600;
+            padding: 0.5rem 0.9rem;
+            border-radius: 50px;
+            white-space: nowrap;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+            opacity: 0;
+            transform: translateX(10px);
+            transition: all 0.25s;
+            pointer-events: none;
+        }
+        .wpp-float:hover .wpp-float-label { opacity: 1; transform: translateX(0); }
+        @keyframes wpp-pulse {
+            0% { box-shadow: 0 6px 24px rgba(37,211,102,0.5), 0 0 0 0 rgba(37,211,102,0.5); }
+            70% { box-shadow: 0 6px 24px rgba(37,211,102,0.5), 0 0 0 18px rgba(37,211,102,0); }
+            100% { box-shadow: 0 6px 24px rgba(37,211,102,0.5), 0 0 0 0 rgba(37,211,102,0); }
+        }
+
         /* MISC */
         .text-gradient {
             background: var(--gradient);
@@ -539,17 +574,32 @@
             .hero-mockup { display: none; }
             .step-connector { display: none; }
             .price-card.featured { transform: none; }
+            .btn-cta-wpp { margin-left: 0; margin-top: 0.75rem; }
+            .wpp-float { width: 54px; height: 54px; font-size: 1.6rem; bottom: 18px; right: 18px; }
         }
     </style>
 </head>
 <body>
+
+{{-- 
+    ============================================================
+    CONFIGURE AQUI: número do WhatsApp e mensagens iniciais
+    Formato: 55 (país) + DDD + número, sem espaços, sem traços.
+    Ex.: 5521987654321
+    ============================================================
+--}}
+@php
+    $whatsapp_numero = '5521999999999'; // <-- TROQUE pelo seu número
+    $whatsapp_msg_demo = rawurlencode('Olá! Tenho um estúdio de Pilates e queria agendar uma demonstração do PilatesGestão.');
+    $whatsapp_msg_geral = rawurlencode('Olá! Vim pelo site do PilatesGestão e tenho uma dúvida.');
+@endphp
 
 <!-- ==================== NAVBAR ==================== -->
 <nav class="navbar-custom" id="navbar">
     <div class="container d-flex align-items-center justify-content-between">
         <div class="d-flex align-items-center gap-2">
             <i class="fa-solid fa-calendar-check" style="color: var(--primary); font-size: 1.4rem;"></i>
-            <span class="navbar-brand-text">AgendaPro</span>
+            <span class="navbar-brand-text">PilatesGestão</span>
         </div>
         <div class="d-none d-md-flex align-items-center gap-4">
             <a href="#funcionalidades" class="nav-link-custom">Funcionalidades</a>
@@ -570,33 +620,24 @@
         <div class="row align-items-center g-5">
             <div class="col-lg-6">
                 <div class="hero-badge">
-                    <i class="fa-solid fa-bolt me-1"></i> Plataforma completa de gestão
+                    <i class="fa-solid fa-bolt me-1"></i> Feito para estúdios de Pilates
                 </div>
-                <h1>Gerencie seu negócio com <em style="font-style:normal;" class="text-white">inteligência</em></h1>
+                <h1>Pare de gerenciar seu estúdio no <em style="font-style:normal;" class="text-white">caderno</em> e no <em style="font-style:normal;" class="text-white">WhatsApp</em></h1>
                 <p class="lead">
-                    Agendamentos, alunos, professores, pagamentos e finanças — tudo integrado numa única plataforma multi-tenant para escolas, estúdios e prestadores de serviço.
+                    Agenda de aparelho e solo, mensalidades automáticas no Pix e cartão, controle de alunos e instrutores — tudo num único sistema feito sob medida pra estúdios de Pilates.
                 </p>
                 <div class="hero-btns">
                     <a href="{{ route('home.registerAluno') }}" class="btn-hero-primary text-decoration-none">
-                        <i class="fa-solid fa-rocket me-2"></i> Começar gratuitamente
+                        <i class="fa-solid fa-rocket me-2"></i> Testar 14 dias grátis
                     </a>
-                    <a href="#funcionalidades" class="btn-hero-outline text-decoration-none">
-                        <i class="fa-solid fa-play me-2"></i> Ver funcionalidades
+                    <a href="https://wa.me/{{ $whatsapp_numero }}?text={{ $whatsapp_msg_demo }}" target="_blank" rel="noopener" class="btn-hero-outline text-decoration-none">
+                        <i class="fa-brands fa-whatsapp me-2"></i> Agendar demonstração
                     </a>
                 </div>
-                <div class="hero-stats">
-                    <div class="hero-stat">
-                        <strong>+500</strong>
-                        <span>Empresas ativas</span>
-                    </div>
-                    <div class="hero-stat">
-                        <strong>+10k</strong>
-                        <span>Agendamentos/mês</span>
-                    </div>
-                    <div class="hero-stat">
-                        <strong>99.9%</strong>
-                        <span>Disponibilidade</span>
-                    </div>
+                <div class="hero-trust">
+                    <span><i class="fa-solid fa-check"></i> Sem cartão de crédito</span>
+                    <span><i class="fa-solid fa-check"></i> Configura em 15 min</span>
+                    <span><i class="fa-solid fa-check"></i> Cancele quando quiser</span>
                 </div>
             </div>
             <div class="col-lg-6">
@@ -605,29 +646,29 @@
                         <div class="mockup-dot" style="background:#ff5f57;"></div>
                         <div class="mockup-dot" style="background:#ffbd2e;"></div>
                         <div class="mockup-dot" style="background:#28c840;"></div>
-                        <span style="font-size:0.7rem; color:rgba(255,255,255,0.6); margin-left:0.5rem;">Dashboard — AgendaPro</span>
+                        <span style="font-size:0.7rem; color:rgba(255,255,255,0.6); margin-left:0.5rem;">Painel — PilatesGestão</span>
                     </div>
                     <div class="mockup-card">
-                        <div class="mockup-card-label">Agendamentos hoje</div>
-                        <div class="mockup-card-value">28 aulas confirmadas</div>
-                        <div class="mockup-card-sub"><i class="fa-solid fa-arrow-trend-up me-1"></i>+12% vs semana passada</div>
+                        <div class="mockup-card-label">Aulas hoje</div>
+                        <div class="mockup-card-value">12 aulas confirmadas</div>
+                        <div class="mockup-card-sub"><i class="fa-solid fa-circle-check me-1"></i>3 horários ainda livres</div>
                     </div>
                     <div class="mockup-grid">
                         <div class="mockup-mini">
-                            <div class="mockup-mini-icon">👥</div>
-                            <div class="mockup-mini-text">142 alunos ativos</div>
+                            <div class="mockup-mini-icon">🧘‍♀️</div>
+                            <div class="mockup-mini-text">Aparelho • 8</div>
+                        </div>
+                        <div class="mockup-mini">
+                            <div class="mockup-mini-icon">🤸</div>
+                            <div class="mockup-mini-text">Solo • 4</div>
                         </div>
                         <div class="mockup-mini">
                             <div class="mockup-mini-icon">💰</div>
-                            <div class="mockup-mini-text">R$ 18.4k faturado</div>
+                            <div class="mockup-mini-text">Pix recebido hoje</div>
                         </div>
                         <div class="mockup-mini">
-                            <div class="mockup-mini-icon">📅</div>
-                            <div class="mockup-mini-text">6 modalidades</div>
-                        </div>
-                        <div class="mockup-mini">
-                            <div class="mockup-mini-icon">⭐</div>
-                            <div class="mockup-mini-text">4.9 avaliação média</div>
+                            <div class="mockup-mini-icon">📲</div>
+                            <div class="mockup-mini-text">2 alunos novos</div>
                         </div>
                     </div>
                 </div>
@@ -639,7 +680,7 @@
 <!-- ==================== LOGOS ==================== -->
 <div class="logos-strip text-center">
     <div class="container">
-        <p>Integrado com as principais ferramentas do mercado</p>
+        <p>Integrado com as ferramentas que seu estúdio já usa</p>
         <div>
             <span class="logo-item"><i class="fa-brands fa-stripe"></i> Stripe</span>
             <span class="logo-item"><i class="fa-brands fa-google"></i> Google Calendar</span>
@@ -656,51 +697,51 @@
         <div class="row justify-content-center text-center mb-5">
             <div class="col-lg-6">
                 <div class="section-label">Funcionalidades</div>
-                <h2 class="section-title">Tudo que você precisa para <span class="text-gradient">crescer</span></h2>
-                <p class="section-desc mx-auto">Uma plataforma completa que elimina a necessidade de vários sistemas diferentes, centralizando toda a gestão do seu negócio.</p>
+                <h2 class="section-title">Tudo que seu estúdio precisa em <span class="text-gradient">um lugar só</span></h2>
+                <p class="section-desc mx-auto">Chega de pular entre planilha, agenda física, WhatsApp e maquininha. Centralize a gestão do seu estúdio numa única plataforma.</p>
             </div>
         </div>
         <div class="row g-4">
             <div class="col-md-6 col-lg-4">
                 <div class="feature-card">
                     <div class="feature-icon"><i class="fa-solid fa-calendar-check"></i></div>
-                    <h5>Agendamento Inteligente</h5>
-                    <p>Sistema completo de agendamento com disponibilidade por horário, modalidades, turmas e confirmação automática. Alunos agendam online 24h.</p>
+                    <h5>Agenda de Aparelho e Solo</h5>
+                    <p>Configure horários, vagas por aparelho e modalidades. Aluno agenda online 24h sem precisar te chamar no WhatsApp.</p>
                 </div>
             </div>
             <div class="col-md-6 col-lg-4">
                 <div class="feature-card">
                     <div class="feature-icon"><i class="fa-solid fa-users"></i></div>
-                    <h5>Gestão de Alunos e Professores</h5>
-                    <p>Cadastro completo com histórico de aulas, planos ativos, pagamentos, avaliações e comunicação direta via chat integrado.</p>
+                    <h5>Ficha do Aluno Completa</h5>
+                    <p>Histórico de aulas, plano ativo, pagamentos, observações da avaliação e contato direto. Tudo num clique.</p>
                 </div>
             </div>
             <div class="col-md-6 col-lg-4">
                 <div class="feature-card">
                     <div class="feature-icon"><i class="fa-solid fa-credit-card"></i></div>
-                    <h5>Cobranças Automáticas</h5>
-                    <p>Aceite Cartão de Crédito, Pix, Boleto e Débito via Stripe e Asaas. Receba automaticamente e acompanhe o status de cada pagamento.</p>
+                    <h5>Mensalidade Automática</h5>
+                    <p>Pix, cartão, boleto recorrente. O sistema cobra, confirma e avisa o aluno em atraso — você não precisa correr atrás.</p>
                 </div>
             </div>
             <div class="col-md-6 col-lg-4">
                 <div class="feature-card">
                     <div class="feature-icon"><i class="fa-solid fa-chart-line"></i></div>
-                    <h5>Dashboard Financeiro</h5>
-                    <p>Controle total de receitas, despesas, contas a receber e a pagar. Relatórios detalhados por período, categoria e método de pagamento.</p>
+                    <h5>Financeiro do Estúdio</h5>
+                    <p>Receitas, despesas, contas a receber e fluxo de caixa. Saiba antes do dia 1 quanto vai entrar no mês.</p>
                 </div>
             </div>
             <div class="col-md-6 col-lg-4">
                 <div class="feature-card">
                     <div class="feature-icon"><i class="fa-solid fa-globe"></i></div>
-                    <h5>Site Personalizado</h5>
-                    <p>Cada empresa tem seu próprio site com domínio, template, portfólio de serviços, depoimentos e integração com blog e SEO.</p>
+                    <h5>Site Próprio do Estúdio</h5>
+                    <p>Página com seu domínio, fotos, modalidades, depoimentos e botão de agendamento direto. Pronta em minutos.</p>
                 </div>
             </div>
             <div class="col-md-6 col-lg-4">
                 <div class="feature-card">
                     <div class="feature-icon"><i class="fa-solid fa-robot"></i></div>
-                    <h5>Chatbot com IA</h5>
-                    <p>Bot inteligente para atendimento automático de alunos, geração de conteúdo para blog e assistência via WhatsApp e chat interno.</p>
+                    <h5>Atendimento com IA</h5>
+                    <p>Chatbot responde dúvidas comuns dos alunos no WhatsApp e no site, libera tempo da recepção e nunca dorme.</p>
                 </div>
             </div>
         </div>
@@ -714,13 +755,13 @@
             <div class="col-lg-5">
                 <div class="section-label">Módulos do sistema</div>
                 <h2 class="section-title">Uma plataforma <span class="text-gradient">completa</span> e modular</h2>
-                <p class="section-desc">Cada módulo foi pensado para um fluxo específico do seu negócio, funcionando de forma integrada e coesa.</p>
+                <p class="section-desc">Cada módulo foi pensado para um fluxo específico do estúdio de Pilates, funcionando de forma integrada e coesa.</p>
                 <div class="mt-4 p-3 rounded-3" style="background:#fff; border: 1px solid var(--border);">
                     <div class="d-flex align-items-center gap-2 mb-2">
                         <i class="fa-solid fa-shield-halved text-success"></i>
-                        <strong style="font-size:0.9rem;">Multi-tenant seguro</strong>
+                        <strong style="font-size:0.9rem;">Cada estúdio com seu próprio espaço</strong>
                     </div>
-                    <p style="font-size:0.82rem; color:var(--text-gray); margin:0;">Cada empresa tem seu próprio ambiente isolado com domínio personalizado e permissões granulares por perfil de usuário.</p>
+                    <p style="font-size:0.82rem; color:var(--text-gray); margin:0;">Arquitetura multi-tenant: seus dados isolados, domínio próprio e permissões diferentes para dono, recepção e instrutor.</p>
                 </div>
             </div>
             <div class="col-lg-7">
@@ -728,12 +769,12 @@
                     <div class="module-icon" style="background:#eff6ff; color:#3b82f6;"><i class="fa-solid fa-calendar-days"></i></div>
                     <div>
                         <h6>Agenda & Agendamento</h6>
-                        <p>Calendário visual completo, configuração de disponibilidade por dia/horário, modalidades de aula, reservas e cancelamentos.</p>
+                        <p>Calendário visual, configuração por aparelho e horário, modalidades, reservas e lista de espera.</p>
                         <div class="tag-list">
-                            <span class="tag">FullCalendar</span>
+                            <span class="tag">Aparelho</span>
+                            <span class="tag">Solo</span>
                             <span class="tag">Turmas</span>
-                            <span class="tag">Modalidades</span>
-                            <span class="tag">Disponibilidade</span>
+                            <span class="tag">Lista de espera</span>
                         </div>
                     </div>
                 </div>
@@ -741,7 +782,7 @@
                     <div class="module-icon" style="background:#f0fdf4; color:#16a34a;"><i class="fa-solid fa-money-bill-trend-up"></i></div>
                     <div>
                         <h6>Financeiro Completo</h6>
-                        <p>Receitas, despesas, fluxo de caixa, contas recorrentes, planos de assinatura e relatórios exportáveis em Excel.</p>
+                        <p>Receitas, despesas, fluxo de caixa, contas recorrentes, planos de assinatura e relatórios em Excel.</p>
                         <div class="tag-list">
                             <span class="tag">Receitas</span>
                             <span class="tag">Despesas</span>
@@ -753,11 +794,11 @@
                 <div class="module-item d-flex align-items-start gap-3">
                     <div class="module-icon" style="background:#fdf4ff; color:#9333ea;"><i class="fa-solid fa-comments"></i></div>
                     <div>
-                        <h6>Comunicação em Tempo Real</h6>
-                        <p>Chat entre alunos e professores via Socket.io, histórico de conversas e notificações automáticas por e-mail e SMS.</p>
+                        <h6>Comunicação com Alunos</h6>
+                        <p>Chat entre alunos e instrutores, lembretes automáticos de aula e cobrança por e-mail e SMS.</p>
                         <div class="tag-list">
-                            <span class="tag">Socket.io</span>
                             <span class="tag">Chat</span>
+                            <span class="tag">Lembretes</span>
                             <span class="tag">SMS</span>
                             <span class="tag">E-mail</span>
                         </div>
@@ -767,9 +808,9 @@
                     <div class="module-icon" style="background:#fff7ed; color:#ea580c;"><i class="fa-solid fa-newspaper"></i></div>
                     <div>
                         <h6>Blog & Conteúdo com IA</h6>
-                        <p>Crie artigos, publique novidades e gere conteúdo automaticamente com IA integrada (DeepSeek / OpenAI).</p>
+                        <p>Publique artigos sobre Pilates, dicas e novidades. A IA ajuda a gerar conteúdo otimizado pra Google.</p>
                         <div class="tag-list">
-                            <span class="tag">Blog CMS</span>
+                            <span class="tag">Blog</span>
                             <span class="tag">IA Generativa</span>
                             <span class="tag">SEO</span>
                         </div>
@@ -786,7 +827,7 @@
         <div class="row justify-content-center text-center mb-5">
             <div class="col-lg-6">
                 <div class="section-label">Como funciona</div>
-                <h2 class="section-title">Comece em <span class="text-gradient">minutos</span></h2>
+                <h2 class="section-title">Seu estúdio organizado em <span class="text-gradient">15 minutos</span></h2>
             </div>
         </div>
         <div class="row justify-content-center g-0">
@@ -794,7 +835,7 @@
                 <div class="step-card">
                     <div class="step-number">1</div>
                     <h5>Crie sua conta</h5>
-                    <p>Cadastre-se como empresa ou aluno. Configure seu perfil, modalidades e disponibilidade em poucos passos.</p>
+                    <p>Cadastre seu estúdio, configure modalidades (aparelho, solo, kids) e horários disponíveis.</p>
                 </div>
             </div>
             <div class="col-md-1 d-none d-md-flex align-items-center">
@@ -803,8 +844,8 @@
             <div class="col-md-3">
                 <div class="step-card">
                     <div class="step-number">2</div>
-                    <h5>Configure seu negócio</h5>
-                    <p>Defina serviços, preços, horários, professores e formas de pagamento aceitas pela plataforma.</p>
+                    <h5>Importe seus alunos</h5>
+                    <p>Suba sua planilha ou cadastre um a um. Nossa equipe ajuda na migração se você quiser.</p>
                 </div>
             </div>
             <div class="col-md-1 d-none d-md-flex align-items-center">
@@ -813,8 +854,8 @@
             <div class="col-md-3">
                 <div class="step-card">
                     <div class="step-number">3</div>
-                    <h5>Receba agendamentos</h5>
-                    <p>Alunos agendam online, pagam automaticamente e você gerencia tudo pelo dashboard em tempo real.</p>
+                    <h5>Comece a receber</h5>
+                    <p>Alunos agendam pelo celular, mensalidades caem automático no Pix e você acompanha tudo num painel.</p>
                 </div>
             </div>
         </div>
@@ -827,8 +868,8 @@
         <div class="row align-items-center g-5">
             <div class="col-lg-6">
                 <div class="section-label">Meios de pagamento</div>
-                <h2 class="section-title">Aceite qualquer forma de <span class="text-gradient">pagamento</span></h2>
-                <p class="section-desc">Integração nativa com os principais gateways do Brasil e do mundo. Cobranças automáticas, webhooks e reconciliação financeira inclusos.</p>
+                <h2 class="section-title">Receba do jeito que <span class="text-gradient">o aluno preferir</span></h2>
+                <p class="section-desc">Integração nativa com os principais gateways do Brasil. Cobrança automática, baixa no recebimento e relatório financeiro consolidado.</p>
                 <div class="mt-4">
                     <span class="payment-badge"><i class="fa-brands fa-stripe" style="color:#6772e5;"></i> Stripe</span>
                     <span class="payment-badge"><i class="fa-solid fa-barcode" style="color:#00b894;"></i> Asaas</span>
@@ -843,29 +884,29 @@
                     <div class="col-6">
                         <div class="feature-card text-center p-3">
                             <i class="fa-solid fa-rotate me-2 text-primary" style="font-size:1.5rem; display:block; margin-bottom:0.5rem;"></i>
-                            <h6 style="font-size:0.9rem; font-weight:700;">Cobranças Recorrentes</h6>
-                            <p style="font-size:0.8rem; color:var(--text-gray);">Mensalidades automáticas para planos de assinatura</p>
+                            <h6 style="font-size:0.9rem; font-weight:700;">Mensalidade Recorrente</h6>
+                            <p style="font-size:0.8rem; color:var(--text-gray);">Cobrança automática todo mês, sem você precisar lembrar.</p>
                         </div>
                     </div>
                     <div class="col-6">
                         <div class="feature-card text-center p-3">
-                            <i class="fa-solid fa-webhook text-primary" style="font-size:1.5rem; display:block; margin-bottom:0.5rem;"></i>
-                            <h6 style="font-size:0.9rem; font-weight:700;">Webhooks Integrados</h6>
-                            <p style="font-size:0.8rem; color:var(--text-gray);">Confirmação automática de pagamentos em tempo real</p>
+                            <i class="fa-solid fa-bell text-primary" style="font-size:1.5rem; display:block; margin-bottom:0.5rem;"></i>
+                            <h6 style="font-size:0.9rem; font-weight:700;">Aviso de Inadimplência</h6>
+                            <p style="font-size:0.8rem; color:var(--text-gray);">Aluno em atraso recebe lembrete automático por WhatsApp.</p>
                         </div>
                     </div>
                     <div class="col-6">
                         <div class="feature-card text-center p-3">
                             <i class="fa-solid fa-chart-pie text-primary" style="font-size:1.5rem; display:block; margin-bottom:0.5rem;"></i>
                             <h6 style="font-size:0.9rem; font-weight:700;">Relatórios Detalhados</h6>
-                            <p style="font-size:0.8rem; color:var(--text-gray);">Exportação em Excel com filtros por período</p>
+                            <p style="font-size:0.8rem; color:var(--text-gray);">Quanto entrou, quanto falta, quem deve. Exporta em Excel.</p>
                         </div>
                     </div>
                     <div class="col-6">
                         <div class="feature-card text-center p-3">
-                            <i class="fa-solid fa-shield-check text-primary" style="font-size:1.5rem; display:block; margin-bottom:0.5rem;"></i>
+                            <i class="fa-solid fa-shield-halved text-primary" style="font-size:1.5rem; display:block; margin-bottom:0.5rem;"></i>
                             <h6 style="font-size:0.9rem; font-weight:700;">Pagamento Seguro</h6>
-                            <p style="font-size:0.8rem; color:var(--text-gray);">Criptografia SSL e conformidade com PCI-DSS</p>
+                            <p style="font-size:0.8rem; color:var(--text-gray);">Criptografia SSL e gateways com certificação PCI-DSS.</p>
                         </div>
                     </div>
                 </div>
@@ -874,53 +915,36 @@
     </div>
 </section>
 
-<!-- ==================== DEPOIMENTOS ==================== -->
+<!-- ==================== POR QUE ESCOLHER (substitui depoimentos fakes) ==================== -->
 <section class="section">
     <div class="container">
         <div class="row justify-content-center text-center mb-5">
-            <div class="col-lg-6">
-                <div class="section-label">Depoimentos</div>
-                <h2 class="section-title">O que dizem nossos <span class="text-gradient">clientes</span></h2>
+            <div class="col-lg-7">
+                <div class="section-label">Por que escolher o PilatesGestão</div>
+                <h2 class="section-title">Construído <span class="text-gradient">para Pilates</span>, não adaptado de outro segmento</h2>
+                <p class="section-desc mx-auto">Sistemas genéricos de academia ou clínica não entendem o que é uma turma de aparelho com 5 vagas, uma reposição ou um plano com frequência variável. Nós entendemos.</p>
             </div>
         </div>
         <div class="row g-4">
             <div class="col-md-4">
-                <div class="testimonial-card">
-                    <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
-                    <p>"Reduzimos em 80% o tempo gasto com agendamento manual. Os alunos adoraram poder marcar aulas pelo celular a qualquer hora."</p>
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="testimonial-avatar">AL</div>
-                        <div>
-                            <div class="testimonial-name">Ana Lima</div>
-                            <div class="testimonial-role">Diretora — Estúdio Pilates Zen</div>
-                        </div>
-                    </div>
+                <div class="diff-card">
+                    <div class="diff-icon"><i class="fa-solid fa-dumbbell"></i></div>
+                    <h5>Pensado pra rotina do estúdio</h5>
+                    <p>Vagas por aparelho, agendamento por nível, reposição de aulas, frequência mensal — funcionalidades que você não encontra em sistema genérico.</p>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="testimonial-card">
-                    <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
-                    <p>"O módulo financeiro transformou nossa visibilidade sobre o negócio. Hoje sei exatamente quanto vou receber no mês antes mesmo de começar."</p>
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="testimonial-avatar">CS</div>
-                        <div>
-                            <div class="testimonial-name">Carlos Santos</div>
-                            <div class="testimonial-role">Proprietário — Academia FitLife</div>
-                        </div>
-                    </div>
+                <div class="diff-card">
+                    <div class="diff-icon"><i class="fa-solid fa-headset"></i></div>
+                    <h5>Suporte humano no WhatsApp</h5>
+                    <p>Falar com gente de verdade quando precisa. Sem ticket que demora 3 dias, sem chatbot empurrando artigo de ajuda.</p>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="testimonial-card">
-                    <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
-                    <p>"Ter meu próprio site com domínio e poder gerenciar tudo em um lugar só foi um diferencial enorme para minha escola de música."</p>
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="testimonial-avatar">MO</div>
-                        <div>
-                            <div class="testimonial-name">Mariana Oliveira</div>
-                            <div class="testimonial-role">Fundadora — Escola de Música Harmonia</div>
-                        </div>
-                    </div>
+                <div class="diff-card">
+                    <div class="diff-icon"><i class="fa-solid fa-truck-arrow-right"></i></div>
+                    <h5>Migração assistida grátis</h5>
+                    <p>Já usa planilha ou outro sistema? Nossa equipe importa seus alunos, planos e histórico pra você não começar do zero.</p>
                 </div>
             </div>
         </div>
@@ -933,18 +957,18 @@
         <div class="row justify-content-center text-center mb-5">
             <div class="col-lg-6">
                 <div class="section-label">Planos e preços</div>
-                <h2 class="section-title">Escolha o plano ideal para <span class="text-gradient">seu negócio</span></h2>
-                <p class="section-desc mx-auto">Comece gratuitamente e escale conforme crescer. Sem taxa de adesão.</p>
+                <h2 class="section-title">Escolha o plano ideal pro <span class="text-gradient">seu estúdio</span></h2>
+                <p class="section-desc mx-auto">Comece testando 14 dias grátis. Sem taxa de adesão, sem fidelidade.</p>
             </div>
         </div>
         <div class="row g-4 justify-content-center">
             <div class="col-md-4">
                 <div class="price-card">
                     <div class="price-name">Básico</div>
-                    <div class="price-desc">Para quem está começando</div>
+                    <div class="price-desc">Pra estúdios começando</div>
                     <div class="price-value"><sup>R$</sup>0<sub>/mês</sub></div>
                     <hr class="price-divider">
-                    <div class="price-feature"><i class="fa-solid fa-check text-success"></i> Até 2 professores</div>
+                    <div class="price-feature"><i class="fa-solid fa-check text-success"></i> Até 2 instrutores</div>
                     <div class="price-feature"><i class="fa-solid fa-check text-success"></i> Até 30 alunos</div>
                     <div class="price-feature"><i class="fa-solid fa-check text-success"></i> Agendamento online</div>
                     <div class="price-feature"><i class="fa-solid fa-check text-success"></i> Site básico</div>
@@ -956,35 +980,35 @@
             </div>
             <div class="col-md-4">
                 <div class="price-card featured">
-                    <div class="price-badge">Mais popular</div>
+                    <div class="price-badge">Mais escolhido</div>
                     <div class="price-name">Profissional</div>
-                    <div class="price-desc">Para negócios em crescimento</div>
+                    <div class="price-desc">Pra estúdios em crescimento</div>
                     <div class="price-value"><sup>R$</sup>97<sub>/mês</sub></div>
                     <hr class="price-divider">
-                    <div class="price-feature"><i class="fa-solid fa-check"></i> Professores ilimitados</div>
+                    <div class="price-feature"><i class="fa-solid fa-check"></i> Instrutores ilimitados</div>
                     <div class="price-feature"><i class="fa-solid fa-check"></i> Alunos ilimitados</div>
                     <div class="price-feature"><i class="fa-solid fa-check"></i> Agendamento online</div>
                     <div class="price-feature"><i class="fa-solid fa-check"></i> Site + domínio próprio</div>
                     <div class="price-feature"><i class="fa-solid fa-check"></i> Módulo financeiro completo</div>
-                    <div class="price-feature"><i class="fa-solid fa-check"></i> Pagamentos automáticos</div>
+                    <div class="price-feature"><i class="fa-solid fa-check"></i> Mensalidade automática</div>
                     <div class="price-feature disabled" style="color:rgba(255,255,255,0.4);"><i class="fa-solid fa-xmark"></i> Chatbot com IA</div>
-                    <a href="{{ route('home.registerAluno') }}" class="btn-price-primary">Assinar agora</a>
+                    <a href="{{ route('home.registerAluno') }}" class="btn-price-primary">Testar 14 dias grátis</a>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="price-card">
                     <div class="price-name">Enterprise</div>
-                    <div class="price-desc">Para grandes operações</div>
+                    <div class="price-desc">Pra redes e estúdios grandes</div>
                     <div class="price-value"><sup>R$</sup>247<sub>/mês</sub></div>
                     <hr class="price-divider">
                     <div class="price-feature"><i class="fa-solid fa-check text-success"></i> Tudo do Profissional</div>
                     <div class="price-feature"><i class="fa-solid fa-check text-success"></i> Chatbot com IA</div>
                     <div class="price-feature"><i class="fa-solid fa-check text-success"></i> Geração de conteúdo IA</div>
-                    <div class="price-feature"><i class="fa-solid fa-check text-success"></i> Multi-domínios</div>
+                    <div class="price-feature"><i class="fa-solid fa-check text-success"></i> Multi-unidades</div>
                     <div class="price-feature"><i class="fa-solid fa-check text-success"></i> API & Webhooks</div>
-                    <div class="price-feature"><i class="fa-solid fa-check text-success"></i> Google Calendar Sync</div>
+                    <div class="price-feature"><i class="fa-solid fa-check text-success"></i> Sincronização Google Calendar</div>
                     <div class="price-feature"><i class="fa-solid fa-check text-success"></i> Suporte prioritário</div>
-                    <a href="{{ route('home.registerAluno') }}" class="btn-price-outline">Contratar</a>
+                    <a href="https://wa.me/{{ $whatsapp_numero }}?text={{ rawurlencode('Olá! Tenho interesse no plano Enterprise do PilatesGestão.') }}" target="_blank" rel="noopener" class="btn-price-outline">Falar com vendas</a>
                 </div>
             </div>
         </div>
@@ -994,13 +1018,18 @@
 <!-- ==================== CTA FINAL ==================== -->
 <section class="cta-section">
     <div class="container position-relative">
-        <h2>Pronto para transformar sua gestão?</h2>
-        <p>Junte-se a centenas de negócios que já usam o AgendaPro para crescer com mais organização e menos esforço.</p>
-        <a href="{{ route('home.registerAluno') }}" class="btn-cta-white">
-            <i class="fa-solid fa-rocket me-2"></i> Começar agora — é grátis
-        </a>
+        <h2>Pronto pra deixar a planilha pra trás?</h2>
+        <p>Teste 14 dias grátis ou agende uma demonstração de 20 minutos. Sem cartão de crédito, sem compromisso.</p>
+        <div class="d-inline-flex flex-wrap justify-content-center align-items-center">
+            <a href="{{ route('home.registerAluno') }}" class="btn-cta-white">
+                <i class="fa-solid fa-rocket me-2"></i> Começar grátis
+            </a>
+            <a href="https://wa.me/{{ $whatsapp_numero }}?text={{ $whatsapp_msg_demo }}" target="_blank" rel="noopener" class="btn-cta-wpp">
+                <i class="fa-brands fa-whatsapp me-2"></i> Agendar demonstração
+            </a>
+        </div>
         <div class="mt-3" style="color:rgba(255,255,255,0.65); font-size:0.82rem;">
-            Sem cartão de crédito &bull; Configuração em 5 minutos &bull; Cancele quando quiser
+            Sem cartão de crédito &bull; Configura em 15 minutos &bull; Cancele quando quiser
         </div>
     </div>
 </section>
@@ -1010,8 +1039,8 @@
     <div class="container">
         <div class="row g-5">
             <div class="col-lg-4">
-                <div class="brand"><i class="fa-solid fa-calendar-check me-2"></i><span>AgendaPro</span></div>
-                <p class="mt-2">Plataforma completa de gestão para escolas, estúdios e prestadores de serviço. Multi-tenant, seguro e escalável.</p>
+                <div class="brand"><i class="fa-solid fa-calendar-check me-2"></i><span>PilatesGestão</span></div>
+                <p class="mt-2">O sistema feito sob medida pra estúdios de Pilates: agenda, alunos, mensalidades e financeiro num lugar só.</p>
             </div>
             <div class="col-lg-2 col-md-4">
                 <h6>Produto</h6>
@@ -1024,34 +1053,44 @@
                 <h6>Plataforma</h6>
                 <a href="{{ route('home.login') }}">Entrar</a>
                 <a href="{{ route('home.registerAluno') }}">Cadastrar aluno</a>
-                <a href="{{ route('home.registerProf') }}">Cadastrar professor</a>
-                <a href="{{ route('home.index') }}">Ver empresas</a>
+                <a href="{{ route('home.registerProf') }}">Cadastrar instrutor</a>
+                <a href="{{ route('home.index') }}">Ver estúdios</a>
             </div>
             <div class="col-lg-2 col-md-4">
                 <h6>Suporte</h6>
-                <a href="#">Documentação</a>
+                <a href="https://wa.me/{{ $whatsapp_numero }}?text={{ $whatsapp_msg_geral }}" target="_blank" rel="noopener">WhatsApp</a>
+                <a href="mailto:contato@pilatesgestao.com.br">contato@pilatesgestao.com.br</a>
                 <a href="#">Central de ajuda</a>
-                <a href="#">Status da plataforma</a>
-                <a href="#">Contato</a>
+                <a href="#">Status</a>
             </div>
             <div class="col-lg-2">
                 <h6>Legal</h6>
-                <a href="#">Termos de uso</a>
-                <a href="#">Privacidade</a>
-                <a href="#">LGPD</a>
+                <a href="{{ url('/termos') }}">Termos de uso</a>
+                <a href="{{ url('/privacidade') }}">Política de Privacidade</a>
+                <a href="{{ url('/lgpd') }}">LGPD</a>
             </div>
         </div>
         <hr class="footer-divider">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-            <div class="footer-bottom">© {{ date('Y') }} AgendaPro. Todos os direitos reservados.</div>
+            <div class="footer-bottom">© {{ date('Y') }} PilatesGestão. Todos os direitos reservados.</div>
             <div class="d-flex gap-3">
                 <a href="#" style="color:rgba(255,255,255,0.4); font-size:1.1rem;"><i class="fa-brands fa-instagram"></i></a>
-                <a href="#" style="color:rgba(255,255,255,0.4); font-size:1.1rem;"><i class="fa-brands fa-whatsapp"></i></a>
+                <a href="https://wa.me/{{ $whatsapp_numero }}" target="_blank" rel="noopener" style="color:rgba(255,255,255,0.4); font-size:1.1rem;"><i class="fa-brands fa-whatsapp"></i></a>
                 <a href="#" style="color:rgba(255,255,255,0.4); font-size:1.1rem;"><i class="fa-brands fa-linkedin"></i></a>
             </div>
         </div>
     </div>
 </footer>
+
+<!-- ==================== WHATSAPP FLOATING BUTTON ==================== -->
+<a href="https://wa.me/{{ $whatsapp_numero }}?text={{ $whatsapp_msg_geral }}"
+   target="_blank"
+   rel="noopener"
+   class="wpp-float"
+   aria-label="Falar no WhatsApp">
+    <i class="fa-brands fa-whatsapp"></i>
+    <span class="wpp-float-label">Tire suas dúvidas no WhatsApp</span>
+</a>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
