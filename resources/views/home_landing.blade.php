@@ -589,7 +589,7 @@
     ============================================================
 --}}
 @php
-    $whatsapp_numero = '5521999999999'; // <-- TROQUE pelo seu número
+    $whatsapp_numero = '5521990271287'; // <-- TROQUE pelo seu número
     $whatsapp_msg_demo = rawurlencode('Olá! Tenho um estúdio de Pilates e queria agendar uma demonstração do PilatesGestão.');
     $whatsapp_msg_geral = rawurlencode('Olá! Vim pelo site do PilatesGestão e tenho uma dúvida.');
 @endphp
