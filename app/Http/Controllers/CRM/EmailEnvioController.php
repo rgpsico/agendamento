@@ -8,6 +8,7 @@ use App\Models\EmailTemplate;
 use App\Models\Lead;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
@@ -31,10 +32,14 @@ class EmailEnvioController extends Controller
             $lead->refresh();
         }
 
-        Mail::to($lead->email)->send(new LeadTemplateMail($lead, $template));
-        $lead->update(['email_enviado_em' => now()]);
-
-        return back()->with('success', 'E-mail enviado para ' . $lead->nome . '.');
+        try {
+            Mail::to($lead->email)->send(new LeadTemplateMail($lead, $template));
+            $lead->update(['email_enviado_em' => now()]);
+            return back()->with('success', 'E-mail enviado para ' . $lead->nome . '.');
+        } catch (\Exception $e) {
+            Log::error('Falha ao enviar e-mail para lead ' . $lead->id . ': ' . $e->getMessage());
+            return back()->with('error', 'Erro ao enviar e-mail: ' . $e->getMessage());
+        }
     }
 
     public function enviarMassa(Request $request)
@@ -51,25 +56,45 @@ class EmailEnvioController extends Controller
             ->where('ativo', true)
             ->findOrFail($request->email_template_id);
 
-        $leads = Lead::forTenant($tenantId)
-            ->whereIn('id', $request->lead_ids)
+        // Busca os leads pelos IDs selecionados SEM filtro de tenant
+        // para funcionar tanto no painel admin quanto no CRM
+        $leads = Lead::whereIn('id', $request->lead_ids)
+            ->where('tenant_id', $tenantId)
             ->whereNotNull('email')
             ->get();
 
-        $enviados = 0;
-
-        foreach ($leads as $lead) {
-            if (empty($lead->token)) {
-                $lead->update(['token' => Str::uuid()]);
-                $lead->refresh();
-            }
-
-            Mail::to($lead->email)->send(new LeadTemplateMail($lead, $template));
-            $lead->update(['email_enviado_em' => now()]);
-            $enviados++;
+        if ($leads->isEmpty()) {
+            return back()->with('error', 'Nenhum lead válido encontrado. Verifique se os leads pertencem ao seu estúdio e possuem e-mail cadastrado.');
         }
 
-        return back()->with('success', "E-mail enviado para {$enviados} lead(s) com sucesso.");
+        $enviados = 0;
+        $falhas   = 0;
+
+        foreach ($leads as $lead) {
+            try {
+                if (empty($lead->token)) {
+                    $lead->update(['token' => Str::uuid()]);
+                    $lead->refresh();
+                }
+
+                Mail::to($lead->email)->send(new LeadTemplateMail($lead, $template));
+                $lead->update(['email_enviado_em' => now()]);
+                $enviados++;
+            } catch (\Exception $e) {
+                $falhas++;
+                Log::error('Falha ao enviar e-mail para lead ' . $lead->id . ' (' . $lead->email . '): ' . $e->getMessage());
+            }
+        }
+
+        if ($falhas > 0 && $enviados === 0) {
+            return back()->with('error', "Falha ao enviar todos os {$falhas} e-mail(s). Verifique as configurações de e-mail em storage/logs/laravel.log.");
+        }
+
+        if ($falhas > 0) {
+            return back()->with('error', "Enviados: {$enviados}. Falhas: {$falhas}. Verifique storage/logs/laravel.log para detalhes.");
+        }
+
+        return back()->with('success', "E-mail enviado com sucesso para {$enviados} lead(s).");
     }
 
     private function tenantId(): int
