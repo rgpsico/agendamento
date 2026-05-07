@@ -5,4 +5,5 @@
     <a class="btn btn-sm {{ request()->routeIs('crm.campanhas.*') ? 'btn-primary' : 'btn-outline-primary' }}" href="{{ route('crm.campanhas.index') }}">Campanhas</a>
     <a class="btn btn-sm {{ request()->routeIs('crm.formularios.*') ? 'btn-primary' : 'btn-outline-primary' }}" href="{{ route('crm.formularios.index') }}">Formularios</a>
     <a class="btn btn-sm {{ request()->routeIs('crm.relatorios.*') ? 'btn-primary' : 'btn-outline-primary' }}" href="{{ route('crm.relatorios.index') }}">Relatorios</a>
+    <a class="btn btn-sm {{ request()->routeIs('crm.email-templates.*') ? 'btn-primary' : 'btn-outline-primary' }}" href="{{ route('crm.email-templates.index') }}">Templates de E-mail</a>
 </div>

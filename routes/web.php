@@ -52,6 +52,8 @@ use App\Http\Controllers\CRM\LeadController as CRMLeadController;
 use App\Http\Controllers\CRM\PipelineController;
 use App\Http\Controllers\CRM\RelatorioController as CRMRelatorioController;
 use App\Http\Controllers\CRM\TarefaController as CRMTarefaController;
+use App\Http\Controllers\CRM\EmailTemplateController as CRMEmailTemplateController;
+use App\Http\Controllers\CRM\EmailEnvioController as CRMEmailEnvioController;
 
 
 
@@ -132,6 +134,11 @@ Route::prefix('crm')->middleware(['auth', 'tenant'])->name('crm.')->group(functi
     Route::post('tarefas', [CRMTarefaController::class, 'store'])->name('tarefas.store');
     Route::patch('tarefas/{tarefa}/concluir', [CRMTarefaController::class, 'concluir'])->name('tarefas.concluir');
     Route::get('relatorios', [CRMRelatorioController::class, 'index'])->name('relatorios.index');
+
+    Route::resource('email-templates', CRMEmailTemplateController::class)->only(['index', 'store', 'update', 'destroy']);
+
+    Route::post('leads/{lead}/enviar-email', [CRMEmailEnvioController::class, 'enviar'])->name('leads.enviar-email');
+    Route::post('leads/enviar-email-massa', [CRMEmailEnvioController::class, 'enviarMassa'])->name('leads.enviar-email-massa');
 });
 
 

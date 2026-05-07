@@ -4,6 +4,7 @@ namespace App\Http\Controllers\CRM;
 
 use App\Http\Controllers\Controller;
 use App\Models\Campanha;
+use App\Models\EmailTemplate;
 use App\Models\Lead;
 use App\Models\Tarefa;
 use App\Models\Usuario;
@@ -45,10 +46,13 @@ class LeadController extends Controller
 
         $leads = $query->latest()->paginate(20)->withQueryString();
 
+        $emailTemplates = EmailTemplate::forTenant($tenantId)->where('ativo', true)->orderBy('nome')->get();
+
         return view('crm.leads.index', [
             'leads' => $leads,
             'statuses' => Lead::$pipelineStatus,
             'origens' => Lead::$origens,
+            'emailTemplates' => $emailTemplates,
         ]);
     }
 
@@ -79,7 +83,9 @@ class LeadController extends Controller
 
         $lead->load(['campanha', 'responsavel', 'historicos.usuario', 'tarefas.usuario']);
 
-        return view('crm.leads.show', compact('lead'));
+        $emailTemplates = EmailTemplate::forTenant($this->tenantId())->where('ativo', true)->orderBy('nome')->get();
+
+        return view('crm.leads.show', compact('lead', 'emailTemplates'));
     }
 
     public function whatsapp(Lead $lead)

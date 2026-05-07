@@ -3,12 +3,17 @@
         <div class="content container-fluid">
             <div class="page-header d-flex justify-content-between align-items-center">
                 <div><h3 class="page-title">{{ $lead->nome }}</h3><ul class="breadcrumb"><li class="breadcrumb-item">CRM</li><li class="breadcrumb-item active">Perfil</li></ul></div>
-                <div class="d-flex gap-2">
+                <div class="d-flex gap-2 flex-wrap">
                     @if($lead->whatsapp_url)
                         <form method="POST" action="{{ route('crm.leads.whatsapp', $lead) }}" target="_blank" class="d-inline">
                             @csrf
                             <button type="submit" class="btn btn-success">WhatsApp</button>
                         </form>
+                    @endif
+                    @if($lead->email)
+                        <button class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#modalEnviarEmail">
+                            Enviar E-mail
+                        </button>
                     @endif
                     <a href="{{ route('agenda.create') }}" class="btn btn-outline-primary">Agendar experimental</a>
                     <form method="POST" action="{{ route('crm.pipeline.move', $lead) }}">@csrf @method('PATCH')<input type="hidden" name="pipeline_status" value="matriculado"><button class="btn btn-primary">Converter em aluno</button></form>
@@ -28,6 +33,7 @@
                             <p><strong>Interesse:</strong> {{ $lead->interesse ?? '-' }}</p>
                             <p><strong>Status:</strong> {{ $lead->pipeline_status_label }}</p>
                             <p><strong>WhatsApp:</strong> {{ $lead->whatsapp_enviado_em ? 'Enviado em ' . $lead->whatsapp_enviado_em->format('d/m/Y H:i') : 'Pendente' }}</p>
+                            <p><strong>E-mail:</strong> {{ $lead->email_enviado_em ? 'Enviado em ' . $lead->email_enviado_em->format('d/m/Y H:i') : 'Pendente' }}</p>
                             <p><strong>Campanha:</strong> {{ $lead->campanha->nome ?? '-' }}</p>
                             <p><strong>Responsavel:</strong> {{ $lead->responsavel->nome ?? '-' }}</p>
                             <p class="mb-0"><strong>Observacoes:</strong><br>{{ $lead->observacoes ?? '-' }}</p>
@@ -83,4 +89,42 @@
             </div>
         </div>
     </div>
+
+    {{-- Modal enviar e-mail --}}
+    @if($lead->email)
+    <div class="modal fade" id="modalEnviarEmail" tabindex="-1">
+        <div class="modal-dialog">
+            <form method="POST" action="{{ route('crm.leads.enviar-email', $lead) }}">
+                @csrf
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Enviar E-mail para {{ $lead->nome }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-muted small mb-3">Para: <strong>{{ $lead->email }}</strong></p>
+                        <div class="mb-3">
+                            <label class="form-label">Escolha o template <span class="text-danger">*</span></label>
+                            <select name="email_template_id" class="form-select" required>
+                                <option value="">— Selecione —</option>
+                                @foreach($emailTemplates as $tpl)
+                                    <option value="{{ $tpl->id }}">{{ $tpl->nome }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @if($emailTemplates->isEmpty())
+                            <div class="alert alert-warning mb-0">
+                                Nenhum template ativo. <a href="{{ route('crm.email-templates.index') }}">Criar template</a>
+                            </div>
+                        @endif
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary" @if($emailTemplates->isEmpty()) disabled @endif>Enviar E-mail</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    @endif
 </x-admin.layout>
