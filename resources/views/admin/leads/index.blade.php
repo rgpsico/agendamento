@@ -153,6 +153,10 @@
                                         <option value="{{ $tpl->id }}">{{ $tpl->nome }}</option>
                                     @endforeach
                                 </select>
+                                <button type="button" class="btn btn-outline-info btn-sm"
+                                    onclick="verTemplateDoSelect(document.getElementById('selectTemplate'))">
+                                    <i class="fe fe-eye"></i> Ver
+                                </button>
                                 @if($emailTemplates->isEmpty())
                                     <a href="{{ route('crm.email-templates.index') }}" class="btn btn-warning btn-sm">
                                         Criar template primeiro
@@ -289,6 +293,8 @@
         </div>
     </div>
 
+    @include('crm.email-templates._preview-script')
+
     {{-- Modal Import --}}
     <div class="modal fade" id="modalImport" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg">
@@ -375,15 +381,10 @@
             const ids = getSelecionados();
             if (!ids.length) return;
 
-            const templateId = document.getElementById('selectTemplate').value;
-            if (!templateId) {
-                alert('Selecione um template antes de disparar.');
-                return;
-            }
+            const selectEl = document.getElementById('selectTemplate');
+            if (!confirmarEnvioTemplate(selectEl, ids.length + ' lead(s)')) return;
 
-            if (!confirm('Disparar e-mail para ' + ids.length + ' lead(s) selecionado(s)?')) return;
-
-            document.getElementById('hiddenTemplateId').value = templateId;
+            document.getElementById('hiddenTemplateId').value = selectEl.value;
             idsContainer.innerHTML = ids.map(id => `<input type="hidden" name="lead_ids[]" value="${id}">`).join('');
             formEmails.submit();
         });

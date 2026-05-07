@@ -50,10 +50,15 @@
                                 <option value="{{ $tpl->id }}">{{ $tpl->nome }}</option>
                             @endforeach
                         </select>
+                        <button type="button" class="btn btn-outline-info btn-sm"
+                            onclick="verTemplateDoSelect(document.querySelector('#formEnvioMassa select[name=email_template_id]'))">
+                            <i class="fe fe-eye"></i> Ver
+                        </button>
                         @if($emailTemplates->isEmpty())
                             <a href="{{ route('crm.email-templates.index') }}" class="btn btn-outline-warning btn-sm">Criar template primeiro</a>
                         @else
-                            <button type="submit" class="btn btn-primary" onclick="return confirm('Enviar e-mail para os leads selecionados?')">
+                            <button type="submit" class="btn btn-primary"
+                                onclick="return confirmarEnvioTemplate(this.form.querySelector('select[name=email_template_id]'), document.getElementById('qtdSelecionados').textContent + ' lead(s)')">
                                 Enviar E-mail em Massa
                             </button>
                         @endif
@@ -175,6 +180,8 @@
             </div>
         </div>
     </div>
+
+    @include('crm.email-templates._preview-script')
 
     <script>
     (function () {

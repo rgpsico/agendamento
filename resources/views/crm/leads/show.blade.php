@@ -105,12 +105,18 @@
                         <p class="text-muted small mb-3">Para: <strong>{{ $lead->email }}</strong></p>
                         <div class="mb-3">
                             <label class="form-label">Escolha o template <span class="text-danger">*</span></label>
-                            <select name="email_template_id" class="form-select" required>
-                                <option value="">— Selecione —</option>
-                                @foreach($emailTemplates as $tpl)
-                                    <option value="{{ $tpl->id }}">{{ $tpl->nome }}</option>
-                                @endforeach
-                            </select>
+                            <div class="d-flex gap-2">
+                                <select name="email_template_id" id="selectTemplateShow" class="form-select" required>
+                                    <option value="">— Selecione —</option>
+                                    @foreach($emailTemplates as $tpl)
+                                        <option value="{{ $tpl->id }}">{{ $tpl->nome }}</option>
+                                    @endforeach
+                                </select>
+                                <button type="button" class="btn btn-outline-info"
+                                    onclick="verTemplateDoSelect(document.getElementById('selectTemplateShow'))">
+                                    <i class="fe fe-eye"></i> Ver
+                                </button>
+                            </div>
                         </div>
                         @if($emailTemplates->isEmpty())
                             <div class="alert alert-warning mb-0">
@@ -120,11 +126,16 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary" @if($emailTemplates->isEmpty()) disabled @endif>Enviar E-mail</button>
+                        <button type="submit" class="btn btn-primary"
+                            @if($emailTemplates->isEmpty()) disabled @endif
+                            onclick="return confirmarEnvioTemplate(document.getElementById('selectTemplateShow'), '{{ addslashes($lead->nome) }} ({{ addslashes($lead->email) }})')">
+                            Enviar E-mail
+                        </button>
                     </div>
                 </div>
             </form>
         </div>
     </div>
+    @include('crm.email-templates._preview-script')
     @endif
 </x-admin.layout>
