@@ -56,15 +56,12 @@ class EmailEnvioController extends Controller
             ->where('ativo', true)
             ->findOrFail($request->email_template_id);
 
-        // Busca os leads pelos IDs selecionados SEM filtro de tenant
-        // para funcionar tanto no painel admin quanto no CRM
         $leads = Lead::whereIn('id', $request->lead_ids)
-            ->where('tenant_id', $tenantId)
             ->whereNotNull('email')
             ->get();
 
         if ($leads->isEmpty()) {
-            return back()->with('error', 'Nenhum lead válido encontrado. Verifique se os leads pertencem ao seu estúdio e possuem e-mail cadastrado.');
+            return back()->with('error', 'Nenhum lead com e-mail encontrado na seleção.');
         }
 
         $enviados = 0;
