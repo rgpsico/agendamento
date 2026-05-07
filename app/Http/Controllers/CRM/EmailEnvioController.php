@@ -33,9 +33,9 @@ class EmailEnvioController extends Controller
         }
 
         try {
-            Mail::to($lead->email)->send(new LeadTemplateMail($lead, $template));
+            Mail::to($lead->email)->queue(new LeadTemplateMail($lead, $template));
             $lead->update(['email_enviado_em' => now()]);
-            return back()->with('success', 'E-mail enviado para ' . $lead->nome . '.');
+            return back()->with('success', 'E-mail enfileirado para ' . $lead->nome . '.');
         } catch (\Exception $e) {
             Log::error('Falha ao enviar e-mail para lead ' . $lead->id . ': ' . $e->getMessage());
             return back()->with('error', 'Erro ao enviar e-mail: ' . $e->getMessage());
@@ -74,7 +74,7 @@ class EmailEnvioController extends Controller
                     $lead->refresh();
                 }
 
-                Mail::to($lead->email)->send(new LeadTemplateMail($lead, $template));
+                Mail::to($lead->email)->queue(new LeadTemplateMail($lead, $template));
                 $lead->update(['email_enviado_em' => now()]);
                 $enviados++;
             } catch (\Exception $e) {
@@ -91,7 +91,7 @@ class EmailEnvioController extends Controller
             return back()->with('error', "Enviados: {$enviados}. Falhas: {$falhas}. Verifique storage/logs/laravel.log para detalhes.");
         }
 
-        return back()->with('success', "E-mail enviado com sucesso para {$enviados} lead(s).");
+        return back()->with('success', "E-mail enfileirado para {$enviados} lead(s). O envio acontece em segundo plano.");
     }
 
     private function tenantId(): int
