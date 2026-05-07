@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\EmailTemplate;
 use App\Models\Lead;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class LeadController extends Controller
 {
@@ -31,10 +33,16 @@ class LeadController extends Controller
 
         $leads = $query->latest()->paginate(20)->withQueryString();
 
+        $tenantId = Auth::user()?->empresa?->id;
+        $emailTemplates = $tenantId
+            ? EmailTemplate::where('tenant_id', $tenantId)->where('ativo', true)->orderBy('nome')->get()
+            : collect();
+
         return view('admin.leads.index', [
-            'leads'      => $leads,
-            'statusList' => Lead::$statusList,
-            'origens'    => Lead::$origens,
+            'leads'          => $leads,
+            'statusList'     => Lead::$statusList,
+            'origens'        => Lead::$origens,
+            'emailTemplates' => $emailTemplates,
         ]);
     }
 
