@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\EnviarEmailLeadJob;
+use App\Models\EmailTemplate;
 use App\Models\Lead;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class LeadController extends Controller
 {
@@ -70,15 +72,21 @@ class LeadController extends Controller
 
         $leads = $query->paginate($perPage)->withQueryString();
 
+        $tenantId = Auth::user()?->empresa?->id;
+        $emailTemplates = $tenantId
+            ? EmailTemplate::where('tenant_id', $tenantId)->where('ativo', true)->orderBy('nome')->get()
+            : collect();
+
         return view('admin.leads.index', [
-            'leads'      => $leads,
-            'statusList' => Lead::$statusList,
-            'origens'    => Lead::$origens,
-            'bairros'    => Lead::whereNotNull('bairro')
+            'leads'          => $leads,
+            'statusList'     => Lead::$statusList,
+            'origens'        => Lead::$origens,
+            'bairros'        => Lead::whereNotNull('bairro')
                 ->where('bairro', '<>', '')
                 ->distinct()
                 ->orderBy('bairro')
                 ->pluck('bairro'),
+            'emailTemplates' => $emailTemplates,
         ]);
     }
 
