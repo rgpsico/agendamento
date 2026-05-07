@@ -36,6 +36,10 @@
                                         @endif
                                     </td>
                                     <td class="text-end">
+                                        <button class="btn btn-sm btn-outline-info"
+                                            onclick="previsualizarTemplate({{ $template->id }})">
+                                            Visualizar
+                                        </button>
                                         <button class="btn btn-sm btn-outline-secondary"
                                             data-bs-toggle="modal"
                                             data-bs-target="#modalEditarTemplate{{ $template->id }}">
@@ -101,6 +105,52 @@
             </form>
         </div>
     </div>
+
+    {{-- Modal preview --}}
+    <div class="modal fade" id="modalPreview" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Preview: <span id="previewNome"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="bg-light px-3 py-2 border-bottom text-muted small">
+                        <strong>Assunto:</strong> <span id="previewAssunto"></span>
+                    </div>
+                    <iframe id="previewFrame" style="width:100%; height:520px; border:none;"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Dados dos templates para JS --}}
+    <script>
+        const templates = @json($templates->keyBy('id'));
+
+        function previsualizarTemplate(id) {
+            const tpl = templates[id];
+            document.getElementById('previewNome').textContent    = tpl.nome;
+            document.getElementById('previewAssunto').textContent = tpl.assunto
+                .replace(/{nome}/g, 'João Silva')
+                .replace(/{email}/g, 'joao@exemplo.com')
+                .replace(/{telefone}/g, '(21) 99999-9999')
+                .replace(/{empresa}/g, 'Studio Pilates')
+                .replace(/{interesse}/g, 'Pilates');
+
+            const corpo = tpl.corpo
+                .replace(/{nome}/g, 'João Silva')
+                .replace(/{email}/g, 'joao@exemplo.com')
+                .replace(/{telefone}/g, '(21) 99999-9999')
+                .replace(/{empresa}/g, 'Studio Pilates')
+                .replace(/{interesse}/g, 'Pilates');
+
+            const frame = document.getElementById('previewFrame');
+            frame.srcdoc = corpo;
+
+            new bootstrap.Modal(document.getElementById('modalPreview')).show();
+        }
+    </script>
 
     @if($errors->any())
         <script>
