@@ -54,6 +54,9 @@ use App\Http\Controllers\CRM\RelatorioController as CRMRelatorioController;
 use App\Http\Controllers\CRM\TarefaController as CRMTarefaController;
 use App\Http\Controllers\CRM\EmailTemplateController as CRMEmailTemplateController;
 use App\Http\Controllers\CRM\EmailEnvioController as CRMEmailEnvioController;
+use App\Http\Controllers\CRM\ModalCapturaController;
+use App\Http\Controllers\WidgetController;
+use App\Http\Controllers\Api\ModalLeadController;
 
 
 
@@ -139,6 +142,16 @@ Route::prefix('crm')->middleware(['auth', 'tenant'])->name('crm.')->group(functi
 
     Route::post('leads/{lead}/enviar-email', [CRMEmailEnvioController::class, 'enviar'])->name('leads.enviar-email');
     Route::post('leads/enviar-email-massa', [CRMEmailEnvioController::class, 'enviarMassa'])->name('leads.enviar-email-massa');
+
+    Route::resource('modal-capturas', ModalCapturaController::class)->only(['index', 'store', 'update', 'destroy']);
+});
+
+// Widget JS — público, sem auth
+Route::get('/widget/{token}.js', [WidgetController::class, 'js'])->name('widget.js');
+
+// API pública do widget — sem auth, CORS liberado
+Route::prefix('api/widget')->middleware('api')->group(function () {
+    Route::post('{token}/lead', [ModalLeadController::class, 'submit'])->name('widget.lead.submit');
 });
 
 
