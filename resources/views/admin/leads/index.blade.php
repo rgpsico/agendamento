@@ -131,9 +131,10 @@
             </div>
 
             {{-- Form de envio em massa — FORA da tabela para evitar forms aninhados --}}
-            <form action="{{ route('admin.leads.enviar.emails') }}" method="POST" id="formEmails">
+            <form action="{{ route('crm.leads.enviar-email-massa') }}" method="POST" id="formEmails">
                 @csrf
                 <div id="idsContainer"></div>
+                <input type="hidden" name="email_template_id" id="hiddenTemplateId">
             </form>
 
             <div class="row">
@@ -142,13 +143,25 @@
                         <div class="card-body">
 
                             {{-- Barra de ação --}}
-                            <div id="barraSelecionados" class="d-none mb-3 p-2 bg-light rounded d-flex align-items-center gap-3">
+                            <div id="barraSelecionados" class="d-none mb-3 p-2 bg-light rounded d-flex align-items-center gap-3 flex-wrap">
                                 <span class="text-muted small">
                                     <strong id="qtdSelecionados">0</strong> lead(s) selecionado(s)
                                 </span>
-                                <button type="button" class="btn btn-primary btn-sm" id="btnDispararEmails">
-                                    <i class="fe fe-send"></i> Disparar e-mails
-                                </button>
+                                <select id="selectTemplate" class="form-select form-select-sm" style="max-width:260px" required>
+                                    <option value="">— Escolha o template —</option>
+                                    @foreach($emailTemplates as $tpl)
+                                        <option value="{{ $tpl->id }}">{{ $tpl->nome }}</option>
+                                    @endforeach
+                                </select>
+                                @if($emailTemplates->isEmpty())
+                                    <a href="{{ route('crm.email-templates.index') }}" class="btn btn-warning btn-sm">
+                                        Criar template primeiro
+                                    </a>
+                                @else
+                                    <button type="button" class="btn btn-primary btn-sm" id="btnDispararEmails">
+                                        <i class="fe fe-send"></i> Disparar e-mails
+                                    </button>
+                                @endif
                             </div>
 
                             <div class="table-responsive">
@@ -361,10 +374,17 @@
         btnDisparar.addEventListener('click', function () {
             const ids = getSelecionados();
             if (!ids.length) return;
+
+            const templateId = document.getElementById('selectTemplate').value;
+            if (!templateId) {
+                alert('Selecione um template antes de disparar.');
+                return;
+            }
+
             if (!confirm('Disparar e-mail para ' + ids.length + ' lead(s) selecionado(s)?')) return;
 
-            // Injeta os IDs no form separado e submete
-            idsContainer.innerHTML = ids.map(id => `<input type="hidden" name="ids[]" value="${id}">`).join('');
+            document.getElementById('hiddenTemplateId').value = templateId;
+            idsContainer.innerHTML = ids.map(id => `<input type="hidden" name="lead_ids[]" value="${id}">`).join('');
             formEmails.submit();
         });
     </script>
