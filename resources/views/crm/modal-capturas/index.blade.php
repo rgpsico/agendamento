@@ -31,6 +31,10 @@
                                 @if($modal->campo_email)    <span class="badge bg-light text-dark border">E-mail</span> @endif
                                 @if($modal->campo_telefone) <span class="badge bg-light text-dark border">Telefone</span> @endif
                                 <span class="badge bg-light text-dark border">{{ $modal->origem_lead }}</span>
+                                <span class="badge bg-light text-dark border">{{ ucfirst($modal->tamanho ?? 'medio') }}</span>
+                                <span class="badge bg-light text-dark border">{{ ucfirst($modal->posicao ?? 'centro') }}</span>
+                                @php $gatilhoLabels = ['imediato'=>'Imediato','delay'=>'Delay','scroll'=>'Scroll','elemento'=>'Elemento','saida'=>'Exit-intent']; @endphp
+                                <span class="badge bg-info text-white">{{ $gatilhoLabels[$modal->gatilho ?? 'imediato'] ?? 'Imediato' }}</span>
                             </div>
                         </div>
 
@@ -71,12 +75,12 @@
 
             {{-- Modal editar --}}
             <div class="modal fade" id="modalEditar{{ $modal->id }}" tabindex="-1">
-                <div class="modal-dialog modal-lg">
+                <div class="modal-dialog modal-xl modal-dialog-scrollable">
                     <form method="POST" action="{{ route('crm.modal-capturas.update', $modal) }}">
                         @csrf @method('PUT')
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title">Editar Widget</h5>
+                                <h5 class="modal-title">Editar Widget — {{ $modal->nome }}</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                             </div>
                             <div class="modal-body">
@@ -100,7 +104,7 @@
 
     {{-- Modal novo --}}
     <div class="modal fade" id="modalNovo" tabindex="-1">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
             <form method="POST" action="{{ route('crm.modal-capturas.store') }}">
                 @csrf
                 <div class="modal-content">
@@ -122,9 +126,8 @@
 
     {{-- Modal preview --}}
     <div class="modal fade" id="modalPreviewWidget" tabindex="-1">
-        <div class="modal-dialog modal-sm">
-            <div class="modal-content" id="previewWidgetContent">
-            </div>
+        <div class="modal-dialog modal-dialog-centered" id="previewWidgetDialog">
+            <div class="modal-content" id="previewWidgetContent" style="overflow:hidden"></div>
         </div>
     </div>
 
@@ -138,20 +141,38 @@
     }
 
     function previewModal(cfg) {
-        var fields = '';
-        if (cfg.campo_nome)     fields += '<input type="text" class="form-control mb-2" placeholder="Seu nome">';
-        if (cfg.campo_email)    fields += '<input type="email" class="form-control mb-2" placeholder="Seu e-mail">';
-        if (cfg.campo_telefone) fields += '<input type="tel" class="form-control mb-2" placeholder="Seu telefone">';
+        var larguras = { pequeno: '320px', medio: '420px', grande: '560px' };
+        var largura  = larguras[cfg.tamanho] || '420px';
+        var bordas   = (cfg.bordas !== undefined ? cfg.bordas : 12) + 'px';
+        var corFundo = cfg.cor_fundo  || '#ffffff';
+        var corTexto = cfg.cor_texto  || '#333333';
 
+        var fields = '';
+        if (cfg.campo_nome)     fields += '<input type="text"  class="form-control mb-2" placeholder="Seu nome">';
+        if (cfg.campo_email)    fields += '<input type="email" class="form-control mb-2" placeholder="Seu e-mail">';
+        if (cfg.campo_telefone) fields += '<input type="tel"   class="form-control mb-2" placeholder="Seu telefone">';
+
+        var banner = cfg.imagem_url
+            ? '<img src="' + cfg.imagem_url + '" style="width:100%;max-height:160px;object-fit:cover;display:block">'
+            : '';
+
+        // Ajusta largura do dialog
+        var dialog = document.getElementById('previewWidgetDialog');
+        dialog.style.maxWidth = largura;
+
+        document.getElementById('previewWidgetContent').style.borderRadius = bordas;
+        document.getElementById('previewWidgetContent').style.background   = corFundo;
         document.getElementById('previewWidgetContent').innerHTML =
-            '<div class="modal-header" style="background:' + cfg.cor_primaria + '; color:#fff;">'
-            + '<h5 class="modal-title" style="color:#fff">' + cfg.titulo + '</h5>'
-            + '<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>'
-            + '</div>'
-            + '<div class="modal-body">'
-            + (cfg.descricao ? '<p class="text-muted">' + cfg.descricao + '</p>' : '')
-            + fields
-            + '<button class="btn w-100 mt-2" style="background:' + cfg.cor_primaria + '; color:#fff">' + cfg.botao_texto + '</button>'
+            banner
+            + '<div style="padding:24px">'
+            +   '<button type="button" class="btn-close float-end" data-bs-dismiss="modal" style="margin:-4px -4px 8px 8px"></button>'
+            +   '<h5 style="color:' + cfg.cor_primaria + ';margin-bottom:8px">' + cfg.titulo + '</h5>'
+            +   (cfg.descricao ? '<p style="color:' + corTexto + ';font-size:14px;margin-bottom:16px">' + cfg.descricao + '</p>' : '')
+            +   fields
+            +   '<button class="btn w-100 mt-1" style="background:' + cfg.cor_primaria + ';color:#fff;border-radius:' + Math.max(4, (cfg.bordas||12) - 4) + 'px">'
+            +     cfg.botao_texto
+            +   '</button>'
+            +   '<div class="mt-3 text-center"><small class="text-muted">📍 ' + (cfg.posicao||'centro') + ' &nbsp;|&nbsp; ⚡ ' + (cfg.gatilho||'imediato') + (cfg.gatilho_valor ? ' (' + cfg.gatilho_valor + ')' : '') + '</small></div>'
             + '</div>';
 
         new bootstrap.Modal(document.getElementById('modalPreviewWidget')).show();
