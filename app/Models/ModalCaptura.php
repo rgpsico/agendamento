@@ -22,6 +22,18 @@ class ModalCaptura extends Model
         'campanha_id',
         'origem_lead',
         'ativo',
+        // Estilo
+        'tamanho',
+        'cor_texto',
+        'cor_fundo',
+        'bordas',
+        'imagem_url',
+        'posicao',
+        // Gatilho
+        'gatilho',
+        'gatilho_valor',
+        // Comportamento
+        'mostrar_uma_vez',
     ];
 
     protected $casts = [
@@ -29,6 +41,8 @@ class ModalCaptura extends Model
         'campo_email'     => 'boolean',
         'campo_telefone'  => 'boolean',
         'ativo'           => 'boolean',
+        'mostrar_uma_vez' => 'boolean',
+        'bordas'          => 'integer',
     ];
 
     protected static function booted(): void

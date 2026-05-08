@@ -64,11 +64,24 @@ class ModalCapturaController extends Controller
             'campanha_id'      => 'nullable|integer',
             'origem_lead'      => 'nullable|string|max:50',
             'ativo'            => 'boolean',
+            // Estilo
+            'tamanho'          => 'required|in:pequeno,medio,grande',
+            'cor_texto'        => 'required|string|size:7',
+            'cor_fundo'        => 'required|string|size:7',
+            'bordas'           => 'required|integer|min:0|max:24',
+            'imagem_url'       => 'nullable|url|max:500',
+            'posicao'          => 'required|in:centro,direito,esquerdo',
+            // Gatilho
+            'gatilho'          => 'required|in:imediato,delay,scroll,elemento,saida',
+            'gatilho_valor'    => 'nullable|string|max:255',
+            // Comportamento
+            'mostrar_uma_vez'  => 'boolean',
         ]) + [
-            'campo_nome'     => false,
-            'campo_email'    => false,
-            'campo_telefone' => false,
-            'ativo'          => false,
+            'campo_nome'      => false,
+            'campo_email'     => false,
+            'campo_telefone'  => false,
+            'ativo'           => false,
+            'mostrar_uma_vez' => false,
         ];
     }
 
