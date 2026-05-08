@@ -35,8 +35,10 @@ class WidgetController extends Controller
   // Injeta estilos
   var style = document.createElement('style');
   style.textContent = [
-    '#pg-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:99999;display:flex;align-items:center;justify-content:center}',
-    '#pg-modal{background:#fff;border-radius:12px;padding:32px;max-width:420px;width:90%;position:relative;box-shadow:0 8px 40px rgba(0,0,0,.18);font-family:Arial,sans-serif}',
+    '#pg-overlay{position:fixed;inset:0;background:rgba(0,0,0,0);z-index:99999;display:flex;align-items:center;justify-content:center;transition:background .3s ease}',
+    '#pg-overlay.pg-show{background:rgba(0,0,0,.55)}',
+    '#pg-modal{background:#fff;border-radius:12px;padding:32px;max-width:420px;width:90%;position:relative;box-shadow:0 8px 40px rgba(0,0,0,.18);font-family:Arial,sans-serif;opacity:0;transform:translateY(24px);transition:opacity .3s ease,transform .3s ease}',
+    '#pg-overlay.pg-show #pg-modal{opacity:1;transform:translateY(0)}',
     '#pg-modal h2{margin:0 0 8px;font-size:20px;color:' + cfg.corPrimaria + '}',
     '#pg-modal p{margin:0 0 20px;color:#555;font-size:14px;line-height:1.6}',
     '#pg-modal input{width:100%;padding:10px 14px;margin-bottom:12px;border:1px solid #ddd;border-radius:6px;font-size:14px;box-sizing:border-box}',
@@ -68,12 +70,23 @@ class WidgetController extends Controller
   wrapper.innerHTML = html;
   document.body.appendChild(wrapper);
 
+  // Fade in
+  requestAnimationFrame(function() {
+    requestAnimationFrame(function() {
+      document.getElementById('pg-overlay').classList.add('pg-show');
+    });
+  });
+
+  function fechar() {
+    var overlay = document.getElementById('pg-overlay');
+    overlay.classList.remove('pg-show');
+    setTimeout(function() { wrapper.remove(); }, 300);
+  }
+
   // Fechar
-  document.getElementById('pg-close').onclick = function() {
-    wrapper.remove();
-  };
+  document.getElementById('pg-close').onclick = fechar;
   document.getElementById('pg-overlay').onclick = function(e) {
-    if (e.target.id === 'pg-overlay') wrapper.remove();
+    if (e.target.id === 'pg-overlay') fechar();
   };
 
   // Submit
@@ -108,7 +121,7 @@ class WidgetController extends Controller
         btn.textContent = cfg.botaoTexto;
       } else {
         document.getElementById('pg-modal').innerHTML = '<div id="pg-success">✅ ' + cfg.mensagemSucesso + '</div>';
-        setTimeout(function() { wrapper.remove(); }, 4000);
+        setTimeout(function() { fechar(); }, 4000);
       }
     })
     .catch(function() {
