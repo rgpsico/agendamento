@@ -11,10 +11,13 @@ use Illuminate\Support\Facades\Auth;
 
 class LeadController extends Controller
 {
+    // ─── Listagem ────────────────────────────────────────────────────────────
+
     public function index(Request $request)
     {
-        $query = Lead::with('responsavel');
-        $perPage = $this->perPage($request);
+        $tenantId = $this->tenantId();
+        $query    = Lead::forTenant($tenantId)->with('responsavel');
+        $perPage  = $this->perPage($request);
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
@@ -72,23 +75,21 @@ class LeadController extends Controller
 
         $leads = $query->paginate($perPage)->withQueryString();
 
-        $tenantId = Auth::user()?->empresa?->id;
-        $emailTemplates = $tenantId
-            ? EmailTemplate::where('tenant_id', $tenantId)->where('ativo', true)->orderBy('nome')->get()
-            : collect();
+        $emailTemplates = EmailTemplate::where('tenant_id', $tenantId)
+            ->where('ativo', true)->orderBy('nome')->get();
 
         return view('admin.leads.index', [
             'leads'          => $leads,
             'statusList'     => Lead::$statusList,
             'origens'        => Lead::$origens,
-            'bairros'        => Lead::whereNotNull('bairro')
-                ->where('bairro', '<>', '')
-                ->distinct()
-                ->orderBy('bairro')
-                ->pluck('bairro'),
+            'bairros'        => Lead::forTenant($tenantId)
+                ->whereNotNull('bairro')->where('bairro', '<>', '')
+                ->distinct()->orderBy('bairro')->pluck('bairro'),
             'emailTemplates' => $emailTemplates,
         ]);
     }
+
+    // ─── Criar ───────────────────────────────────────────────────────────────
 
     public function create()
     {
@@ -114,13 +115,18 @@ class LeadController extends Controller
             'responsavel_id' => 'nullable|exists:usuarios,id',
         ]);
 
+        $validated['tenant_id'] = $this->tenantId();
+
         Lead::create($validated);
 
         return redirect()->route('admin.leads.index')->with('success', 'Lead cadastrado com sucesso!');
     }
 
+    // ─── Ver / Editar / Atualizar / Excluir ──────────────────────────────────
+
     public function show(Lead $lead)
     {
+        $this->autorizarLead($lead);
         $lead->load('responsavel');
 
         return view('admin.leads.show', compact('lead'));
@@ -128,6 +134,8 @@ class LeadController extends Controller
 
     public function edit(Lead $lead)
     {
+        $this->autorizarLead($lead);
+
         return view('admin.leads.edit', [
             'lead'         => $lead,
             'statusList'   => Lead::$statusList,
@@ -138,6 +146,8 @@ class LeadController extends Controller
 
     public function update(Request $request, Lead $lead)
     {
+        $this->autorizarLead($lead);
+
         $validated = $request->validate([
             'nome'           => 'required|string|max:255',
             'email'          => 'nullable|email|max:255',
@@ -156,35 +166,19 @@ class LeadController extends Controller
         return redirect()->route('admin.leads.index')->with('success', 'Lead atualizado com sucesso!');
     }
 
-    public function enviarEmails(Request $request)
+    public function destroy(Lead $lead)
     {
-        $request->validate([
-            'ids'   => 'required|array|min:1',
-            'ids.*' => 'exists:leads,id',
-        ]);
+        $this->autorizarLead($lead);
+        $lead->delete();
 
-        $leads = Lead::whereIn('id', $request->ids)
-                     ->whereNotNull('email')
-                     ->get();
-
-        $despachados = 0;
-        $semEmail    = count($request->ids) - $leads->count();
-
-        foreach ($leads as $lead) {
-            EnviarEmailLeadJob::dispatch($lead)->onQueue('default');
-            $despachados++;
-        }
-
-        $msg = "{$despachados} e-mail(s) adicionado(s) à fila para envio.";
-        if ($semEmail > 0) {
-            $msg .= " {$semEmail} lead(s) ignorado(s) por não ter e-mail cadastrado.";
-        }
-
-        return redirect()->back()->with('success', $msg);
+        return redirect()->route('admin.leads.index')->with('success', 'Lead excluído com sucesso!');
     }
+
+    // ─── Ações ───────────────────────────────────────────────────────────────
 
     public function whatsapp(Lead $lead)
     {
+        $this->autorizarLead($lead);
         abort_unless($lead->whatsapp_url, 404);
 
         $lead->update(['whatsapp_enviado_em' => now()]);
@@ -194,6 +188,8 @@ class LeadController extends Controller
 
     public function resetar(Lead $lead)
     {
+        $this->autorizarLead($lead);
+
         $lead->update([
             'status'              => 'novo',
             'email_enviado_em'    => null,
@@ -208,27 +204,49 @@ class LeadController extends Controller
                          ->with('success', 'Lead resetado ao início do funil.');
     }
 
-    public function destroy(Lead $lead)
+    public function enviarEmails(Request $request)
     {
-        $lead->delete();
+        $tenantId = $this->tenantId();
 
-        return redirect()->route('admin.leads.index')->with('success', 'Lead excluído com sucesso!');
+        $request->validate([
+            'ids'   => 'required|array|min:1',
+            'ids.*' => 'integer',
+        ]);
+
+        $leads = Lead::forTenant($tenantId)
+                     ->whereIn('id', $request->ids)
+                     ->whereNotNull('email')
+                     ->get();
+
+        $despachados = 0;
+
+        foreach ($leads as $lead) {
+            EnviarEmailLeadJob::dispatch($lead)->onQueue('default');
+            $despachados++;
+        }
+
+        $ignorados = count($request->ids) - $despachados;
+        $msg = "{$despachados} e-mail(s) adicionado(s) à fila.";
+        if ($ignorados > 0) {
+            $msg .= " {$ignorados} lead(s) ignorado(s) (sem e-mail ou de outra empresa).";
+        }
+
+        return redirect()->back()->with('success', $msg);
     }
+
+    // ─── Importação CSV ──────────────────────────────────────────────────────
 
     public function import(Request $request)
     {
-        $request->validate([
-            'arquivo' => 'required|file|mimes:csv,txt|max:2048',
-        ]);
+        $request->validate(['arquivo' => 'required|file|mimes:csv,txt|max:2048']);
 
-        $file    = $request->file('arquivo');
-        $handle  = fopen($file->getRealPath(), 'r');
-        $header  = null;
+        $tenantId = $this->tenantId();
+        $handle   = fopen($request->file('arquivo')->getRealPath(), 'r');
+        $header   = null;
         $imported = 0;
-        $errors  = [];
+        $errors   = [];
 
         while (($row = fgetcsv($handle, 1000, ',')) !== false) {
-            // Pula linha de cabeçalho
             if ($header === null) {
                 $header = array_map('strtolower', array_map('trim', $row));
                 continue;
@@ -237,22 +255,20 @@ class LeadController extends Controller
             if (count($row) < 2) continue;
 
             $data = array_combine($header, array_map('trim', $row));
-
             $nome = $data['nome'] ?? $data['nome do negocio'] ?? $data['negocio'] ?? null;
 
-            if (empty($nome)) {
-                $errors[] = "Linha ignorada: nome vazio.";
-                continue;
-            }
+            if (empty($nome)) { $errors[] = "Linha ignorada: nome vazio."; continue; }
 
             Lead::create([
+                'tenant_id' => $tenantId,
                 'nome'      => $nome,
-                'telefone'  => $data['telefone'] ?? $data['whatsapp'] ?? $data['whatsapp / telefone'] ?? null,
+                'telefone'  => $data['telefone'] ?? $data['whatsapp'] ?? null,
                 'email'     => $data['email'] ?? $data['e-mail'] ?? null,
                 'bairro'    => $data['bairro'] ?? null,
                 'interesse' => $data['interesse'] ?? $data['tipo'] ?? null,
                 'origem'    => $data['origem'] ?? 'manual',
                 'status'    => 'novo',
+                'pipeline_status' => 'novo_lead',
             ]);
 
             $imported++;
@@ -260,20 +276,15 @@ class LeadController extends Controller
 
         fclose($handle);
 
-        $msg = "{$imported} lead(s) importado(s) com sucesso.";
-        if (count($errors)) {
-            $msg .= ' ' . count($errors) . ' linha(s) ignorada(s).';
-        }
-
-        return redirect()->route('admin.leads.index')->with('success', $msg);
+        return redirect()->route('admin.leads.index')
+            ->with('success', "{$imported} lead(s) importado(s). " . count($errors) . " ignorado(s).");
     }
 
     public function importText(Request $request)
     {
-        $request->validate([
-            'conteudo' => 'required|string',
-        ]);
+        $request->validate(['conteudo' => 'required|string']);
 
+        $tenantId = $this->tenantId();
         $lines    = explode("\n", trim($request->conteudo));
         $header   = null;
         $imported = 0;
@@ -295,19 +306,12 @@ class LeadController extends Controller
             }
 
             $data = array_combine($header, array_map('trim', $row));
+            $nome = $data['nome'] ?? $data['nome_negocio'] ?? $data['nome do negocio'] ?? null;
 
-            $nome = $data['nome']
-                ?? $data['nome_negocio']
-                ?? $data['nome do negocio']
-                ?? $data['negocio']
-                ?? null;
-
-            if (empty($nome)) {
-                $errors[] = "Linha ignorada: nome vazio.";
-                continue;
-            }
+            if (empty($nome)) { $errors[] = "Linha ignorada: nome vazio."; continue; }
 
             Lead::create([
+                'tenant_id' => $tenantId,
                 'nome'      => $nome,
                 'telefone'  => $data['telefone'] ?? $data['whatsapp'] ?? null,
                 'email'     => $data['email'] ?? $data['e-mail'] ?? null,
@@ -315,17 +319,14 @@ class LeadController extends Controller
                 'interesse' => $data['interesse'] ?? $data['tipo'] ?? null,
                 'origem'    => $data['origem'] ?? 'manual',
                 'status'    => 'novo',
+                'pipeline_status' => 'novo_lead',
             ]);
 
             $imported++;
         }
 
-        $msg = "{$imported} lead(s) importado(s) com sucesso.";
-        if (count($errors)) {
-            $msg .= ' ' . count($errors) . ' linha(s) ignorada(s).';
-        }
-
-        return redirect()->route('admin.leads.index')->with('success', $msg);
+        return redirect()->route('admin.leads.index')
+            ->with('success', "{$imported} lead(s) importado(s). " . count($errors) . " ignorado(s).");
     }
 
     public function templateCsv()
@@ -337,7 +338,7 @@ class LeadController extends Controller
 
         $callback = function () {
             $handle = fopen('php://output', 'w');
-            fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF)); // BOM UTF-8
+            fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF));
             fputcsv($handle, ['nome', 'telefone', 'email', 'bairro', 'interesse', 'origem']);
             fputcsv($handle, ['Peninsula Pilates Studio', '(21) 99835-6116', 'pilatespeninsula@gmail.com', 'Barra da Tijuca', 'Pilates', 'manual']);
             fclose($handle);
@@ -346,10 +347,23 @@ class LeadController extends Controller
         return response()->stream($callback, 200, $headers);
     }
 
+    // ─── Helpers ─────────────────────────────────────────────────────────────
+
+    private function tenantId(): int
+    {
+        abort_unless(Auth::user()?->empresa, 403, 'Sua conta não está associada a nenhuma empresa.');
+        return (int) Auth::user()->empresa->id;
+    }
+
+    private function autorizarLead(Lead $lead): void
+    {
+        abort_unless($lead->tenant_id === $this->tenantId(), 403, 'Acesso negado.');
+    }
+
     private function perPage(Request $request): int
     {
         if ($request->per_page === 'all') {
-            return max(Lead::count(), 1);
+            return max(Lead::forTenant($this->tenantId())->count(), 1);
         }
 
         return in_array((int) $request->per_page, [20, 100, 200], true)
