@@ -13,22 +13,28 @@ class MetricaWidgetController extends Controller
      * POST /api/track/{token}/evento
      * Recebe eventos de rastreamento do script JS externo.
      */
+    /** Responde ao preflight OPTIONS sem autenticação */
+    public function preflight()
+    {
+        return $this->corsResponse(response()->noContent());
+    }
+
     public function evento(Request $request, string $token)
     {
         $site = WidgetSite::where('token', $token)->where('ativo', true)->first();
 
         if (! $site) {
-            return response()->json(['ok' => false], 200); // silencioso
+            return $this->corsResponse(response()->json(['ok' => false], 200));
         }
 
         $request->validate([
-            'tipo'       => 'required|string|max:30',
-            'session_id' => 'required|string|max:48',
-            'pagina'     => 'nullable|string|max:500',
-            'referrer'   => 'nullable|string|max:500',
-            'dispositivo'=> 'nullable|string|max:10',
-            'duracao'    => 'nullable|integer|min:0|max:86400',
-            'meta'       => 'nullable|string|max:255',
+            'tipo'        => 'required|string|max:30',
+            'session_id'  => 'required|string|max:48',
+            'pagina'      => 'nullable|string|max:500',
+            'referrer'    => 'nullable|string|max:500',
+            'dispositivo' => 'nullable|string|max:10',
+            'duracao'     => 'nullable|integer|min:0|max:86400',
+            'meta'        => 'nullable|string|max:255',
         ]);
 
         WidgetEvento::create([
@@ -42,6 +48,14 @@ class MetricaWidgetController extends Controller
             'meta'        => $request->meta,
         ]);
 
-        return response()->json(['ok' => true], 200);
+        return $this->corsResponse(response()->json(['ok' => true], 200));
+    }
+
+    private function corsResponse($response)
+    {
+        return $response
+            ->header('Access-Control-Allow-Origin', '*')
+            ->header('Access-Control-Allow-Methods', 'POST, OPTIONS')
+            ->header('Access-Control-Allow-Headers', 'Content-Type, Accept');
     }
 }

@@ -167,9 +167,10 @@ Route::prefix('api/bot')->middleware('api')->group(function () {
     Route::post('{token}/chat', [\App\Http\Controllers\Api\BotWidgetController::class, 'chat'])->name('bot.widget.chat');
 });
 
-// API pública de rastreamento — sem auth
+// API pública de rastreamento — sem auth, CORS explícito
 Route::prefix('api/track')->middleware('api')->group(function () {
-    Route::post('{token}/evento', [\App\Http\Controllers\Api\MetricaWidgetController::class, 'evento'])->name('track.evento');
+    Route::options('{token}/evento', [\App\Http\Controllers\Api\MetricaWidgetController::class, 'preflight']);
+    Route::post('{token}/evento',    [\App\Http\Controllers\Api\MetricaWidgetController::class, 'evento'])->name('track.evento');
 });
 
 
