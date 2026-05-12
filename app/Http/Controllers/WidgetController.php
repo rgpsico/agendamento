@@ -230,7 +230,7 @@ JS;
 
         return response($js, 200)
             ->header('Content-Type', 'application/javascript')
-            ->header('Cache-Control', 'public, max-age=300');
+            ->header('Cache-Control', 'no-cache, must-revalidate');
     }
 
     // ─── Bot Chat Widget ──────────────────────────────────────────────────────
@@ -558,6 +558,6 @@ JS;
 
         return response($js, 200)
             ->header('Content-Type', 'application/javascript')
-            ->header('Cache-Control', 'public, max-age=300');
+            ->header('Cache-Control', 'no-cache, must-revalidate');
     }
 }
