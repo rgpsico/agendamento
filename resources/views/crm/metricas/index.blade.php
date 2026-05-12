@@ -202,13 +202,14 @@
         <div class="card-body p-0">
             <table class="table table-sm mb-0">
                 <thead class="table-light"><tr>
-                    <th>Nome</th><th>Domínio</th><th>Status</th><th>Snippet</th><th></th>
+                    <th>Nome</th><th>Domínio</th><th>Seletor WA</th><th>Status</th><th>Snippet</th><th></th>
                 </tr></thead>
                 <tbody>
                 @foreach($sites as $s)
                 <tr>
                     <td>{{ $s->nome }}</td>
                     <td class="text-muted">{{ $s->dominio ?: '—' }}</td>
+                    <td><code class="text-muted small">{{ $s->whatsapp_selector ?: '—' }}</code></td>
                     <td>
                         @if($s->ativo) <span class="badge bg-success">Ativo</span>
                         @else          <span class="badge bg-secondary">Inativo</span>
@@ -260,6 +261,15 @@
                         <label class="form-label">Domínio <span class="text-muted">(informativo)</span></label>
                         <input type="text" name="dominio" class="form-control"
                             placeholder="surfclub.com.br">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Seletor CSS do botão WhatsApp <span class="text-muted">(opcional)</span></label>
+                        <input type="text" name="whatsapp_selector" class="form-control font-monospace"
+                            placeholder="Ex: #ht-ctc-chat  ou  .ht-ctc-chat  ou  .ctc-analytics">
+                        <div class="form-text">
+                            Inspecione o botão do WhatsApp no site (F12 → clique no elemento) e cole aqui o <code>#id</code> ou <code>.classe</code>.
+                            Assim capturamos cliques em botões que <strong>não</strong> usam link <code>&lt;a href="wa.me/..."&gt;</code>.
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">

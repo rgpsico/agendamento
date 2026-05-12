@@ -34,8 +34,9 @@ class MetricaController extends Controller
     public function storeSite(Request $request)
     {
         $validated = $request->validate([
-            'nome'    => 'required|string|max:255',
-            'dominio' => 'nullable|string|max:255',
+            'nome'                => 'required|string|max:255',
+            'dominio'             => 'nullable|string|max:255',
+            'whatsapp_selector'   => 'nullable|string|max:255',
         ]);
 
         $validated['tenant_id'] = $this->tenantId();
