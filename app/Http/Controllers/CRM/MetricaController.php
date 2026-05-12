@@ -46,6 +46,24 @@ class MetricaController extends Controller
         return redirect()->route('crm.metricas.index')->with('success', 'Site criado com sucesso!');
     }
 
+    public function updateSite(Request $request, WidgetSite $widgetSite)
+    {
+        abort_unless($widgetSite->tenant_id === $this->tenantId(), 403);
+
+        $validated = $request->validate([
+            'nome'              => 'required|string|max:255',
+            'dominio'           => 'nullable|string|max:255',
+            'whatsapp_selector' => 'nullable|string|max:255',
+            'ativo'             => 'boolean',
+        ]);
+
+        $validated['ativo'] = $request->boolean('ativo');
+        $widgetSite->update($validated);
+
+        return redirect()->route('crm.metricas.index', ['site_id' => $widgetSite->id])
+            ->with('success', 'Site atualizado com sucesso!');
+    }
+
     public function destroySite(WidgetSite $widgetSite)
     {
         abort_unless($widgetSite->tenant_id === $this->tenantId(), 403);
