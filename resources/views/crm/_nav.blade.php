@@ -7,4 +7,5 @@
     <a class="btn btn-sm {{ request()->routeIs('crm.relatorios.*') ? 'btn-primary' : 'btn-outline-primary' }}" href="{{ route('crm.relatorios.index') }}">Relatorios</a>
     <a class="btn btn-sm {{ request()->routeIs('crm.email-templates.*') ? 'btn-primary' : 'btn-outline-primary' }}" href="{{ route('crm.email-templates.index') }}">Templates de E-mail</a>
     <a class="btn btn-sm {{ request()->routeIs('crm.modal-capturas.*') ? 'btn-primary' : 'btn-outline-primary' }}" href="{{ route('crm.modal-capturas.index') }}">Widgets</a>
+    <a class="btn btn-sm {{ request()->routeIs('crm.metricas.*') ? 'btn-primary' : 'btn-outline-primary' }}" href="{{ route('crm.metricas.index') }}">📊 Métricas</a>
 </div>
