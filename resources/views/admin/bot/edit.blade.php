@@ -186,6 +186,83 @@
                             </div>
                         </div>
 
+                        <!-- Card Widget Externo -->
+                        <div class="card shadow-xl border-0 mb-4" data-aos="fade-up" data-aos-delay="300">
+                            <div class="card-header text-white position-relative overflow-hidden" style="background:linear-gradient(135deg,#00b894 0%,#00cec9 100%)">
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-container me-3">
+                                        <i class="fas fa-comments" style="font-size:1.5rem;animation:iconPulse 2s ease-in-out infinite"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="card-title mb-0 fw-bold">Widget de Chat — Embed em Sites Externos</h5>
+                                        <small class="opacity-75">Cole o snippet no WordPress (antes de &lt;/body&gt;) para adicionar o chat ao site</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body p-4">
+
+                                @if($bot->widget_token)
+                                <div class="mb-4 p-3 border rounded-3 bg-light">
+                                    <label class="form-label text-muted small fw-semibold mb-1">Código do widget</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control font-monospace"
+                                            id="bot-widget-snippet"
+                                            value='<script src="{{ $bot->widgetUrl() }}" defer></script>'
+                                            readonly>
+                                        <button class="btn btn-outline-secondary" type="button"
+                                            onclick="copiarSnippetBot(this)">
+                                            <i class="fas fa-copy me-1"></i> Copiar
+                                        </button>
+                                    </div>
+                                    <div class="form-text">Cole este código no seu site WordPress, Wix ou qualquer página HTML, antes da tag <code>&lt;/body&gt;</code>.</div>
+                                </div>
+                                @endif
+
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="form-check form-switch mb-3">
+                                            <input type="checkbox" id="widget_ativo" name="widget_ativo" class="form-check-input"
+                                                value="1" {{ old('widget_ativo', $bot->widget_ativo) ? 'checked' : '' }}>
+                                            <label class="form-check-label fw-semibold ms-2" for="widget_ativo">
+                                                Widget ativo (visível nos sites)
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">Nome exibido no chat</label>
+                                        <input type="text" name="widget_nome_bot" class="form-control"
+                                            value="{{ old('widget_nome_bot', $bot->widget_nome_bot ?? $bot->nome) }}"
+                                            placeholder="Ex: Assistente Surf Club">
+                                    </div>
+                                    <div class="col-md-8">
+                                        <label class="form-label fw-semibold">Mensagem de boas-vindas</label>
+                                        <input type="text" name="widget_saudacao" class="form-control"
+                                            value="{{ old('widget_saudacao', $bot->widget_saudacao ?? 'Olá! Como posso ajudar?') }}"
+                                            placeholder="Olá! Como posso ajudar?">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label fw-semibold">Cor do chat</label>
+                                        <input type="color" name="widget_cor" class="form-control form-control-color w-100"
+                                            value="{{ old('widget_cor', $bot->widget_cor ?? '#2a5298') }}">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label fw-semibold">Posição</label>
+                                        <select name="widget_posicao" class="form-select">
+                                            <option value="direito"  @selected(old('widget_posicao', $bot->widget_posicao ?? 'direito') === 'direito')>Direito</option>
+                                            <option value="esquerdo" @selected(old('widget_posicao', $bot->widget_posicao ?? 'direito') === 'esquerdo')>Esquerdo</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label fw-semibold">URL do avatar / logo <span class="text-muted">(opcional)</span></label>
+                                        <input type="url" name="widget_avatar_url" class="form-control"
+                                            value="{{ old('widget_avatar_url', $bot->widget_avatar_url) }}"
+                                            placeholder="https://seusite.com.br/logo.png">
+                                        <div class="form-text">Imagem redonda exibida no header do chat e no bubble (recomendado: 64×64px).</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Card Botões de Ação -->
                         <div class="card shadow-xl border-0 action-card" data-aos="fade-up" data-aos-delay="400">
                             <div class="card-body p-4">
@@ -1119,6 +1196,15 @@
                 ease: 'power2.out',
                 delay: 0.2
             });
+
+            // Copiar snippet do widget
+            window.copiarSnippetBot = function(btn) {
+                var el = document.getElementById('bot-widget-snippet');
+                navigator.clipboard.writeText(el.value).then(function() {
+                    btn.innerHTML = '<i class="fas fa-check me-1"></i> Copiado!';
+                    setTimeout(function() { btn.innerHTML = '<i class="fas fa-copy me-1"></i> Copiar'; }, 2000);
+                });
+            };
 
             // Efeito de typing no placeholder (apenas visual)
             function createTypingEffect(element, text, speed = 50) {

@@ -147,11 +147,17 @@ Route::prefix('crm')->middleware(['auth', 'tenant'])->name('crm.')->group(functi
 });
 
 // Widget JS — público, sem auth
-Route::get('/widget/{token}.js', [WidgetController::class, 'js'])->name('widget.js');
+Route::get('/widget/{token}.js',         [WidgetController::class, 'js'])->name('widget.js');
+Route::get('/widget/bot/{token}.js',     [WidgetController::class, 'botJs'])->name('widget.bot.js');
 
 // API pública do widget — sem auth, CORS liberado
 Route::prefix('api/widget')->middleware('api')->group(function () {
     Route::post('{token}/lead', [ModalLeadController::class, 'submit'])->name('widget.lead.submit');
+});
+
+// API pública do bot widget — sem auth
+Route::prefix('api/bot')->middleware('api')->group(function () {
+    Route::post('{token}/chat', [\App\Http\Controllers\Api\BotWidgetController::class, 'chat'])->name('bot.widget.chat');
 });
 
 
