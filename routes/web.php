@@ -144,11 +144,17 @@ Route::prefix('crm')->middleware(['auth', 'tenant'])->name('crm.')->group(functi
     Route::post('leads/enviar-email-massa', [CRMEmailEnvioController::class, 'enviarMassa'])->name('leads.enviar-email-massa');
 
     Route::resource('modal-capturas', ModalCapturaController::class)->only(['index', 'store', 'update', 'destroy']);
+
+    // Métricas / rastreamento
+    Route::get('metricas',           [\App\Http\Controllers\CRM\MetricaController::class, 'index'])->name('metricas.index');
+    Route::post('metricas/sites',    [\App\Http\Controllers\CRM\MetricaController::class, 'storeSite'])->name('metricas.sites.store');
+    Route::delete('metricas/sites/{widgetSite}', [\App\Http\Controllers\CRM\MetricaController::class, 'destroySite'])->name('metricas.sites.destroy');
 });
 
 // Widget JS — público, sem auth
 Route::get('/widget/{token}.js',         [WidgetController::class, 'js'])->name('widget.js');
 Route::get('/widget/bot/{token}.js',     [WidgetController::class, 'botJs'])->name('widget.bot.js');
+Route::get('/widget/track/{token}.js',   [WidgetController::class, 'trackJs'])->name('widget.track.js');
 
 // API pública do widget — sem auth, CORS liberado
 Route::prefix('api/widget')->middleware('api')->group(function () {
@@ -158,6 +164,11 @@ Route::prefix('api/widget')->middleware('api')->group(function () {
 // API pública do bot widget — sem auth
 Route::prefix('api/bot')->middleware('api')->group(function () {
     Route::post('{token}/chat', [\App\Http\Controllers\Api\BotWidgetController::class, 'chat'])->name('bot.widget.chat');
+});
+
+// API pública de rastreamento — sem auth
+Route::prefix('api/track')->middleware('api')->group(function () {
+    Route::post('{token}/evento', [\App\Http\Controllers\Api\MetricaWidgetController::class, 'evento'])->name('track.evento');
 });
 
 

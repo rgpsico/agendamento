@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Bot;
 use App\Models\ModalCaptura;
+use App\Models\WidgetSite;
 use Illuminate\Http\Response;
 
 class WidgetController extends Controller
@@ -427,5 +428,105 @@ JS;
         return response($js, 200)
             ->header('Content-Type', 'application/javascript')
             ->header('Cache-Control', 'public, max-age=60');
+    }
+
+    // ─── Tracking Script ──────────────────────────────────────────────────────
+
+    public function trackJs(string $token): Response
+    {
+        $site = WidgetSite::where('token', $token)->where('ativo', true)->first();
+
+        if (! $site) {
+            return response('/* tracker not found */', 200)
+                ->header('Content-Type', 'application/javascript');
+        }
+
+        $apiUrl = url('/api/track/' . $token . '/evento');
+
+        $js = <<<JS
+(function() {
+  var API = '{$apiUrl}';
+
+  // ── Session ID (persiste na aba, não entre abas) ───────────────────────────
+  var sid = sessionStorage.getItem('_pgSid');
+  if (!sid) {
+    sid = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+    sessionStorage.setItem('_pgSid', sid);
+  }
+
+  // ── Detecta dispositivo ───────────────────────────────────────────────────
+  var ua  = navigator.userAgent;
+  var dev = /tablet|ipad|playbook|silk/i.test(ua) ? 'tablet'
+          : /mobile|android|iphone|ipod|blackberry|opera mini|iemobile/i.test(ua) ? 'mobile'
+          : 'desktop';
+
+  // ── Envia evento para a API ───────────────────────────────────────────────
+  function enviar(tipo, extra) {
+    var payload = Object.assign({
+      session_id:  sid,
+      tipo:        tipo,
+      pagina:      location.href.slice(0, 500),
+      referrer:    (document.referrer || '').slice(0, 500),
+      dispositivo: dev,
+    }, extra || {});
+
+    // Usa sendBeacon quando disponível (não bloqueia o unload)
+    var blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon(API, blob);
+    } else {
+      fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), keepalive: true }).catch(function(){});
+    }
+  }
+
+  // ── Visita ────────────────────────────────────────────────────────────────
+  // Evita contar a mesma página mais de uma vez por aba
+  var pageKey = '_pgVisit_' + location.pathname;
+  if (!sessionStorage.getItem(pageKey)) {
+    sessionStorage.setItem(pageKey, '1');
+    enviar('visita');
+  }
+
+  // ── Tempo na página ───────────────────────────────────────────────────────
+  var inicio = Date.now();
+  var tempoEnviado = false;
+
+  function enviarTempo() {
+    if (tempoEnviado) return;
+    tempoEnviado = true;
+    var segundos = Math.round((Date.now() - inicio) / 1000);
+    if (segundos > 1) {
+      enviar('tempo', { duracao: segundos });
+    }
+  }
+
+  document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'hidden') enviarTempo();
+  });
+  window.addEventListener('pagehide', enviarTempo);
+  window.addEventListener('beforeunload', enviarTempo);
+
+  // ── Cliques no WhatsApp ───────────────────────────────────────────────────
+  document.addEventListener('click', function(e) {
+    var el = e.target.closest('a[href]');
+    if (!el) return;
+    var href = el.getAttribute('href') || '';
+    if (/wa\.me|whatsapp\.com\/send|api\.whatsapp/i.test(href)) {
+      enviar('whatsapp', { meta: href.slice(0, 255) });
+    }
+  }, true);
+
+  // ── Cliques em telefone ───────────────────────────────────────────────────
+  document.addEventListener('click', function(e) {
+    var el = e.target.closest('a[href^="tel:"]');
+    if (el) enviar('tel', { meta: el.getAttribute('href').slice(0, 50) });
+  }, true);
+
+})();
+JS;
+
+        return response($js, 200)
+            ->header('Content-Type', 'application/javascript')
+            ->header('Cache-Control', 'public, max-age=300');
     }
 }
