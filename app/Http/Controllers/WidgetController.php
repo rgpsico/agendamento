@@ -441,7 +441,8 @@ JS;
                 ->header('Content-Type', 'application/javascript');
         }
 
-        $apiUrl = url('/api/track/' . $token . '/evento');
+        $apiUrl    = url('/api/track/' . $token . '/evento');
+        $waSelector = addslashes($site->whatsapp_selector ?? '');
 
         $js = <<<JS
 (function() {
@@ -506,7 +507,7 @@ JS;
   window.addEventListener('pagehide', enviarTempo);
   window.addEventListener('beforeunload', enviarTempo);
 
-  // ── Cliques no WhatsApp ───────────────────────────────────────────────────
+  // ── Cliques no WhatsApp (links <a href="wa.me/..."> ) ─────────────────────
   document.addEventListener('click', function(e) {
     var el = e.target.closest('a[href]');
     if (!el) return;
@@ -515,6 +516,31 @@ JS;
       enviar('whatsapp', { meta: href.slice(0, 255) });
     }
   }, true);
+
+  // ── Cliques no WhatsApp (botão/ícone customizado via seletor CSS) ──────────
+  var waSelector = '{$waSelector}';
+  if (waSelector) {
+    // Tenta vincular imediatamente e também após o DOM carregar completamente
+    function bindWaSelector() {
+      var els = document.querySelectorAll(waSelector);
+      els.forEach(function(el) {
+        if (el._pgWaBound) return;
+        el._pgWaBound = true;
+        el.addEventListener('click', function() {
+          enviar('whatsapp', { meta: waSelector });
+        }, true);
+      });
+    }
+    // Bind inicial + observer para elementos que aparecem depois (widgets lazy)
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', bindWaSelector);
+    } else {
+      bindWaSelector();
+    }
+    if (typeof MutationObserver !== 'undefined') {
+      new MutationObserver(bindWaSelector).observe(document.body, { childList: true, subtree: true });
+    }
+  }
 
   // ── Cliques em telefone ───────────────────────────────────────────────────
   document.addEventListener('click', function(e) {

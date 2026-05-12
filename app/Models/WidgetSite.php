@@ -9,7 +9,7 @@ class WidgetSite extends Model
 {
     protected $table = 'widget_sites';
 
-    protected $fillable = ['tenant_id', 'nome', 'token', 'dominio', 'ativo'];
+    protected $fillable = ['tenant_id', 'nome', 'token', 'dominio', 'whatsapp_selector', 'ativo'];
 
     protected $casts = ['ativo' => 'boolean'];
 
