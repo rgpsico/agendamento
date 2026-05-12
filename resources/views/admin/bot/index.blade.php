@@ -20,6 +20,7 @@
                                 <th>Nome</th>
                                 <th>Segmento</th>
                                 <th>Status</th>
+                                <th>Widget</th>
                                 <th>Ações</th>
                             </tr>
                         </thead>
@@ -33,6 +34,22 @@
                                         <span class="badge bg-success">Ativo</span>
                                     @else
                                         <span class="badge bg-secondary">Inativo</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    @if($bot->widget_ativo)
+                                        <span class="badge bg-success mb-1">Widget ativo</span><br>
+                                        {{-- Input oculto com o snippet --}}
+                                        <input type="text" id="snippet-bot-{{ $bot->id }}"
+                                            value='<script src="{{ $bot->widgetUrl() }}" defer></script>'
+                                            style="position:absolute;opacity:0;pointer-events:none" readonly>
+                                        <button class="btn btn-outline-secondary btn-sm"
+                                            onclick="copiarSnippetBot({{ $bot->id }}, this)"
+                                            title="Copiar código do widget">
+                                            <i class="fas fa-code me-1"></i> Copiar snippet
+                                        </button>
+                                    @else
+                                        <span class="badge bg-light text-secondary">Widget inativo</span>
                                     @endif
                                 </td>
                                 <td>
@@ -53,4 +70,18 @@
 
         </div>
     </div>
+
+    <script>
+    function copiarSnippetBot(id, btn) {
+        var el = document.getElementById('snippet-bot-' + id);
+        navigator.clipboard.writeText(el.value).then(function() {
+            btn.innerHTML = '<i class="fas fa-check me-1"></i> Copiado!';
+            btn.classList.replace('btn-outline-secondary', 'btn-success');
+            setTimeout(function() {
+                btn.innerHTML = '<i class="fas fa-code me-1"></i> Copiar snippet';
+                btn.classList.replace('btn-success', 'btn-outline-secondary');
+            }, 2500);
+        });
+    }
+    </script>
 </x-admin.layout>
