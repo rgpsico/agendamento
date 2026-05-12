@@ -462,6 +462,9 @@ JS;
           : 'desktop';
 
   // ── Envia evento para a API ───────────────────────────────────────────────
+  // Usamos fetch + keepalive:true em vez de sendBeacon porque sendBeacon sempre
+  // envia credentials:'include', o que conflita com Access-Control-Allow-Origin:*
+  // fetch + credentials:'omit' + keepalive:true = sem CORS issue + sobrevive ao unload
   function enviar(tipo, extra) {
     var payload = Object.assign({
       session_id:  sid,
@@ -471,13 +474,15 @@ JS;
       dispositivo: dev,
     }, extra || {});
 
-    // Usa sendBeacon quando disponível (não bloqueia o unload)
-    var blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
-    if (navigator.sendBeacon) {
-      navigator.sendBeacon(API, blob);
-    } else {
-      fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), keepalive: true }).catch(function(){});
-    }
+    try {
+      fetch(API, {
+        method:      'POST',
+        headers:     { 'Content-Type': 'application/json' },
+        body:        JSON.stringify(payload),
+        credentials: 'omit',      // sem cookies — cross-origin funciona com Allow-Origin:*
+        keepalive:   true,        // requisição sobrevive ao fechamento da página
+      }).catch(function(){});
+    } catch(e) {}
   }
 
   // ── Visita ────────────────────────────────────────────────────────────────
