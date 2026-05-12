@@ -221,9 +221,13 @@
                             value='<script src="{{ $s->trackUrl() }}" defer></script>'
                             style="max-width:320px">
                     </td>
-                    <td class="text-end">
+                    <td class="text-end d-flex gap-1 justify-content-end">
                         <button class="btn btn-outline-secondary btn-sm"
                             onclick="copiarSnippetId('snp-{{ $s->id }}', this)">Copiar</button>
+                        <button class="btn btn-outline-primary btn-sm"
+                            onclick="abrirEditar({{ json_encode(['id'=>$s->id,'nome'=>$s->nome,'dominio'=>$s->dominio,'whatsapp_selector'=>$s->whatsapp_selector,'ativo'=>$s->ativo]) }})">
+                            Editar
+                        </button>
                         <form method="POST" action="{{ route('crm.metricas.sites.destroy', $s) }}"
                             class="d-inline" onsubmit="return confirm('Excluir site e todos os dados?')">
                             @csrf @method('DELETE')
@@ -281,6 +285,50 @@
     </div>
 </div>
 
+{{-- ── Modal Editar Site ───────────────────────────────────────────────────── --}}
+<div class="modal fade" id="modalEditarSite" tabindex="-1">
+    <div class="modal-dialog">
+        <form method="POST" id="formEditarSite">
+            @csrf @method('PUT')
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Editar Site</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body row g-3">
+                    <div class="col-12">
+                        <label class="form-label">Nome interno <span class="text-danger">*</span></label>
+                        <input type="text" name="nome" id="edit_nome" class="form-control" required>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Domínio <span class="text-muted">(informativo)</span></label>
+                        <input type="text" name="dominio" id="edit_dominio" class="form-control"
+                            placeholder="surfclub.com.br">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Seletor CSS do botão WhatsApp <span class="text-muted">(opcional)</span></label>
+                        <input type="text" name="whatsapp_selector" id="edit_wa_selector"
+                            class="form-control font-monospace"
+                            placeholder="#ht-ctc-chat  ou  .meu-botao-wa">
+                        <div class="form-text">ID ou classe CSS do botão WhatsApp que não usa link <code>wa.me</code>.</div>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-check">
+                            <input type="checkbox" name="ativo" id="edit_ativo"
+                                class="form-check-input" value="1">
+                            <label class="form-check-label" for="edit_ativo">Site ativo</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
 @if($site && $dados)
@@ -313,6 +361,15 @@
     });
 })();
 @endif
+
+function abrirEditar(s) {
+    document.getElementById('edit_nome').value        = s.nome || '';
+    document.getElementById('edit_dominio').value     = s.dominio || '';
+    document.getElementById('edit_wa_selector').value = s.whatsapp_selector || '';
+    document.getElementById('edit_ativo').checked     = !!s.ativo;
+    document.getElementById('formEditarSite').action  = '/crm/metricas/sites/' + s.id;
+    new bootstrap.Modal(document.getElementById('modalEditarSite')).show();
+}
 
 function copiarSnippet() {
     copiarSnippetId('snippet-track', document.querySelector('[onclick="copiarSnippet()"]'));

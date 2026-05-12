@@ -146,9 +146,10 @@ Route::prefix('crm')->middleware(['auth', 'tenant'])->name('crm.')->group(functi
     Route::resource('modal-capturas', ModalCapturaController::class)->only(['index', 'store', 'update', 'destroy']);
 
     // Métricas / rastreamento
-    Route::get('metricas',           [\App\Http\Controllers\CRM\MetricaController::class, 'index'])->name('metricas.index');
-    Route::post('metricas/sites',    [\App\Http\Controllers\CRM\MetricaController::class, 'storeSite'])->name('metricas.sites.store');
-    Route::delete('metricas/sites/{widgetSite}', [\App\Http\Controllers\CRM\MetricaController::class, 'destroySite'])->name('metricas.sites.destroy');
+    Route::get('metricas',                        [\App\Http\Controllers\CRM\MetricaController::class, 'index'])->name('metricas.index');
+    Route::post('metricas/sites',                 [\App\Http\Controllers\CRM\MetricaController::class, 'storeSite'])->name('metricas.sites.store');
+    Route::put('metricas/sites/{widgetSite}',     [\App\Http\Controllers\CRM\MetricaController::class, 'updateSite'])->name('metricas.sites.update');
+    Route::delete('metricas/sites/{widgetSite}',  [\App\Http\Controllers\CRM\MetricaController::class, 'destroySite'])->name('metricas.sites.destroy');
 });
 
 // Widget JS — público, sem auth
