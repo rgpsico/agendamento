@@ -167,8 +167,17 @@ class BotController extends Controller
             'tom',
             'token_deepseek',
             'status',
-            'prompt'
-        ]));
+            'prompt',
+            // Widget
+            'widget_nome_bot',
+            'widget_saudacao',
+            'widget_cor',
+            'widget_posicao',
+            'widget_avatar_url',
+        ]) + [
+            // checkboxes: se não vieram no request = false
+            'widget_ativo' => $request->boolean('widget_ativo'),
+        ]);
 
         EventLogger::log('bot_updated', [
             'bot_id' => $bot->id,
