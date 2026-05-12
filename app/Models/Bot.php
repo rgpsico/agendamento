@@ -44,6 +44,12 @@ class Bot extends Model
 
     public function widgetUrl(): string
     {
+        // Gera e persiste o token se ainda não existir (bots criados antes da migration)
+        if (empty($this->widget_token)) {
+            $this->widget_token = \Illuminate\Support\Str::random(40);
+            $this->saveQuietly();
+        }
+
         return url('/widget/bot/' . $this->widget_token . '.js');
     }
 
