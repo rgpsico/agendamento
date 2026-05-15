@@ -17,6 +17,9 @@
                     @endif
                     <a href="{{ route('agenda.create') }}" class="btn btn-outline-primary">Agendar experimental</a>
                     <form method="POST" action="{{ route('crm.pipeline.move', $lead) }}">@csrf @method('PATCH')<input type="hidden" name="pipeline_status" value="matriculado"><button class="btn btn-primary">Converter em aluno</button></form>
+                    <button class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#modalDispararSequencia">
+                        🤖 Automação IA
+                    </button>
                 </div>
             </div>
             @include('crm._nav')
@@ -138,4 +141,55 @@
     </div>
     @include('crm.email-templates._preview-script')
     @endif
+
+    {{-- Modal: Disparar Sequência de Automação IA --}}
+    <div class="modal fade" id="modalDispararSequencia" tabindex="-1">
+    <div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">🤖 Disparar Automação IA</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+            @php
+                $sequenciasDisponiveis = \App\Models\AutomacaoSequencia::forTenant(auth()->user()->empresa->id)
+                    ->where('ativo', true)
+                    ->with('etapas')
+                    ->get();
+            @endphp
+
+            @if($sequenciasDisponiveis->isEmpty())
+                <div class="alert alert-warning">
+                    Nenhuma sequência ativa. <a href="{{ route('crm.sequencias.index') }}">Criar sequência</a>
+                </div>
+            @else
+                <p class="text-muted small">Escolha uma sequência para disparar para <strong>{{ $lead->nome }}</strong>:</p>
+
+                @foreach($sequenciasDisponiveis as $seq)
+                <form method="POST" action="{{ route('crm.sequencias.disparar', $seq) }}" class="mb-2">
+                    @csrf
+                    <input type="hidden" name="lead_id" value="{{ $lead->id }}">
+                    <div class="card border">
+                        <div class="card-body py-2 px-3 d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="fw-semibold">{{ $seq->nome }}</div>
+                                <div class="text-muted small">{{ $seq->etapas->count() }} etapa{{ $seq->etapas->count() != 1 ? 's' : '' }} — {{ $seq->gatilho_label }}</div>
+                            </div>
+                            <button type="submit" class="btn btn-sm btn-primary ms-3"
+                                onclick="return confirm('Disparar a sequência {{ addslashes($seq->nome) }} para {{ addslashes($lead->nome) }}?')">
+                                ▶ Disparar
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                @endforeach
+            @endif
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            <a href="{{ route('crm.sequencias.index') }}" class="btn btn-outline-primary">Gerenciar Sequências</a>
+        </div>
+    </div>
+    </div>
+    </div>
 </x-admin.layout>
