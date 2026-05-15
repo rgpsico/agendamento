@@ -150,6 +150,17 @@ Route::prefix('crm')->middleware(['auth', 'tenant'])->name('crm.')->group(functi
     Route::post('metricas/sites',                 [\App\Http\Controllers\CRM\MetricaController::class, 'storeSite'])->name('metricas.sites.store');
     Route::put('metricas/sites/{widgetSite}',     [\App\Http\Controllers\CRM\MetricaController::class, 'updateSite'])->name('metricas.sites.update');
     Route::delete('metricas/sites/{widgetSite}',  [\App\Http\Controllers\CRM\MetricaController::class, 'destroySite'])->name('metricas.sites.destroy');
+
+    // Automação com IA — Sequências de mensagens
+    Route::prefix('sequencias')->name('sequencias.')->group(function () {
+        Route::get('/',                                              [\App\Http\Controllers\CRM\SequenciaController::class, 'index'])->name('index');
+        Route::post('/',                                             [\App\Http\Controllers\CRM\SequenciaController::class, 'store'])->name('store');
+        Route::put('/{sequencia}',                                   [\App\Http\Controllers\CRM\SequenciaController::class, 'update'])->name('update');
+        Route::delete('/{sequencia}',                                [\App\Http\Controllers\CRM\SequenciaController::class, 'destroy'])->name('destroy');
+        Route::patch('/{sequencia}/toggle',                          [\App\Http\Controllers\CRM\SequenciaController::class, 'toggleAtivo'])->name('toggle');
+        Route::get('/{sequencia}/envios',                            [\App\Http\Controllers\CRM\SequenciaController::class, 'envios'])->name('envios');
+        Route::post('/{sequencia}/disparar',                         [\App\Http\Controllers\CRM\SequenciaController::class, 'dispararParaLead'])->name('disparar');
+    });
 });
 
 // Widget JS — público, sem auth
