@@ -197,28 +197,6 @@
             </div>
         </div>
 
-        {{-- Planos --}}
-        <div class="col-md-6">
-            <div class="info-card">
-                <div class="fw-bold mb-3"><i class="fas fa-credit-card me-2 text-primary"></i>Planos</div>
-                @forelse($empresa->planos as $plano)
-                <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
-                    <div>
-                        <div class="fw-semibold">{{ $plano->nome }}</div>
-                        <small class="text-muted">{{ $plano->periodicidade }} · R$ {{ number_format($plano->valor, 2, ',', '.') }}</small>
-                    </div>
-                    <small class="text-muted">
-                        {{ \Carbon\Carbon::parse($plano->pivot->data_inicio)->format('d/m/Y') }}
-                        @if($plano->pivot->data_fim)
-                            → {{ \Carbon\Carbon::parse($plano->pivot->data_fim)->format('d/m/Y') }}
-                        @endif
-                    </small>
-                </div>
-                @empty
-                    <p class="text-muted mb-0">Nenhum plano vinculado.</p>
-                @endforelse
-            </div>
-        </div>
 
         {{-- Resumo operacional --}}
         <div class="col-12">

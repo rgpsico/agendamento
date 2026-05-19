@@ -43,7 +43,7 @@ class SuperAdminController extends Controller
 
     public function clientes(Request $request)
     {
-        $query = Empresa::with(['modalidade', 'user', 'site', 'planos'])
+        $query = Empresa::with(['modalidade', 'user', 'site'])
             ->withCount(['professores', 'servicos']);
 
         // Filtros
@@ -78,7 +78,6 @@ class SuperAdminController extends Controller
             'modalidade',
             'user',
             'site',
-            'planos',
             'endereco',
             'professores',
             'servicos',

@@ -136,13 +136,7 @@
                         </td>
                         <td class="text-center">{{ $e->professores_count }}</td>
                         <td class="text-center">{{ $e->servicos_count }}</td>
-                        <td>
-                            @if($e->planos->isNotEmpty())
-                                <small>{{ $e->planos->last()->nome }}</small>
-                            @else
-                                <small class="text-muted">—</small>
-                            @endif
-                        </td>
+                        <td><small class="text-muted">—</small></td>
                         <td>
                             @if($e->data_vencimento)
                                 <small class="{{ $e->data_vencimento->isPast() ? 'text-danger fw-semibold' : '' }}">
