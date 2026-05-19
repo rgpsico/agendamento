@@ -67,30 +67,23 @@ use App\Http\Controllers\Api\ModalLeadController;
 // Cada domínio aponta para o site da empresa correspondente.
 // Basta adicionar aqui + cadastrar dominio_personalizado no banco.
 // ─────────────────────────────────────────────
-foreach (['surfgestao.com.br', 'www.surfgestao.com.br'] as $dominioSurf) {
-    Route::domain($dominioSurf)->group(function () {
-        // Landing page de captação do SaaS de surf
-        Route::get('/', function () {
-            return view('site.surf_landing');
-        })->name('surf.landing');
-
-        // Demais rotas do domínio (site público da escola, se cadastrada)
-        Route::get('/{path}', [SiteController::class, 'mostrarDominio'])
-            ->where('path', '.+')
-            ->name('surf.site');
-    });
-}
-
-// Rota raiz: domínio principal da plataforma
 Route::get('/', function (\Illuminate\Http\Request $request) {
-    // Fallback via middleware DetectTenant (outros domínios personalizados)
-    $site = app()->has('currentSite') ? app('currentSite') : null;
+    $host = $request->getHost();
 
+    // Domínio do Surf SaaS → landing page de captação
+    $dominiosSurf = ['surfgestao.com.br', 'www.surfgestao.com.br'];
+    if (in_array($host, $dominiosSurf)) {
+        return view('site/surf_landing');
+    }
+
+    // Tenant via domínio personalizado de escola cadastrada
+    $site = app()->has('currentSite') ? app('currentSite') : null;
     if ($site) {
         return app(\App\Http\Controllers\SiteController::class)
             ->mostrarDominio($request);
     }
 
+    // Home padrão da plataforma (pilates)
     return app(\App\Http\Controllers\HomeController::class)
         ->home($request);
 })->name('home');
@@ -361,6 +354,17 @@ Route::get('/test', function () {
     return Inertia::render('Test');
 });
 
+// Rota temporária de debug — remover após confirmar o domínio
+Route::get('/debug-host', function (\Illuminate\Http\Request $request) {
+    return response()->json([
+        'host'            => $request->getHost(),
+        'full_url'        => $request->fullUrl(),
+        'header_host'     => $request->header('Host'),
+        'header_x_forwarded_host' => $request->header('X-Forwarded-Host'),
+        'in_dominios_surf' => in_array($request->getHost(), DOMINIOS_SURF),
+    ]);
+});
+
 Route::get('/treino', [AgendaController::class, 'treino'])->name('treino');
 Route::get('/logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
 
@@ -398,7 +402,16 @@ Route::get('/chat/{conversationId?}', [ChatController::class, 'chat'])->name('ch
 Route::post('/chat/update-control', [ChatController::class, 'updateControl'])
     ->name('chat.updateControl');
 
+use App\Http\Controllers\SuperAdminController;
 use App\Http\Controllers\VirtualHostController;
+
+// ─── Super Admin ───────────────────────────────────────────
+Route::prefix('super-admin')->name('super.admin.')->middleware(['auth', 'master'])->group(function () {
+    Route::get('/',                          [SuperAdminController::class, 'index'])->name('index');
+    Route::get('/clientes',                  [SuperAdminController::class, 'clientes'])->name('clientes');
+    Route::get('/clientes/{empresa}',        [SuperAdminController::class, 'show'])->name('show');
+    Route::patch('/clientes/{empresa}/toggle', [SuperAdminController::class, 'toggleStatus'])->name('toggle');
+});
 
 Route::resource('virtualhosts', VirtualHostController::class)->except(['show']);
 Route::get('/virtualhosts', [VirtualHostController::class, 'index'])->name('virtualhosts.index');

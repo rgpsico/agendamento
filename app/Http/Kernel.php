@@ -67,6 +67,7 @@ class Kernel extends HttpKernel
         'signed' => \App\Http\Middleware\ValidateSignature::class,
         'tenant'        => \App\Http\Middleware\EnsureTenantContext::class,
         'detect.tenant' => \App\Http\Middleware\DetectTenant::class,
+        'master'        => \App\Http\Middleware\IsMasterUser::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
     ];
