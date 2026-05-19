@@ -60,7 +60,19 @@ use App\Http\Controllers\Api\ModalLeadController;
 
 
 
-Route::get('/', [HomeController::class, 'home'])->name('home');
+// Rota raiz: se vier de um domínio personalizado, exibe o site da empresa.
+// Caso contrário, exibe a home normal da plataforma.
+Route::get('/', function (\Illuminate\Http\Request $request) {
+    $site = app()->has('currentSite') ? app('currentSite') : null;
+
+    if ($site) {
+        return app(\App\Http\Controllers\SiteController::class)
+            ->mostrarDominio($request);
+    }
+
+    return app(\App\Http\Controllers\HomeController::class)
+        ->home($request);
+})->name('home');
 
 Route::get('/create', [UserManagementController::class, 'create'])->name('register.professor');
 

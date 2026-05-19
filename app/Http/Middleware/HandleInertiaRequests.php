@@ -29,6 +29,7 @@ class HandleInertiaRequests extends Middleware
 
     /**
      * Defines the props that are shared by default.
+     * Todos os componentes Vue têm acesso a `$page.props.tenant` e `$page.props.site`.
      *
      * @see https://inertiajs.com/shared-data
      * @param  \Illuminate\Http\Request  $request
@@ -36,8 +37,27 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $site    = app()->has('currentSite')   ? app('currentSite')   : null;
+        $empresa = app()->has('currentTenant') ? app('currentTenant') : null;
+
         return array_merge(parent::share($request), [
-            //
+
+            // Dados do tenant (empresa) — disponível em todos os componentes Vue
+            'tenant' => $empresa ? [
+                'id'         => $empresa->id,
+                'nome'       => $empresa->nome,
+                'modalidade' => $empresa->modalidade?->nome,
+                'avatar'     => $empresa->avatar,
+            ] : null,
+
+            // Dados de branding do site — cores, logo, título
+            'site' => $site ? [
+                'titulo' => $site->titulo,
+                'slug'   => $site->slug,
+                'logo'   => $site->logo,
+                'cores'  => $site->cores,  // ['primaria' => '#1E90FF', 'secundaria' => '#FFD700']
+            ] : null,
+
         ]);
     }
 }

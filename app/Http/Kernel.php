@@ -38,6 +38,7 @@ class Kernel extends HttpKernel
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            \App\Http\Middleware\DetectTenant::class,        // detecta tenant pelo domínio
             \App\Http\Middleware\HandleInertiaRequests::class,
         ],
 
@@ -64,7 +65,8 @@ class Kernel extends HttpKernel
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         'password.confirm' => \Illuminate\Auth\Middleware\RequirePassword::class,
         'signed' => \App\Http\Middleware\ValidateSignature::class,
-        'tenant' => \App\Http\Middleware\EnsureTenantContext::class,
+        'tenant'        => \App\Http\Middleware\EnsureTenantContext::class,
+        'detect.tenant' => \App\Http\Middleware\DetectTenant::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
     ];
