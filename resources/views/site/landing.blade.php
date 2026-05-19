@@ -475,7 +475,7 @@
             'Content-Type': 'application/json',
             'X-CSRF-TOKEN': token,
           },
-          body: JSON.stringify({ nome, email, whatsapp }),
+          body: JSON.stringify({ nome, email, whatsapp, origem: 'pilates' }),
         });
       } catch (_) {}
 

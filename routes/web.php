@@ -407,10 +407,15 @@ use App\Http\Controllers\VirtualHostController;
 
 // ─── Super Admin ───────────────────────────────────────────
 Route::prefix('super-admin')->name('super.admin.')->middleware(['auth', 'master'])->group(function () {
-    Route::get('/',                          [SuperAdminController::class, 'index'])->name('index');
-    Route::get('/clientes',                  [SuperAdminController::class, 'clientes'])->name('clientes');
-    Route::get('/clientes/{empresa}',        [SuperAdminController::class, 'show'])->name('show');
-    Route::patch('/clientes/{empresa}/toggle', [SuperAdminController::class, 'toggleStatus'])->name('toggle');
+    Route::get('/',                               [SuperAdminController::class, 'index'])->name('index');
+    Route::get('/clientes',                       [SuperAdminController::class, 'clientes'])->name('clientes');
+    Route::get('/clientes/{empresa}',             [SuperAdminController::class, 'show'])->name('show');
+    Route::patch('/clientes/{empresa}/toggle',    [SuperAdminController::class, 'toggleStatus'])->name('toggle');
+
+    // CRM — leads das landing pages (SaaS)
+    Route::get('/crm',                            [SuperAdminController::class, 'crmLeads'])->name('crm.leads');
+    Route::get('/crm/pipeline',                   [SuperAdminController::class, 'crmPipeline'])->name('crm.pipeline');
+    Route::patch('/crm/{lead}/mover',             [SuperAdminController::class, 'crmMover'])->name('crm.mover');
 });
 
 Route::resource('virtualhosts', VirtualHostController::class)->except(['show']);

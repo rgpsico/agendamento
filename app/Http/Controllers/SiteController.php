@@ -33,29 +33,52 @@ class SiteController extends Controller
     public function lead(Request $request)
     {
         $data = $request->validate([
-            'nome' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'whatsapp' => 'required|string|max:30',
+            'nome'    => 'required|string|max:255',
+            'email'   => 'required|email|max:255',
+            'whatsapp'=> 'required|string|max:30',
+            'origem'  => 'nullable|string|max:50',
         ]);
 
-        $lead = UserEvent::create([
-            'user_id' => null,
+        // Detecta o nicho pelo domínio ou pelo campo origem enviado pelo form
+        $nichosPorDominio = [
+            'surfgestao.com.br'    => 'surf',
+            'www.surfgestao.com.br'=> 'surf',
+            'pilatesgestao.com.br' => 'pilates',
+        ];
+        $origem = $nichosPorDominio[$request->getHost()]
+            ?? $data['origem']
+            ?? 'landing';
+
+        // Salva na tabela leads (tenant_id null = lead do SaaS, não de uma escola)
+        \App\Models\Lead::create([
+            'tenant_id'      => null,
+            'nome'           => $data['nome'],
+            'email'          => $data['email'],
+            'telefone'       => $data['whatsapp'],
+            'origem'         => $origem,
+            'status'         => 'novo',
+            'pipeline_status'=> 'novo_lead',
+        ]);
+
+        // Mantém o registro no UserEvent para rastreamento
+        UserEvent::create([
+            'user_id'    => null,
             'event_type' => 'site.landing.lead',
-            'payload' => $data,
-            'ip' => $request->ip(),
+            'payload'    => array_merge($data, ['origem' => $origem]),
+            'ip'         => $request->ip(),
             'user_agent' => (string) $request->userAgent(),
-            'source' => 'landing',
+            'source'     => 'landing',
         ]);
 
         Mail::raw(
-            "Novo lead recebido pela landing.\n\n" .
+            "Novo lead recebido pela landing ({$origem}).\n\n" .
             "Nome: {$data['nome']}\n" .
             "Email: {$data['email']}\n" .
             "WhatsApp: {$data['whatsapp']}\n" .
             "IP: {$request->ip()}\n",
-            function ($message) use ($data) {
+            function ($message) use ($data, $origem) {
                 $message->to('rogernevesn@gmail.com')
-                    ->subject('Novo lead da landing: ' . $data['nome']);
+                    ->subject("Novo lead [{$origem}]: " . $data['nome']);
             }
         );
 
