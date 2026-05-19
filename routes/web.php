@@ -69,8 +69,14 @@ use App\Http\Controllers\Api\ModalLeadController;
 // ─────────────────────────────────────────────
 foreach (['surfgestao.com.br', 'www.surfgestao.com.br'] as $dominioSurf) {
     Route::domain($dominioSurf)->group(function () {
-        Route::get('/{path?}', [SiteController::class, 'mostrarDominio'])
-            ->where('path', '.*')
+        // Landing page de captação do SaaS de surf
+        Route::get('/', function () {
+            return view('site.surf_landing');
+        })->name('surf.landing');
+
+        // Demais rotas do domínio (site público da escola, se cadastrada)
+        Route::get('/{path}', [SiteController::class, 'mostrarDominio'])
+            ->where('path', '.+')
             ->name('surf.site');
     });
 }
