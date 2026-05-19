@@ -62,7 +62,22 @@ use App\Http\Controllers\Api\ModalLeadController;
 
 // Rota raiz: se vier de um domínio personalizado, exibe o site da empresa.
 // Caso contrário, exibe a home normal da plataforma.
+// ─────────────────────────────────────────────
+// Domínios personalizados das escolas (SaaS multi-tenant)
+// Cada domínio aponta para o site da empresa correspondente.
+// Basta adicionar aqui + cadastrar dominio_personalizado no banco.
+// ─────────────────────────────────────────────
+foreach (['surfgestao.com.br', 'www.surfgestao.com.br'] as $dominioSurf) {
+    Route::domain($dominioSurf)->group(function () {
+        Route::get('/{path?}', [SiteController::class, 'mostrarDominio'])
+            ->where('path', '.*')
+            ->name('surf.site');
+    });
+}
+
+// Rota raiz: domínio principal da plataforma
 Route::get('/', function (\Illuminate\Http\Request $request) {
+    // Fallback via middleware DetectTenant (outros domínios personalizados)
     $site = app()->has('currentSite') ? app('currentSite') : null;
 
     if ($site) {

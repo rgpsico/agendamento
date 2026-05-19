@@ -212,20 +212,30 @@ class SiteController extends Controller
 
     public function mostrarDominio(Request $request)
     {
-    
-        $resolvedSite = EmpresaSite::resolveByHost($request->getHost());
+        // Tenta via DetectTenant middleware (já resolvido) ou resolve agora
+        $resolvedSite = app()->has('currentSite')
+            ? app('currentSite')
+            : EmpresaSite::resolveByHost($request->getHost());
 
-        // Domínio padrão do sistema
-
-        if (!$resolvedSite) {
+        if (! $resolvedSite) {
             return view('home_landing');
         }
 
-        // Caso seja domínio personalizado
         $site = EmpresaSite::whereKey($resolvedSite->id)
-            ->with(['servicos', 'depoimentos', 'contatos', 'template'])
+            ->with([
+                'servicos',
+                'siteServicos',
+                'depoimentos',
+                'contatos',
+                'endereco',
+                'empresa',
+                'empresa.modalidade',
+                'template',
+                'trackingCodes',
+            ])
             ->firstOrFail();
 
+        // Usa o template da empresa ou fallback para site.publico (surf/geral)
         $view_template = $site->template->path_view ?? 'site.publico';
 
         return view($view_template, compact('site'));
