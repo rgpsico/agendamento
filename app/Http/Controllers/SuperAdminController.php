@@ -8,6 +8,7 @@ use App\Models\Modalidade;
 use App\Models\NichoConfiguracao;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class SuperAdminController extends Controller
 {
@@ -136,7 +137,8 @@ class SuperAdminController extends Controller
 
     public function nichoEdit(NichoConfiguracao $nicho)
     {
-        return view('super_admin.nichos.form', compact('nicho'));
+        $modalidades = Modalidade::doNicho($nicho->nicho)->orderBy('nome')->get();
+        return view('super_admin.nichos.form', compact('nicho', 'modalidades'));
     }
 
     public function nichoUpdate(Request $request, NichoConfiguracao $nicho)
@@ -168,6 +170,38 @@ class SuperAdminController extends Controller
         $nicho->update($data);
 
         return redirect()->route('super.admin.nichos')->with('success', 'Nicho atualizado!');
+    }
+
+    public function nichoModalidadeStore(Request $request, NichoConfiguracao $nicho)
+    {
+        $data = $request->validate([
+            'nome' => [
+                'required', 'string', 'max:100',
+                Rule::unique('modalidade')->where('nicho', $nicho->nicho),
+            ],
+        ]);
+
+        Modalidade::create([
+            'nome'  => $data['nome'],
+            'nicho' => $nicho->nicho,
+        ]);
+
+        return back()->with('success', "Modalidade \"{$data['nome']}\" adicionada ao nicho {$nicho->nome}.");
+    }
+
+    public function nichoModalidadeDestroy(NichoConfiguracao $nicho, Modalidade $modalidade)
+    {
+        abort_unless($modalidade->nicho === $nicho->nicho, 403);
+
+        // Verifica se há empresas usando esta modalidade
+        $emUso = $modalidade->empresas()->count();
+        if ($emUso > 0) {
+            return back()->withErrors(['modalidade' => "Não é possível remover: {$emUso} empresa(s) usam esta modalidade."]);
+        }
+
+        $modalidade->delete();
+
+        return back()->with('success', "Modalidade \"{$modalidade->nome}\" removida.");
     }
 
     public function nichoDestroy(NichoConfiguracao $nicho)

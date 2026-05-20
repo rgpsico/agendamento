@@ -221,6 +221,61 @@
             <a href="{{ route('super.admin.nichos') }}" class="btn btn-outline-secondary">Cancelar</a>
         </div>
     </form>
+
+    {{-- Modalidades do nicho — só exibe ao editar --}}
+    @if($nicho->exists)
+    <div class="form-card mt-4">
+        <div class="section-title">Modalidades do nicho</div>
+
+        @if(session('success'))
+            <div class="alert alert-success py-2 mb-3">{{ session('success') }}</div>
+        @endif
+        @if($errors->has('modalidade'))
+            <div class="alert alert-danger py-2 mb-3">{{ $errors->first('modalidade') }}</div>
+        @endif
+
+        {{-- Lista existente --}}
+        <div class="mb-3">
+            @forelse($modalidades ?? [] as $mod)
+            <div class="d-flex align-items-center justify-content-between py-2 border-bottom">
+                <span class="fw-semibold">{{ $mod->nome }}</span>
+                <div class="d-flex align-items-center gap-3">
+                    @if($mod->empresas_count ?? $mod->empresas()->count() > 0)
+                        <small class="text-muted">{{ $mod->empresas()->count() }} empresa(s)</small>
+                    @endif
+                    <form method="POST"
+                          action="{{ route('super.admin.nichos.modalidades.destroy', [$nicho, $mod]) }}"
+                          onsubmit="return confirm('Remover modalidade \'{{ $mod->nome }}\'?')">
+                        @csrf @method('DELETE')
+                        <button class="btn btn-sm btn-outline-danger">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            @empty
+            <p class="text-muted mb-3">Nenhuma modalidade cadastrada para este nicho.</p>
+            @endforelse
+        </div>
+
+        {{-- Adicionar nova --}}
+        <form method="POST" action="{{ route('super.admin.nichos.modalidades.store', $nicho) }}"
+              class="d-flex gap-2 align-items-start">
+            @csrf
+            <div class="flex-fill">
+                <input type="text" name="nome" class="form-control @error('nome') is-invalid @enderror"
+                       placeholder="Ex: Surf, Stand-Up Paddle, Bodyboard..."
+                       value="{{ old('nome') }}" required>
+                @error('nome')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-plus me-1"></i> Adicionar
+            </button>
+        </form>
+    </div>
+    @endif
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

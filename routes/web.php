@@ -419,6 +419,9 @@ Route::prefix('super-admin')->name('super.admin.')->middleware(['auth', 'master'
     Route::get('/nichos/{nicho}/editar',          [SuperAdminController::class, 'nichoEdit'])->name('nichos.edit');
     Route::put('/nichos/{nicho}',                 [SuperAdminController::class, 'nichoUpdate'])->name('nichos.update');
     Route::delete('/nichos/{nicho}',              [SuperAdminController::class, 'nichoDestroy'])->name('nichos.destroy');
+    // Modalidades por nicho
+    Route::post('/nichos/{nicho}/modalidades',                        [SuperAdminController::class, 'nichoModalidadeStore'])->name('nichos.modalidades.store');
+    Route::delete('/nichos/{nicho}/modalidades/{modalidade}',         [SuperAdminController::class, 'nichoModalidadeDestroy'])->name('nichos.modalidades.destroy');
 
     // CRM — leads das landing pages (SaaS)
     Route::get('/crm',                            [SuperAdminController::class, 'crmLeads'])->name('crm.leads');
