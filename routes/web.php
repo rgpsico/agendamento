@@ -412,6 +412,14 @@ Route::prefix('super-admin')->name('super.admin.')->middleware(['auth', 'master'
     Route::get('/clientes/{empresa}',             [SuperAdminController::class, 'show'])->name('show');
     Route::patch('/clientes/{empresa}/toggle',    [SuperAdminController::class, 'toggleStatus'])->name('toggle');
 
+    // Configuração de nichos
+    Route::get('/nichos',                         [SuperAdminController::class, 'nichos'])->name('nichos');
+    Route::get('/nichos/criar',                   [SuperAdminController::class, 'nichoCreate'])->name('nichos.create');
+    Route::post('/nichos',                        [SuperAdminController::class, 'nichoStore'])->name('nichos.store');
+    Route::get('/nichos/{nicho}/editar',          [SuperAdminController::class, 'nichoEdit'])->name('nichos.edit');
+    Route::put('/nichos/{nicho}',                 [SuperAdminController::class, 'nichoUpdate'])->name('nichos.update');
+    Route::delete('/nichos/{nicho}',              [SuperAdminController::class, 'nichoDestroy'])->name('nichos.destroy');
+
     // CRM — leads das landing pages (SaaS)
     Route::get('/crm',                            [SuperAdminController::class, 'crmLeads'])->name('crm.leads');
     Route::get('/crm/pipeline',                   [SuperAdminController::class, 'crmPipeline'])->name('crm.pipeline');

@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Empresa;
 use App\Models\Lead;
 use App\Models\Modalidade;
+use App\Models\NichoConfiguracao;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class SuperAdminController extends Controller
 {
@@ -86,6 +88,96 @@ class SuperAdminController extends Controller
         ]);
 
         return view('super_admin.show', compact('empresa'));
+    }
+
+    // ─── Nicho Configurações ──────────────────────────────────
+
+    public function nichos()
+    {
+        $nichos = NichoConfiguracao::orderBy('nome')->get();
+        return view('super_admin.nichos.index', compact('nichos'));
+    }
+
+    public function nichoCreate()
+    {
+        return view('super_admin.nichos.form', ['nicho' => new NichoConfiguracao()]);
+    }
+
+    public function nichoStore(Request $request)
+    {
+        $data = $request->validate([
+            'nicho'          => 'required|string|max:50|unique:nicho_configuracoes,nicho',
+            'nome'           => 'required|string|max:100',
+            'dominio'        => 'nullable|string|max:150',
+            'dominio_www'    => 'nullable|string|max:150',
+            'emoji'          => 'nullable|string|max:10',
+            'cor_primaria'   => 'required|string|max:10',
+            'cor_secundaria' => 'required|string|max:10',
+            'logo'           => 'nullable|image|max:2048',
+            'login_imagem'   => 'nullable|image|max:4096',
+            'registro_imagem'=> 'nullable|image|max:4096',
+            'ativo'          => 'boolean',
+        ]);
+
+        foreach (['logo', 'login_imagem', 'registro_imagem'] as $campo) {
+            if ($request->hasFile($campo)) {
+                $data[$campo] = $request->file($campo)->store("nicho/{$data['nicho']}", 'public');
+            } else {
+                unset($data[$campo]);
+            }
+        }
+
+        $data['ativo'] = $request->boolean('ativo', true);
+
+        NichoConfiguracao::create($data);
+
+        return redirect()->route('super.admin.nichos')->with('success', 'Nicho criado com sucesso!');
+    }
+
+    public function nichoEdit(NichoConfiguracao $nicho)
+    {
+        return view('super_admin.nichos.form', compact('nicho'));
+    }
+
+    public function nichoUpdate(Request $request, NichoConfiguracao $nicho)
+    {
+        $data = $request->validate([
+            'nome'           => 'required|string|max:100',
+            'dominio'        => 'nullable|string|max:150',
+            'dominio_www'    => 'nullable|string|max:150',
+            'emoji'          => 'nullable|string|max:10',
+            'cor_primaria'   => 'required|string|max:10',
+            'cor_secundaria' => 'required|string|max:10',
+            'logo'           => 'nullable|image|max:2048',
+            'login_imagem'   => 'nullable|image|max:4096',
+            'registro_imagem'=> 'nullable|image|max:4096',
+            'ativo'          => 'boolean',
+        ]);
+
+        foreach (['logo', 'login_imagem', 'registro_imagem'] as $campo) {
+            if ($request->hasFile($campo)) {
+                if ($nicho->$campo) Storage::disk('public')->delete($nicho->$campo);
+                $data[$campo] = $request->file($campo)->store("nicho/{$nicho->nicho}", 'public');
+            } else {
+                unset($data[$campo]);
+            }
+        }
+
+        $data['ativo'] = $request->boolean('ativo', true);
+
+        $nicho->update($data);
+
+        return redirect()->route('super.admin.nichos')->with('success', 'Nicho atualizado!');
+    }
+
+    public function nichoDestroy(NichoConfiguracao $nicho)
+    {
+        foreach (['logo', 'login_imagem', 'registro_imagem'] as $campo) {
+            if ($nicho->$campo) Storage::disk('public')->delete($nicho->$campo);
+        }
+        $nicho->delete();
+
+        return redirect()->route('super.admin.nichos')->with('success', 'Nicho removido.');
     }
 
     // ─── CRM Super Admin ──────────────────────────────────────
