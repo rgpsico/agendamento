@@ -366,7 +366,7 @@ class EmpresaController extends Controller
         }
 
         $empresas = $query->get();
-        $modalidades = Modalidade::all();
+        $modalidades = Modalidade::doNichoAtual()->get();
         $pageTitle = 'Empresa';
         $route = $this->route;
 
@@ -625,7 +625,7 @@ class EmpresaController extends Controller
         $userId =  Usuario::find($userId);
        $email_user = $userId->email;
 
-        $modalidades = Modalidade::all();
+        $modalidades = Modalidade::doNichoAtual()->get();
         return view(
             'admin.empresas.treinoform',    
             [

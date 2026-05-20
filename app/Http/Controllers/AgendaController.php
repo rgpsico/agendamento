@@ -95,7 +95,7 @@ class AgendaController extends Controller
     public function create()
     {
        
-       $modalidades = Modalidade::all();
+       $modalidades = Modalidade::doNichoAtual()->get();
 
         return view(
             $this->view . '.create',
@@ -140,7 +140,7 @@ class AgendaController extends Controller
     public function edit($id)
     {
     $model = $this->model->find($id);
-    $modalidades = Modalidade::all();
+    $modalidades = Modalidade::doNichoAtual()->get();
 
     return view(
         $this->view . '.create',

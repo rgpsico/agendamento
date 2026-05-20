@@ -75,7 +75,7 @@ class HomeController extends Controller
        
        
         $model = $this->model::with('modalidade', 'endereco', 'galeria', 'avaliacao')->where('status', 'ativo')->get();
-        $modalidade = Modalidade::all();
+        $modalidade = Modalidade::doNichoAtual()->get();
         $bairros = Bairros::all();
 
         // Adiciona configuração de agendamento para cada empresa
@@ -242,7 +242,7 @@ class HomeController extends Controller
     {
 
 
-        $modalidade = Modalidade::all();
+        $modalidade = Modalidade::doNichoAtual()->get();
         $config = ConfiguracaoGeral::first();
 
         return view(
@@ -260,7 +260,7 @@ class HomeController extends Controller
 
     public function registerAluno()
     {
-        $modalidade = Modalidade::all();
+        $modalidade = Modalidade::doNichoAtual()->get();
         $config = ConfiguracaoGeral::first();
 
         return view(
@@ -279,7 +279,7 @@ class HomeController extends Controller
 
     public function login()
     {
-        $modalidade = Modalidade::all();
+        $modalidade = Modalidade::doNichoAtual()->get();
         $config = ConfiguracaoGeral::first();
         
         return view(
