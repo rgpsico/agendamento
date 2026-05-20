@@ -16,21 +16,30 @@
                         <!-- Logo -->
                      
                         <a href="{{ route('home.index') }}" class="navbar-brand logo">
-                               @isset($config->logo_header )
-                                     <img src="{{ $config->logo_header ? asset('storage/'.$config->logo_header) : 'https://via.placeholder.com/150x50?text=Logo' }}"
-                                class="img-fluid" alt="Logo">
-                                @else
-                                    <img src="https://rjpasseios.com.br/wp-content/uploads/2024/12/cropped-logo-1.png"
-                                    class="img-fluid" alt="Logo">
-                            @endisset
+                            @php
+                                $logoSrc = null;
+                                if (!empty($config->logo_header)) {
+                                    $logoSrc = asset('storage/' . $config->logo_header);
+                                } elseif (!empty($currentNicho?->logo)) {
+                                    $logoSrc = $currentNicho->logo_url;
+                                }
+                            @endphp
+                            @if($logoSrc)
+                                <img src="{{ $logoSrc }}" class="img-fluid" alt="Logo">
+                            @else
+                                <span class="fw-bold fs-5 text-dark">{{ $currentNicho?->nome ?? config('app.name') }}</span>
+                            @endif
                         </a>
                     </div>
 
                     <div class="main-menu-wrapper">
                         <div class="menu-header">
-                            <a href="" class="menu-logo">
-                                <img src="https://rjpasseios.com.br/wp-content/uploads/2024/12/cropped-logo-1.png"
-                                    class="img-fluid" alt="Logo">
+                            <a href="{{ route('home.index') }}" class="menu-logo">
+                                @if($logoSrc ?? null)
+                                    <img src="{{ $logoSrc }}" class="img-fluid" alt="Logo">
+                                @else
+                                    <span class="fw-bold fs-5 text-dark">{{ $currentNicho?->nome ?? config('app.name') }}</span>
+                                @endif
                             </a>
                             <a id="menu_close" class="menu-close" href="javascript:void(0);">
                                 <i class="fas fa-times"></i>
