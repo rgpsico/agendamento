@@ -17,11 +17,12 @@
                      
                         <a href="{{ route('home.index') }}" class="navbar-brand logo">
                             @php
+                                // Prioridade: 1) nicho (por domínio) → 2) config global da empresa
                                 $logoSrc = null;
-                                if (!empty($config->logo_header)) {
-                                    $logoSrc = asset('storage/' . $config->logo_header);
-                                } elseif (!empty($currentNicho?->logo)) {
+                                if (!empty($currentNicho?->logo)) {
                                     $logoSrc = $currentNicho->logo_url;
+                                } elseif (!empty($config->logo_header)) {
+                                    $logoSrc = asset('storage/' . $config->logo_header);
                                 }
                             @endphp
                             @if($logoSrc)
