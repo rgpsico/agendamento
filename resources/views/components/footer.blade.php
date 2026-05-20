@@ -9,8 +9,22 @@
                     <div class="footer-widget footer-about">
                         <div class="footer-logo">
                             <a href="/">
-                                <img src="{{ $config && $config->logo_footer ? asset('storage/'.$config->logo_footer) : 'admin/img/surfbread2.png' }}" 
-                                     class="img-fluid" alt="Logo">
+                                @php
+                                    // Prioridade: 1) nicho (por domínio) → 2) logo_footer global
+                                    $footerLogoSrc = null;
+                                    if (!empty($currentNicho?->logo)) {
+                                        $footerLogoSrc = $currentNicho->logo_url;
+                                    } elseif ($config && $config->logo_footer) {
+                                        $footerLogoSrc = asset('storage/' . $config->logo_footer);
+                                    } elseif ($config && $config->logo_header) {
+                                        $footerLogoSrc = asset('storage/' . $config->logo_header);
+                                    }
+                                @endphp
+                                @if($footerLogoSrc)
+                                    <img src="{{ $footerLogoSrc }}" class="img-fluid" alt="Logo">
+                                @else
+                                    <span class="fw-bold text-white fs-5">{{ $currentNicho?->nome ?? config('app.name') }}</span>
+                                @endif
                             </a>
                         </div>
                         <div class="footer-about-content footer-descricao" style="color:#fff; text-align: left;">
