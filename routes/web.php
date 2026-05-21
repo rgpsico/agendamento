@@ -453,6 +453,16 @@ Route::prefix('super-admin')->name('super.admin.')->middleware(['auth', 'master'
     Route::post('/crm/templates/gerar-ia',        [SuperAdminController::class, 'crmTemplateGerarIA'])->name('crm.templates.gerar-ia');
     Route::put('/crm/templates/{template}',       [SuperAdminController::class, 'crmTemplateUpdate'])->name('crm.templates.update');
     Route::delete('/crm/templates/{template}',    [SuperAdminController::class, 'crmTemplateDestroy'])->name('crm.templates.destroy');
+
+    // Geração de Conteúdo / Artigos com DeepSeek
+    Route::get('/conteudos',                      [SuperAdminController::class, 'conteudos'])->name('conteudos');
+    Route::get('/conteudos/novo',                 [SuperAdminController::class, 'conteudoCreate'])->name('conteudos.create');
+    Route::post('/conteudos',                     [SuperAdminController::class, 'conteudoStore'])->name('conteudos.store');
+    Route::post('/conteudos/gerar-ia',            [SuperAdminController::class, 'conteudoGerarIA'])->name('conteudos.gerar-ia');
+    Route::get('/conteudos/{conteudo}/editar',    [SuperAdminController::class, 'conteudoEdit'])->name('conteudos.edit');
+    Route::put('/conteudos/{conteudo}',           [SuperAdminController::class, 'conteudoUpdate'])->name('conteudos.update');
+    Route::delete('/conteudos/{conteudo}',        [SuperAdminController::class, 'conteudoDestroy'])->name('conteudos.destroy');
+    Route::post('/conteudos/{conteudo}/publicado',[SuperAdminController::class, 'conteudoMarcarPublicado'])->name('conteudos.publicado');
 });
 
 Route::resource('virtualhosts', VirtualHostController::class)->except(['show']);

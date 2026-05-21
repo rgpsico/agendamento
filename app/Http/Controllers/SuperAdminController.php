@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AutomacaoSequencia;
 use App\Models\EmailTemplate;
 use App\Models\Empresa;
+use App\Models\SistemaConteudo;
 use App\Models\SistemaVideo;
 use App\Models\Lead;
 use App\Models\Modalidade;
@@ -712,5 +713,227 @@ EOT;
         $empresa->save();
 
         return back()->with('success', "Status da empresa '{$empresa->nome}' atualizado.");
+    }
+
+    /* ══════════════════════════════════════════════════════════
+     |  CONTEÚDO / ARTIGOS — Geração com DeepSeek + TinyMCE
+     ══════════════════════════════════════════════════════════ */
+
+    public function conteudos(Request $request)
+    {
+        $nicho    = $request->get('nicho');
+        $formato  = $request->get('formato');
+        $status   = $request->get('status');
+
+        $conteudos = SistemaConteudo::query()
+            ->doNicho($nicho)
+            ->doFormato($formato)
+            ->when($status, fn($q) => $q->where('status', $status))
+            ->latest()
+            ->paginate(20);
+
+        $nichos = NichoConfiguracao::orderBy('nome')->get();
+
+        return view('super_admin.conteudos.index', compact('conteudos', 'nichos', 'nicho', 'formato', 'status'));
+    }
+
+    public function conteudoCreate()
+    {
+        $nichos = NichoConfiguracao::orderBy('nome')->get();
+        return view('super_admin.conteudos.form', compact('nichos'));
+    }
+
+    public function conteudoStore(Request $request)
+    {
+        $validated = $request->validate([
+            'titulo'    => 'required|string|max:255',
+            'nicho'     => 'nullable|string|max:50',
+            'formato'   => 'required|in:artigo,post_instagram,post_tiktok,legenda_video',
+            'topico'    => 'nullable|string|max:2000',
+            'corpo'     => 'nullable|string',
+            'legenda'   => 'nullable|string|max:2200',
+            'hashtags'  => 'nullable|string|max:500',
+            'status'    => 'required|in:rascunho,revisado,publicado',
+            'imagem_capa' => 'nullable|image|max:4096',
+        ]);
+
+        if ($request->hasFile('imagem_capa')) {
+            $validated['imagem_capa'] = $request->file('imagem_capa')->store('conteudos/capas', 'public');
+        }
+
+        // Contar palavras do corpo (strip HTML)
+        if (!empty($validated['corpo'])) {
+            $validated['palavras_count'] = str_word_count(strip_tags($validated['corpo']));
+        }
+
+        SistemaConteudo::create($validated);
+
+        return redirect()->route('super.admin.conteudos')->with('success', 'Conteúdo salvo com sucesso!');
+    }
+
+    public function conteudoEdit(SistemaConteudo $conteudo)
+    {
+        $nichos = NichoConfiguracao::orderBy('nome')->get();
+        return view('super_admin.conteudos.form', compact('conteudo', 'nichos'));
+    }
+
+    public function conteudoUpdate(Request $request, SistemaConteudo $conteudo)
+    {
+        $validated = $request->validate([
+            'titulo'    => 'required|string|max:255',
+            'nicho'     => 'nullable|string|max:50',
+            'formato'   => 'required|in:artigo,post_instagram,post_tiktok,legenda_video',
+            'topico'    => 'nullable|string|max:2000',
+            'corpo'     => 'nullable|string',
+            'legenda'   => 'nullable|string|max:2200',
+            'hashtags'  => 'nullable|string|max:500',
+            'status'    => 'required|in:rascunho,revisado,publicado',
+            'imagem_capa' => 'nullable|image|max:4096',
+        ]);
+
+        if ($request->hasFile('imagem_capa')) {
+            if ($conteudo->imagem_capa) {
+                Storage::disk('public')->delete($conteudo->imagem_capa);
+            }
+            $validated['imagem_capa'] = $request->file('imagem_capa')->store('conteudos/capas', 'public');
+        }
+
+        if (!empty($validated['corpo'])) {
+            $validated['palavras_count'] = str_word_count(strip_tags($validated['corpo']));
+        }
+
+        $conteudo->update($validated);
+
+        return redirect()->route('super.admin.conteudos')->with('success', 'Conteúdo atualizado!');
+    }
+
+    public function conteudoDestroy(SistemaConteudo $conteudo)
+    {
+        if ($conteudo->imagem_capa) {
+            Storage::disk('public')->delete($conteudo->imagem_capa);
+        }
+        $conteudo->delete();
+        return back()->with('success', 'Conteúdo removido.');
+    }
+
+    /**
+     * Gerar conteúdo via DeepSeek AI — retorna JSON {titulo, corpo, legenda, hashtags}
+     */
+    public function conteudoGerarIA(Request $request)
+    {
+        $request->validate([
+            'topico'  => 'required|string|max:2000',
+            'formato' => 'required|in:artigo,post_instagram,post_tiktok,legenda_video',
+            'nicho'   => 'nullable|string|max:50',
+            'tom'     => 'nullable|string|max:50',
+        ]);
+
+        $nicho   = $request->nicho ? ucfirst($request->nicho) : 'gestão';
+        $tom     = $request->tom ?: 'profissional e envolvente';
+        $formato = $request->formato;
+
+        $instrucoes = match($formato) {
+            'artigo' => <<<EOT
+Crie um artigo completo de blog em HTML semântico (use <h2>, <h3>, <p>, <ul>, <strong>, <em>).
+O artigo deve ter introdução, desenvolvimento com subtítulos, e conclusão com CTA.
+Tamanho: 600 a 1200 palavras.
+Também gere uma "legenda" de até 200 caracteres para redes sociais, e uma lista de hashtags relevantes.
+EOT,
+            'post_instagram' => <<<EOT
+Crie um post para Instagram.
+O texto deve ser envolvente, com gancho na primeira linha, conteúdo de valor no meio e CTA no final.
+Limite: até 2.200 caracteres.
+Também gere hashtags relevantes (entre 10 e 20).
+O campo "corpo" deve ser o texto puro do post (sem HTML).
+EOT,
+            'post_tiktok' => <<<EOT
+Crie um roteiro/script de vídeo curto para TikTok (30 a 60 segundos de fala).
+Formato: gancho impactante nos primeiros 3 segundos, desenvolvimento rápido, CTA final.
+Escreva como se fosse uma fala natural, pode usar emojis.
+O campo "corpo" é o script do vídeo.
+Também gere uma legenda curta e hashtags para o post do TikTok.
+EOT,
+            'legenda_video' => <<<EOT
+Crie uma legenda/descrição completa para um vídeo do YouTube.
+Inclua: parágrafo de introdução, tópicos abordados no vídeo, CTA para seguir/assinar, links placeholder [LINK].
+O campo "corpo" é a descrição completa.
+Gere também hashtags para YouTube.
+EOT,
+            default => 'Crie um conteúdo de marketing relevante.',
+        };
+
+        $prompt = <<<EOT
+Você é um especialista em marketing de conteúdo para SaaS de gestão no Brasil.
+Nicho: {$nicho} Gestão
+Tom desejado: {$tom}
+Assunto/Tópico: {$request->topico}
+
+{$instrucoes}
+
+Retorne APENAS um JSON válido com exatamente este formato (sem markdown, sem texto fora do JSON):
+{
+  "titulo": "título aqui",
+  "corpo": "conteúdo principal aqui",
+  "legenda": "legenda curta aqui",
+  "hashtags": "#hashtag1 #hashtag2 #hashtag3"
+}
+EOT;
+
+        try {
+            $response = \Illuminate\Support\Facades\Http::withHeaders([
+                'Authorization' => 'Bearer ' . env('DEEP_SEEK_API_KEY'),
+                'Content-Type'  => 'application/json',
+            ])->timeout(45)->post('https://api.deepseek.com/v1/chat/completions', [
+                'model'       => 'deepseek-chat',
+                'messages'    => [
+                    ['role' => 'system', 'content' => 'Você é um especialista em marketing de conteúdo para SaaS. Responda APENAS com JSON válido, sem markdown, sem explicações.'],
+                    ['role' => 'user',   'content' => $prompt],
+                ],
+                'temperature' => 0.85,
+                'max_tokens'  => 3000,
+            ]);
+
+            if (!$response->successful()) {
+                return response()->json(['error' => 'Erro na API DeepSeek: ' . $response->status()], 500);
+            }
+
+            $content = $response->json('choices.0.message.content', '');
+
+            // Remove markdown fences se a IA colocou
+            $content = preg_replace('/^```(?:json)?\s*/i', '', trim($content));
+            $content = preg_replace('/\s*```$/', '', $content);
+
+            $decoded = json_decode($content, true);
+
+            if (!$decoded || !isset($decoded['titulo'], $decoded['corpo'])) {
+                return response()->json(['error' => 'Resposta da IA em formato inesperado. Tente novamente.'], 422);
+            }
+
+            return response()->json([
+                'titulo'    => $decoded['titulo']   ?? '',
+                'corpo'     => $decoded['corpo']    ?? '',
+                'legenda'   => $decoded['legenda']  ?? '',
+                'hashtags'  => $decoded['hashtags'] ?? '',
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Falha ao conectar com DeepSeek: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Marcar conteúdo como publicado em determinada rede
+     */
+    public function conteudoMarcarPublicado(Request $request, SistemaConteudo $conteudo)
+    {
+        $request->validate(['rede' => 'required|in:instagram,tiktok']);
+
+        $campo = 'publicado_' . $request->rede . '_em';
+        $conteudo->update([
+            $campo   => now(),
+            'status' => 'publicado',
+        ]);
+
+        return response()->json(['ok' => true, 'publicado_em' => now()->format('d/m/Y H:i')]);
     }
 }

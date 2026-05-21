@@ -34,6 +34,7 @@
         <a href="{{ route('super.admin.clientes') }}" class="nav-link"><i class="fas fa-building"></i> Clientes</a>
         <a href="{{ route('super.admin.nichos') }}"   class="nav-link active"><i class="fas fa-palette"></i> Nichos</a>
         <a href="{{ route('super.admin.videos') }}"   class="nav-link"><i class="fas fa-play-circle"></i> Vídeos</a>
+        <a href="{{ route('super.admin.conteudos') }}" class="nav-link"><i class="fas fa-pen-nib"></i> Conteúdo / IA</a>
         <a href="{{ route('home') }}" class="nav-link mt-3"><i class="fas fa-arrow-left"></i> Voltar</a>
     </nav>
 </div>
