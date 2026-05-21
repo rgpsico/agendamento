@@ -160,27 +160,42 @@
 
                     <div class="card-actions">
                         <small class="text-muted me-auto">{{ $item->created_at->format('d/m/Y') }}</small>
+
+                        {{-- Editar --}}
                         <a href="{{ route('super.admin.conteudos.edit', $item) }}"
                            class="btn btn-sm btn-outline-primary" title="Editar">
                             <i class="fas fa-edit"></i>
                         </a>
-                        @if($item->status === 'publicado' && $item->formato === 'artigo')
-                        <button class="btn btn-sm btn-success btn-copiar-link"
-                                data-link="{{ url('/artigos/' . $item->slug) }}"
-                                title="Copiar link do artigo">
-                            <i class="fas fa-link"></i>
-                        </button>
-                        <a href="{{ url('/artigos/' . $item->slug) }}" target="_blank"
-                           class="btn btn-sm btn-outline-success" title="Ver artigo publicado">
-                            <i class="fas fa-external-link-alt"></i>
-                        </a>
+
+                        {{-- Ver / Prévia — sempre disponível para artigos --}}
+                        @if($item->formato === 'artigo')
+                            @if($item->status === 'publicado')
+                                {{-- Publicado: link público real --}}
+                                <a href="{{ url('/artigos/' . $item->slug) }}" target="_blank"
+                                   class="btn btn-sm btn-success" title="Ver artigo publicado (nova aba)">
+                                    <i class="fas fa-eye me-1"></i>Ver artigo
+                                </a>
+                                <button class="btn btn-sm btn-outline-success btn-copiar-link"
+                                        data-link="{{ url('/artigos/' . $item->slug) }}"
+                                        title="Copiar link">
+                                    <i class="fas fa-link"></i>
+                                </button>
+                            @else
+                                {{-- Rascunho/Revisado: preview autenticado --}}
+                                <a href="{{ route('super.admin.conteudos.preview', $item) }}" target="_blank"
+                                   class="btn btn-sm btn-outline-secondary" title="Prévia do artigo (nova aba)">
+                                    <i class="fas fa-eye me-1"></i>Prévia
+                                </a>
+                            @endif
                         @else
-                        <button class="btn btn-sm btn-outline-success btn-copiar"
-                                data-corpo="{{ htmlspecialchars(strip_tags($item->corpo ?? ''), ENT_QUOTES) }}"
-                                title="Copiar texto">
-                            <i class="fas fa-copy"></i>
-                        </button>
+                            {{-- Outros formatos: copiar texto --}}
+                            <button class="btn btn-sm btn-outline-success btn-copiar"
+                                    data-corpo="{{ htmlspecialchars(strip_tags($item->corpo ?? ''), ENT_QUOTES) }}"
+                                    title="Copiar texto">
+                                <i class="fas fa-copy"></i>
+                            </button>
                         @endif
+
                         @if(in_array($item->formato, ['post_instagram','artigo']))
                         <a href="https://www.instagram.com/" target="_blank"
                            class="btn btn-sm btn-outline-danger" title="Abrir Instagram">

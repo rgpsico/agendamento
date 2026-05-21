@@ -222,6 +222,29 @@
 </head>
 <body>
 
+{{-- Banner de Preview (visível apenas no super admin preview) --}}
+@if(isset($isPreview) && $isPreview)
+<div style="position:fixed;top:0;left:0;right:0;z-index:9999;background:linear-gradient(90deg,#7c3aed,#4f46e5);color:#fff;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;font-family:'Segoe UI',sans-serif;font-size:.85rem;box-shadow:0 2px 12px rgba(0,0,0,.3);">
+    <div style="display:flex;align-items:center;gap:10px;">
+        <span style="background:rgba(255,255,255,.2);border-radius:20px;padding:2px 10px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;">
+            👁 Modo Preview
+        </span>
+        <span>Este artigo está em <strong>{{ $conteudo->status_label }}</strong> — não está visível ao público ainda.</span>
+    </div>
+    <div style="display:flex;gap:8px;">
+        <a href="{{ route('super.admin.conteudos.edit', $conteudo) }}"
+           style="background:rgba(255,255,255,.15);color:#fff;text-decoration:none;padding:5px 14px;border-radius:6px;font-size:.8rem;font-weight:600;">
+            ✏️ Editar artigo
+        </a>
+        <button onclick="window.close()"
+                style="background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.3);padding:5px 14px;border-radius:6px;font-size:.8rem;cursor:pointer;">
+            ✕ Fechar
+        </button>
+    </div>
+</div>
+<div style="height:46px;"></div>{{-- espaçador para o conteúdo não ficar sob o banner --}}
+@endif
+
 <header>
     <div class="header-inner">
         <a href="{{ route('artigos.index') }}" class="logo">{{ $nichoAtual?->nome ?? config('app.name') }}</a>

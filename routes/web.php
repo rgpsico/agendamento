@@ -459,6 +459,7 @@ Route::prefix('super-admin')->name('super.admin.')->middleware(['auth', 'master'
     Route::get('/conteudos/novo',                 [SuperAdminController::class, 'conteudoCreate'])->name('conteudos.create');
     Route::post('/conteudos',                     [SuperAdminController::class, 'conteudoStore'])->name('conteudos.store');
     Route::post('/conteudos/gerar-ia',            [SuperAdminController::class, 'conteudoGerarIA'])->name('conteudos.gerar-ia');
+    Route::get('/conteudos/{conteudo}/preview',   [SuperAdminController::class, 'conteudoPreview'])->name('conteudos.preview');
     Route::get('/conteudos/{conteudo}/editar',    [SuperAdminController::class, 'conteudoEdit'])->name('conteudos.edit');
     Route::put('/conteudos/{conteudo}',           [SuperAdminController::class, 'conteudoUpdate'])->name('conteudos.update');
     Route::delete('/conteudos/{conteudo}',        [SuperAdminController::class, 'conteudoDestroy'])->name('conteudos.destroy');

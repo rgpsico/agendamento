@@ -776,6 +776,21 @@ EOT;
             ->with('success', 'Conteúdo salvo! ' . ($conteudo->status === 'publicado' ? 'O link público já está ativo.' : 'Mude o status para "Publicado" para ativar o link.'));
     }
 
+    public function conteudoPreview(SistemaConteudo $conteudo)
+    {
+        $nichoAtual  = NichoConfiguracao::where('nicho', $conteudo->nicho)->first();
+        $relacionados = SistemaConteudo::where('formato', 'artigo')
+            ->where('id', '!=', $conteudo->id)
+            ->doNicho($conteudo->nicho)
+            ->latest()
+            ->limit(3)
+            ->get();
+
+        // Passa flag de preview para a view poder exibir banner
+        return view('public.artigos.show', compact('conteudo', 'nichoAtual', 'relacionados'))
+            ->with('isPreview', true);
+    }
+
     public function conteudoEdit(SistemaConteudo $conteudo)
     {
         $nichos = NichoConfiguracao::orderBy('nome')->get();
