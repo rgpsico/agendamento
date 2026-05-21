@@ -272,7 +272,7 @@ class SiteController extends Controller
 
         $empresa = Auth::user()->empresa;
 
-        $site = EmpresaSite::firstOrNew(['empresa_id' => $empresa->id]);
+        $site = EmpresaSite::with('trackingCodes')->firstOrNew(['empresa_id' => $empresa->id]);
 
         if (!$site->exists) {
             // Gera o slug base

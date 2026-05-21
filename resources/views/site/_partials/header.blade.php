@@ -109,16 +109,8 @@
     </script>
     <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-4ZMP2C63TR">
-</script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-4ZMP2C63TR');
-</script>
+    {{-- ── Códigos de rastreamento / marketing (dinâmico) ── --}}
+    @include('site._partials.tracking')
     @php
         $corPrimaria = $site->cores['primaria'] ?? '#667eea';
         $corSecundaria = $site->cores['secundaria'] ?? '#764ba2';

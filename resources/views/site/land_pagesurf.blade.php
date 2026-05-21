@@ -357,6 +357,9 @@ footer{background:var(--bg)}
   h1.headline{font-size:42px}
 }
 </style>
+
+  {{-- ── Códigos de rastreamento / marketing ── --}}
+  @include('site._partials.tracking')
 </head>
 <body>
 

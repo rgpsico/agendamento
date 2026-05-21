@@ -66,10 +66,13 @@ class TrackingCodesController extends Controller
     // Excluir um tracking code
     public function destroy($id)
     {
-        $tracking = TrackingCode::findOrFail($id);      
-
+        $tracking = TrackingCode::findOrFail($id);
         $tracking->delete();
 
-        return response()->json(['success' => true, 'message' => 'Código de rastreamento removido com sucesso!']);
+        if (request()->expectsJson()) {
+            return response()->json(['success' => true, 'message' => 'Código removido com sucesso!']);
+        }
+
+        return back()->with('success', 'Código de rastreamento removido!');
     }
 }
