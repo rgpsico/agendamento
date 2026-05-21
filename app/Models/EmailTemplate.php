@@ -8,6 +8,7 @@ class EmailTemplate extends Model
 {
     protected $fillable = [
         'tenant_id',
+        'nicho',
         'nome',
         'assunto',
         'corpo',
@@ -21,6 +22,15 @@ class EmailTemplate extends Model
     public function scopeForTenant($query, int $tenantId)
     {
         return $query->where('tenant_id', $tenantId);
+    }
+
+    public function scopeForSuperAdmin($query, ?string $nicho = null)
+    {
+        $query->whereNull('tenant_id');
+        if ($nicho) {
+            $query->where(fn($q) => $q->where('nicho', $nicho)->orWhereNull('nicho'));
+        }
+        return $query;
     }
 
     public function renderCorpo(Lead $lead): string

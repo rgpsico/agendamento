@@ -427,6 +427,20 @@ Route::prefix('super-admin')->name('super.admin.')->middleware(['auth', 'master'
     Route::get('/crm',                            [SuperAdminController::class, 'crmLeads'])->name('crm.leads');
     Route::get('/crm/pipeline',                   [SuperAdminController::class, 'crmPipeline'])->name('crm.pipeline');
     Route::patch('/crm/{lead}/mover',             [SuperAdminController::class, 'crmMover'])->name('crm.mover');
+    Route::post('/crm/{lead}/email',              [SuperAdminController::class, 'crmEnviarEmail'])->name('crm.email');
+
+    // CRM — Sequências de automação (super admin)
+    Route::get('/crm/sequencias',                        [SuperAdminController::class, 'crmSequencias'])->name('crm.sequencias');
+    Route::post('/crm/sequencias',                       [SuperAdminController::class, 'crmSequenciaStore'])->name('crm.sequencias.store');
+    Route::patch('/crm/sequencias/{sequencia}/toggle',   [SuperAdminController::class, 'crmSequenciaToggle'])->name('crm.sequencias.toggle');
+    Route::delete('/crm/sequencias/{sequencia}',         [SuperAdminController::class, 'crmSequenciaDestroy'])->name('crm.sequencias.destroy');
+    Route::post('/crm/sequencias/{sequencia}/disparar',  [SuperAdminController::class, 'crmDispararParaLead'])->name('crm.sequencias.disparar');
+
+    // CRM — Templates de email (super admin)
+    Route::get('/crm/templates',                  [SuperAdminController::class, 'crmTemplates'])->name('crm.templates');
+    Route::post('/crm/templates',                 [SuperAdminController::class, 'crmTemplateStore'])->name('crm.templates.store');
+    Route::put('/crm/templates/{template}',       [SuperAdminController::class, 'crmTemplateUpdate'])->name('crm.templates.update');
+    Route::delete('/crm/templates/{template}',    [SuperAdminController::class, 'crmTemplateDestroy'])->name('crm.templates.destroy');
 });
 
 Route::resource('virtualhosts', VirtualHostController::class)->except(['show']);

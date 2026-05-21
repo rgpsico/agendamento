@@ -62,7 +62,11 @@ class AutomacaoService
 
     private function dispararSequenciasPorPipeline(Lead $lead, string $novoStatus): void
     {
-        $sequencias = AutomacaoSequencia::paraPipelineStatus((int) $lead->tenant_id, $novoStatus);
+        $sequencias = AutomacaoSequencia::paraPipelineStatus(
+            $lead->tenant_id ? (int) $lead->tenant_id : null,
+            $novoStatus,
+            $lead->origem ?? null  // nicho para leads do super admin
+        );
 
         foreach ($sequencias as $sequencia) {
             $this->iniciarSequencia($lead, $sequencia);

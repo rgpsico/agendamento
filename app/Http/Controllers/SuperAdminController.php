@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AutomacaoSequencia;
+use App\Models\EmailTemplate;
 use App\Models\Empresa;
 use App\Models\Lead;
 use App\Models\Modalidade;
 use App\Models\NichoConfiguracao;
+use App\Services\CRM\AutomacaoService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
@@ -266,14 +270,192 @@ class SuperAdminController extends Controller
         return view('super_admin.crm.pipeline', compact('pipeline', 'colunas', 'nicho'));
     }
 
-    public function crmMover(Request $request, Lead $lead)
+    public function crmMover(Request $request, Lead $lead, AutomacaoService $automacao)
     {
         $request->validate(['pipeline_status' => 'required|in:' . implode(',', array_keys(Lead::$pipelineStatus))]);
         abort_unless(is_null($lead->tenant_id), 403);
 
+        $statusAnterior = $lead->pipeline_status;
         $lead->update(['pipeline_status' => $request->pipeline_status]);
 
+        // Dispara automações do super admin
+        $automacao->aoMoverLead($lead, $statusAnterior, $request->pipeline_status);
+
         return back()->with('success', 'Lead movido.');
+    }
+
+    // ─── CRM Super Admin — Sequências ─────────────────────────────────────────
+
+    public function crmSequencias(Request $request)
+    {
+        $nicho     = $request->get('nicho');
+        $sequencias = AutomacaoSequencia::forSuperAdmin($nicho)
+            ->withCount(['envios as enviados_count' => fn($q) => $q->where('status', 'enviado')])
+            ->withCount(['envios as pendentes_count' => fn($q) => $q->where('status', 'pendente')])
+            ->with('etapas')
+            ->latest()
+            ->get();
+
+        $nichos    = NichoConfiguracao::orderBy('nome')->get();
+        $templates = EmailTemplate::forSuperAdmin($nicho)->where('ativo', true)->get();
+
+        return view('super_admin.crm.sequencias', compact('sequencias', 'nichos', 'nicho', 'templates'));
+    }
+
+    public function crmSequenciaStore(Request $request)
+    {
+        $validated = $request->validate([
+            'nome'                       => 'required|string|max:255',
+            'descricao'                  => 'nullable|string|max:1000',
+            'nicho'                      => 'nullable|string|max:50',
+            'gatilho'                    => 'required|in:manual,pipeline_status,novo_lead',
+            'gatilho_valor'              => 'nullable|string|max:100',
+            'etapas'                     => 'required|array|min:1',
+            'etapas.*.canal'             => 'required|in:whatsapp,email,ambos',
+            'etapas.*.delay_dias'        => 'required|integer|min:0|max:365',
+            'etapas.*.delay_horas'       => 'required|integer|min:0|max:23',
+            'etapas.*.tipo_mensagem'     => 'required|in:ia,template',
+            'etapas.*.instrucao_ia'      => 'nullable|string|max:1000',
+            'etapas.*.template_mensagem' => 'nullable|string|max:2000',
+            'etapas.*.assunto_email'     => 'nullable|string|max:255',
+        ]);
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($validated) {
+            $sequencia = AutomacaoSequencia::create([
+                'tenant_id'     => null,
+                'nicho'         => $validated['nicho'] ?: null,
+                'nome'          => $validated['nome'],
+                'descricao'     => $validated['descricao'],
+                'gatilho'       => $validated['gatilho'],
+                'gatilho_valor' => $validated['gatilho_valor'],
+                'ativo'         => true,
+            ]);
+
+            foreach ($validated['etapas'] as $ordem => $etapa) {
+                $sequencia->etapas()->create([
+                    'ordem'              => $ordem + 1,
+                    'canal'              => $etapa['canal'],
+                    'delay_dias'         => (int) $etapa['delay_dias'],
+                    'delay_horas'        => (int) $etapa['delay_horas'],
+                    'tipo_mensagem'      => $etapa['tipo_mensagem'],
+                    'instrucao_ia'       => $etapa['instrucao_ia'] ?? null,
+                    'template_mensagem'  => $etapa['template_mensagem'] ?? null,
+                    'assunto_email'      => $etapa['assunto_email'] ?? null,
+                ]);
+            }
+        });
+
+        return redirect()->route('super.admin.crm.sequencias')->with('success', 'Sequência criada!');
+    }
+
+    public function crmSequenciaToggle(AutomacaoSequencia $sequencia)
+    {
+        abort_unless(is_null($sequencia->tenant_id), 403);
+        $sequencia->update(['ativo' => !$sequencia->ativo]);
+        return back()->with('success', 'Sequência ' . ($sequencia->ativo ? 'ativada' : 'pausada') . '.');
+    }
+
+    public function crmSequenciaDestroy(AutomacaoSequencia $sequencia)
+    {
+        abort_unless(is_null($sequencia->tenant_id), 403);
+        $sequencia->delete();
+        return redirect()->route('super.admin.crm.sequencias')->with('success', 'Sequência removida.');
+    }
+
+    public function crmDispararParaLead(Request $request, AutomacaoSequencia $sequencia, AutomacaoService $automacao)
+    {
+        abort_unless(is_null($sequencia->tenant_id), 403);
+        $request->validate(['lead_id' => 'required|integer|exists:leads,id']);
+
+        $lead = Lead::findOrFail($request->lead_id);
+        abort_unless(is_null($lead->tenant_id), 403);
+
+        $sequencia->load('etapas');
+        $automacao->iniciarSequencia($lead, $sequencia);
+
+        return back()->with('success', "Sequência disparada para {$lead->nome}!");
+    }
+
+    // ─── CRM Super Admin — Templates de Email ────────────────────────────────
+
+    public function crmTemplates(Request $request)
+    {
+        $nicho     = $request->get('nicho');
+        $templates = EmailTemplate::forSuperAdmin($nicho)->latest()->get();
+        $nichos    = NichoConfiguracao::orderBy('nome')->get();
+
+        return view('super_admin.crm.templates', compact('templates', 'nichos', 'nicho'));
+    }
+
+    public function crmTemplateStore(Request $request)
+    {
+        $validated = $request->validate([
+            'nome'    => 'required|string|max:255',
+            'nicho'   => 'nullable|string|max:50',
+            'assunto' => 'required|string|max:255',
+            'corpo'   => 'required|string',
+        ]);
+
+        EmailTemplate::create([
+            'tenant_id' => null,
+            'nicho'     => $validated['nicho'] ?: null,
+            'nome'      => $validated['nome'],
+            'assunto'   => $validated['assunto'],
+            'corpo'     => $validated['corpo'],
+            'ativo'     => true,
+        ]);
+
+        return redirect()->route('super.admin.crm.templates')->with('success', 'Template criado!');
+    }
+
+    public function crmTemplateUpdate(Request $request, EmailTemplate $template)
+    {
+        abort_unless(is_null($template->tenant_id), 403);
+
+        $validated = $request->validate([
+            'nome'    => 'required|string|max:255',
+            'nicho'   => 'nullable|string|max:50',
+            'assunto' => 'required|string|max:255',
+            'corpo'   => 'required|string',
+            'ativo'   => 'boolean',
+        ]);
+
+        $template->update([
+            'nicho'   => $validated['nicho'] ?: null,
+            'nome'    => $validated['nome'],
+            'assunto' => $validated['assunto'],
+            'corpo'   => $validated['corpo'],
+            'ativo'   => $request->boolean('ativo'),
+        ]);
+
+        return redirect()->route('super.admin.crm.templates')->with('success', 'Template atualizado!');
+    }
+
+    public function crmTemplateDestroy(EmailTemplate $template)
+    {
+        abort_unless(is_null($template->tenant_id), 403);
+        $template->delete();
+        return redirect()->route('super.admin.crm.templates')->with('success', 'Template removido.');
+    }
+
+    public function crmEnviarEmail(Request $request, Lead $lead)
+    {
+        abort_unless(is_null($lead->tenant_id), 403);
+        abort_unless($lead->email, 422);
+
+        $request->validate(['email_template_id' => 'required|integer']);
+
+        $template = EmailTemplate::whereNull('tenant_id')
+            ->where('ativo', true)
+            ->findOrFail($request->email_template_id);
+
+        try {
+            Mail::to($lead->email)->queue(new \App\Mail\LeadTemplateMail($lead, $template));
+            $lead->update(['email_enviado_em' => now()]);
+            return back()->with('success', "E-mail enviado para {$lead->nome}.");
+        } catch (\Exception $e) {
+            return back()->with('error', 'Erro ao enviar: ' . $e->getMessage());
+        }
     }
 
     public function toggleStatus(Empresa $empresa)

@@ -11,6 +11,7 @@ class AutomacaoSequencia extends Model
 
     protected $fillable = [
         'tenant_id',
+        'nicho',
         'nome',
         'descricao',
         'ativo',
@@ -37,30 +38,55 @@ class AutomacaoSequencia extends Model
         return $query->where('tenant_id', $tenantId);
     }
 
+    /** Sequências do super admin (tenant_id NULL), opcionalmente filtradas por nicho */
+    public function scopeForSuperAdmin($query, ?string $nicho = null)
+    {
+        $query->whereNull('tenant_id');
+        if ($nicho) {
+            $query->where(fn($q) => $q->where('nicho', $nicho)->orWhereNull('nicho'));
+        }
+        return $query;
+    }
+
     public function scopeAtiva($query)
     {
         return $query->where('ativo', true);
     }
 
-    /** Retorna sequências que devem disparar para um determinado pipeline_status */
-    public static function paraPipelineStatus(int $tenantId, string $status)
+    /** Retorna sequências que devem disparar para um determinado pipeline_status (empresa ou super admin) */
+    public static function paraPipelineStatus(?int $tenantId, string $status, ?string $nicho = null)
     {
-        return static::where('tenant_id', $tenantId)
-            ->where('ativo', true)
+        $query = static::where('ativo', true)
             ->where('gatilho', 'pipeline_status')
             ->where('gatilho_valor', $status)
-            ->with('etapas')
-            ->get();
+            ->with('etapas');
+
+        if ($tenantId) {
+            $query->where('tenant_id', $tenantId);
+        } else {
+            // super admin: pega sequências sem tenant, do nicho específico ou globais
+            $query->whereNull('tenant_id')
+                  ->where(fn($q) => $q->where('nicho', $nicho)->orWhereNull('nicho'));
+        }
+
+        return $query->get();
     }
 
     /** Retorna sequências com gatilho 'novo_lead' */
-    public static function paraNovoLead(int $tenantId)
+    public static function paraNovoLead(?int $tenantId, ?string $nicho = null)
     {
-        return static::where('tenant_id', $tenantId)
-            ->where('ativo', true)
+        $query = static::where('ativo', true)
             ->where('gatilho', 'novo_lead')
-            ->with('etapas')
-            ->get();
+            ->with('etapas');
+
+        if ($tenantId) {
+            $query->where('tenant_id', $tenantId);
+        } else {
+            $query->whereNull('tenant_id')
+                  ->where(fn($q) => $q->where('nicho', $nicho)->orWhereNull('nicho'));
+        }
+
+        return $query->get();
     }
 
     public function getGatilhoLabelAttribute(): string
