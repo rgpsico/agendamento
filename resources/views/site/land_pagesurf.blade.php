@@ -297,6 +297,19 @@ footer{width:100%;margin-top:32px;padding:48px 0 28px;border-top:1px solid var(-
   justify-content:center;border:1px solid var(--line);transition:background .2s,color .2s,border-color .2s}
 .foot-socials a:hover{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 
+/* ── Google Translate / bandeiras ── */
+#google_translate_element{display:none}
+.goog-te-banner-frame,.skiptranslate{display:none!important}
+body{top:0!important}
+.lang-switch{display:flex;align-items:center;gap:4px;margin-left:8px}
+.lang-btn{width:30px;height:30px;border-radius:50%;border:2px solid transparent;
+  font-size:16px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;background:transparent;transition:border-color .2s,transform .15s;
+  padding:0;line-height:1}
+.lang-btn:hover{transform:scale(1.15);border-color:var(--line)}
+.lang-btn.active{border-color:var(--sea);box-shadow:0 0 0 2px color-mix(in srgb,var(--sea) 25%,transparent)}
+@media(max-width:640px){.lang-switch{gap:2px}.lang-btn{width:26px;height:26px;font-size:14px}}
+
 /* ── Seções com background próprio ── */
 #aulas{background:var(--bg-2)}
 #precos{background:color-mix(in srgb,var(--sea) 5%,var(--bg))}
@@ -365,11 +378,22 @@ footer{background:var(--bg)}
       <a href="#depoimentos">Depoimentos</a>
       <a href="#faq">FAQ</a>
     </nav>
+    {{-- Seletor de idiomas --}}
+    <div class="lang-switch" id="langSwitch">
+      <button class="lang-btn" onclick="gtTo('pt')" title="Português" data-lang="pt">🇧🇷</button>
+      <button class="lang-btn" onclick="gtTo('en')" title="English"   data-lang="en">🇺🇸</button>
+      <button class="lang-btn" onclick="gtTo('es')" title="Español"   data-lang="es">🇪🇸</button>
+      <button class="lang-btn" onclick="gtTo('fr')" title="Français"  data-lang="fr">🇫🇷</button>
+    </div>
+
     <div class="nav-cta">
       <a href="#contato" class="btn btn-primary">Agendar aula</a>
     </div>
   </div>
 </header>
+
+{{-- Google Translate element oculto --}}
+<div id="google_translate_element"></div>
 
 {{-- ═══ HERO ═══ --}}
 <section class="hero">
@@ -852,6 +876,51 @@ if(ondaForm){
   });
 }
 </script>
+
+{{-- ═══ GOOGLE TRANSLATE COM BANDEIRAS ═══ --}}
+<script>
+// ── Inicializa o widget oculto do Google Translate ──
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'pt',
+    includedLanguages: 'pt,en,es,fr',
+    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+    autoDisplay: false
+  }, 'google_translate_element');
+}
+
+// ── Detecta idioma ativo pelo cookie googtrans ──
+function getLangFromCookie() {
+  const match = document.cookie.match(/googtrans=\/pt\/([a-z]{2})/);
+  return match ? match[1] : 'pt';
+}
+
+// ── Muda idioma via cookie + reload ──
+function gtTo(lang) {
+  if (lang === 'pt') {
+    // Remove cookie → volta ao original
+    const domains = ['', '.' + location.hostname];
+    domains.forEach(d => {
+      document.cookie = 'googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT; domain=' + d;
+    });
+  } else {
+    const domains = ['', '.' + location.hostname];
+    domains.forEach(d => {
+      document.cookie = 'googtrans=/pt/' + lang + '; path=/; domain=' + d;
+    });
+  }
+  location.reload();
+}
+
+// ── Marca a bandeira do idioma ativo ──
+document.addEventListener('DOMContentLoaded', function () {
+  const current = getLangFromCookie();
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === current);
+  });
+});
+</script>
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" defer></script>
 
 </body>
 </html>
