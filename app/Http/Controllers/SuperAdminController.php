@@ -434,6 +434,80 @@ class SuperAdminController extends Controller
         return redirect()->route('super.admin.crm.templates')->with('success', 'Template atualizado!');
     }
 
+    public function crmTemplateGerarIA(Request $request)
+    {
+        $request->validate([
+            'instrucao' => 'required|string|max:1000',
+            'nicho'     => 'nullable|string|max:50',
+            'tom'       => 'nullable|string|max:50',
+        ]);
+
+        $nicho = $request->nicho ? ucfirst($request->nicho) : 'SaaS de gestão';
+        $tom   = $request->tom ?: 'profissional e amigável';
+
+        $prompt = <<<EOT
+Você é um especialista em email marketing para SaaS. Crie um template de email em português para um sistema de gestão chamado "{$nicho} Gestão".
+
+Tom desejado: {$tom}
+
+Instrução do usuário: {$request->instrucao}
+
+Variáveis disponíveis para personalização (use se fizer sentido):
+- {nome} → nome do lead
+- {email} → email do lead
+- {telefone} → telefone do lead
+- {empresa} → empresa do lead
+- {interesse} → interesse demonstrado
+
+Retorne APENAS um JSON válido com exatamente este formato:
+{
+  "assunto": "assunto do email aqui",
+  "corpo": "corpo completo do email aqui, pode ter quebras de linha"
+}
+
+Não inclua nenhum texto fora do JSON. O corpo pode ter até 500 palavras. Use linguagem natural, não use HTML.
+EOT;
+
+        try {
+            $response = \Illuminate\Support\Facades\Http::withHeaders([
+                'Authorization' => 'Bearer ' . env('DEEP_SEEK_API_KEY'),
+                'Content-Type'  => 'application/json',
+            ])->timeout(30)->post('https://api.deepseek.com/v1/chat/completions', [
+                'model'       => 'deepseek-chat',
+                'messages'    => [
+                    ['role' => 'system', 'content' => 'Você é um especialista em copywriting para email marketing de SaaS. Responda APENAS com JSON válido, sem markdown, sem explicações.'],
+                    ['role' => 'user',   'content' => $prompt],
+                ],
+                'temperature' => 0.8,
+                'max_tokens'  => 1500,
+            ]);
+
+            if (!$response->successful()) {
+                return response()->json(['error' => 'Erro na API DeepSeek: ' . $response->status()], 500);
+            }
+
+            $content = $response->json('choices.0.message.content', '');
+
+            // Remove markdown se a IA colocou ```json ... ```
+            $content = preg_replace('/^```(?:json)?\s*/i', '', trim($content));
+            $content = preg_replace('/\s*```$/', '', $content);
+
+            $decoded = json_decode($content, true);
+
+            if (!$decoded || !isset($decoded['assunto'], $decoded['corpo'])) {
+                return response()->json(['error' => 'Resposta da IA em formato inesperado. Tente novamente.'], 422);
+            }
+
+            return response()->json([
+                'assunto' => $decoded['assunto'],
+                'corpo'   => $decoded['corpo'],
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Falha ao conectar com DeepSeek: ' . $e->getMessage()], 500);
+        }
+    }
+
     public function crmTemplateDestroy(EmailTemplate $template)
     {
         abort_unless(is_null($template->tenant_id), 403);

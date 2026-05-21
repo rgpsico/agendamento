@@ -441,6 +441,7 @@ Route::prefix('super-admin')->name('super.admin.')->middleware(['auth', 'master'
     // CRM — Templates de email (super admin)
     Route::get('/crm/templates',                  [SuperAdminController::class, 'crmTemplates'])->name('crm.templates');
     Route::post('/crm/templates',                 [SuperAdminController::class, 'crmTemplateStore'])->name('crm.templates.store');
+    Route::post('/crm/templates/gerar-ia',        [SuperAdminController::class, 'crmTemplateGerarIA'])->name('crm.templates.gerar-ia');
     Route::put('/crm/templates/{template}',       [SuperAdminController::class, 'crmTemplateUpdate'])->name('crm.templates.update');
     Route::delete('/crm/templates/{template}',    [SuperAdminController::class, 'crmTemplateDestroy'])->name('crm.templates.destroy');
 });
