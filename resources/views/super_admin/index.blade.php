@@ -38,6 +38,7 @@
         <a href="{{ route('super.admin.index') }}"    class="nav-link active"><i class="fas fa-chart-pie"></i> Dashboard</a>
         <a href="{{ route('super.admin.clientes') }}" class="nav-link"><i class="fas fa-building"></i> Clientes</a>
         <a href="{{ route('super.admin.nichos') }}"   class="nav-link"><i class="fas fa-palette"></i> Nichos</a>
+        <a href="{{ route('super.admin.videos') }}"   class="nav-link"><i class="fas fa-play-circle"></i> Vídeos</a>
         <div style="padding:16px 24px 4px;font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:#4a5568">CRM</div>
         <a href="{{ route('super.admin.crm.leads') }}"    class="nav-link"><i class="fas fa-users"></i> Leads</a>
         <a href="{{ route('super.admin.crm.pipeline') }}" class="nav-link"><i class="fas fa-columns"></i> Pipeline</a>

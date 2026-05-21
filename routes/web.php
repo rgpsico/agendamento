@@ -412,6 +412,13 @@ Route::prefix('super-admin')->name('super.admin.')->middleware(['auth', 'master'
     Route::get('/clientes/{empresa}',             [SuperAdminController::class, 'show'])->name('show');
     Route::patch('/clientes/{empresa}/toggle',    [SuperAdminController::class, 'toggleStatus'])->name('toggle');
 
+    // Vídeos do sistema
+    Route::get('/videos',                         [SuperAdminController::class, 'videos'])->name('videos');
+    Route::post('/videos',                        [SuperAdminController::class, 'videoStore'])->name('videos.store');
+    Route::put('/videos/{video}',                 [SuperAdminController::class, 'videoUpdate'])->name('videos.update');
+    Route::delete('/videos/{video}',              [SuperAdminController::class, 'videoDestroy'])->name('videos.destroy');
+    Route::patch('/videos/{video}/toggle',        [SuperAdminController::class, 'videoToggle'])->name('videos.toggle');
+
     // Configuração de nichos
     Route::get('/nichos',                         [SuperAdminController::class, 'nichos'])->name('nichos');
     Route::get('/nichos/criar',                   [SuperAdminController::class, 'nichoCreate'])->name('nichos.create');

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AutomacaoSequencia;
 use App\Models\EmailTemplate;
 use App\Models\Empresa;
+use App\Models\SistemaVideo;
 use App\Models\Lead;
 use App\Models\Modalidade;
 use App\Models\NichoConfiguracao;
@@ -285,6 +286,111 @@ class SuperAdminController extends Controller
         $automacao->aoMoverLead($lead, $statusAnterior, $request->pipeline_status);
 
         return back()->with('success', 'Lead movido.');
+    }
+
+    // ─── Vídeos do Sistema ────────────────────────────────────────────────────
+
+    public function videos(Request $request)
+    {
+        $nicho     = $request->get('nicho');
+        $categoria = $request->get('categoria');
+
+        $videos = SistemaVideo::when($nicho, fn($q) => $q->where(fn($q2) =>
+                        $q2->where('nicho', $nicho)->orWhereNull('nicho')
+                    ))
+                    ->when($categoria, fn($q) => $q->where('categoria', $categoria))
+                    ->orderBy('ordem')->orderBy('created_at', 'desc')
+                    ->get();
+
+        $nichos      = NichoConfiguracao::orderBy('nome')->get();
+        $categorias  = SistemaVideo::whereNotNull('categoria')->distinct()->pluck('categoria');
+
+        return view('super_admin.videos.index', compact('videos', 'nichos', 'nicho', 'categorias', 'categoria'));
+    }
+
+    public function videoStore(Request $request)
+    {
+        $data = $request->validate([
+            'titulo'            => 'required|string|max:200',
+            'descricao'         => 'nullable|string|max:1000',
+            'tipo'              => 'required|in:youtube,vimeo,upload',
+            'url'               => 'nullable|url|max:500',
+            'arquivo'           => 'nullable|file|mimetypes:video/mp4,video/webm,video/ogg|max:204800',
+            'thumbnail'         => 'nullable|image|max:2048',
+            'nicho'             => 'nullable|string|max:50',
+            'categoria'         => 'nullable|string|max:100',
+            'duracao_segundos'  => 'nullable|integer|min:1',
+            'ordem'             => 'nullable|integer|min:0',
+        ]);
+
+        // Extrai video_id para YouTube/Vimeo
+        if (in_array($data['tipo'], ['youtube', 'vimeo']) && !empty($data['url'])) {
+            $data['video_id'] = SistemaVideo::extrairVideoId($data['url'], $data['tipo']);
+        }
+
+        // Upload de arquivo
+        if ($request->hasFile('arquivo')) {
+            $data['arquivo'] = $request->file('arquivo')->store('sistema/videos', 'public');
+        }
+
+        // Upload de thumbnail customizada
+        if ($request->hasFile('thumbnail')) {
+            $data['thumbnail'] = $request->file('thumbnail')->store('sistema/thumbnails', 'public');
+        }
+
+        $data['ativo'] = true;
+        $data['ordem'] = $data['ordem'] ?? 0;
+
+        SistemaVideo::create($data);
+
+        return redirect()->route('super.admin.videos')->with('success', 'Vídeo cadastrado com sucesso!');
+    }
+
+    public function videoUpdate(Request $request, SistemaVideo $video)
+    {
+        $data = $request->validate([
+            'titulo'            => 'required|string|max:200',
+            'descricao'         => 'nullable|string|max:1000',
+            'url'               => 'nullable|url|max:500',
+            'thumbnail'         => 'nullable|image|max:2048',
+            'nicho'             => 'nullable|string|max:50',
+            'categoria'         => 'nullable|string|max:100',
+            'duracao_segundos'  => 'nullable|integer|min:1',
+            'ordem'             => 'nullable|integer|min:0',
+            'ativo'             => 'boolean',
+        ]);
+
+        // Re-extrai video_id se URL mudou
+        if (!empty($data['url']) && $data['url'] !== $video->url) {
+            $data['video_id'] = SistemaVideo::extrairVideoId($data['url'], $video->tipo);
+        }
+
+        // Nova thumbnail
+        if ($request->hasFile('thumbnail')) {
+            if ($video->thumbnail) Storage::disk('public')->delete($video->thumbnail);
+            $data['thumbnail'] = $request->file('thumbnail')->store('sistema/thumbnails', 'public');
+        }
+
+        $data['ativo'] = $request->boolean('ativo');
+
+        $video->update($data);
+
+        return redirect()->route('super.admin.videos')->with('success', 'Vídeo atualizado!');
+    }
+
+    public function videoDestroy(SistemaVideo $video)
+    {
+        if ($video->arquivo)   Storage::disk('public')->delete($video->arquivo);
+        if ($video->thumbnail) Storage::disk('public')->delete($video->thumbnail);
+        $video->delete();
+
+        return redirect()->route('super.admin.videos')->with('success', 'Vídeo removido.');
+    }
+
+    public function videoToggle(SistemaVideo $video)
+    {
+        $video->update(['ativo' => !$video->ativo]);
+        return back()->with('success', 'Status do vídeo atualizado.');
     }
 
     // ─── CRM Super Admin — Sequências ─────────────────────────────────────────
