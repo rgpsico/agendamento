@@ -647,6 +647,12 @@ Route::get('/metrics', function () {
 use App\Http\Controllers\PlanoAlunoController;
 use App\Http\Controllers\SiteArtigoPublicPageController;
 
+// ─── Blog / Artigos públicos do sistema ───────────────────────────────────────
+use App\Http\Controllers\ConteudoPublicController;
+
+Route::get('/artigos',        [ConteudoPublicController::class, 'index'])->name('artigos.index');
+Route::get('/artigos/{slug}', [ConteudoPublicController::class, 'show'])->name('artigos.show');
+
 // Páginas legais
 Route::view('/termos', 'legal.termos')->name('legal.termos');
 Route::view('/privacidade', 'legal.privacidade')->name('legal.privacidade');

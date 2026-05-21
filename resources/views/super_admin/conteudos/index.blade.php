@@ -164,11 +164,23 @@
                            class="btn btn-sm btn-outline-primary" title="Editar">
                             <i class="fas fa-edit"></i>
                         </a>
+                        @if($item->status === 'publicado' && $item->formato === 'artigo')
+                        <button class="btn btn-sm btn-success btn-copiar-link"
+                                data-link="{{ url('/artigos/' . $item->slug) }}"
+                                title="Copiar link do artigo">
+                            <i class="fas fa-link"></i>
+                        </button>
+                        <a href="{{ url('/artigos/' . $item->slug) }}" target="_blank"
+                           class="btn btn-sm btn-outline-success" title="Ver artigo publicado">
+                            <i class="fas fa-external-link-alt"></i>
+                        </a>
+                        @else
                         <button class="btn btn-sm btn-outline-success btn-copiar"
                                 data-corpo="{{ htmlspecialchars(strip_tags($item->corpo ?? ''), ENT_QUOTES) }}"
                                 title="Copiar texto">
                             <i class="fas fa-copy"></i>
                         </button>
+                        @endif
                         @if(in_array($item->formato, ['post_instagram','artigo']))
                         <a href="https://www.instagram.com/" target="_blank"
                            class="btn btn-sm btn-outline-danger" title="Abrir Instagram">
@@ -224,6 +236,16 @@ document.querySelectorAll('.btn-copiar').forEach(btn => {
                 this.innerHTML = orig;
                 this.classList.replace('btn-success', 'btn-outline-success');
             }, 1800);
+        });
+    });
+});
+
+document.querySelectorAll('.btn-copiar-link').forEach(btn => {
+    btn.addEventListener('click', function () {
+        navigator.clipboard.writeText(this.dataset.link).then(() => {
+            const orig = this.innerHTML;
+            this.innerHTML = '<i class="fas fa-check"></i>';
+            setTimeout(() => this.innerHTML = orig, 1800);
         });
     });
 });

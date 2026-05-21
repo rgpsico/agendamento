@@ -746,29 +746,34 @@ EOT;
     public function conteudoStore(Request $request)
     {
         $validated = $request->validate([
-            'titulo'    => 'required|string|max:255',
-            'nicho'     => 'nullable|string|max:50',
-            'formato'   => 'required|in:artigo,post_instagram,post_tiktok,legenda_video',
-            'topico'    => 'nullable|string|max:2000',
-            'corpo'     => 'nullable|string',
-            'legenda'   => 'nullable|string|max:2200',
-            'hashtags'  => 'nullable|string|max:500',
-            'status'    => 'required|in:rascunho,revisado,publicado',
-            'imagem_capa' => 'nullable|image|max:4096',
+            'titulo'         => 'required|string|max:255',
+            'nicho'          => 'nullable|string|max:50',
+            'formato'        => 'required|in:artigo,post_instagram,post_tiktok,legenda_video',
+            'topico'         => 'nullable|string|max:2000',
+            'corpo'          => 'nullable|string',
+            'legenda'        => 'nullable|string|max:2200',
+            'hashtags'       => 'nullable|string|max:500',
+            'status'         => 'required|in:rascunho,revisado,publicado',
+            'publico'        => 'boolean',
+            'autor'          => 'nullable|string|max:120',
+            'meta_descricao' => 'nullable|string|max:300',
+            'imagem_capa'    => 'nullable|image|max:4096',
         ]);
+
+        $validated['publico'] = $request->boolean('publico', true);
 
         if ($request->hasFile('imagem_capa')) {
             $validated['imagem_capa'] = $request->file('imagem_capa')->store('conteudos/capas', 'public');
         }
 
-        // Contar palavras do corpo (strip HTML)
         if (!empty($validated['corpo'])) {
             $validated['palavras_count'] = str_word_count(strip_tags($validated['corpo']));
         }
 
-        SistemaConteudo::create($validated);
+        $conteudo = SistemaConteudo::create($validated);
 
-        return redirect()->route('super.admin.conteudos')->with('success', 'Conteúdo salvo com sucesso!');
+        return redirect()->route('super.admin.conteudos.edit', $conteudo)
+            ->with('success', 'Conteúdo salvo! ' . ($conteudo->status === 'publicado' ? 'O link público já está ativo.' : 'Mude o status para "Publicado" para ativar o link.'));
     }
 
     public function conteudoEdit(SistemaConteudo $conteudo)
@@ -780,16 +785,21 @@ EOT;
     public function conteudoUpdate(Request $request, SistemaConteudo $conteudo)
     {
         $validated = $request->validate([
-            'titulo'    => 'required|string|max:255',
-            'nicho'     => 'nullable|string|max:50',
-            'formato'   => 'required|in:artigo,post_instagram,post_tiktok,legenda_video',
-            'topico'    => 'nullable|string|max:2000',
-            'corpo'     => 'nullable|string',
-            'legenda'   => 'nullable|string|max:2200',
-            'hashtags'  => 'nullable|string|max:500',
-            'status'    => 'required|in:rascunho,revisado,publicado',
-            'imagem_capa' => 'nullable|image|max:4096',
+            'titulo'         => 'required|string|max:255',
+            'nicho'          => 'nullable|string|max:50',
+            'formato'        => 'required|in:artigo,post_instagram,post_tiktok,legenda_video',
+            'topico'         => 'nullable|string|max:2000',
+            'corpo'          => 'nullable|string',
+            'legenda'        => 'nullable|string|max:2200',
+            'hashtags'       => 'nullable|string|max:500',
+            'status'         => 'required|in:rascunho,revisado,publicado',
+            'publico'        => 'boolean',
+            'autor'          => 'nullable|string|max:120',
+            'meta_descricao' => 'nullable|string|max:300',
+            'imagem_capa'    => 'nullable|image|max:4096',
         ]);
+
+        $validated['publico'] = $request->boolean('publico', true);
 
         if ($request->hasFile('imagem_capa')) {
             if ($conteudo->imagem_capa) {
@@ -804,7 +814,12 @@ EOT;
 
         $conteudo->update($validated);
 
-        return redirect()->route('super.admin.conteudos')->with('success', 'Conteúdo atualizado!');
+        $msg = 'Conteúdo atualizado!';
+        if ($conteudo->status === 'publicado' && $conteudo->formato === 'artigo') {
+            $msg .= ' Link público: ' . $conteudo->url_publica;
+        }
+
+        return redirect()->route('super.admin.conteudos.edit', $conteudo)->with('success', $msg);
     }
 
     public function conteudoDestroy(SistemaConteudo $conteudo)

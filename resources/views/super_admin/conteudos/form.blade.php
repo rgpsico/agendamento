@@ -108,6 +108,41 @@
                         <h5 class="section-title"><i class="fas fa-info-circle text-primary me-2"></i>Informações</h5>
                     </div>
                     <div class="section-body">
+                        {{-- Link público (só na edição de artigo publicado) --}}
+                        @if(isset($conteudo) && $conteudo->status === 'publicado' && $conteudo->formato === 'artigo')
+                        <div class="alert mb-3 d-flex align-items-center justify-content-between"
+                             style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:12px 16px;">
+                            <div>
+                                <span style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#15803d;">
+                                    <i class="fas fa-globe me-1"></i> Artigo publicado — link compartilhável
+                                </span>
+                                <div style="font-size:.88rem;color:#166534;margin-top:2px;word-break:break-all;">
+                                    {{ $conteudo->url_publica }}
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2 flex-shrink-0 ms-3">
+                                <button type="button" class="btn btn-sm btn-success" id="btnCopiarLinkAdmin"
+                                        data-link="{{ $conteudo->url_publica }}">
+                                    <i class="fas fa-copy me-1"></i>Copiar
+                                </button>
+                                <a href="{{ $conteudo->url_publica }}" target="_blank"
+                                   class="btn btn-sm btn-outline-success">
+                                    <i class="fas fa-external-link-alt me-1"></i>Ver
+                                </a>
+                                <a href="https://wa.me/?text={{ urlencode($conteudo->titulo . "\n\n" . $conteudo->url_publica) }}"
+                                   target="_blank" class="btn btn-sm" style="background:#25d366;color:#fff;">
+                                    <i class="fab fa-whatsapp"></i>
+                                </a>
+                            </div>
+                        </div>
+                        @elseif(isset($conteudo) && $conteudo->formato === 'artigo')
+                        <div class="alert mb-3 d-flex align-items-center gap-2"
+                             style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:12px 16px;font-size:.85rem;color:#92400e;">
+                            <i class="fas fa-info-circle"></i>
+                            Mude o <strong>Status</strong> para <strong>Publicado</strong> para ativar o link público compartilhável.
+                        </div>
+                        @endif
+
                         <div class="row g-3">
                             <div class="col-md-8">
                                 <label class="form-label fw-semibold">Título <span class="text-danger">*</span></label>
@@ -142,6 +177,18 @@
                                         <option value="{{ $n->nicho }}" @selected(old('nicho', $conteudo->nicho ?? '') === $n->nicho)>{{ $n->nome }}</option>
                                     @endforeach
                                 </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Autor</label>
+                                <input type="text" name="autor" class="form-control"
+                                       value="{{ old('autor', $conteudo->autor ?? '') }}"
+                                       placeholder="Nome do autor (opcional)">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Meta descrição <small class="text-muted">(SEO)</small></label>
+                                <input type="text" name="meta_descricao" class="form-control"
+                                       value="{{ old('meta_descricao', $conteudo->meta_descricao ?? '') }}"
+                                       placeholder="Descrição para Google / WhatsApp preview (até 300 chars)" maxlength="300">
                             </div>
                             <div class="col-12">
                                 <label class="form-label fw-semibold">Imagem de Capa</label>
@@ -650,6 +697,15 @@ document.querySelectorAll('.btn-marcar-publicado').forEach(btn => {
             this.disabled = false;
             this.innerHTML = '<i class="fas fa-check me-1"></i>Registrar';
         }
+    });
+});
+
+/* ── Copiar link público ─────────────────────────────────── */
+document.getElementById('btnCopiarLinkAdmin')?.addEventListener('click', function() {
+    navigator.clipboard.writeText(this.dataset.link).then(() => {
+        const orig = this.innerHTML;
+        this.innerHTML = '<i class="fas fa-check me-1"></i>Copiado!';
+        setTimeout(() => this.innerHTML = orig, 2000);
     });
 });
 
