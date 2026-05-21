@@ -24,7 +24,7 @@
   $endStr     = $endRel ? trim(($endRel->logradouro ?? '').' '.($endRel->numero ?? '').', '.($endRel->bairro ?? '').' — '.($endRel->cidade ?? '')) : null;
 @endphp
 <!doctype html>
-<html lang="pt-BR" style="width:100%;margin:0;padding:0">
+<html lang="pt-BR">
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
@@ -52,22 +52,23 @@
   --sans:    "DM Sans", ui-sans-serif, system-ui, sans-serif;
   --mono:    "JetBrains Mono", ui-monospace, monospace;
 }
-*{box-sizing:border-box}
-html,body{margin:0;padding:0;width:100%}
-html{scroll-behavior:smooth}
-body{font-family:var(--sans);color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased;line-height:1.55;font-size:16px;overflow-x:hidden}
+*{box-sizing:border-box;margin:0;padding:0}
+html{width:100%;overflow-x:hidden;scroll-behavior:smooth}
+body{width:100%;min-height:100vh;font-family:var(--sans);color:var(--ink);background:var(--bg);
+  -webkit-font-smoothing:antialiased;line-height:1.55;font-size:16px;overflow-x:hidden}
 img,svg{display:block;max-width:100%}
 a{color:inherit;text-decoration:none}
 button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
 ::selection{background:var(--sea);color:#fff}
 
 /* ── Layout ── */
-.wrap{width:100%;max-width:1320px;margin:0 auto;padding-inline:clamp(16px,4vw,56px)}
-section{width:100%;padding:clamp(56px,8vw,112px) 0}
+.wrap{width:100%;max-width:1280px;margin-inline:auto;padding-inline:clamp(20px,5vw,60px)}
+section{display:block;width:100%;padding:clamp(56px,8vw,112px) 0}
 
 /* ── Nav ── */
-.nav{position:sticky;top:0;z-index:50;width:100%;backdrop-filter:blur(14px);
-  background:color-mix(in srgb,var(--bg) 82%,transparent);
+.nav{position:sticky;top:0;left:0;z-index:50;width:100%;display:block;
+  backdrop-filter:blur(14px);
+  background:color-mix(in srgb,var(--bg) 90%,transparent);
   border-bottom:1px solid var(--line)}
 .nav-row{display:flex;align-items:center;gap:20px;height:68px}
 .brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:700;font-size:21px;letter-spacing:-.01em;flex-shrink:0}
@@ -87,7 +88,9 @@ section{width:100%;padding:clamp(56px,8vw,112px) 0}
 .btn-ghost:hover{border-color:var(--ink)}
 
 /* ── Hero ── */
-.hero{position:relative;overflow:hidden;padding:clamp(48px,7vw,100px) 0 clamp(56px,8vw,112px)}
+.hero{position:relative;overflow:hidden;width:100%;
+  padding:clamp(48px,7vw,100px) 0 clamp(56px,8vw,112px);
+  background:linear-gradient(135deg,color-mix(in srgb,var(--sea) 9%,#fff) 0%,var(--bg) 65%)}
 .hero-grid{display:grid;grid-template-columns:1.1fr 0.9fr;gap:clamp(24px,4vw,64px);align-items:center}
 .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--sea-deep);
   display:inline-flex;align-items:center;gap:10px;margin-bottom:20px}
@@ -291,6 +294,18 @@ footer{width:100%;margin-top:32px;padding:48px 0 28px;border-top:1px solid var(-
 .foot-socials a{width:34px;height:34px;border-radius:50%;display:inline-flex;align-items:center;
   justify-content:center;border:1px solid var(--line);transition:background .2s,color .2s,border-color .2s}
 .foot-socials a:hover{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+
+/* ── Seções com background próprio ── */
+#aulas{background:var(--bg-2)}
+#precos{background:color-mix(in srgb,var(--sea) 5%,var(--bg))}
+#depoimentos{background:var(--bg)}
+#agendar{background:var(--ink);padding:clamp(48px,7vw,96px) 0}
+#agendar .wrap{max-width:100%;padding-inline:clamp(20px,5vw,60px)}
+/* Remove borda arredondada do CTA band quando seção já tem background */
+#agendar .cta-band{background:transparent;border-radius:0;padding:0;box-shadow:none}
+#agendar .cta-band h2{color:#f9f8f6}
+#agendar .cta-band p{color:rgba(249,248,246,.7)}
+footer{background:var(--bg)}
 
 /* ── WhatsApp flutuante ── */
 .whats{position:fixed;right:clamp(14px,3vw,26px);bottom:clamp(14px,3vw,26px);z-index:100;
