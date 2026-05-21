@@ -248,6 +248,11 @@ Route::get('/site/{slug}', [SiteController::class, 'mostrar'])->name('site.publi
 Route::get('/landing', [SiteController::class, 'landing'])->name('site.landing');
 Route::post('/landing/lead', [SiteController::class, 'lead'])->name('site.landing.lead');
 
+// Landing page da escola de surf (template completo)
+Route::get('/escola-de-surf', function () {
+    return view('site.land_pagesurf');
+})->name('site.land_pagesurf');
+
 
 Route::prefix('admin/site/ssl')->middleware(['auth'])->name('admin.site.dominios.')->group(function () {
     Route::get('/', [SiteController::class, 'editarDominio'])->name('index');
@@ -436,6 +441,7 @@ Route::prefix('super-admin')->name('super.admin.')->middleware(['auth', 'master'
     // Rotas bulk ANTES das rotas com {lead} para evitar conflito de parâmetro
     Route::post('/crm/bulk/email',                [SuperAdminController::class, 'crmBulkEmail'])->name('crm.bulk.email');
     Route::post('/crm/bulk/sequencia',            [SuperAdminController::class, 'crmBulkSequencia'])->name('crm.bulk.sequencia');
+    Route::post('/crm/bulk/mover',                [SuperAdminController::class, 'crmBulkMover'])->name('crm.bulk.mover');
     // Rotas com parâmetro dinâmico depois
     Route::patch('/crm/{lead}/mover',             [SuperAdminController::class, 'crmMover'])->name('crm.mover');
     Route::post('/crm/{lead}/email',              [SuperAdminController::class, 'crmEnviarEmail'])->name('crm.email');

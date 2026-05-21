@@ -278,6 +278,23 @@
 
     <div style="width:1px;height:28px;background:#ffffff30"></div>
 
+    {{-- Mover estágio em massa --}}
+    <form method="POST" action="{{ route('super.admin.crm.bulk.mover') }}" id="formBulkMover" class="d-flex gap-2 align-items-center">
+        @csrf
+        <div id="bulkMoverIds"></div>
+        <select name="pipeline_status" class="form-select form-select-sm" required>
+            <option value="">Mover para estágio...</option>
+            @foreach(\App\Models\Lead::$pipelineStatus as $val => $lbl)
+                <option value="{{ $val }}">{{ $lbl }}</option>
+            @endforeach
+        </select>
+        <button type="submit" class="btn btn-sm btn-info text-dark" title="Mover leads para estágio selecionado">
+            <i class="fas fa-arrows-alt-h me-1"></i> Mover
+        </button>
+    </form>
+
+    <div style="width:1px;height:28px;background:#ffffff30"></div>
+
     <button onclick="deselectAll()" class="btn btn-sm btn-outline-light">
         <i class="fas fa-times"></i> Limpar
     </button>
@@ -289,6 +306,7 @@ const bulkBar      = document.getElementById('bulkBar');
 const bulkCount    = document.getElementById('bulkCount');
 const bulkEmailIds = document.getElementById('bulkEmailIds');
 const bulkSeqIds   = document.getElementById('bulkSeqIds');
+const bulkMoverIds = document.getElementById('bulkMoverIds');
 const selectAll    = document.getElementById('selectAll');
 
 function getSelected() {
@@ -301,8 +319,8 @@ function updateBar() {
 
     bulkCount.textContent = n + (n === 1 ? ' selecionado' : ' selecionados');
 
-    // Injeta os lead_ids nos dois forms
-    ['bulkEmailIds', 'bulkSeqIds'].forEach(containerId => {
+    // Injeta os lead_ids nos três forms
+    ['bulkEmailIds', 'bulkSeqIds', 'bulkMoverIds'].forEach(containerId => {
         const container = document.getElementById(containerId);
         container.innerHTML = '';
         ids.forEach(id => {
@@ -353,6 +371,13 @@ document.getElementById('formBulkEmail')?.addEventListener('submit', function (e
 document.getElementById('formBulkSeq')?.addEventListener('submit', function (e) {
     const n = getSelected().length;
     if (!confirm(`Disparar sequência para ${n} lead(s)?`)) e.preventDefault();
+});
+document.getElementById('formBulkMover')?.addEventListener('submit', function (e) {
+    const n = getSelected().length;
+    const sel = this.querySelector('select[name="pipeline_status"]');
+    const label = sel.options[sel.selectedIndex]?.text ?? '';
+    if (!label || sel.value === '') { e.preventDefault(); return alert('Selecione um estágio de destino.'); }
+    if (!confirm(`Mover ${n} lead(s) para "${label}"?`)) e.preventDefault();
 });
 </script>
 </body>

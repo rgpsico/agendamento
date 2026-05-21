@@ -687,6 +687,39 @@ EOT;
         return back()->with('success', "Sequência \"{$sequencia->nome}\" disparada para {$disparados} lead(s).");
     }
 
+    public function crmBulkMover(Request $request, AutomacaoService $automacao)
+    {
+        $request->validate([
+            'lead_ids'        => 'required|array|min:1',
+            'lead_ids.*'      => 'integer|exists:leads,id',
+            'pipeline_status' => 'required|string|in:' . implode(',', array_keys(Lead::$pipelineStatus)),
+        ]);
+
+        $novoStatus = $request->pipeline_status;
+
+        $leads = Lead::whereIn('id', $request->lead_ids)
+            ->whereNull('tenant_id')
+            ->get();
+
+        if ($leads->isEmpty()) {
+            return back()->with('error', 'Nenhum lead selecionado.');
+        }
+
+        $movidos = 0;
+        foreach ($leads as $lead) {
+            if ($lead->pipeline_status === $novoStatus) {
+                continue; // já está no estágio, não faz nada
+            }
+            $statusAnterior = $lead->pipeline_status;
+            $lead->update(['pipeline_status' => $novoStatus]);
+            $automacao->aoMoverLead($lead->fresh(), $statusAnterior, $novoStatus);
+            $movidos++;
+        }
+
+        $label = Lead::$pipelineStatus[$novoStatus] ?? $novoStatus;
+        return back()->with('success', "{$movidos} lead(s) movido(s) para \"{$label}\".");
+    }
+
     public function crmEnviarEmail(Request $request, Lead $lead)
     {
         abort_unless(is_null($lead->tenant_id), 403);

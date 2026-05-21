@@ -9,178 +9,212 @@ use Illuminate\Http\Request;
 
 class PlanoAlunoController extends Controller
 {
-    // Listar todos os planos
-    public function index()
-    {
-        $planos = PlanoAluno::all();
-        return response()->json($planos);
-    }
-
-    // Criar novo plano
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'nome' => 'required|string|max:255',
-            'descricao' => 'nullable|string',
-            'valor' => 'required|numeric',
-            'duracao_dias' => 'required|integer',
-        ]);
-
-        $plano = PlanoAluno::create($validated);
-
-        // Redireciona para a listagem de planos com mensagem de sucesso
-        return redirect()->route('alunos.planos.index')
-            ->with('success', 'Plano criado com sucesso!');
-    }
-
-
-    // Mostrar um plano específico
-    public function show($id)
-    {
-        $plano = PlanoAluno::findOrFail($id);
-        return response()->json($plano);
-    }
-
-    // Atualizar um plano
-    public function update(Request $request, $id)
-    {
-        $plano = PlanoAluno::findOrFail($id);
-
-        $validated = $request->validate([
-            'nome' => 'sometimes|required|string|max:255',
-            'descricao' => 'nullable|string',
-            'valor' => 'sometimes|required|numeric',
-            'duracao_dias' => 'sometimes|required|integer',
-        ]);
-
-        $plano->update($validated);
-
-        // Redireciona para a listagem de planos com mensagem de sucesso
-        return redirect()->route('alunos.planos.index')
-            ->with('success', 'Plano atualizado com sucesso!');
-    }
-
-
-    // Deletar um plano
-    public function destroy($id)
-    {
-        $plano = PlanoAluno::findOrFail($id);
-        $plano->delete();
-
-        return redirect()->route('alunos.planos.index')
-            ->with('success', 'Plano Excluido com sucesso!');
-    }
-
-
-    // Tela de listagem
     public function indexView()
     {
-        $planos = PlanoAluno::all();
+        $planos = PlanoAluno::orderBy('nome')->get();
         return view('admin.aluno.planos.index', compact('planos'));
     }
 
-    // Tela de criação
     public function create()
     {
         return view('admin.aluno.planos.create');
     }
 
-    // Tela de edição
     public function edit(PlanoAluno $plano)
     {
         return view('admin.aluno.planos.edit', compact('plano'));
     }
 
-    // Funções store, update e destroy continuam iguais
+    public function store(Request $request)
+    {
+        $tipo = $request->input('tipo', 'livre');
+
+        if ($tipo === 'semanal') {
+            $validated = $request->validate([
+                'nome'          => 'required|string|max:255',
+                'valor'         => 'required|numeric|min:0',
+                'dias_semana'   => 'required|array|min:1',
+                'dias_semana.*' => 'in:seg,ter,qua,qui,sex,sab,dom',
+                'horario'       => 'nullable|string|max:10',
+                'duracao_meses' => 'nullable|integer|min:1',
+                'aulas_semana'  => 'nullable|integer|min:1',
+                'descricao'     => 'nullable|string',
+            ]);
+
+            PlanoAluno::create([
+                'nome'          => $validated['nome'],
+                'valor'         => $validated['valor'],
+                'dias_semana'   => json_encode($validated['dias_semana']),
+                'horario'       => $validated['horario'] ?? null,
+                'duracao_dias'  => isset($validated['duracao_meses']) ? $validated['duracao_meses'] * 30 : null,
+                'aulas_semana'  => $validated['aulas_semana'] ?? count($validated['dias_semana']),
+                'descricao'     => $validated['descricao'] ?? null,
+                'periodicidade' => 'mensal',
+                'tipo'          => 'semanal',
+            ]);
+
+        } else {
+            $validated = $request->validate([
+                'nome'          => 'required|string|max:255',
+                'valor'         => 'required|numeric|min:0',
+                'descricao'     => 'nullable|string',
+                'duracao_dias'  => 'nullable|integer|min:1',
+                'periodicidade' => 'nullable|string|max:20',
+            ]);
+
+            PlanoAluno::create([
+                'nome'          => $validated['nome'],
+                'valor'         => $validated['valor'],
+                'descricao'     => $validated['descricao'] ?? null,
+                'duracao_dias'  => $validated['duracao_dias'] ?? null,
+                'periodicidade' => $validated['periodicidade'] ?? 'avulso',
+                'tipo'          => 'livre',
+            ]);
+        }
+
+        return redirect()->route('alunos.planos.index')
+            ->with('success', 'Plano criado com sucesso!');
+    }
+
+    public function update(Request $request, $id)
+    {
+        $plano = PlanoAluno::findOrFail($id);
+        $tipo  = $request->input('tipo', $plano->tipo ?? 'livre');
+
+        if ($tipo === 'semanal') {
+            $validated = $request->validate([
+                'nome'          => 'required|string|max:255',
+                'valor'         => 'required|numeric|min:0',
+                'dias_semana'   => 'required|array|min:1',
+                'dias_semana.*' => 'in:seg,ter,qua,qui,sex,sab,dom',
+                'horario'       => 'nullable|string|max:10',
+                'duracao_meses' => 'nullable|integer|min:1',
+                'aulas_semana'  => 'nullable|integer|min:1',
+                'descricao'     => 'nullable|string',
+            ]);
+
+            $plano->update([
+                'nome'         => $validated['nome'],
+                'valor'        => $validated['valor'],
+                'dias_semana'  => json_encode($validated['dias_semana']),
+                'horario'      => $validated['horario'] ?? null,
+                'duracao_dias' => isset($validated['duracao_meses']) ? $validated['duracao_meses'] * 30 : null,
+                'aulas_semana' => $validated['aulas_semana'] ?? count($validated['dias_semana']),
+                'descricao'    => $validated['descricao'] ?? null,
+                'tipo'         => 'semanal',
+            ]);
+
+        } else {
+            $validated = $request->validate([
+                'nome'          => 'required|string|max:255',
+                'valor'         => 'required|numeric|min:0',
+                'descricao'     => 'nullable|string',
+                'duracao_dias'  => 'nullable|integer|min:1',
+                'periodicidade' => 'nullable|string|max:20',
+            ]);
+
+            $plano->update([
+                'nome'          => $validated['nome'],
+                'valor'         => $validated['valor'],
+                'descricao'     => $validated['descricao'] ?? null,
+                'duracao_dias'  => $validated['duracao_dias'] ?? null,
+                'periodicidade' => $validated['periodicidade'] ?? 'avulso',
+                'dias_semana'   => null,
+                'horario'       => null,
+                'tipo'          => 'livre',
+            ]);
+        }
+
+        return redirect()->route('alunos.planos.index')
+            ->with('success', 'Plano atualizado com sucesso!');
+    }
+
+    public function destroy($id)
+    {
+        PlanoAluno::findOrFail($id)->delete();
+        return redirect()->route('alunos.planos.index')
+            ->with('success', 'Plano removido com sucesso!');
+    }
+
+    /* ── API endpoints (mantidos para compatibilidade) ─── */
+
+    public function index()
+    {
+        return response()->json(PlanoAluno::orderBy('nome')->get());
+    }
+
+    public function show($id)
+    {
+        return response()->json(PlanoAluno::findOrFail($id));
+    }
+
+    /* ── Vincular aluno a plano ─────────────────────────── */
 
     public function vincular(Request $request)
     {
         $busca = $request->query('busca');
 
         $alunosQuery = Alunos::with('usuario')
-            ->whereHas('usuario', function ($query) {
-                $query->whereRaw('LOWER(tipo_usuario) = ?', ['aluno']);
-            });
+            ->whereHas('usuario', fn($q) => $q->whereRaw('LOWER(tipo_usuario) = ?', ['aluno']));
 
         if ($busca) {
-            $alunosQuery->whereHas('usuario', function ($query) use ($busca) {
-                $query->where('nome', 'like', "%{$busca}%")
-                    ->orWhere('email', 'like', "%{$busca}%")
-                    ->orWhere('telefone', 'like', "%{$busca}%");
-            });
+            $alunosQuery->whereHas('usuario', fn($q) =>
+                $q->where('nome', 'like', "%{$busca}%")
+                  ->orWhere('email', 'like', "%{$busca}%")
+                  ->orWhere('telefone', 'like', "%{$busca}%")
+            );
         }
 
-        $alunos = $alunosQuery
-            ->orderByDesc('id')
-            ->paginate(10)
-            ->withQueryString();
-
+        $alunos           = $alunosQuery->orderByDesc('id')->paginate(10)->withQueryString();
         $alunoSelecionado = null;
-        $historicoPlanos = collect();
-        $pagamentos = collect();
+        $historicoPlanos  = collect();
+        $pagamentos       = collect();
 
         if ($request->filled('aluno_id')) {
             $alunoSelecionado = Alunos::with([
                 'usuario',
-                'planos' => function ($query) {
-                    $query->orderByDesc('aluno_planos.created_at');
-                },
+                'planos' => fn($q) => $q->orderByDesc('aluno_planos.created_at'),
             ])->find($request->query('aluno_id'));
 
             if ($alunoSelecionado) {
                 $historicoPlanos = $alunoSelecionado->planos;
-                $pagamentos = Pagamento::where('aluno_id', $alunoSelecionado->id)
-                    ->latest()
-                    ->get();
+                $pagamentos      = Pagamento::where('aluno_id', $alunoSelecionado->id)->latest()->get();
             } else {
-                return redirect()
-                    ->route('alunos.planos.vincular', array_filter(['busca' => $busca]))
+                return redirect()->route('alunos.planos.vincular', array_filter(['busca' => $busca]))
                     ->with('error', 'Aluno não encontrado.');
             }
         }
 
         $planos = PlanoAluno::orderBy('nome')->get();
 
-        return view('admin.aluno.planos.vincular', [
-            'planos' => $planos,
-            'alunos' => $alunos,
-            'alunoSelecionado' => $alunoSelecionado,
-            'historicoPlanos' => $historicoPlanos,
-            'pagamentos' => $pagamentos,
-            'busca' => $busca,
-        ]);
+        return view('admin.aluno.planos.vincular', compact(
+            'planos', 'alunos', 'alunoSelecionado', 'historicoPlanos', 'pagamentos', 'busca'
+        ));
     }
 
     public function vincularStore(Request $request)
     {
         $validated = $request->validate([
-            'aluno_id' => 'required|exists:alunos,id',
-            'plano_id' => 'required|exists:planos_alunos,id',
-            'data_inicio' => 'nullable|date',
-            'data_fim' => 'nullable|date|after_or_equal:data_inicio',
-            'status' => 'required|in:ativo,inativo,cancelado',
-            'valor_pago' => 'nullable|numeric',
+            'aluno_id'        => 'required|exists:alunos,id',
+            'plano_id'        => 'required|exists:planos_alunos,id',
+            'data_inicio'     => 'nullable|date',
+            'data_fim'        => 'nullable|date|after_or_equal:data_inicio',
+            'status'          => 'required|in:ativo,inativo,cancelado',
+            'valor_pago'      => 'nullable|numeric',
             'forma_pagamento' => 'nullable|string|max:255',
         ]);
 
-        $aluno = Alunos::findOrFail($validated['aluno_id']);
-
-        $aluno->planos()->syncWithoutDetaching([
+        Alunos::findOrFail($validated['aluno_id'])->planos()->syncWithoutDetaching([
             $validated['plano_id'] => [
-                'data_inicio' => $validated['data_inicio'] ?? null,
-                'data_fim' => $validated['data_fim'] ?? null,
-                'status' => $validated['status'],
-                'valor_pago' => $validated['valor_pago'] ?? null,
+                'data_inicio'     => $validated['data_inicio'] ?? null,
+                'data_fim'        => $validated['data_fim'] ?? null,
+                'status'          => $validated['status'],
+                'valor_pago'      => $validated['valor_pago'] ?? null,
                 'forma_pagamento' => $validated['forma_pagamento'] ?? null,
             ],
         ]);
 
-        return redirect()
-            ->route('alunos.planos.vincular', [
-                'aluno_id' => $aluno->id,
-            ])
+        return redirect()->route('alunos.planos.vincular', ['aluno_id' => $validated['aluno_id']])
             ->with('success', 'Plano vinculado ao aluno com sucesso!');
     }
-
 }
-
