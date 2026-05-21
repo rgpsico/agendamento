@@ -30,17 +30,22 @@ class SiteServicoController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'titulo' => 'required|string|max:255',
-            'descricao' => 'required|string',
-            'preco' => 'nullable|numeric',
-            'imagem' => 'nullable|image',
+            'titulo'     => 'required|string|max:255',
+            'descricao'  => 'required|string',
+            'preco'      => 'nullable|numeric',
+            'imagem'     => 'nullable|image',
+            'nivel'      => 'nullable|string|max:60',
+            'duracao'    => 'nullable|string|max:60',
+            'capacidade' => 'nullable|string|max:80',
+            'info_extra' => 'nullable|string|max:100',
+            'destaque'   => 'nullable|boolean',
         ]);
 
         $empresaSite = Auth::user()->empresa->site;
 
-
-        $dados = $request->only(['titulo', 'descricao', 'preco']);
-        $dados['site_id'] = $empresaSite->id;
+        $dados = $request->only(['titulo', 'descricao', 'preco', 'nivel', 'duracao', 'capacidade', 'info_extra']);
+        $dados['site_id']  = $empresaSite->id;
+        $dados['destaque'] = $request->boolean('destaque');
 
         if ($request->hasFile('imagem')) {
             $dados['imagem'] = $request->file('imagem')->store('sites/servicos', 'public');
@@ -59,13 +64,19 @@ class SiteServicoController extends Controller
     public function update(Request $request, SiteServico $servico)
     {
         $request->validate([
-            'titulo' => 'required|string|max:255',
-            'descricao' => 'required|string',
-            'preco' => 'nullable|numeric',
-            'imagem' => 'nullable|image',
+            'titulo'     => 'required|string|max:255',
+            'descricao'  => 'required|string',
+            'preco'      => 'nullable|numeric',
+            'imagem'     => 'nullable|image',
+            'nivel'      => 'nullable|string|max:60',
+            'duracao'    => 'nullable|string|max:60',
+            'capacidade' => 'nullable|string|max:80',
+            'info_extra' => 'nullable|string|max:100',
+            'destaque'   => 'nullable|boolean',
         ]);
 
-        $dados = $request->only(['titulo', 'descricao', 'preco']);
+        $dados = $request->only(['titulo', 'descricao', 'preco', 'nivel', 'duracao', 'capacidade', 'info_extra']);
+        $dados['destaque'] = $request->boolean('destaque');
 
         if ($request->hasFile('imagem')) {
             $dados['imagem'] = $request->file('imagem')->store('sites/servicos', 'public');

@@ -147,6 +147,8 @@ h2.title em{font-style:italic;font-weight:500;color:var(--sea-deep)}
 .class-card{border-radius:var(--radius-l);overflow:hidden;background:var(--bg-2);border:1px solid var(--line);
   display:flex;flex-direction:column;transition:transform .3s}
 .class-card:hover{transform:translateY(-4px)}
+.class-card.featured{border-color:var(--sea);background:color-mix(in srgb,var(--sea) 4%,var(--bg-2))}
+.class-card.featured .tag{background:var(--sea);color:#fff}
 .class-card .media{aspect-ratio:16/9;overflow:hidden;position:relative}
 .class-card .media img{width:100%;height:100%;object-fit:cover}
 .class-card .media .ph-block{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
@@ -463,20 +465,30 @@ footer{background:var(--bg)}
     <div class="classes">
       @if($servicos->isNotEmpty())
         @foreach($servicos as $srv)
-        <article class="class-card">
+        <article class="class-card{{ $srv->destaque ? ' featured' : '' }}">
           <div class="media">
             @if(!empty($srv->imagem))
-              <img src="{{ asset('storage/'.$srv->imagem) }}" alt="{{ $srv->nome }}">
+              <img src="{{ asset('storage/'.$srv->imagem) }}" alt="{{ $srv->titulo }}">
             @else
-              <div class="ph-block"><span>{{ $srv->nome }}</span></div>
+              <div class="ph-block"><span>{{ $srv->titulo }}</span></div>
             @endif
           </div>
           <div class="body">
-            @if(!empty($srv->categoria))<span class="tag">{{ $srv->categoria }}</span>@endif
-            <h3>{{ $srv->nome }}</h3>
+            @if(!empty($srv->nivel))<span class="tag">{{ $srv->nivel }}</span>@endif
+            <h3>{{ $srv->titulo }}</h3>
             <p>{{ $srv->descricao }}</p>
-            @if(!empty($srv->preco))
-            <div class="meta"><span>💰 <b>R$ {{ number_format($srv->preco,2,',','.') }}</b></span></div>
+            @php
+              $meta = array_filter([
+                $srv->duracao   ? '⏱ <b>'.$srv->duracao.'</b>' : null,
+                $srv->capacidade? '👥 <b>'.$srv->capacidade.'</b>' : null,
+                $srv->info_extra? '📌 <b>'.$srv->info_extra.'</b>' : null,
+                $srv->preco     ? '💰 <b>R$ '.number_format($srv->preco,2,',','.').'</b>' : null,
+              ]);
+            @endphp
+            @if($meta)
+            <div class="meta">
+              @foreach($meta as $m)<span>{!! $m !!}</span>@endforeach
+            </div>
             @endif
           </div>
         </article>
