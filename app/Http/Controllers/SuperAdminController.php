@@ -246,7 +246,10 @@ class SuperAdminController extends Controller
             ->groupBy('origem')
             ->pluck('total', 'origem');
 
-        return view('super_admin.crm.leads', compact('leads', 'totais'));
+        $templates  = EmailTemplate::whereNull('tenant_id')->where('ativo', true)->orderBy('nome')->get();
+        $sequencias = AutomacaoSequencia::whereNull('tenant_id')->where('ativo', true)->orderBy('nome')->get();
+
+        return view('super_admin.crm.leads', compact('leads', 'totais', 'templates', 'sequencias'));
     }
 
     public function crmPipeline(Request $request)
@@ -436,6 +439,71 @@ class SuperAdminController extends Controller
         abort_unless(is_null($template->tenant_id), 403);
         $template->delete();
         return redirect()->route('super.admin.crm.templates')->with('success', 'Template removido.');
+    }
+
+    public function crmBulkEmail(Request $request)
+    {
+        $request->validate([
+            'lead_ids'          => 'required|array|min:1',
+            'lead_ids.*'        => 'integer|exists:leads,id',
+            'email_template_id' => 'required|integer',
+        ]);
+
+        $template = EmailTemplate::whereNull('tenant_id')
+            ->where('ativo', true)
+            ->findOrFail($request->email_template_id);
+
+        $leads = Lead::whereIn('id', $request->lead_ids)
+            ->whereNull('tenant_id')
+            ->whereNotNull('email')
+            ->get();
+
+        if ($leads->isEmpty()) {
+            return back()->with('error', 'Nenhum lead selecionado possui e-mail cadastrado.');
+        }
+
+        $enviados = 0;
+        foreach ($leads as $lead) {
+            try {
+                Mail::to($lead->email)->queue(new \App\Mail\LeadTemplateMail($lead, $template));
+                $lead->update(['email_enviado_em' => now()]);
+                $enviados++;
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error("Bulk email falhou para lead {$lead->id}: " . $e->getMessage());
+            }
+        }
+
+        return back()->with('success', "E-mail enfileirado para {$enviados} lead(s).");
+    }
+
+    public function crmBulkSequencia(Request $request, AutomacaoService $automacao)
+    {
+        $request->validate([
+            'lead_ids'      => 'required|array|min:1',
+            'lead_ids.*'    => 'integer|exists:leads,id',
+            'sequencia_id'  => 'required|integer',
+        ]);
+
+        $sequencia = AutomacaoSequencia::whereNull('tenant_id')
+            ->where('ativo', true)
+            ->with('etapas')
+            ->findOrFail($request->sequencia_id);
+
+        $leads = Lead::whereIn('id', $request->lead_ids)
+            ->whereNull('tenant_id')
+            ->get();
+
+        if ($leads->isEmpty()) {
+            return back()->with('error', 'Nenhum lead selecionado.');
+        }
+
+        $disparados = 0;
+        foreach ($leads as $lead) {
+            $automacao->iniciarSequencia($lead, $sequencia);
+            $disparados++;
+        }
+
+        return back()->with('success', "Sequência \"{$sequencia->nome}\" disparada para {$disparados} lead(s).");
     }
 
     public function crmEnviarEmail(Request $request, Lead $lead)

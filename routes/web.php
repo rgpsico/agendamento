@@ -428,6 +428,8 @@ Route::prefix('super-admin')->name('super.admin.')->middleware(['auth', 'master'
     Route::get('/crm/pipeline',                   [SuperAdminController::class, 'crmPipeline'])->name('crm.pipeline');
     Route::patch('/crm/{lead}/mover',             [SuperAdminController::class, 'crmMover'])->name('crm.mover');
     Route::post('/crm/{lead}/email',              [SuperAdminController::class, 'crmEnviarEmail'])->name('crm.email');
+    Route::post('/crm/bulk/email',                [SuperAdminController::class, 'crmBulkEmail'])->name('crm.bulk.email');
+    Route::post('/crm/bulk/sequencia',            [SuperAdminController::class, 'crmBulkSequencia'])->name('crm.bulk.sequencia');
 
     // CRM — Sequências de automação (super admin)
     Route::get('/crm/sequencias',                        [SuperAdminController::class, 'crmSequencias'])->name('crm.sequencias');

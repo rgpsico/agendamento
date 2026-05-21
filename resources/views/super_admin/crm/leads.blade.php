@@ -32,6 +32,19 @@
         .stat-chip { background: #fff; border: 1px solid #e9ecf0; border-radius: 10px; padding: 14px 20px; }
         .stat-chip .num { font-size: 1.6rem; font-weight: 800; color: #1a1f36; }
         .stat-chip .lbl { font-size: 0.75rem; color: #8892b0; text-transform: uppercase; letter-spacing: .05em; }
+
+        /* Barra de ações em massa */
+        #bulkBar {
+            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+            background: #1a1f36; color: #fff; border-radius: 14px;
+            padding: 14px 24px; display: none; align-items: center; gap: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,.25); z-index: 1000;
+            white-space: nowrap; min-width: 600px;
+        }
+        #bulkBar.show { display: flex; }
+        #bulkBar select { min-width: 180px; }
+        .row-cb { width: 18px; height: 18px; cursor: pointer; }
+        tr.selected-row { background: #f0f4ff !important; }
     </style>
 </head>
 <body>
@@ -124,9 +137,12 @@
     {{-- Tabela --}}
     <div class="card border-0 shadow-sm">
         <div class="table-responsive">
-            <table class="table table-hover mb-0 align-middle">
+            <table class="table table-hover mb-0 align-middle" id="leadsTable">
                 <thead class="table-light">
                     <tr>
+                        <th style="width:36px">
+                            <input type="checkbox" class="row-cb" id="selectAll" title="Selecionar todos">
+                        </th>
                         <th>Lead</th>
                         <th>Nicho</th>
                         <th>Telefone</th>
@@ -138,10 +154,13 @@
                 </thead>
                 <tbody>
                     @forelse($leads as $lead)
-                    <tr>
+                    <tr data-id="{{ $lead->id }}">
+                        <td>
+                            <input type="checkbox" class="row-cb lead-cb" value="{{ $lead->id }}">
+                        </td>
                         <td>
                             <div class="fw-semibold">{{ $lead->nome }}</div>
-                            <small class="text-muted">{{ $lead->email }}</small>
+                            <small class="text-muted">{{ $lead->email ?? '—' }}</small>
                         </td>
                         <td>
                             <span class="nicho-badge nicho-{{ $lead->origem }}">
@@ -191,7 +210,7 @@
                         </td>
                     </tr>
                     @empty
-                    <tr><td colspan="7" class="text-center text-muted py-5">Nenhum lead encontrado.</td></tr>
+                    <tr><td colspan="8" class="text-center text-muted py-5">Nenhum lead encontrado.</td></tr>
                     @endforelse
                 </tbody>
             </table>
@@ -204,6 +223,134 @@
     </div>
 </div>
 
+{{-- Barra de ações em massa --}}
+<div id="bulkBar">
+    <span id="bulkCount" class="fw-bold me-2">0 selecionados</span>
+
+    {{-- Email em massa --}}
+    <form method="POST" action="{{ route('super.admin.crm.bulk.email') }}" id="formBulkEmail" class="d-flex gap-2 align-items-center">
+        @csrf
+        <div id="bulkEmailIds"></div>
+        @if($templates->isNotEmpty())
+            <select name="email_template_id" class="form-select form-select-sm" required>
+                <option value="">Selecione template...</option>
+                @foreach($templates as $tpl)
+                    <option value="{{ $tpl->id }}">{{ $tpl->nome }}</option>
+                @endforeach
+            </select>
+            <button type="submit" class="btn btn-sm btn-light" title="Enviar e-mail para selecionados">
+                <i class="fas fa-envelope me-1"></i> Enviar e-mail
+            </button>
+        @else
+            <span class="text-white-50" style="font-size:.8rem">
+                <i class="fas fa-envelope me-1"></i>
+                <a href="{{ route('super.admin.crm.templates') }}" class="text-white">Criar template</a>
+            </span>
+        @endif
+    </form>
+
+    <div style="width:1px;height:28px;background:#ffffff30"></div>
+
+    {{-- Sequência em massa --}}
+    <form method="POST" action="{{ route('super.admin.crm.bulk.sequencia') }}" id="formBulkSeq" class="d-flex gap-2 align-items-center">
+        @csrf
+        <div id="bulkSeqIds"></div>
+        @if($sequencias->isNotEmpty())
+            <select name="sequencia_id" class="form-select form-select-sm" required>
+                <option value="">Selecione sequência...</option>
+                @foreach($sequencias as $seq)
+                    <option value="{{ $seq->id }}">{{ $seq->nome }}</option>
+                @endforeach
+            </select>
+            <button type="submit" class="btn btn-sm btn-warning text-dark" title="Disparar sequência para selecionados">
+                <i class="fas fa-robot me-1"></i> Disparar
+            </button>
+        @else
+            <span class="text-white-50" style="font-size:.8rem">
+                <i class="fas fa-robot me-1"></i>
+                <a href="{{ route('super.admin.crm.sequencias') }}" class="text-white">Criar sequência</a>
+            </span>
+        @endif
+    </form>
+
+    <div style="width:1px;height:28px;background:#ffffff30"></div>
+
+    <button onclick="deselectAll()" class="btn btn-sm btn-outline-light">
+        <i class="fas fa-times"></i> Limpar
+    </button>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const bulkBar      = document.getElementById('bulkBar');
+const bulkCount    = document.getElementById('bulkCount');
+const bulkEmailIds = document.getElementById('bulkEmailIds');
+const bulkSeqIds   = document.getElementById('bulkSeqIds');
+const selectAll    = document.getElementById('selectAll');
+
+function getSelected() {
+    return [...document.querySelectorAll('.lead-cb:checked')].map(cb => cb.value);
+}
+
+function updateBar() {
+    const ids = getSelected();
+    const n   = ids.length;
+
+    bulkCount.textContent = n + (n === 1 ? ' selecionado' : ' selecionados');
+
+    // Injeta os lead_ids nos dois forms
+    ['bulkEmailIds', 'bulkSeqIds'].forEach(containerId => {
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';
+        ids.forEach(id => {
+            const input = document.createElement('input');
+            input.type  = 'hidden';
+            input.name  = 'lead_ids[]';
+            input.value = id;
+            container.appendChild(input);
+        });
+    });
+
+    // Destaca linhas selecionadas
+    document.querySelectorAll('.lead-cb').forEach(cb => {
+        cb.closest('tr').classList.toggle('selected-row', cb.checked);
+    });
+
+    bulkBar.classList.toggle('show', n > 0);
+}
+
+function deselectAll() {
+    document.querySelectorAll('.lead-cb').forEach(cb => cb.checked = false);
+    selectAll.checked = false;
+    updateBar();
+}
+
+// Select all da página atual
+selectAll.addEventListener('change', function () {
+    document.querySelectorAll('.lead-cb').forEach(cb => cb.checked = this.checked);
+    updateBar();
+});
+
+// Cada checkbox individual
+document.querySelectorAll('.lead-cb').forEach(cb => {
+    cb.addEventListener('change', function () {
+        const total    = document.querySelectorAll('.lead-cb').length;
+        const checked  = document.querySelectorAll('.lead-cb:checked').length;
+        selectAll.indeterminate = checked > 0 && checked < total;
+        selectAll.checked       = checked === total;
+        updateBar();
+    });
+});
+
+// Confirmação antes de disparar em massa
+document.getElementById('formBulkEmail')?.addEventListener('submit', function (e) {
+    const n = getSelected().length;
+    if (!confirm(`Enviar e-mail para ${n} lead(s)?`)) e.preventDefault();
+});
+document.getElementById('formBulkSeq')?.addEventListener('submit', function (e) {
+    const n = getSelected().length;
+    if (!confirm(`Disparar sequência para ${n} lead(s)?`)) e.preventDefault();
+});
+</script>
 </body>
 </html>
