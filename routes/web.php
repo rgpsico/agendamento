@@ -654,6 +654,21 @@ Route::get('/metrics', function () {
 use App\Http\Controllers\PlanoAlunoController;
 use App\Http\Controllers\SiteArtigoPublicPageController;
 
+// ─── SEO: Sitemap + Robots ────────────────────────────────────────────────────
+use App\Http\Controllers\SitemapController;
+
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
+Route::get('/robots.txt',  fn() => response(
+    "User-agent: *\n" .
+    "Allow: /\n" .
+    "Disallow: /admin\n" .
+    "Disallow: /super-admin\n" .
+    "Disallow: /login\n" .
+    "Disallow: /register\n\n" .
+    "Sitemap: " . request()->getSchemeAndHttpHost() . "/sitemap.xml\n",
+    200, ['Content-Type' => 'text/plain']
+))->name('robots');
+
 // ─── Blog / Artigos públicos do sistema ───────────────────────────────────────
 use App\Http\Controllers\ConteudoPublicController;
 
