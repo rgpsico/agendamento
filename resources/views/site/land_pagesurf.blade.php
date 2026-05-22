@@ -409,15 +409,19 @@ footer{background:var(--bg)}
           @endif
         </a>
         {{-- Bandeiras — ficam sempre visíveis, abaixo do logo --}}
+        @php $flagBase = request()->getSchemeAndHttpHost(); @endphp
         <div class="lang-bar" id="langSwitch">
           <button class="lang-btn" onclick="gtTo('pt')" title="Português" data-lang="pt">
-            <img src="{{ asset('admin/img/country/brasil.png') }}" alt="PT">
+            <img src="{{ $flagBase }}/admin/img/country/brasil.png" alt="PT">
           </button>
           <button class="lang-btn" onclick="gtTo('en')" title="English" data-lang="en">
-            <img src="{{ asset('admin/img/country/usa.png') }}" alt="EN">
+            <img src="{{ $flagBase }}/admin/img/country/usa.png" alt="EN">
           </button>
           <button class="lang-btn" onclick="gtTo('es')" title="Español" data-lang="es">
-            <img src="{{ asset('admin/img/country/espanha.png') }}" alt="ES">
+            <img src="{{ $flagBase }}/admin/img/country/espanha.png" alt="ES">
+          </button>
+          <button class="lang-btn" onclick="gtTo('fr')" title="Français" data-lang="fr">
+            <img src="{{ $flagBase }}/admin/img/country/franca.png" alt="FR">
           </button>
         </div>
       </div>
