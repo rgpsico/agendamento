@@ -352,10 +352,20 @@ form.contact-form{background:var(--bg);border:1px solid var(--line);border-radiu
   color:var(--sea-deep);display:inline-flex;align-items:center;gap:6px;
   transition:gap .2s}
 .blog-card:hover .read{gap:10px}
+.blog-card--featured{grid-column:span 2}
+.blog-card--featured .thumb{aspect-ratio:21/9}
+.blog-card--featured h3{font-size:24px}
 .blog-empty{text-align:center;padding:40px 0;color:var(--ink-soft);font-size:15px}
 .blog-empty a{color:var(--sea-deep);font-weight:600}
-@media(max-width:980px){.blog-grid{grid-template-columns:1fr 1fr}}
-@media(max-width:640px){.blog-grid{grid-template-columns:1fr}}
+@media(max-width:980px){
+  .blog-grid{grid-template-columns:1fr 1fr}
+  .blog-card--featured{grid-column:span 2}
+  .blog-card--featured .thumb{aspect-ratio:16/9}
+}
+@media(max-width:640px){
+  .blog-grid{grid-template-columns:1fr}
+  .blog-card--featured{grid-column:span 1}
+}
 
 /* ── Footer ── */
 footer{width:100%;margin-top:32px;padding:48px 0 28px;border-top:1px solid var(--line)}
@@ -505,6 +515,7 @@ footer{background:var(--bg)}
         <a href="#precos">Preços</a>
         <a href="#depoimentos">Depoimentos</a>
         <a href="#faq">FAQ</a>
+        <a href="#blog" style="color:var(--sea-deep);font-weight:600">Blog</a>
       </nav>
 
       <div class="nav-cta">
@@ -924,13 +935,20 @@ footer{background:var(--bg)}
   <div class="wrap">
     <div class="section-head">
       <div>
-        <span class="kicker">Blog</span>
-        <h2 class="title">Surf, <em>conhecimento e mar.</em></h2>
+        <span class="kicker">Educação &amp; Surf</span>
+        <h2 class="title">Aprender nunca <em>sai de moda.</em></h2>
       </div>
-      <p class="section-lead">
-        Dicas de técnica, segurança, destinos e tudo que você precisa saber antes de entrar na água.
-        <br><a href="{{ route('site.blog.index') }}" style="color:var(--sea-deep);font-weight:600">Ver todos os artigos →</a>
-      </p>
+      <div>
+        <p class="section-lead">
+          Técnica, segurança, condições do mar, destinos e histórias de quem vive o surf de verdade.
+          Conteúdo novo toda semana.
+        </p>
+        <a href="{{ route('site.blog.index') }}"
+           class="btn btn-ghost" style="margin-top:18px;display:inline-flex">
+          Ver todos os artigos
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-left:6px"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
     </div>
 
     @if($artigos->isNotEmpty())
@@ -965,7 +983,8 @@ footer{background:var(--bg)}
 
       <div class="blog-grid">
         @foreach($artigos as $artigo)
-        <article class="blog-card" itemscope itemtype="https://schema.org/BlogPosting">
+        <article class="blog-card {{ $loop->first ? 'blog-card--featured' : '' }}"
+                 itemscope itemtype="https://schema.org/BlogPosting">
           <a href="{{ route('site.blog.show', $artigo->slug) }}" class="thumb" aria-label="{{ $artigo->titulo }}">
             @if($artigo->imagem_capa)
               <img src="{{ request()->getSchemeAndHttpHost() }}/storage/{{ $artigo->imagem_capa }}"
@@ -976,10 +995,10 @@ footer{background:var(--bg)}
           </a>
           <div class="body">
             <div class="meta-row">
-              <span class="cat">Surf</span>
+              <span class="cat">{{ $loop->first ? '⭐ Destaque' : 'Surf' }}</span>
               @if($artigo->publicado_em)
                 <time class="date" itemprop="datePublished" datetime="{{ $artigo->publicado_em->toIso8601String() }}">
-                  {{ $artigo->publicado_em->translatedFormat('d M Y') }}
+                  {{ $artigo->publicado_em->translatedFormat('d \d\e M \d\e Y') }}
                 </time>
               @endif
             </div>
@@ -990,7 +1009,8 @@ footer{background:var(--bg)}
               <p itemprop="description">{{ $artigo->resumo }}</p>
             @endif
             <a href="{{ route('site.blog.show', $artigo->slug) }}" class="read">
-              Ler artigo <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              Ler artigo
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </a>
           </div>
         </article>

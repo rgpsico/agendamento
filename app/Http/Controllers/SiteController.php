@@ -258,7 +258,7 @@ class SiteController extends Controller
                 'artigos' => fn($q) => $q
                     ->where('status', 'publicado')
                     ->latest('publicado_em')
-                    ->limit(3),
+                    ->limit(6),
             ])
             ->firstOrFail();
 
