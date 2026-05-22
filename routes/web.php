@@ -660,6 +660,10 @@ use App\Http\Controllers\ConteudoPublicController;
 Route::get('/artigos',        [ConteudoPublicController::class, 'index'])->name('artigos.index');
 Route::get('/artigos/{slug}', [ConteudoPublicController::class, 'show'])->name('artigos.show');
 
+// Blog por domínio (domain-aware — usa SiteArtigoPublicPageController)
+Route::get('/blog',           [SiteArtigoPublicPageController::class, 'index'])->name('site.blog.index');
+Route::get('/blog/{slug}',    [SiteArtigoPublicPageController::class, 'show'])->name('site.blog.show');
+
 // Páginas legais
 Route::view('/termos', 'legal.termos')->name('legal.termos');
 Route::view('/privacidade', 'legal.privacidade')->name('legal.privacidade');

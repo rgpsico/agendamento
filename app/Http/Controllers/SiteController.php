@@ -255,6 +255,10 @@ class SiteController extends Controller
                 'empresa.modalidade',
                 'template',
                 'trackingCodes',
+                'artigos' => fn($q) => $q
+                    ->where('status', 'publicado')
+                    ->latest('publicado_em')
+                    ->limit(3),
             ])
             ->firstOrFail();
 

@@ -30,6 +30,41 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <title>{{ $nomeEscola }} — Escola de Surf</title>
+<meta name="description" content="{{ $descricao }}">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="{{ request()->url() }}">
+
+{{-- Open Graph --}}
+<meta property="og:type"        content="website">
+<meta property="og:title"       content="{{ $nomeEscola }} — Escola de Surf">
+<meta property="og:description" content="{{ $descricao }}">
+<meta property="og:url"         content="{{ request()->url() }}">
+@if($capaUrl)<meta property="og:image" content="{{ $capaUrl }}">@endif
+<meta property="og:locale"      content="pt_BR">
+
+{{-- Twitter Card --}}
+<meta name="twitter:card"        content="summary_large_image">
+<meta name="twitter:title"       content="{{ $nomeEscola }} — Escola de Surf">
+<meta name="twitter:description" content="{{ $descricao }}">
+@if($capaUrl)<meta name="twitter:image" content="{{ $capaUrl }}">@endif
+
+{{-- Schema.org LocalBusiness --}}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SportsActivityLocation",
+  "name": "{{ $nomeEscola }}",
+  "description": "{{ $descricao }}"
+  @if($logoUrl),"logo": "{{ $logoUrl }}"@endif
+  @if($capaUrl),"image": "{{ $capaUrl }}"@endif
+  @if($wa),"telephone": "+{{ $wa }}"@endif
+  @if($emailSite),"email": "{{ $emailSite }}"@endif
+  @if($endStr),"address": {"@type":"PostalAddress","streetAddress":"{{ $endStr }}"}@endif
+  ,"url": "{{ request()->getSchemeAndHttpHost() }}"
+  ,"sameAs": []
+}
+</script>
+
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
@@ -283,6 +318,44 @@ form.contact-form{background:var(--bg);border:1px solid var(--line);border-radiu
   border:1px solid color-mix(in srgb,var(--sea) 28%,var(--line));border-radius:10px;
   padding:16px 18px;font-size:14px;color:var(--sea-deep);align-items:center;gap:10px}
 .form-success.show{display:flex}
+
+/* ── Blog / Artigos ── */
+#blog{background:var(--bg-2)}
+.blog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.blog-card{background:var(--bg);border:1px solid var(--line);border-radius:var(--radius-l);
+  overflow:hidden;display:flex;flex-direction:column;
+  transition:transform .3s,box-shadow .3s}
+.blog-card:hover{transform:translateY(-4px);
+  box-shadow:0 16px 40px -16px color-mix(in srgb,var(--ink) 18%,transparent)}
+.blog-card .thumb{aspect-ratio:16/9;overflow:hidden;position:relative;background:var(--sea-soft)}
+.blog-card .thumb img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.blog-card:hover .thumb img{transform:scale(1.05)}
+.blog-card .thumb .ph-block{position:absolute;inset:0;display:flex;align-items:center;
+  justify-content:center;
+  background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--sea) 10%,#fff) 0 14px,var(--sea-soft) 14px 28px)}
+.blog-card .thumb .ph-block span{background:rgba(255,255,255,.8);padding:5px 10px;
+  border-radius:5px;font-family:var(--mono);font-size:11px;text-transform:uppercase;color:var(--sea-deep)}
+.blog-card .body{padding:20px 22px 24px;display:flex;flex-direction:column;gap:8px;flex:1}
+.blog-card .meta-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.blog-card .cat{font-family:var(--mono);font-size:10px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--sea-deep);background:var(--sea-soft);
+  padding:3px 8px;border-radius:5px}
+.blog-card .date{font-family:var(--mono);font-size:10px;color:var(--ink-soft)}
+.blog-card h3{font-family:var(--display);font-size:19px;font-weight:600;
+  line-height:1.25;letter-spacing:-.01em;margin:0;text-wrap:balance}
+.blog-card h3 a{color:var(--ink);transition:color .2s}
+.blog-card h3 a:hover{color:var(--sea-deep)}
+.blog-card p{margin:0;color:var(--ink-soft);font-size:14px;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.blog-card .read{margin-top:auto;padding-top:14px;
+  font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--sea-deep);display:inline-flex;align-items:center;gap:6px;
+  transition:gap .2s}
+.blog-card:hover .read{gap:10px}
+.blog-empty{text-align:center;padding:40px 0;color:var(--ink-soft);font-size:15px}
+.blog-empty a{color:var(--sea-deep);font-weight:600}
+@media(max-width:980px){.blog-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:640px){.blog-grid{grid-template-columns:1fr}}
 
 /* ── Footer ── */
 footer{width:100%;margin-top:32px;padding:48px 0 28px;border-top:1px solid var(--line)}
@@ -842,6 +915,95 @@ footer{background:var(--bg)}
         @endif
       </div>
     </div>
+  </div>
+</section>
+
+{{-- ═══ BLOG / ÚLTIMOS ARTIGOS ═══ --}}
+@php $artigos = $site->artigos ?? collect(); @endphp
+<section id="blog">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="kicker">Blog</span>
+        <h2 class="title">Surf, <em>conhecimento e mar.</em></h2>
+      </div>
+      <p class="section-lead">
+        Dicas de técnica, segurança, destinos e tudo que você precisa saber antes de entrar na água.
+        <br><a href="{{ route('site.blog.index') }}" style="color:var(--sea-deep);font-weight:600">Ver todos os artigos →</a>
+      </p>
+    </div>
+
+    @if($artigos->isNotEmpty())
+      {{-- Schema.org BlogPosting para SEO --}}
+      <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Blog",
+        "name": "{{ $nomeEscola }} — Blog",
+        "url": "{{ request()->getSchemeAndHttpHost() }}/blog",
+        "blogPost": [
+          @foreach($artigos as $i => $a)
+          {
+            "@type": "BlogPosting",
+            "headline": "{{ addslashes($a->titulo) }}",
+            "description": "{{ addslashes($a->resumo ?? '') }}",
+            "url": "{{ request()->getSchemeAndHttpHost() }}/blog/{{ $a->slug }}",
+            "datePublished": "{{ $a->publicado_em?->toIso8601String() }}",
+            "dateModified":  "{{ $a->updated_at->toIso8601String() }}",
+            "author": {"@type":"Organization","name":"{{ $nomeEscola }}"},
+            "publisher": {
+              "@type": "Organization",
+              "name": "{{ $nomeEscola }}"
+              @if($logoUrl),"logo":{"@type":"ImageObject","url":"{{ $logoUrl }}"}@endif
+            }
+            @if($a->imagem_capa),"image":"{{ request()->getSchemeAndHttpHost() }}/storage/{{ $a->imagem_capa }}"@endif
+          }{{ !$loop->last ? ',' : '' }}
+          @endforeach
+        ]
+      }
+      </script>
+
+      <div class="blog-grid">
+        @foreach($artigos as $artigo)
+        <article class="blog-card" itemscope itemtype="https://schema.org/BlogPosting">
+          <a href="{{ route('site.blog.show', $artigo->slug) }}" class="thumb" aria-label="{{ $artigo->titulo }}">
+            @if($artigo->imagem_capa)
+              <img src="{{ request()->getSchemeAndHttpHost() }}/storage/{{ $artigo->imagem_capa }}"
+                   alt="{{ $artigo->titulo }}" itemprop="image" loading="lazy">
+            @else
+              <div class="ph-block"><span>Surf &amp; Mar</span></div>
+            @endif
+          </a>
+          <div class="body">
+            <div class="meta-row">
+              <span class="cat">Surf</span>
+              @if($artigo->publicado_em)
+                <time class="date" itemprop="datePublished" datetime="{{ $artigo->publicado_em->toIso8601String() }}">
+                  {{ $artigo->publicado_em->translatedFormat('d M Y') }}
+                </time>
+              @endif
+            </div>
+            <h3 itemprop="headline">
+              <a href="{{ route('site.blog.show', $artigo->slug) }}">{{ $artigo->titulo }}</a>
+            </h3>
+            @if($artigo->resumo)
+              <p itemprop="description">{{ $artigo->resumo }}</p>
+            @endif
+            <a href="{{ route('site.blog.show', $artigo->slug) }}" class="read">
+              Ler artigo <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+          </div>
+        </article>
+        @endforeach
+      </div>
+
+    @else
+      {{-- Sem artigos: exibe CTA para criar --}}
+      <div class="blog-empty">
+        <p>Em breve novos artigos sobre surf, técnica e segurança no mar.</p>
+        <p style="margin-top:8px"><a href="{{ route('site.blog.index') }}">Acompanhe o blog →</a></p>
+      </div>
+    @endif
   </div>
 </section>
 

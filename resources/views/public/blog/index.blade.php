@@ -17,9 +17,9 @@
         }
 
         :root {
-            --primary: #0f766e;
-            --primary-dark: #115e59;
-            --accent: #f97316;
+            --primary: {{ $site->cores['primaria'] ?? '#0f766e' }};
+            --primary-dark: color-mix(in srgb, {{ $site->cores['primaria'] ?? '#0f766e' }} 75%, #000);
+            --accent: {{ $site->cores['secundaria'] ?? '#f97316' }};
             --text-dark: #0f172a;
             --text-light: #475569;
             --bg-light: #f8fafc;
