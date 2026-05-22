@@ -295,10 +295,10 @@
 <body>
     <header>
         <div class="header-content">
-            <a href="{{ route('public.blog.index') }}" class="logo">Blog Moderno</a>
+            <a href="{{ route('site.blog.index') }}" class="logo">Blog Moderno</a>
             <nav>
                 <ul>
-                    <li><a href="{{ route('public.blog.index') }}">Inicio</a></li>
+                    <li><a href="{{ route('site.blog.index') }}">Inicio</a></li>
                     <li><a href="#footer">Contato</a></li>
                 </ul>
             </nav>
@@ -316,7 +316,7 @@
         @else
             <div class="articles-grid">
                 @foreach ($artigos as $artigo)
-                    <a href="{{ route('public.blog.show', $artigo->slug) }}" class="article-card">
+                    <a href="{{ route('site.blog.show', $artigo->slug) }}" class="article-card">
                         @if ($artigo->imagem_capa)
                             <div class="article-image" style="background-image: url('{{ asset('storage/' . $artigo->imagem_capa) }}');"></div>
                         @else
@@ -349,16 +349,16 @@
             <div class="footer-section">
                 <h3>Links Rapidos</h3>
                 <ul class="footer-links">
-                    <li><a href="{{ route('public.blog.index') }}">Inicio</a></li>
+                    <li><a href="{{ route('site.blog.index') }}">Inicio</a></li>
                     <li><a href="#footer">Contato</a></li>
                 </ul>
             </div>
             <div class="footer-section">
                 <h3>Categorias</h3>
                 <ul class="footer-links">
-                    <li><a href="{{ route('public.blog.index') }}">Tecnologia</a></li>
-                    <li><a href="{{ route('public.blog.index') }}">Design</a></li>
-                    <li><a href="{{ route('public.blog.index') }}">Negocios</a></li>
+                    <li><a href="{{ route('site.blog.index') }}">Tecnologia</a></li>
+                    <li><a href="{{ route('site.blog.index') }}">Design</a></li>
+                    <li><a href="{{ route('site.blog.index') }}">Negocios</a></li>
                 </ul>
             </div>
         </div>

@@ -166,8 +166,8 @@
 <body>
     <header>
         <div class="header-content">
-            <a href="{{ route('public.blog.index') }}" class="logo">Blog Moderno</a>
-            <a href="{{ route('public.blog.index') }}" class="back-button">Voltar para a lista</a>
+            <a href="{{ route('site.blog.index') }}" class="logo">Blog Moderno</a>
+            <a href="{{ route('site.blog.index') }}" class="back-button">Voltar para a lista</a>
         </div>
     </header>
 
@@ -179,7 +179,7 @@
                 <div class="article-hero placeholder"></div>
             @endif
             <div class="article-body">
-                <a href="{{ route('public.blog.index') }}" class="back-button">← Voltar</a>
+                <a href="{{ route('site.blog.index') }}" class="back-button">← Voltar</a>
                 <h1 class="article-title">{{ $artigo->titulo }}</h1>
                 <div class="article-meta">
                     <span>{{ $artigo->publicado_em ? $artigo->publicado_em->format('d/m/Y') : $artigo->created_at->format('d/m/Y') }}</span>
