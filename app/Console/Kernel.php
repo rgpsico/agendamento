@@ -12,7 +12,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        // Regera o sitemap.xml todo dia às 3h da manhã
+        $schedule->command('sitemap:gerar')->dailyAt('03:00');
     }
 
     /**
