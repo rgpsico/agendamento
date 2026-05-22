@@ -68,14 +68,18 @@ section{display:block;width:100%;padding:clamp(56px,8vw,112px) 0}
 /* ── Nav ── */
 .nav{position:sticky;top:0;left:0;z-index:50;width:100%;display:block;
   backdrop-filter:blur(14px);
-  background:color-mix(in srgb,var(--bg) 90%,transparent);
+  background:color-mix(in srgb,var(--bg) 92%,transparent);
   border-bottom:1px solid var(--line)}
-.nav-row{display:flex;align-items:center;gap:20px;height:68px}
-.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:700;font-size:21px;letter-spacing:-.01em;flex-shrink:0}
-.brand img{height:36px;width:auto;object-fit:contain}
-.brand .mark{width:32px;height:32px;border-radius:50%;
+.nav-inner{display:flex;flex-direction:column;width:100%}
+.nav-row{display:flex;align-items:center;gap:20px;padding:10px 0 8px}
+
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);
+  font-weight:700;font-size:21px;letter-spacing:-.01em;flex-shrink:0;line-height:1}
+.brand img{height:34px;width:auto;object-fit:contain}
+.brand .mark{width:30px;height:30px;border-radius:50%;flex-shrink:0;
   background:conic-gradient(from 200deg,var(--sea-deep),var(--sea) 35%,var(--sea-soft) 60%,var(--sea) 100%)}
-.nav-links{display:flex;gap:24px;margin-left:12px}
+
+.nav-links{display:flex;gap:24px;margin-left:8px}
 .nav-links a{font-size:14px;color:var(--ink-soft);transition:color .2s}
 .nav-links a:hover{color:var(--ink)}
 .nav-cta{margin-left:auto;display:flex;align-items:center;gap:10px}
@@ -301,14 +305,32 @@ footer{width:100%;margin-top:32px;padding:48px 0 28px;border-top:1px solid var(-
 #google_translate_element{display:none}
 .goog-te-banner-frame,.skiptranslate{display:none!important}
 body{top:0!important}
-.lang-switch{display:flex;align-items:center;gap:4px;margin-left:8px}
-.lang-btn{width:30px;height:30px;border-radius:50%;border:2px solid transparent;
-  font-size:16px;display:flex;align-items:center;justify-content:center;
-  cursor:pointer;background:transparent;transition:border-color .2s,transform .15s;
-  padding:0;line-height:1}
-.lang-btn:hover{transform:scale(1.15);border-color:var(--line)}
-.lang-btn.active{border-color:var(--sea);box-shadow:0 0 0 2px color-mix(in srgb,var(--sea) 25%,transparent)}
-@media(max-width:640px){.lang-switch{gap:2px}.lang-btn{width:26px;height:26px;font-size:14px}}
+
+/* Nav vira duas linhas para acomodar bandeiras sob o logo */
+.nav-inner{display:flex;flex-direction:column;width:100%}
+.nav-row{height:60px}  /* linha principal: logo + links + cta */
+
+/* Faixa das bandeiras — fica grudada sob o logo */
+.lang-bar{
+  display:flex;align-items:center;gap:2px;
+  padding:4px 0 6px;
+  border-top:1px solid var(--line);
+}
+.lang-btn{
+  width:32px;height:24px;border-radius:6px;
+  border:2px solid transparent;
+  font-size:18px;line-height:1;
+  display:inline-flex;align-items:center;justify-content:center;
+  cursor:pointer;background:transparent;
+  transition:border-color .2s,transform .15s,background .15s;
+  padding:0;
+}
+.lang-btn:hover{transform:scale(1.18);background:var(--sea-soft)}
+.lang-btn.active{
+  border-color:var(--sea);
+  background:var(--sea-soft);
+  box-shadow:0 0 0 1px color-mix(in srgb,var(--sea) 30%,transparent);
+}
 
 /* ── Seções com background próprio ── */
 #aulas{background:var(--bg-2)}
@@ -351,10 +373,16 @@ footer{background:var(--bg)}
   .nav-links{display:none}
   form.contact-form{grid-template-columns:1fr}
   .field.full,.form-foot,.form-success{grid-column:span 1}
+  /* No mobile o botão CTA some, bandeiras ficam --*/
+  .nav-cta .btn{display:none}
 }
 @media(max-width:560px){
   .values{grid-template-columns:1fr}
   h1.headline{font-size:42px}
+  .nav-row{gap:12px;padding:8px 0 6px}
+  .lang-bar{gap:3px}
+  .lang-btn{width:28px;height:22px;font-size:17px}
+  .brand{font-size:18px}
 }
 </style>
 
@@ -365,33 +393,41 @@ footer{background:var(--bg)}
 
 {{-- ═══ NAV ═══ --}}
 <header class="nav">
-  <div class="wrap nav-row">
-    <a href="#" class="brand">
-      @if($logoUrl)
-        <img src="{{ $logoUrl }}" alt="{{ $nomeEscola }}">
-      @else
-        <span class="mark"></span>
-        <span>{{ $nomeEscola }}<span style="color:var(--coral)">.</span></span>
-      @endif
-    </a>
-    <nav class="nav-links">
-      <a href="#sobre">Sobre</a>
-      <a href="#aulas">Aulas</a>
-      <a href="#precos">Preços</a>
-      <a href="#depoimentos">Depoimentos</a>
-      <a href="#faq">FAQ</a>
-    </nav>
-    {{-- Seletor de idiomas --}}
-    <div class="lang-switch" id="langSwitch">
-      <button class="lang-btn" onclick="gtTo('pt')" title="Português" data-lang="pt">🇧🇷</button>
-      <button class="lang-btn" onclick="gtTo('en')" title="English"   data-lang="en">🇺🇸</button>
-      <button class="lang-btn" onclick="gtTo('es')" title="Español"   data-lang="es">🇪🇸</button>
-      <button class="lang-btn" onclick="gtTo('fr')" title="Français"  data-lang="fr">🇫🇷</button>
+  <div class="wrap nav-inner">
+
+    {{-- Linha 1: logo · links · cta --}}
+    <div class="nav-row">
+      <div style="display:flex;flex-direction:column;gap:0">
+        <a href="#" class="brand">
+          @if($logoUrl)
+            <img src="{{ $logoUrl }}" alt="{{ $nomeEscola }}">
+          @else
+            <span class="mark"></span>
+            <span>{{ $nomeEscola }}<span style="color:var(--coral)">.</span></span>
+          @endif
+        </a>
+        {{-- Bandeiras — ficam sempre visíveis, abaixo do logo --}}
+        <div class="lang-bar" id="langSwitch">
+          <button class="lang-btn" onclick="gtTo('pt')" title="Português" data-lang="pt">🇧🇷</button>
+          <button class="lang-btn" onclick="gtTo('en')" title="English"   data-lang="en">🇺🇸</button>
+          <button class="lang-btn" onclick="gtTo('es')" title="Español"   data-lang="es">🇪🇸</button>
+          <button class="lang-btn" onclick="gtTo('fr')" title="Français"  data-lang="fr">🇫🇷</button>
+        </div>
+      </div>
+
+      <nav class="nav-links">
+        <a href="#sobre">Sobre</a>
+        <a href="#aulas">Aulas</a>
+        <a href="#precos">Preços</a>
+        <a href="#depoimentos">Depoimentos</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+
+      <div class="nav-cta">
+        <a href="#contato" class="btn btn-primary">Agendar aula</a>
+      </div>
     </div>
 
-    <div class="nav-cta">
-      <a href="#contato" class="btn btn-primary">Agendar aula</a>
-    </div>
   </div>
 </header>
 
