@@ -317,19 +317,21 @@ body{top:0!important}
   border-top:1px solid var(--line);
 }
 .lang-btn{
-  width:32px;height:24px;border-radius:6px;
+  width:36px;height:26px;border-radius:5px;
   border:2px solid transparent;
-  font-size:18px;line-height:1;
   display:inline-flex;align-items:center;justify-content:center;
-  cursor:pointer;background:transparent;
-  transition:border-color .2s,transform .15s,background .15s;
-  padding:0;
+  cursor:pointer;background:transparent;padding:2px;
+  transition:border-color .2s,transform .15s,box-shadow .15s;
+  overflow:hidden;
 }
-.lang-btn:hover{transform:scale(1.18);background:var(--sea-soft)}
+.lang-btn img{
+  width:100%;height:100%;object-fit:cover;
+  border-radius:3px;display:block;
+}
+.lang-btn:hover{transform:scale(1.15);border-color:var(--line)}
 .lang-btn.active{
   border-color:var(--sea);
-  background:var(--sea-soft);
-  box-shadow:0 0 0 1px color-mix(in srgb,var(--sea) 30%,transparent);
+  box-shadow:0 0 0 2px color-mix(in srgb,var(--sea) 25%,transparent);
 }
 
 /* ── Seções com background próprio ── */
@@ -381,7 +383,7 @@ footer{background:var(--bg)}
   h1.headline{font-size:42px}
   .nav-row{gap:12px;padding:8px 0 6px}
   .lang-bar{gap:3px}
-  .lang-btn{width:28px;height:22px;font-size:17px}
+  .lang-btn{width:30px;height:22px}
   .brand{font-size:18px}
 }
 </style>
@@ -408,10 +410,15 @@ footer{background:var(--bg)}
         </a>
         {{-- Bandeiras — ficam sempre visíveis, abaixo do logo --}}
         <div class="lang-bar" id="langSwitch">
-          <button class="lang-btn" onclick="gtTo('pt')" title="Português" data-lang="pt">🇧🇷</button>
-          <button class="lang-btn" onclick="gtTo('en')" title="English"   data-lang="en">🇺🇸</button>
-          <button class="lang-btn" onclick="gtTo('es')" title="Español"   data-lang="es">🇪🇸</button>
-          <button class="lang-btn" onclick="gtTo('fr')" title="Français"  data-lang="fr">🇫🇷</button>
+          <button class="lang-btn" onclick="gtTo('pt')" title="Português" data-lang="pt">
+            <img src="{{ asset('admin/img/country/brasil.png') }}" alt="PT">
+          </button>
+          <button class="lang-btn" onclick="gtTo('en')" title="English" data-lang="en">
+            <img src="{{ asset('admin/img/country/usa.png') }}" alt="EN">
+          </button>
+          <button class="lang-btn" onclick="gtTo('es')" title="Español" data-lang="es">
+            <img src="{{ asset('admin/img/country/espanha.png') }}" alt="ES">
+          </button>
         </div>
       </div>
 
