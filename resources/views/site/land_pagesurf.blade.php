@@ -32,6 +32,7 @@
 <title>{{ $nomeEscola }} — Escola de Surf</title>
 <meta name="description" content="{{ $descricao }}">
 <meta name="robots" content="index, follow">
+<meta name="google-site-verification" content="PENdq3tzLGfpwMXRvoiqISI5uM6cRsIe0Wvm77kL6K0">
 <link rel="canonical" href="{{ request()->url() }}">
 
 {{-- Open Graph --}}
