@@ -22,3 +22,9 @@ yarn-error.log
 *.jpeg
 *.png
 *.gif
+
+# Exceções — imagens que devem subir no repositório
+!public/admin/img/country/*.png
+!public/admin/img/country/*.jpg
+!public/admin/img/country/*.jpeg
+!public/admin/img/country/*.gif
