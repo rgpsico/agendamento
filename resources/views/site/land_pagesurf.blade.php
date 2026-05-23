@@ -98,7 +98,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
 ::selection{background:var(--sea);color:#fff}
 
 /* ── Layout ── */
-.wrap{width:100%;max-width:1280px;margin-inline:auto;padding-inline:clamp(20px,5vw,60px)}
+.wrap{width:100%;max-width:min(1560px,94vw);margin-inline:auto;padding-inline:clamp(16px,3vw,48px)}
 section{display:block;width:100%;padding:clamp(56px,8vw,112px) 0}
 
 /* ── Nav ── */
