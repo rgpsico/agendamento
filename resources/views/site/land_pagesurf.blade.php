@@ -392,7 +392,7 @@ body{top:0!important}
 
 /* Nav vira duas linhas para acomodar bandeiras sob o logo */
 .nav-inner{display:flex;flex-direction:column;width:100%}
-.nav-row{height:60px}  /* linha principal: logo + links + cta */
+.nav-row{padding:14px 0 10px}  /* linha principal: logo + links + cta */
 
 /* Faixa das bandeiras — fica grudada sob o logo */
 .lang-bar{
