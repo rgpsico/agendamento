@@ -810,92 +810,6 @@ footer{background:var(--bg)}
   </div>
 </section>
 
-{{-- ═══ CONTATO ═══ --}}
-<section id="contato">
-  <div class="wrap">
-    <div class="section-head">
-      <div>
-        <span class="kicker">Fale conosco</span>
-        <h2 class="title">Mande sua dúvida. <em>Respondemos no mesmo dia.</em></h2>
-      </div>
-      <p class="section-lead">Preencha o formulário e nossa equipe entra em contato pelo canal de sua preferência. Para confirmação imediata, prefira o WhatsApp.</p>
-    </div>
-    <div class="contact-grid">
-      <aside class="contact-side">
-        <h3>Outras formas de falar com a gente</h3>
-        <p>Estamos disponíveis todos os dias. Em períodos de chuva forte, atendimento apenas online.</p>
-        @if($endStr)
-        <div class="info-row">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-          <div><small>Endereço</small><strong>{{ $endStr }}</strong></div>
-        </div>
-        @endif
-        @if($wa)
-        <div class="info-row">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92Z"/></svg>
-          <div><small>WhatsApp</small><strong>+{{ $wa }}</strong></div>
-        </div>
-        @endif
-        @if($emailSite)
-        <div class="info-row">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2Z"/><polyline points="22,6 12,13 2,6"/></svg>
-          <div><small>E-mail</small><strong>{{ $emailSite }}</strong></div>
-        </div>
-        @endif
-        <div class="info-row">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          <div><small>Horário</small><strong>Todos os dias · 7h às 18h</strong></div>
-        </div>
-      </aside>
-
-      <form class="contact-form" id="ondaForm" novalidate>
-        @csrf
-        <div class="field">
-          <label>Nome <span class="req">*</span></label>
-          <input id="f-name" name="name" type="text" required placeholder="Como podemos te chamar?"/>
-        </div>
-        <div class="field">
-          <label>E-mail <span class="req">*</span></label>
-          <input id="f-email" name="email" type="email" required placeholder="voce@email.com"/>
-        </div>
-        <div class="field">
-          <label>Telefone / WhatsApp <span class="req">*</span></label>
-          <input id="f-phone" name="phone" type="tel" required placeholder="+55 (11) 99999-9999"/>
-        </div>
-        <div class="field">
-          <label>Tipo de aula</label>
-          <select name="class">
-            <option value="first">Primeira Onda (iniciantes)</option>
-            <option value="private">Aula particular</option>
-            <option value="kids">Onda Mirim (kids)</option>
-            <option value="advanced">Coaching avançado</option>
-            <option value="other">Outro / Tenho dúvida</option>
-          </select>
-        </div>
-        <div class="field full">
-          <label>Mensagem</label>
-          <textarea name="message" placeholder="Conte um pouco sobre o seu nível, datas pretendidas e o que você espera da aula."></textarea>
-        </div>
-        <div class="field full check-row">
-          <input id="f-consent" type="checkbox" required/>
-          <label for="f-consent">Concordo em receber contato por e-mail ou WhatsApp e li a Política de Privacidade.</label>
-        </div>
-        <div class="form-foot">
-          <span class="note">Resposta em até 1h durante o horário comercial.</span>
-          <div class="submit">
-            <button type="submit" class="btn btn-primary">Enviar mensagem →</button>
-            <a href="https://wa.me/{{ $wa }}?text={{ $waText }}" target="_blank" rel="noopener" class="btn btn-ghost">Ou pelo WhatsApp</a>
-          </div>
-        </div>
-        <div class="form-success" id="ondaSuccess" role="status">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>
-          <span>Recebemos sua mensagem! Vamos responder em breve.</span>
-        </div>
-      </form>
-    </div>
-  </div>
-</section>
-
 {{-- ═══ CTA BAND ═══ --}}
 <section id="agendar">
   <div class="wrap">
@@ -1025,6 +939,92 @@ footer{background:var(--bg)}
         <p style="margin-top:8px"><a href="{{ route('site.blog.index') }}">Acompanhe o blog →</a></p>
       </div>
     @endif
+  </div>
+</section>
+
+{{-- ═══ CONTATO ═══ --}}
+<section id="contato">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="kicker">Fale conosco</span>
+        <h2 class="title">Mande sua dúvida. <em>Respondemos no mesmo dia.</em></h2>
+      </div>
+      <p class="section-lead">Preencha o formulário e nossa equipe entra em contato pelo canal de sua preferência. Para confirmação imediata, prefira o WhatsApp.</p>
+    </div>
+    <div class="contact-grid">
+      <aside class="contact-side">
+        <h3>Outras formas de falar com a gente</h3>
+        <p>Estamos disponíveis todos os dias. Em períodos de chuva forte, atendimento apenas online.</p>
+        @if($endStr)
+        <div class="info-row">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+          <div><small>Endereço</small><strong>{{ $endStr }}</strong></div>
+        </div>
+        @endif
+        @if($wa)
+        <div class="info-row">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92Z"/></svg>
+          <div><small>WhatsApp</small><strong>+{{ $wa }}</strong></div>
+        </div>
+        @endif
+        @if($emailSite)
+        <div class="info-row">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2Z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <div><small>E-mail</small><strong>{{ $emailSite }}</strong></div>
+        </div>
+        @endif
+        <div class="info-row">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <div><small>Horário</small><strong>Todos os dias · 7h às 18h</strong></div>
+        </div>
+      </aside>
+
+      <form class="contact-form" id="ondaForm" novalidate>
+        @csrf
+        <div class="field">
+          <label>Nome <span class="req">*</span></label>
+          <input id="f-name" name="name" type="text" required placeholder="Como podemos te chamar?"/>
+        </div>
+        <div class="field">
+          <label>E-mail <span class="req">*</span></label>
+          <input id="f-email" name="email" type="email" required placeholder="voce@email.com"/>
+        </div>
+        <div class="field">
+          <label>Telefone / WhatsApp <span class="req">*</span></label>
+          <input id="f-phone" name="phone" type="tel" required placeholder="+55 (11) 99999-9999"/>
+        </div>
+        <div class="field">
+          <label>Tipo de aula</label>
+          <select name="class">
+            <option value="first">Primeira Onda (iniciantes)</option>
+            <option value="private">Aula particular</option>
+            <option value="kids">Onda Mirim (kids)</option>
+            <option value="advanced">Coaching avançado</option>
+            <option value="other">Outro / Tenho dúvida</option>
+          </select>
+        </div>
+        <div class="field full">
+          <label>Mensagem</label>
+          <textarea name="message" placeholder="Conte um pouco sobre o seu nível, datas pretendidas e o que você espera da aula."></textarea>
+        </div>
+        <div class="field full check-row">
+          <input id="f-consent" type="checkbox" required/>
+          <label for="f-consent">Concordo em receber contato por e-mail ou WhatsApp e li a Política de Privacidade.</label>
+        </div>
+        <div class="form-foot">
+          <span class="note">Resposta em até 1h durante o horário comercial.</span>
+          <div class="submit">
+            <button type="submit" class="btn btn-primary">Enviar mensagem →</button>
+            <a href="https://wa.me/{{ $wa }}?text={{ $waText }}" target="_blank" rel="noopener" class="btn btn-ghost">Ou pelo WhatsApp</a>
+          </div>
+        </div>
+        <div class="form-success" id="ondaSuccess" role="status">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>
+          <span>Recebemos sua mensagem! Vamos responder em breve.</span>
+        </div>
+      </form>
+    </div>
   </div>
 </section>
 
