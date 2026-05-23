@@ -810,40 +810,6 @@ footer{background:var(--bg)}
   </div>
 </section>
 
-{{-- ═══ CTA BAND ═══ --}}
-<section id="agendar">
-  <div class="wrap">
-    <div class="cta-band">
-      <div>
-        <h2>Pronto pra remar?<br/><em>A primeira onda é por nossa conta.</em></h2>
-        <p>Agende sua aula em menos de 1 minuto. Confirmação imediata por WhatsApp.</p>
-        <div class="btns">
-          <a href="https://wa.me/{{ $wa }}" class="btn btn-primary" target="_blank" rel="noopener">Agendar pelo WhatsApp</a>
-          <a href="#contato" class="btn btn-ghost">Preencher formulário</a>
-        </div>
-      </div>
-      <div class="info-card">
-        @if($endStr)
-        <div class="row">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-          <div><small>Localização</small><strong>{{ $endStr }}</strong></div>
-        </div>
-        @endif
-        <div class="row">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          <div><small>Horário</small><strong>Todos os dias · 7h às 18h</strong></div>
-        </div>
-        @if($wa)
-        <div class="row">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92Z"/></svg>
-          <div><small>WhatsApp</small><strong>+{{ $wa }}</strong></div>
-        </div>
-        @endif
-      </div>
-    </div>
-  </div>
-</section>
-
 {{-- ═══ BLOG / ÚLTIMOS ARTIGOS ═══ --}}
 @php $artigos = $site->artigos ?? collect(); @endphp
 <section id="blog">
@@ -1024,6 +990,43 @@ footer{background:var(--bg)}
           <span>Recebemos sua mensagem! Vamos responder em breve.</span>
         </div>
       </form>
+    </div>
+  </div>
+</section>
+
+{{-- ═══ CTA BAND (Agendar) ═══ --}}
+<section id="agendar">
+  <div class="wrap">
+    <div class="cta-band">
+      <div>
+        <h2>Pronto pra remar?<br/><em>A primeira onda é por nossa conta.</em></h2>
+        <p>Agende sua aula em menos de 1 minuto. Confirmação imediata por WhatsApp.</p>
+        <div class="btns">
+          <a href="https://wa.me/{{ $wa }}?text={{ $waText }}" class="btn btn-primary" target="_blank" rel="noopener">
+            <svg width="18" height="18" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M16.003 3.2c-7.067 0-12.8 5.733-12.8 12.8 0 2.258.59 4.453 1.713 6.394L3.2 28.8l6.582-1.726a12.78 12.78 0 0 0 6.221 1.585h.006c7.067 0 12.8-5.733 12.803-12.8 0-3.42-1.331-6.635-3.749-9.054A12.71 12.71 0 0 0 16.003 3.2Z"/></svg>
+            Agendar pelo WhatsApp
+          </a>
+          <a href="#contato" class="btn btn-ghost">Preencher formulário</a>
+        </div>
+      </div>
+      <div class="info-card">
+        @if($endStr)
+        <div class="row">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+          <div><small>Endereço</small><strong>{{ $endStr }}</strong></div>
+        </div>
+        @endif
+        <div class="row">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <div><small>Horário de atendimento</small><strong>Todos os dias · 7h às 18h</strong></div>
+        </div>
+        @if($wa)
+        <div class="row">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92Z"/></svg>
+          <div><small>WhatsApp</small><strong>+{{ $wa }}</strong></div>
+        </div>
+        @endif
+      </div>
     </div>
   </div>
 </section>
