@@ -517,6 +517,7 @@ footer{background:var(--bg)}
         <a href="#depoimentos">Depoimentos</a>
         <a href="#faq">FAQ</a>
         <a href="#blog" style="color:var(--sea-deep);font-weight:600">Blog</a>
+        <a href="#contato">Contato</a>
       </nav>
 
       <div class="nav-cta">
