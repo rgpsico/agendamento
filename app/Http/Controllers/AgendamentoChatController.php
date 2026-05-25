@@ -22,8 +22,19 @@ class AgendamentoChatController extends Controller
 
     public function index()
     {
+        $user      = Auth::user();
+        $empresaId = $this->resolverEmpresaId($user);
+        $empresa   = $empresaId ? \App\Models\Empresa::find($empresaId) : null;
+        $bots      = $empresaId
+            ? Bot::where('empresa_id', $empresaId)->orderBy('nome')->get(['id','nome','status'])
+            : collect();
+
         return view('admin.agendamentos.chat', [
-            'pageTitle' => 'Chat IA · Agendamentos',
+            'pageTitle'  => 'Chat IA · Agendamentos',
+            'usuario'    => $user,
+            'empresa'    => $empresa,
+            'bots'       => $bots,
+            'empresaId'  => $empresaId,
         ]);
     }
 
@@ -33,14 +44,18 @@ class AgendamentoChatController extends Controller
         $request->validate([
             'mensagem'        => 'required|string|max:2000',
             'conversation_id' => 'nullable|integer',
+            'bot_id'          => 'nullable|integer',
         ]);
 
-        $user       = Auth::user();
-        $empresaId  = $this->resolverEmpresaId($user);
-        $mensagem   = $request->input('mensagem');
+        $user      = Auth::user();
+        $empresaId = $this->resolverEmpresaId($user);
+        $mensagem  = $request->input('mensagem');
 
-        // ── Resolve / cria bot da empresa ──────────────────────────────────
-        $bot = Bot::where('empresa_id', $empresaId)->where('status', true)->first();
+        // ── Resolve bot: pelo ID escolhido ou o primeiro ativo da empresa ──
+        $bot = $request->filled('bot_id')
+            ? Bot::where('id', $request->bot_id)->where('empresa_id', $empresaId)->first()
+            : Bot::where('empresa_id', $empresaId)->where('status', true)->first()
+              ?? Bot::where('empresa_id', $empresaId)->first(); // fallback: qualquer bot
 
         if (!$empresaId) {
             return response()->json([

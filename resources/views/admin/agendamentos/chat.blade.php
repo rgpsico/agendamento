@@ -290,7 +290,7 @@ table.rt tbody tr:hover{background:var(--glass-2)}
         <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
       </div>
       <div>
-        <span>GestãoPro</span>
+        <span>{{ $empresa->nome ?? 'GestãoPro' }}</span>
         <small>ADMIN · IA</small>
       </div>
     </div>
@@ -324,10 +324,10 @@ table.rt tbody tr:hover{background:var(--glass-2)}
 
     <div class="sidebar-footer">
       <div class="user-chip">
-        <div class="avatar">{{ mb_strtoupper(mb_substr(Auth::user()->name ?? 'U', 0, 1)) }}</div>
+        <div class="avatar">{{ mb_strtoupper(mb_substr($usuario->name ?? $usuario->nome ?? 'U', 0, 1)) }}</div>
         <div class="info">
-          <b>{{ Auth::user()->name ?? 'Usuário' }}</b>
-          <span>Admin</span>
+          <b>{{ $usuario->name ?? $usuario->nome ?? 'Usuário' }}</b>
+          <span>{{ $empresa->nome ?? 'Empresa' }}</span>
         </div>
       </div>
     </div>
@@ -341,12 +341,39 @@ table.rt tbody tr:hover{background:var(--glass-2)}
       <div class="chat-header-left">
         <span class="pulse"></span>
         <div>
-          <h1>Assistente de Agendamentos</h1>
-          <p>Pergunte em linguagem natural · resposta instantânea</p>
+          <h1>Assistente de Agendamentos
+            @if($empresa)
+              <span style="font-weight:400;font-size:12px;color:var(--text-2);margin-left:8px">· {{ $empresa->nome }}</span>
+            @endif
+          </h1>
+          <p>
+            Logado como <strong style="color:var(--text)">{{ $usuario->name ?? $usuario->nome ?? 'Usuário' }}</strong>
+            · resposta por linguagem natural
+          </p>
         </div>
       </div>
-      <div class="chat-header-actions">
-        <button class="icon-btn" title="Limpar conversa" id="btnClear">
+      <div class="chat-header-actions" style="display:flex;align-items:center;gap:10px">
+
+        {{-- Select de Bot --}}
+        @if($bots->isNotEmpty())
+        <div style="display:flex;align-items:center;gap:8px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <select id="botSelect" style="background:var(--bg-3);border:1px solid var(--border-2);color:var(--text);border-radius:9px;padding:7px 12px;font-size:12px;font-family:var(--sans);outline:none;cursor:pointer;min-width:160px">
+            @foreach($bots as $bot)
+              <option value="{{ $bot->id }}" {{ $bot->status ? '' : 'style=color:#64748b' }}>
+                {{ $bot->nome }}{{ $bot->status ? '' : ' (inativo)' }}
+              </option>
+            @endforeach
+          </select>
+        </div>
+        @else
+          <span style="font-size:11px;color:var(--red);background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);padding:5px 10px;border-radius:8px">
+            ⚠ Nenhum bot encontrado
+            @if(!$empresaId)· empresa não vinculada@endif
+          </span>
+        @endif
+
+        <button class="icon-btn" title="Nova conversa" id="btnClear">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.49"/></svg>
         </button>
         <a href="{{ url('/admin') }}" class="icon-btn" title="Voltar ao admin">
@@ -492,8 +519,21 @@ const inputEl    = document.getElementById('chatInput');
 const sendBtn    = document.getElementById('sendBtn');
 const sugestoesEl= document.getElementById('sugestoes');
 const welcomeEl  = document.getElementById('welcome');
+const botSelect  = document.getElementById('botSelect'); // pode ser null se sem bots
 
-let conversationId = null; // mantém contexto entre mensagens
+let conversationId = null;
+
+// Quando trocar de bot, reinicia a conversa
+if (botSelect) {
+  botSelect.addEventListener('change', () => {
+    conversationId = null;
+    messagesEl.innerHTML = '';
+    messagesEl.appendChild(welcomeEl);
+    welcomeEl.style.display = '';
+    const nome = botSelect.options[botSelect.selectedIndex].text;
+    appendSystemMsg(`🤖 Bot alterado para <strong>${escHtml(nome)}</strong>. Nova conversa iniciada.`);
+  });
+}
 
 // ── Auto-resize textarea ──────────────────────────────────────────────────
 inputEl.addEventListener('input', () => {
@@ -516,6 +556,7 @@ document.getElementById('btnClear').addEventListener('click', () => {
   messagesEl.innerHTML = '';
   messagesEl.appendChild(welcomeEl);
   welcomeEl.style.display = '';
+  sugestoesEl.innerHTML = '';
   renderSugestoes([
     'Agendamentos de hoje',
     'Agendamentos deste mês',
@@ -556,6 +597,7 @@ async function enviar() {
   try {
     const body = { mensagem: texto };
     if (conversationId) body.conversation_id = conversationId;
+    if (botSelect && botSelect.value) body.bot_id = parseInt(botSelect.value);
 
     const res  = await fetch(QUERY_URL, {
       method: 'POST',
@@ -667,6 +709,14 @@ function renderSugestoes(lista) {
   sugestoesEl.querySelectorAll('.sug-btn').forEach(btn => {
     btn.addEventListener('click', () => { inputEl.value = btn.dataset.msg; enviar(); });
   });
+}
+
+function appendSystemMsg(html) {
+  const d = document.createElement('div');
+  d.style.cssText = 'text-align:center;padding:6px 0';
+  d.innerHTML = `<span style="font-size:11px;color:var(--text-3);background:var(--glass);border:1px solid var(--border);border-radius:20px;padding:4px 12px;display:inline-block">${html}</span>`;
+  messagesEl.appendChild(d);
+  scrollBottom();
 }
 
 function scrollBottom() {
