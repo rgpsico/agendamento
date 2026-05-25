@@ -509,10 +509,15 @@ table.rt tbody tr:hover{background:var(--glass-2)}
 
 </div>{{-- .shell --}}
 
+{{-- Variáveis Blade expostas ao JS antes do @verbatim --}}
 <script>
 const QUERY_URL    = @json(route('admin.agendamentos.chat.query'));
 const INSIGHTS_URL = @json(route('admin.agendamentos.chat.insights'));
 const CSRF_TOKEN   = document.querySelector('meta[name=csrf-token]').content;
+</script>
+
+<script>
+@verbatim
 
 const messagesEl = document.getElementById('messages');
 const inputEl    = document.getElementById('chatInput');
@@ -761,6 +766,7 @@ function updateInsights(ins) {
     if (data.insights) updateInsights(data.insights);
   } catch(e) {}
 })();
+@endverbatim
 </script>
 
 <style>
