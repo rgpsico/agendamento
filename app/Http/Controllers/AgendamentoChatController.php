@@ -25,7 +25,21 @@ class AgendamentoChatController extends Controller
         $user      = Auth::user();
         $empresaId = $this->resolverEmpresaId($user);
         $empresa   = $empresaId ? \App\Models\Empresa::find($empresaId) : null;
-        $bots      = $empresaId
+
+        // Auto-cria bot padrão se a empresa não tiver nenhum
+        if ($empresaId && Bot::where('empresa_id', $empresaId)->doesntExist()) {
+            Bot::create([
+                'empresa_id'     => $empresaId,
+                'nome'           => 'Assistente IA',
+                'segmento'       => 'agendamentos',
+                'tom'            => 'profissional',
+                'status'         => true,
+                'token_deepseek' => 2000,
+                'prompt'         => 'Você é um assistente inteligente para gerenciamento de agendamentos da empresa ' . ($empresa->nome ?? 'da empresa') . '. Ajude com agendamentos, alunos, serviços e consultas ao sistema.',
+            ]);
+        }
+
+        $bots = $empresaId
             ? Bot::where('empresa_id', $empresaId)->orderBy('nome')->get(['id','nome','status'])
             : collect();
 
@@ -51,12 +65,6 @@ class AgendamentoChatController extends Controller
         $empresaId = $this->resolverEmpresaId($user);
         $mensagem  = $request->input('mensagem');
 
-        // ── Resolve bot: pelo ID escolhido ou o primeiro ativo da empresa ──
-        $bot = $request->filled('bot_id')
-            ? Bot::where('id', $request->bot_id)->where('empresa_id', $empresaId)->first()
-            : Bot::where('empresa_id', $empresaId)->where('status', true)->first()
-              ?? Bot::where('empresa_id', $empresaId)->first(); // fallback: qualquer bot
-
         if (!$empresaId) {
             return response()->json([
                 'reply'    => '⚠️ Sua conta não está vinculada a nenhuma empresa. Verifique seu perfil ou entre em contato com o administrador.',
@@ -64,11 +72,23 @@ class AgendamentoChatController extends Controller
             ]);
         }
 
+        // ── Resolve bot: pelo ID escolhido, primeiro ativo, qualquer bot, ou cria default ──
+        $bot = $request->filled('bot_id')
+            ? Bot::where('id', $request->bot_id)->where('empresa_id', $empresaId)->first()
+            : Bot::where('empresa_id', $empresaId)->where('status', true)->first()
+              ?? Bot::where('empresa_id', $empresaId)->first();
+
+        // Se ainda não há bot, cria um padrão automaticamente
         if (!$bot) {
-            $botUrl = url('/admin/bot/dashboard');
-            return response()->json([
-                'reply'    => "Nenhum bot ativo encontrado para sua empresa.\n\nPara habilitar o assistente de IA, acesse **Admin → Bot** e crie um bot vinculado à sua empresa.\n\n[Criar bot agora]({$botUrl})",
-                'insights' => $this->buildInsights($empresaId, $user),
+            $empresa = \App\Models\Empresa::find($empresaId);
+            $bot = Bot::create([
+                'empresa_id'     => $empresaId,
+                'nome'           => 'Assistente IA',
+                'segmento'       => 'agendamentos',
+                'tom'            => 'profissional',
+                'status'         => true,
+                'token_deepseek' => 2000,
+                'prompt'         => 'Você é um assistente inteligente para gerenciamento de agendamentos da empresa ' . ($empresa->nome ?? 'da empresa') . '. Ajude com agendamentos, alunos, serviços e consultas ao sistema.',
             ]);
         }
 
@@ -83,11 +103,10 @@ class AgendamentoChatController extends Controller
 
         // ── Salva mensagem do usuário ──────────────────────────────────────
         $conversation->messages()->create([
-            'from'    => 'user',
-            'to'      => 'bot',
-            'user_id' => $user->id,
-            'body'    => $mensagem,
-            'tipo'    => 'user',
+            'from' => 'user',
+            'to'   => 'bot',
+            'role' => 'user',
+            'body' => $mensagem,
         ]);
 
         // ── Chama DeepSeek com function calling completo ───────────────────
