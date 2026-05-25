@@ -666,7 +666,7 @@ Route::get('/robots.txt',  fn() => response(
     "Disallow: /super-admin\n" .
     "Disallow: /login\n" .
     "Disallow: /register\n\n" .
-    "Sitemap: " . request()->getSchemeAndHttpHost() . "/sitemap.xml\n",
+    "Sitemap: https://" . request()->getHost() . "/sitemap.xml\n",
     200, ['Content-Type' => 'text/plain']
 ))->name('robots');
 

@@ -36,7 +36,7 @@ class GerarSitemap extends Command
         // Usa domínio personalizado, senão slug no domínio base
         $base = $site->dominio_personalizado
             ? 'https://' . $site->dominio_personalizado
-            : config('app.url') . '/site/' . $site->slug;
+            : 'https://' . parse_url(config('app.url'), PHP_URL_HOST) . '/site/' . $site->slug;
 
         $artigos = SiteArtigo::where('site_id', $site->id)
             ->where('status', 'publicado')

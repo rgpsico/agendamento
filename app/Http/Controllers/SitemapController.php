@@ -17,7 +17,7 @@ class SitemapController extends Controller
     {
         $site = EmpresaSite::resolveByHost($request->getHost());
 
-        $base = $request->getSchemeAndHttpHost();
+        $base = 'https://' . $request->getHost();
 
         // URLs estáticas da landing page
         $static = [
