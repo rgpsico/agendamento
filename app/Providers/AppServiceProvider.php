@@ -23,8 +23,8 @@ class AppServiceProvider extends ServiceProvider
    public function boot()
     {
         // Força HTTPS se estiver em produção ou se você quiser forçar sempre
-        if ($this->app->environment('production') || env('APP_ENV') === 'production') {
-            URL::forceScheme('https'); // <--- 2. ADICIONE ISSO
+        if (str_starts_with(env('APP_URL', ''), 'https://')) {
+            URL::forceScheme('https');
         }
 
         Paginator::useBootstrapFive();

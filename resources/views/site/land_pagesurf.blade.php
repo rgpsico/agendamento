@@ -33,7 +33,7 @@
 <meta name="description" content="{{ $descricao }}">
 <meta name="robots" content="index, follow">
 <meta name="google-site-verification" content="PENdq3tzLGfpwMXRvoiqISI5uM6cRsIe0Wvm77kL6K0">
-<link rel="canonical" href="{{ request()->url() }}">
+<link rel="canonical" href="{{ str_replace('http://', 'https://', request()->url()) }}">
 
 {{-- Open Graph --}}
 <meta property="og:type"        content="website">
