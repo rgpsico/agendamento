@@ -483,8 +483,9 @@ table.rt tbody tr:hover{background:var(--glass-2)}
 </div>{{-- .shell --}}
 
 <script>
-const QUERY_URL  = @json(route('admin.agendamentos.chat.query'));
-const CSRF_TOKEN = document.querySelector('meta[name=csrf-token]').content;
+const QUERY_URL    = @json(route('admin.agendamentos.chat.query'));
+const INSIGHTS_URL = @json(route('admin.agendamentos.chat.insights'));
+const CSRF_TOKEN   = document.querySelector('meta[name=csrf-token]').content;
 
 const messagesEl = document.getElementById('messages');
 const inputEl    = document.getElementById('chatInput');
@@ -492,46 +493,49 @@ const sendBtn    = document.getElementById('sendBtn');
 const sugestoesEl= document.getElementById('sugestoes');
 const welcomeEl  = document.getElementById('welcome');
 
+let conversationId = null; // mantém contexto entre mensagens
+
 // ── Auto-resize textarea ──────────────────────────────────────────────────
 inputEl.addEventListener('input', () => {
   inputEl.style.height = 'auto';
   inputEl.style.height = Math.min(inputEl.scrollHeight, 120) + 'px';
 });
-
-// ── Enter para enviar ─────────────────────────────────────────────────────
 inputEl.addEventListener('keydown', e => {
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); enviar(); }
 });
 sendBtn.addEventListener('click', enviar);
 
-// ── Sugestões rápidas ─────────────────────────────────────────────────────
+// ── Sugestões iniciais ────────────────────────────────────────────────────
 document.querySelectorAll('.sug-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    inputEl.value = btn.dataset.msg;
-    enviar();
-  });
+  btn.addEventListener('click', () => { inputEl.value = btn.dataset.msg; enviar(); });
 });
 
 // ── Limpar conversa ───────────────────────────────────────────────────────
 document.getElementById('btnClear').addEventListener('click', () => {
+  conversationId = null;
   messagesEl.innerHTML = '';
   messagesEl.appendChild(welcomeEl);
   welcomeEl.style.display = '';
-  renderSugestoes(['Agendamentos de hoje','Agendamentos deste mês','Cancelamentos do mês','Clientes novos','Esta semana']);
+  renderSugestoes([
+    'Agendamentos de hoje',
+    'Agendamentos deste mês',
+    'Quais cancelamentos tive?',
+    'Cadastre um aluno novo',
+    'Verificar disponibilidade para amanhã',
+    'Me mostre os serviços disponíveis',
+  ]);
 });
 
 // ── Refresh insights ──────────────────────────────────────────────────────
-document.getElementById('btnRefresh').addEventListener('click', () => {
+document.getElementById('btnRefresh').addEventListener('click', async () => {
   const btn = document.getElementById('btnRefresh');
   btn.querySelector('svg').classList.add('spin');
-  fetch(QUERY_URL, {
-    method:'POST',
-    headers:{'Content-Type':'application/json','X-CSRF-TOKEN':CSRF_TOKEN,'Accept':'application/json'},
-    body: JSON.stringify({ mensagem: 'agendamentos deste mês' })
-  }).then(r=>r.json()).then(data => {
-    if(data.insights) updateInsights(data.insights);
-    btn.querySelector('svg').classList.remove('spin');
-  }).catch(()=> btn.querySelector('svg').classList.remove('spin'));
+  try {
+    const res  = await fetch(INSIGHTS_URL, { headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN } });
+    const data = await res.json();
+    if (data.insights) updateInsights(data.insights);
+  } catch(e) {}
+  btn.querySelector('svg').classList.remove('spin');
 });
 
 // ── ENVIAR MENSAGEM ───────────────────────────────────────────────────────
@@ -539,33 +543,46 @@ async function enviar() {
   const texto = inputEl.value.trim();
   if (!texto || sendBtn.disabled) return;
 
-  // Esconde welcome e sugestões antigas
   welcomeEl.style.display = 'none';
   sugestoesEl.innerHTML = '';
 
-  // Mensagem do usuário
   appendUser(texto);
   inputEl.value = '';
   inputEl.style.height = 'auto';
 
-  // Indicator "pensando..."
   const thinkId = appendThinking();
   sendBtn.disabled = true;
 
   try {
+    const body = { mensagem: texto };
+    if (conversationId) body.conversation_id = conversationId;
+
     const res  = await fetch(QUERY_URL, {
       method: 'POST',
-      headers: {'Content-Type':'application/json','X-CSRF-TOKEN':CSRF_TOKEN,'Accept':'application/json'},
-      body: JSON.stringify({ mensagem: texto })
+      headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN, 'Accept': 'application/json' },
+      body: JSON.stringify(body),
     });
     const data = await res.json();
+
+    // Mantém o ID da conversa para contexto
+    if (data.conversation_id) conversationId = data.conversation_id;
+
     removeThinking(thinkId);
-    appendResult(data);
-    if(data.insights) updateInsights(data.insights);
-    if(data.sugestoes?.length) renderSugestoes(data.sugestoes);
+    appendAI(data.reply ?? 'Sem resposta.');
+    if (data.insights) updateInsights(data.insights);
+
+    // Sugestões de follow-up
+    renderSugestoes([
+      'Agendar outro horário',
+      'Ver agendamentos de hoje',
+      'Cadastrar novo aluno',
+      'Listar serviços disponíveis',
+      'Ver cancelamentos do mês',
+    ]);
+
   } catch(err) {
     removeThinking(thinkId);
-    appendError('Ops! Não consegui processar sua solicitação. Tente novamente.');
+    appendError('Ops! Não consegui processar. Tente novamente.');
   } finally {
     sendBtn.disabled = false;
     inputEl.focus();
@@ -584,13 +601,10 @@ function appendUser(texto) {
 function appendThinking() {
   const id = 'th-' + Date.now();
   const d  = document.createElement('div');
-  d.className = 'thinking';
-  d.id = id;
+  d.className = 'thinking'; d.id = id;
   d.innerHTML = `
     <div class="ai-avatar"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
-    <div class="dots">
-      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-    </div>
+    <div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
     <span>IA pensando...</span>`;
   messagesEl.appendChild(d);
   scrollBottom();
@@ -602,57 +616,29 @@ function removeThinking(id) {
   if (el) el.remove();
 }
 
-function appendResult(data) {
+// Converte markdown simples → HTML
+function markdownToHtml(md) {
+  return md
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/`(.+?)`/g, '<code style="background:rgba(255,255,255,.08);padding:1px 5px;border-radius:4px;font-family:var(--mono);font-size:12px">$1</code>')
+    .replace(/^### (.+)$/gm, '<h4 style="margin:10px 0 4px;font-size:14px;font-weight:600">$1</h4>')
+    .replace(/^## (.+)$/gm, '<h3 style="margin:10px 0 4px;font-size:15px;font-weight:700">$1</h3>')
+    .replace(/^- (.+)$/gm, '<li style="margin:3px 0;padding-left:4px">$1</li>')
+    .replace(/(<li.*<\/li>)/s, '<ul style="list-style:none;padding:0;margin:8px 0">$1</ul>')
+    .replace(/\n\n/g, '</p><p style="margin:8px 0">')
+    .replace(/\n/g, '<br>');
+}
+
+function appendAI(texto) {
   const d = document.createElement('div');
   d.className = 'msg-ai';
-  const total = data.total ?? 0;
-  const label = escHtml(data.label ?? 'Resultado');
-
-  let tableHtml = '';
-  if (!data.agendamentos?.length) {
-    tableHtml = `<div class="empty-state">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-      <p>Nenhum agendamento encontrado para esse período.</p>
-    </div>`;
-  } else {
-    const rows = data.agendamentos.map(ag => {
-      const statusCls = ag.status ? ag.status.toLowerCase() : 'agendado';
-      const waNum = ag.telefone ? ag.telefone.replace(/\D/g,'') : '';
-      const waBtn = waNum ? `<a class="wa-btn" href="https://wa.me/${waNum}" target="_blank" rel="noopener">
-        <svg viewBox="0 0 32 32" fill="currentColor"><path d="M16 3.2c-7.07 0-12.8 5.73-12.8 12.8 0 2.26.59 4.45 1.71 6.39L3.2 28.8l6.58-1.73a12.78 12.78 0 0 0 6.22 1.59c7.07 0 12.8-5.73 12.8-12.8S23.07 3.2 16 3.2Z"/></svg>
-        WA</a>` : '<span style="color:var(--text-3);font-size:11px">—</span>';
-      return `<tr>
-        <td><strong style="font-size:13px">${escHtml(ag.cliente)}</strong></td>
-        <td><span style="font-family:var(--mono);font-size:11px">${escHtml(ag.data)}</span><br><span style="font-size:10px;color:var(--text-2)">${escHtml(ag.dia)}</span></td>
-        <td><span style="font-family:var(--mono);font-size:12px;color:var(--neon)">${escHtml(ag.horario)}</span></td>
-        <td style="max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(ag.servico)}</td>
-        <td><span class="status-chip ${statusCls}">${escHtml(ag.status ?? 'agendado')}</span></td>
-        <td style="color:var(--green);font-weight:600;font-family:var(--mono);font-size:12px">${escHtml(ag.valor)}</td>
-        <td>${waBtn}</td>
-      </tr>`;
-    }).join('');
-
-    tableHtml = `<div class="result-wrap">
-      <div class="result-head">
-        <span class="r-title">${label}</span>
-        <span class="r-count"><strong>${total}</strong> agendamento${total !== 1 ? 's' : ''} encontrado${total !== 1 ? 's' : ''}</span>
-      </div>
-      <div class="result-table-wrap">
-        <table class="rt">
-          <thead><tr>
-            <th>Cliente</th><th>Data</th><th>Horário</th><th>Serviço</th><th>Status</th><th>Valor</th><th>Contato</th>
-          </tr></thead>
-          <tbody>${rows}</tbody>
-        </table>
-      </div>
-    </div>`;
-  }
-
+  const html = markdownToHtml(texto);
   d.innerHTML = `
     <div class="ai-avatar"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
     <div class="body">
-      <div class="label">Assistente IA <span class="badge">RESPOSTA</span></div>
-      ${tableHtml}
+      <div class="label">Assistente IA <span class="badge">DeepSeek</span></div>
+      <div class="ai-bubble">${html}</div>
     </div>`;
   messagesEl.appendChild(d);
   scrollBottom();
@@ -693,25 +679,21 @@ function escHtml(s) {
 
 // ── UPDATE INSIGHTS ───────────────────────────────────────────────────────
 function updateInsights(ins) {
-  document.getElementById('ins-mes').textContent     = ins.agendamentos_mes    ?? '—';
-  document.getElementById('ins-hoje').textContent    = ins.agendamentos_hoje   ?? '—';
-  document.getElementById('ins-clientes').textContent= ins.clientes_novos      ?? '—';
-  document.getElementById('ins-cancel').textContent  = ins.cancelamentos       ?? '—';
-  document.getElementById('ins-receita').textContent = ins.receita_prevista    ?? '—';
+  document.getElementById('ins-mes').textContent      = ins.agendamentos_mes  ?? '—';
+  document.getElementById('ins-hoje').textContent     = ins.agendamentos_hoje ?? '—';
+  document.getElementById('ins-clientes').textContent = ins.clientes_novos    ?? '—';
+  document.getElementById('ins-cancel').textContent   = ins.cancelamentos     ?? '—';
+  document.getElementById('ins-receita').textContent  = ins.receita_prevista  ?? '—';
 
-  const now = new Date();
   document.getElementById('insightsMes').textContent =
-    now.toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+    new Date().toLocaleDateString('pt-BR', { month:'long', year:'numeric' });
 
-  // Horários
   const horarios = ins.horarios_top ?? {};
   const keys = Object.keys(horarios);
-  if(keys.length) {
+  if (keys.length) {
     const maxVal = Math.max(...Object.values(horarios));
-    const sec = document.getElementById('horariosSection');
-    const body = document.getElementById('horariosBody');
-    sec.style.display = '';
-    body.innerHTML = keys.map(h => {
+    document.getElementById('horariosSection').style.display = '';
+    document.getElementById('horariosBody').innerHTML = keys.map(h => {
       const pct = maxVal > 0 ? Math.round((horarios[h] / maxVal) * 100) : 0;
       return `<div class="horario-bar">
         <div class="hb-top"><span class="hora">${h}</span><span class="qtd">${horarios[h]} aulas</span></div>
@@ -721,18 +703,27 @@ function updateInsights(ins) {
   }
 }
 
-// ── Carrega insights ao abrir ─────────────────────────────────────────────
-(async function loadInsights() {
+// ── Carrega insights silenciosamente ao abrir ─────────────────────────────
+(async function () {
   try {
-    const res  = await fetch(QUERY_URL, {
-      method: 'POST',
-      headers: {'Content-Type':'application/json','X-CSRF-TOKEN':CSRF_TOKEN,'Accept':'application/json'},
-      body: JSON.stringify({ mensagem: 'agendamentos deste mês' })
-    });
+    const res  = await fetch(INSIGHTS_URL, { headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN } });
     const data = await res.json();
-    if(data.insights) updateInsights(data.insights);
-  } catch(e) { /* silencioso */ }
+    if (data.insights) updateInsights(data.insights);
+  } catch(e) {}
 })();
 </script>
+
+<style>
+/* Bubble da IA com texto formatado */
+.ai-bubble{
+  background:var(--glass);border:1px solid var(--border);border-radius:4px 16px 16px 16px;
+  padding:14px 18px;font-size:14px;line-height:1.65;color:var(--text);
+  max-width:680px;
+}
+.ai-bubble strong{color:#fff;font-weight:600}
+.ai-bubble code{font-size:12px}
+.ai-bubble ul{padding-left:16px;margin:6px 0}
+.ai-bubble li::marker{color:var(--neon)}
+</style>
 </body>
 </html>

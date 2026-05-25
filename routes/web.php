@@ -687,8 +687,9 @@ Route::view('/lgpd', 'legal.lgpd')->name('legal.lgpd');
 
 // ── Chat IA de Agendamentos ───────────────────────────────────────────────
 Route::prefix('admin/agendamentos')->middleware(['auth'])->name('admin.agendamentos.')->group(function () {
-    Route::get('chat',       [AgendamentoChatController::class, 'index'])->name('chat');
-    Route::post('chat/query',[AgendamentoChatController::class, 'query'])->name('chat.query');
+    Route::get('chat',           [AgendamentoChatController::class, 'index'])->name('chat');
+    Route::post('chat/query',    [AgendamentoChatController::class, 'query'])->name('chat.query');
+    Route::get('chat/insights',  [AgendamentoChatController::class, 'insights'])->name('chat.insights');
 });
 
 Route::prefix('admin')->group(function () {
