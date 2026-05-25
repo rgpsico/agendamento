@@ -23,6 +23,7 @@ use App\Http\Controllers\BoletoController;
 use App\Http\Controllers\BotController;
 use App\Http\Controllers\BotServiceController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\AgendamentoChatController;
 use App\Http\Controllers\ConfigController;
 use App\Http\Controllers\DashBoardController;
 use App\Http\Controllers\ProfessoresAsaasController;
@@ -683,6 +684,12 @@ Route::get('/blog/{slug}',    [SiteArtigoPublicPageController::class, 'show'])->
 Route::view('/termos', 'legal.termos')->name('legal.termos');
 Route::view('/privacidade', 'legal.privacidade')->name('legal.privacidade');
 Route::view('/lgpd', 'legal.lgpd')->name('legal.lgpd');
+
+// ── Chat IA de Agendamentos ───────────────────────────────────────────────
+Route::prefix('admin/agendamentos')->middleware(['auth'])->name('admin.agendamentos.')->group(function () {
+    Route::get('chat',       [AgendamentoChatController::class, 'index'])->name('chat');
+    Route::post('chat/query',[AgendamentoChatController::class, 'query'])->name('chat.query');
+});
 
 Route::prefix('admin')->group(function () {
     Route::get('planos', [PlanoAlunoController::class, 'indexView'])->name('alunos.planos.index');
