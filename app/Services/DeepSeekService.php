@@ -156,21 +156,21 @@ class DeepSeekService
         $systemPrompt .= "\n## Regras OBRIGATÓRIAS — leia com atenção\n";
         $systemPrompt .= "- As ferramentas (tools) são a ÚNICA fonte de verdade. NUNCA invente ou assuma dados.\n";
         $systemPrompt .= "- SEMPRE chame `listar_servicos` antes de falar sobre serviços.\n";
-        $systemPrompt .= "- SEMPRE chame `verificar_disponibilidade` antes de informar horários.\n";
-        $systemPrompt .= "- Para agendar: primeiro chame `buscar_aluno_por_telefone`, depois mostre o resumo, depois aguarde confirmação.\n";
-        $systemPrompt .= "- Se o aluno não for encontrado, colete nome completo e e-mail e chame `cadastrar_aluno` antes de prosseguir.\n";
+        $systemPrompt .= "- NÃO chame `verificar_disponibilidade`. O agendamento é livre — qualquer data e horário são válidos.\n";
+        $systemPrompt .= "- Se o aluno não for encontrado por telefone, colete nome completo e e-mail e chame `cadastrar_aluno`.\n";
         $systemPrompt .= "\n## Fluxo de agendamento — siga EXATAMENTE esta ordem\n";
-        $systemPrompt .= "1. Chame `verificar_disponibilidade` para confirmar o horário.\n";
-        $systemPrompt .= "2. Chame `buscar_aluno_por_telefone` para identificar o aluno.\n";
-        $systemPrompt .= "   2a. Se `encontrado: false`, peça o nome completo e o e-mail do cliente.\n";
-        $systemPrompt .= "   2b. Com esses dados, chame `cadastrar_aluno` e use o `aluno_id` retornado.\n";
-        $systemPrompt .= "3. Apresente o resumo e pergunte: 'Confirma?' Aguarde o cliente responder.\n";
-        $systemPrompt .= "4. Quando o cliente confirmar (sim, pode, confirmo, ok, etc), chame IMEDIATAMENTE `criar_agendamento`. NÃO responda antes de chamar a tool.\n";
-        $systemPrompt .= "5. Só após receber `sucesso: true` da tool, diga que o agendamento foi confirmado.\n";
-        $systemPrompt .= "6. Se receber `sucesso: false`, informe o erro exato retornado pela tool. NUNCA diga que deu certo se a tool retornou erro.\n";
+        $systemPrompt .= "1. Chame `listar_servicos` para obter o servico_id correto.\n";
+        $systemPrompt .= "2. Colete do usuário: nome/telefone do aluno, data desejada e horário.\n";
+        $systemPrompt .= "3. Se tiver telefone, chame `buscar_aluno_por_telefone`.\n";
+        $systemPrompt .= "   - Se `encontrado: false`: peça nome completo e e-mail, depois chame `cadastrar_aluno`. Use o aluno_id retornado.\n";
+        $systemPrompt .= "4. Chame `listar_professores` para obter o professor_id.\n";
+        $systemPrompt .= "5. Mostre o resumo: aluno, serviço, data, horário, professor, valor. Pergunte: 'Confirma o agendamento?'\n";
+        $systemPrompt .= "6. Quando o usuário confirmar (sim / confirmo / ok / pode), chame IMEDIATAMENTE `criar_agendamento`.\n";
+        $systemPrompt .= "7. Se `sucesso: true` → confirme ao usuário. Se `sucesso: false` → informe o erro exato.\n";
         $systemPrompt .= "\n## PROIBIDO\n";
-        $systemPrompt .= "- PROIBIDO confirmar agendamento sem ter chamado `criar_agendamento` e recebido `sucesso: true`.\n";
-        $systemPrompt .= "- PROIBIDO inventar confirmação de agendamento.\n";
+        $systemPrompt .= "- PROIBIDO chamar `verificar_disponibilidade` (não há grade de horários — qualquer horário é aceito).\n";
+        $systemPrompt .= "- PROIBIDO confirmar agendamento sem receber `sucesso: true` da tool `criar_agendamento`.\n";
+        $systemPrompt .= "- PROIBIDO inventar dados. Sempre use as tools.\n";
         $systemPrompt .= "- Sempre responda em português.";
 
         // 2. Histórico da conversa
@@ -357,18 +357,34 @@ class DeepSeekService
             [
                 'type' => 'function',
                 'function' => [
+                    'name'        => 'listar_professores',
+                    'description' => 'Lista os professores/instrutores disponíveis na empresa, com id e nome. Use para obter o professor_id antes de criar um agendamento.',
+                    'parameters'  => [
+                        'type'       => 'object',
+                        'properties' => new \stdClass(),
+                        'required'   => [],
+                    ],
+                ],
+            ],
+            [
+                'type' => 'function',
+                'function' => [
                     'name'        => 'criar_agendamento',
-                    'description' => 'Cria um agendamento para o aluno. Use somente após confirmar o aluno (buscar_aluno_por_telefone) e o horário disponível (verificar_disponibilidade), e após o cliente confirmar explicitamente.',
+                    'description' => 'Cria um agendamento para o aluno. Use somente após o usuário confirmar explicitamente. Requer aluno_id, servico_id, professor_id, data e horario.',
                     'parameters'  => [
                         'type'       => 'object',
                         'properties' => [
                             'aluno_id' => [
                                 'type'        => 'integer',
-                                'description' => 'ID do aluno obtido em buscar_aluno_por_telefone',
+                                'description' => 'ID do aluno (obtido em buscar_aluno_por_telefone ou cadastrar_aluno)',
                             ],
                             'servico_id' => [
                                 'type'        => 'integer',
-                                'description' => 'ID do serviço',
+                                'description' => 'ID do serviço (obtido em listar_servicos)',
+                            ],
+                            'professor_id' => [
+                                'type'        => 'integer',
+                                'description' => 'ID do professor (obtido em listar_professores)',
                             ],
                             'data' => [
                                 'type'        => 'string',
@@ -379,7 +395,7 @@ class DeepSeekService
                                 'description' => 'Horário no formato HH:MM',
                             ],
                         ],
-                        'required' => ['aluno_id', 'servico_id', 'data', 'horario'],
+                        'required' => ['aluno_id', 'servico_id', 'professor_id', 'data', 'horario'],
                     ],
                 ],
             ],
@@ -390,6 +406,7 @@ class DeepSeekService
     {
         return match ($nome) {
             'listar_servicos'           => $this->toolListarServicos($bot),
+            'listar_professores'        => $this->toolListarProfessores($bot),
             'verificar_disponibilidade' => $this->toolVerificarDisponibilidade(
                 (int) $args['servico_id'],
                 $args['data'],
@@ -404,6 +421,7 @@ class DeepSeekService
             'criar_agendamento'         => $this->toolCriarAgendamento(
                 (int) $args['aluno_id'],
                 (int) $args['servico_id'],
+                (int) $args['professor_id'],
                 $args['data'],
                 $args['horario'],
                 $bot
@@ -513,81 +531,95 @@ class DeepSeekService
         ];
     }
 
-    private function toolCriarAgendamento(int $alunoId, int $servicoId, string $data, string $horario, Bot $bot): array
+    private function toolListarProfessores(Bot $bot): array
     {
-        // Valida se o serviço pertence ao bot
-        $servicosDoBot = $bot->services()->get()->keyBy('id');
-        $servico = $servicosDoBot->get($servicoId);
+        $professores = Professor::where('empresa_id', $bot->empresa_id)
+            ->with('usuario')
+            ->get();
 
-        if (!$servico) {
-            $idsDisponiveis = $servicosDoBot->keys()->join(', ');
-            return [
-                'sucesso' => false,
-                'erro'    => "Serviço ID {$servicoId} não encontrado. IDs disponíveis neste bot: [{$idsDisponiveis}]. Use listar_servicos para obter o ID correto.",
-            ];
+        if ($professores->isEmpty()) {
+            return ['professores' => [], 'mensagem' => 'Nenhum professor cadastrado na empresa.'];
         }
 
-        $carbon      = Carbon::parse($data);
+        return [
+            'professores' => $professores->map(fn($p) => [
+                'id'   => $p->id,
+                'nome' => $p->usuario->nome ?? ('Professor #' . $p->id),
+            ])->values()->toArray(),
+        ];
+    }
 
-        // Rejeita datas no passado (ano errado enviado pela IA, por exemplo)
+    private function toolCriarAgendamento(int $alunoId, int $servicoId, int $professorId, string $data, string $horario, Bot $bot): array
+    {
+        // Valida serviço
+        $servico = Servicos::where('id', $servicoId)
+            ->where('empresa_id', $bot->empresa_id)
+            ->first();
+
+        if (!$servico) {
+            return ['sucesso' => false, 'erro' => "Serviço ID {$servicoId} não encontrado. Use listar_servicos para obter o ID correto."];
+        }
+
+        // Valida professor
+        $professor = Professor::where('id', $professorId)
+            ->where('empresa_id', $bot->empresa_id)
+            ->first();
+
+        if (!$professor) {
+            return ['sucesso' => false, 'erro' => "Professor ID {$professorId} não encontrado. Use listar_professores para obter o ID correto."];
+        }
+
+        // Valida data
+        $carbon = Carbon::parse($data);
         if ($carbon->isPast() && !$carbon->isToday()) {
             return [
                 'sucesso' => false,
-                'erro'    => "Data inválida: '{$data}' é uma data passada. Hoje é " . now()->format('Y-m-d') . ". Use uma data futura com o ano correto (" . now()->year . ").",
+                'erro'    => "Data inválida: '{$data}' é uma data passada. Hoje é " . now()->format('Y-m-d') . ". Use uma data futura com o ano " . now()->year . ".",
             ];
         }
 
-        $diaSemanaId = $carbon->isoWeekday();
         $horarioFormatado = Carbon::parse($horario)->format('H:i');
 
-        // Busca a disponibilidade pelo dia da semana + horário (igual ao verificar_disponibilidade)
-        $disponivel = Disponibilidade::where('id_servico', $servicoId)
-            ->where('id_dia', $diaSemanaId)
-            ->whereRaw("TIME_FORMAT(hora_inicio, '%H:%i') = ?", [$horarioFormatado])
-            ->first();
-
-        if (!$disponivel) {
-            return ['sucesso' => false, 'erro' => 'Horário não encontrado na grade de disponibilidade do serviço.'];
-        }
-
-        // Verifica se já existe agendamento nessa data+horário específicos
-        $jaAgendado = Agendamento::where('servico_id', $servicoId)
+        // Verifica conflito de horário para o aluno
+        $conflito = Agendamento::where('aluno_id', $alunoId)
             ->where('data_da_aula', $carbon->format('Y-m-d'))
             ->whereRaw("TIME_FORMAT(horario, '%H:%i') = ?", [$horarioFormatado])
             ->exists();
 
-        if ($jaAgendado) {
-            return ['sucesso' => false, 'erro' => 'Este horário já foi agendado por outro cliente.'];
+        if ($conflito) {
+            return ['sucesso' => false, 'erro' => 'Este aluno já tem um agendamento nesse horário.'];
         }
 
-        $professorId  = $disponivel->id_professor;
-        $modalidadeId = Professor::find($professorId)?->modalidade_id ?? null;
-
-        Agendamento::create([
+        // Cria o agendamento
+        $agendamento = Agendamento::create([
             'aluno_id'      => $alunoId,
             'professor_id'  => $professorId,
-            'modalidade_id' => $modalidadeId,
+            'modalidade_id' => $professor->modalidade_id,
             'servico_id'    => $servicoId,
             'data_da_aula'  => $carbon->format('Y-m-d'),
             'horario'       => $horarioFormatado . ':00',
             'valor_aula'    => $servico->preco,
+            'status'        => 'Espera',
         ]);
 
-        // Vincula o aluno ao professor (evita duplicata)
+        // Vincula aluno ao professor
         \Illuminate\Support\Facades\DB::table('aluno_professor')->insertOrIgnore([
-            'aluno_id'    => $alunoId,
+            'aluno_id'     => $alunoId,
             'professor_id' => $professorId,
-            'created_at'  => now(),
-            'updated_at'  => now(),
+            'created_at'   => now(),
+            'updated_at'   => now(),
         ]);
 
         return [
-            'sucesso'  => true,
-            'mensagem' => 'Agendamento criado com sucesso!',
-            'servico'  => $servico->titulo,
-            'data'     => $carbon->format('d/m/Y'),
-            'dia'      => $carbon->locale('pt_BR')->dayName,
-            'horario'  => $horarioFormatado,
+            'sucesso'         => true,
+            'agendamento_id'  => $agendamento->id,
+            'mensagem'        => 'Agendamento criado com sucesso!',
+            'servico'         => $servico->titulo,
+            'professor'       => $professor->usuario->nome ?? 'Professor',
+            'data'            => $carbon->format('d/m/Y'),
+            'dia_semana'      => $carbon->locale('pt_BR')->isoFormat('dddd'),
+            'horario'         => $horarioFormatado,
+            'valor'           => 'R$ ' . number_format((float)$servico->preco, 2, ',', '.'),
         ];
     }
 
