@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Agendamento;
-use App\Models\Alunos;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -165,11 +164,8 @@ class AgendamentoChatController extends Controller
             ->pluck('total', 'horario')
             ->toArray();
 
-        // Clientes novos no mês (alunos criados este mês)
-        $clientesNovos = Alunos::whereMonth('created_at', now()->month)
-            ->whereYear('created_at', now()->year)
-            ->when($empresaId, fn($q) => $q->where('empresa_id', $empresaId))
-            ->count();
+        // Clientes novos no mês (alunos únicos que agendaram este mês)
+        $clientesNovos = (clone $mesAtual)->distinct('aluno_id')->count('aluno_id');
 
         return [
             'agendamentos_mes'    => $totalMes,
