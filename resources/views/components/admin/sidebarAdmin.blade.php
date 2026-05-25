@@ -14,10 +14,17 @@
                     <span>Administrativo</span>
                 </li>
             
-                <li> 
+                <li>
                     <a href="{{route('admin.dashboard')}}">
-                        <i class="fe fe-home"></i> 
+                        <i class="fe fe-home"></i>
                         <span>Dashboard</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{route('admin.agendamentos.chat')}}">
+                        <i class="fe fe-message-circle"></i>
+                        <span>Chat IA</span>
                     </a>
                 </li>
 
