@@ -28,7 +28,7 @@ class AgendamentoChatController extends Controller
 
         // Auto-cria bot padrão se a empresa não tiver nenhum
         if ($empresaId && Bot::where('empresa_id', $empresaId)->doesntExist()) {
-            Bot::create([
+            $novoBot = Bot::create([
                 'empresa_id'     => $empresaId,
                 'nome'           => 'Assistente IA',
                 'segmento'       => 'agendamentos',
@@ -37,6 +37,11 @@ class AgendamentoChatController extends Controller
                 'token_deepseek' => 2000,
                 'prompt'         => 'Você é um assistente inteligente para gerenciamento de agendamentos da empresa ' . ($empresa->nome ?? 'da empresa') . '. Ajude com agendamentos, alunos, serviços e consultas ao sistema.',
             ]);
+            // Vincula todos os serviços da empresa ao bot recém-criado
+            $servicoIds = \App\Models\Servicos::where('empresa_id', $empresaId)->pluck('id')->toArray();
+            if ($servicoIds) {
+                $novoBot->services()->syncWithoutDetaching($servicoIds);
+            }
         }
 
         $bots = $empresaId

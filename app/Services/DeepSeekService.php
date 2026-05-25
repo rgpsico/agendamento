@@ -414,10 +414,20 @@ class DeepSeekService
 
     private function toolListarServicos(Bot $bot): array
     {
+        // Busca serviços vinculados ao bot; se vazio, busca todos da empresa (fallback)
         $servicos = $bot->services()->get();
 
+        if ($servicos->isEmpty() && $bot->empresa_id) {
+            $servicos = Servicos::where('empresa_id', $bot->empresa_id)->get();
+
+            // Vincula automaticamente ao bot para consultas futuras
+            if ($servicos->isNotEmpty()) {
+                $bot->services()->syncWithoutDetaching($servicos->pluck('id')->toArray());
+            }
+        }
+
         if ($servicos->isEmpty()) {
-            return ['servicos' => [], 'mensagem' => 'Nenhum serviço cadastrado para este bot.'];
+            return ['servicos' => [], 'mensagem' => 'Nenhum serviço cadastrado para esta empresa. Acesse Admin > Serviços para cadastrar.'];
         }
 
         return [
@@ -425,7 +435,7 @@ class DeepSeekService
                 'id'               => $s->id,
                 'titulo'           => $s->titulo,
                 'descricao'        => $s->descricao,
-                'preco'            => $s->preco,
+                'preco'            => 'R$ ' . number_format((float)$s->preco, 2, ',', '.'),
                 'duracao_minutos'  => $s->tempo_de_aula,
                 'tipo_agendamento' => $s->tipo_agendamento,
             ])->values()->toArray(),
