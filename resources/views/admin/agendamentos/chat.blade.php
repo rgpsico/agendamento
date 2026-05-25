@@ -8,7 +8,15 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="/css/agendamento-chat.css"/>
+<link rel="stylesheet" href="/css/agendamento-chat.css?v={{ filemtime(public_path('css/agendamento-chat.css')) }}"/>
+<style>
+.mic-btn{width:38px;height:38px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);color:#94a3b8;cursor:pointer;transition:all .2s}
+.mic-btn:hover{background:rgba(255,255,255,.1);color:#e2e8f0}
+.mic-btn svg{width:17px;height:17px;pointer-events:none}
+.mic-btn.recording{background:rgba(239,68,68,.18);border-color:rgba(239,68,68,.55);color:#ef4444;animation:mic-pulse 1s ease-in-out infinite}
+@keyframes mic-pulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.4)}50%{box-shadow:0 0 0 7px rgba(239,68,68,0)}}
+.input-hint.recording{color:#ef4444}
+</style>
 </head>
 <body>
 
@@ -229,6 +237,6 @@ window.CHAT_CONFIG = {
   csrfToken:   document.querySelector('meta[name=csrf-token]').content,
 };
 </script>
-<script src="/js/agendamento-chat.js" defer></script>
+<script src="/js/agendamento-chat.js?v={{ filemtime(public_path('js/agendamento-chat.js')) }}" defer></script>
 </body>
 </html>
