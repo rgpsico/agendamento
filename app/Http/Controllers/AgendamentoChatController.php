@@ -42,10 +42,17 @@ class AgendamentoChatController extends Controller
         // ── Resolve / cria bot da empresa ──────────────────────────────────
         $bot = Bot::where('empresa_id', $empresaId)->where('status', true)->first();
 
-        if (!$bot) {
-            // Se não tem bot ativo, responde só com insights (sem IA)
+        if (!$empresaId) {
             return response()->json([
-                'reply'    => 'Nenhum bot ativo encontrado para sua empresa. Cadastre um bot em **Admin → Bot** para habilitar o assistente de IA.',
+                'reply'    => '⚠️ Sua conta não está vinculada a nenhuma empresa. Verifique seu perfil ou entre em contato com o administrador.',
+                'insights' => [],
+            ]);
+        }
+
+        if (!$bot) {
+            $botUrl = url('/admin/bot/dashboard');
+            return response()->json([
+                'reply'    => "Nenhum bot ativo encontrado para sua empresa.\n\nPara habilitar o assistente de IA, acesse **Admin → Bot** e crie um bot vinculado à sua empresa.\n\n[Criar bot agora]({$botUrl})",
                 'insights' => $this->buildInsights($empresaId, $user),
             ]);
         }
@@ -103,6 +110,25 @@ class AgendamentoChatController extends Controller
         }
     }
 
+    // ── Debug: mostra o que o sistema enxerga do usuário logado ───────────
+    public function debug()
+    {
+        $user      = Auth::user();
+        $empresaId = $this->resolverEmpresaId($user);
+        $bots      = Bot::where('empresa_id', $empresaId)->get(['id','nome','status','empresa_id']);
+        $botAtivo  = Bot::where('empresa_id', $empresaId)->where('status', true)->first();
+
+        return response()->json([
+            'usuario_id'   => $user->id,
+            'usuario_nome' => $user->name ?? $user->nome,
+            'empresa_id_resolvido' => $empresaId,
+            'empresa_relation'  => $user->empresa ? ['id' => $user->empresa->id] : null,
+            'professor_relation' => $user->professor ? ['id' => $user->professor->id, 'empresa_id' => $user->professor->empresa_id] : null,
+            'todos_os_bots_da_empresa' => $bots,
+            'bot_ativo_encontrado'     => $botAtivo ? ['id'=>$botAtivo->id,'nome'=>$botAtivo->nome] : null,
+        ]);
+    }
+
     // ── Endpoint separado só para carregar insights ────────────────────────
     public function insights()
     {
@@ -117,8 +143,17 @@ class AgendamentoChatController extends Controller
     // ── Helpers ────────────────────────────────────────────────────────────
     private function resolverEmpresaId($user): ?int
     {
-        if ($user->professor) return $user->professor->empresa_id;
-        if ($user->empresa)   return $user->empresa->id;
+        // Dono/admin da empresa
+        if ($user->empresa) return $user->empresa->id;
+
+        // Professor vinculado a uma empresa
+        if ($user->professor && $user->professor->empresa_id)
+            return $user->professor->empresa_id;
+
+        // Fallback: busca qualquer empresa onde este usuário é dono
+        $empresa = \App\Models\Empresa::where('user_id', $user->id)->first();
+        if ($empresa) return $empresa->id;
+
         return null;
     }
 
