@@ -138,12 +138,15 @@
 
     <div class="chat-input-wrap">
       <div class="chat-input-row">
-        <textarea id="chatInput" placeholder="Pergunte sobre seus agendamentos... ex: mostre os de hoje" rows="1"></textarea>
+        <button class="mic-btn" id="micBtn" title="Falar (voz para texto)">
+          <svg id="micIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+        </button>
+        <textarea id="chatInput" placeholder="Digite ou clique no microfone para falar..." rows="1"></textarea>
         <button class="send-btn" id="sendBtn" title="Enviar">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
         </button>
       </div>
-      <p class="input-hint">Enter para enviar &middot; Shift+Enter nova linha</p>
+      <p class="input-hint" id="inputHint">Enter para enviar &middot; Shift+Enter nova linha &middot; clique no mic para falar</p>
     </div>
   </main>
 

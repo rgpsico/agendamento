@@ -14,8 +14,97 @@
   const sugestoesEl = document.getElementById('sugestoes');
   const welcomeEl   = document.getElementById('welcome');
   const botSelect   = document.getElementById('botSelect');
+  const micBtn      = document.getElementById('micBtn');
+  const inputHint   = document.getElementById('inputHint');
 
   let conversationId = null;
+
+  // ── Reconhecimento de Voz (Web Speech API) ───────────────────────────
+  var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  var recognition = null;
+  var isRecording = false;
+
+  if (!SpeechRecognition) {
+    // Browser não suporta (Firefox sem flag, Safari antigo)
+    if (micBtn) {
+      micBtn.classList.add('unsupported');
+      micBtn.title = 'Reconhecimento de voz não suportado neste browser. Use Chrome ou Edge.';
+    }
+  } else {
+    recognition = new SpeechRecognition();
+    recognition.lang = 'pt-BR';
+    recognition.continuous = false;      // para ao detectar pausa
+    recognition.interimResults = true;   // mostra texto enquanto fala
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = function () {
+      isRecording = true;
+      micBtn.classList.add('recording');
+      inputHint.classList.add('recording');
+      inputHint.textContent = 'Ouvindo... fale agora';
+      inputEl.placeholder = 'Ouvindo...';
+    };
+
+    recognition.onresult = function (event) {
+      var transcript = '';
+      for (var i = event.resultIndex; i < event.results.length; i++) {
+        transcript += event.results[i][0].transcript;
+      }
+      inputEl.value = transcript;
+      // Auto-resize
+      inputEl.style.height = 'auto';
+      inputEl.style.height = Math.min(inputEl.scrollHeight, 120) + 'px';
+    };
+
+    recognition.onend = function () {
+      isRecording = false;
+      micBtn.classList.remove('recording');
+      inputHint.classList.remove('recording');
+      inputHint.textContent = 'Enter para enviar · Shift+Enter nova linha · clique no mic para falar';
+      inputEl.placeholder = 'Digite ou clique no microfone para falar...';
+
+      // Se captou algo, envia automaticamente
+      if (inputEl.value.trim()) {
+        enviar();
+      }
+    };
+
+    recognition.onerror = function (event) {
+      isRecording = false;
+      micBtn.classList.remove('recording');
+      inputHint.classList.remove('recording');
+
+      var msg = {
+        'no-speech'       : 'Nenhuma fala detectada. Tente novamente.',
+        'audio-capture'   : 'Microfone não encontrado.',
+        'not-allowed'     : 'Permissão de microfone negada. Libere nas configurações do browser.',
+        'network'         : 'Erro de rede no reconhecimento de voz.',
+      }[event.error] || ('Erro: ' + event.error);
+
+      inputHint.textContent = msg;
+      inputHint.style.color = 'var(--red)';
+      setTimeout(function () {
+        inputHint.style.color = '';
+        inputHint.textContent = 'Enter para enviar · Shift+Enter nova linha · clique no mic para falar';
+      }, 3000);
+    };
+
+    if (micBtn) {
+      micBtn.addEventListener('click', function () {
+        if (isRecording) {
+          recognition.stop();
+        } else {
+          inputEl.value = '';
+          inputEl.style.height = 'auto';
+          try {
+            recognition.start();
+          } catch (e) {
+            // já estava ativo
+          }
+        }
+      });
+    }
+  }
 
   // ── Troca de bot reinicia a conversa ─────────────────────────────────
   if (botSelect) {
