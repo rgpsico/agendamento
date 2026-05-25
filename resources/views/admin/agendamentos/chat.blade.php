@@ -509,17 +509,17 @@ table.rt tbody tr:hover{background:var(--glass-2)}
 
 </div>{{-- .shell --}}
 
-{{-- Variáveis Blade expostas ao JS antes do @verbatim --}}
 <script>
-const QUERY_URL    = @json(route('admin.agendamentos.chat.query'));
-const INSIGHTS_URL = @json(route('admin.agendamentos.chat.insights'));
-const CSRF_TOKEN   = document.querySelector('meta[name=csrf-token]').content;
+window.CHAT_CONFIG = {
+  queryUrl:    {{ Js::from(route('admin.agendamentos.chat.query')) }},
+  insightsUrl: {{ Js::from(route('admin.agendamentos.chat.insights')) }},
+  csrfToken:   document.querySelector('meta[name=csrf-token]').content,
+};
 </script>
-
+<script src="/js/agendamento-chat.js" defer></script>
 <script>
-@verbatim
-
-const messagesEl = document.getElementById('messages');
+/* placeholder */
+const messagesEl_UNUSED = null;
 const inputEl    = document.getElementById('chatInput');
 const sendBtn    = document.getElementById('sendBtn');
 const sugestoesEl= document.getElementById('sugestoes');
