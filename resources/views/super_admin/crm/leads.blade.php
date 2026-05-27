@@ -75,9 +75,14 @@
             <h4 class="mb-0 fw-bold">CRM — Leads das landing pages</h4>
             <small class="text-muted">Leads que querem contratar o SaaS</small>
         </div>
-        <a href="{{ route('super.admin.crm.pipeline') }}" class="btn btn-primary btn-sm">
-            <i class="fas fa-columns me-1"></i> Ver Pipeline
-        </a>
+        <div class="d-flex gap-2">
+            <a href="{{ route('super.admin.crm.importar.form') }}" class="btn btn-success btn-sm">
+                <i class="fas fa-file-import me-1"></i> Importar Leads
+            </a>
+            <a href="{{ route('super.admin.crm.pipeline') }}" class="btn btn-primary btn-sm">
+                <i class="fas fa-columns me-1"></i> Ver Pipeline
+            </a>
+        </div>
     </div>
 
     @if(session('success'))

@@ -748,6 +748,105 @@ EOT;
         return back()->with('success', "Status da empresa '{$empresa->nome}' atualizado.");
     }
 
+    // ─── CRM — Importar Leads ────────────────────────────────────────────────
+
+    public function crmImportarForm()
+    {
+        return view('super_admin.crm.importar');
+    }
+
+    public function crmImportarStore(Request $request)
+    {
+        $request->validate([
+            'modo'   => 'required|in:lista,csv',
+            'nicho'  => 'required|string|max:50',
+            'cidade' => 'nullable|string|max:100',
+            'lista'  => 'required_if:modo,lista|nullable|string',
+            'csv'    => 'required_if:modo,csv|nullable|file|mimes:csv,txt|max:2048',
+        ]);
+
+        $nicho  = $request->nicho;
+        $cidade = trim($request->cidade ?? '');
+        $linhas = [];
+
+        if ($request->modo === 'lista') {
+            // Cada linha: "Nome;Telefone" ou "Nome,Telefone" ou "Nome - Telefone"
+            $linhas = array_filter(
+                array_map('trim', explode("\n", $request->lista)),
+                fn($l) => strlen($l) > 2
+            );
+        } else {
+            // CSV upload
+            $arquivo = $request->file('csv');
+            $handle  = fopen($arquivo->getPathname(), 'r');
+            // Pula cabeçalho se tiver
+            $primeira = fgetcsv($handle, 0, ';') ?: fgetcsv($handle, 0, ',');
+            $ehCabecalho = $primeira && preg_match('/nome|name|empresa/i', implode('', $primeira));
+            if (!$ehCabecalho && $primeira) {
+                $linhas[] = implode(';', $primeira); // primeira linha é dado
+            }
+            while (($cols = fgetcsv($handle, 0, ';')) !== false) {
+                if ($cols) $linhas[] = implode(';', $cols);
+            }
+            fclose($handle);
+        }
+
+        $importados = 0;
+        $duplicados = 0;
+        $erros      = 0;
+
+        foreach ($linhas as $linha) {
+            // Suporta separadores: ; | , | " - "
+            $partes = preg_split('/[;|]|(?<!\d),(?!\d)| – | - /', $linha, 3);
+            $partes = array_map('trim', $partes);
+
+            $nome     = $partes[0] ?? '';
+            $telefone = isset($partes[1]) ? preg_replace('/\D/', '', $partes[1]) : '';
+            $email    = isset($partes[2]) && str_contains($partes[2], '@') ? $partes[2] : null;
+            $empresa  = isset($partes[2]) && !str_contains($partes[2], '@') ? $partes[2] : null;
+
+            if (empty($nome)) {
+                $erros++;
+                continue;
+            }
+
+            // Evita duplicata por telefone (se informado)
+            if ($telefone) {
+                $existe = Lead::whereNull('tenant_id')
+                    ->where('telefone', 'like', '%' . substr($telefone, -8))
+                    ->exists();
+                if ($existe) {
+                    $duplicados++;
+                    continue;
+                }
+            }
+
+            try {
+                Lead::create([
+                    'tenant_id'       => null,
+                    'nome'            => $nome,
+                    'telefone'        => $telefone ?: null,
+                    'email'           => $email,
+                    'empresa'         => $empresa,
+                    'bairro'          => $cidade ?: null,
+                    'origem'          => $nicho,
+                    'pipeline_status' => 'novo_lead',
+                    'status'          => 'novo',
+                ]);
+                $importados++;
+            } catch (\Exception $e) {
+                $erros++;
+            }
+        }
+
+        $msg = "{$importados} lead(s) importado(s).";
+        if ($duplicados) $msg .= " {$duplicados} duplicado(s) ignorado(s).";
+        if ($erros)      $msg .= " {$erros} linha(s) com erro.";
+
+        return redirect()->route('super.admin.crm.leads')
+            ->with('success', $msg);
+    }
+
     /* ══════════════════════════════════════════════════════════
      |  CONTEÚDO / ARTIGOS — Geração com DeepSeek + TinyMCE
      ══════════════════════════════════════════════════════════ */

@@ -439,6 +439,9 @@ Route::prefix('super-admin')->name('super.admin.')->middleware(['auth', 'master'
     // CRM — leads das landing pages (SaaS)
     Route::get('/crm',                            [SuperAdminController::class, 'crmLeads'])->name('crm.leads');
     Route::get('/crm/pipeline',                   [SuperAdminController::class, 'crmPipeline'])->name('crm.pipeline');
+    // Importar leads (CSV ou lista colada)
+    Route::get('/crm/importar',                   [SuperAdminController::class, 'crmImportarForm'])->name('crm.importar.form');
+    Route::post('/crm/importar',                  [SuperAdminController::class, 'crmImportarStore'])->name('crm.importar.store');
     // Rotas bulk ANTES das rotas com {lead} para evitar conflito de parâmetro
     Route::post('/crm/bulk/email',                [SuperAdminController::class, 'crmBulkEmail'])->name('crm.bulk.email');
     Route::post('/crm/bulk/sequencia',            [SuperAdminController::class, 'crmBulkSequencia'])->name('crm.bulk.sequencia');
