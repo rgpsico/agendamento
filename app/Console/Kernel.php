@@ -12,8 +12,16 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // Regera o sitemap.xml todo dia às 3h da manhã
+        // Gera artigos SEO automaticamente (publica direto) — 7h e 19h
+        $schedule->command('artigo:gerar --publicar')
+                 ->twiceDaily(7, 19)
+                 ->withoutOverlapping()
+                 ->appendOutputTo(storage_path('logs/artigo-seo.log'));
+
+        // Regera o sitemap.xml: às 3h e logo após cada lote de artigos (07:05 e 19:05)
         $schedule->command('sitemap:gerar')->dailyAt('03:00');
+        $schedule->command('sitemap:gerar')->dailyAt('07:05');
+        $schedule->command('sitemap:gerar')->dailyAt('19:05');
     }
 
     /**
