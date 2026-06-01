@@ -597,7 +597,7 @@ footer{background:var(--bg)}
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 7v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V7l-8-5Z"/><path d="m9 12 2 2 4-4"/></svg>
             </div>
             <h3>Segurança em 1º lugar</h3>
-            <p>Certificação ISA, salva-vidas em escala e equipamento revisado a cada aula.</p>
+            <p>Equipamento revisado a cada aula, Profesores com mais de 20 anos de experiência.</p>
           </div>
           <div class="value">
             <div class="ico">
@@ -687,8 +687,8 @@ footer{background:var(--bg)}
           <div class="body">
             <span class="tag">Intermediário+</span>
             <h3>Coaching Avançado</h3>
-            <p>Pacote de 8 aulas para evoluir em manobras com plano semanal e revisão em vídeo.</p>
-            <div class="meta"><span>⏱ <b>8 sessões</b></span><span>📈 <b>plano personalizado</b></span></div>
+            <p>Pacote de 8 aulas para evoluir em manobras com plano semanal.</p>
+            <div class="meta"><span>⏱ <b>Sessões</b></span><span>📈 <b>Com plano personalizado</b></span></div>
           </div>
         </article>
       @endif
@@ -696,15 +696,15 @@ footer{background:var(--bg)}
   </div>
 </section>
 
-{{-- ═══ PREÇOS ═══ --}}
+{{-- ═══ PREÇOS ═══ --
 <section id="precos" style="background:var(--bg-2)">
   <div class="wrap">
     <div class="section-head">
       <div>
         <span class="kicker">Pacotes</span>
-        <h2 class="title">Preços honestos. <em>Sem letras miúdas.</em></h2>
+        <h2 class="title"></em></h2>
       </div>
-      <p class="section-lead">Todos os pacotes incluem prancha, leash, lycra UV, parafina, vestiário com chuveiro e seguro do aluno.</p>
+      <p class="section-lead">Todos os pacotes incluem prancha, leash, lycra UV, parafina</p>
     </div>
     <div class="pricing">
       <div class="plan">
