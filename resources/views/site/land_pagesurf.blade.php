@@ -537,9 +537,9 @@ footer{background:var(--bg)}
     <div>
       <span class="eyebrow">Escola de Surf</span>
       <h1 class="headline">
-        Aprenda a surfar<br/>
-        <em>a primeira onda</em><br/>
-        em um único dia.
+        Aula de Surf<br/>
+        <em>Arpoador</em><br/>
+        Aprendendo a Surfar
       </h1>
       <p class="sub">{{ $descricao }}</p>
       <div class="hero-ctas">
@@ -547,7 +547,7 @@ footer{background:var(--bg)}
         <a href="#contato" class="btn btn-ghost">Falar com a equipe</a>
       </div>
       <div class="hero-stats">
-        <div class="s"><strong>12k+</strong><span>alunos formados</span></div>
+        {{-- <div class="s"><strong>12k+</strong><span>alunos formados</span></div> --}}
         <div class="s"><strong>4.9★</strong><span>avaliações</span></div>
         <div class="s"><strong>13</strong><span>anos na praia</span></div>
       </div>
@@ -620,7 +620,8 @@ footer{background:var(--bg)}
         <span class="kicker">Nossas aulas</span>
         <h2 class="title">Para cada pé <em>na areia.</em></h2>
       </div>
-      <p class="section-lead">Da primeira remada à manobra. Escolha o formato que combina com o seu nível, ritmo e curiosidade.</p>
+      <p class="section-lead">Da primeira remada à manobra.
+         Escolha o formato que combina com o seu nível, ritmo e curiosidade.</p>
     </div>
     <div class="classes">
       @if($servicos->isNotEmpty())
@@ -660,7 +661,7 @@ footer{background:var(--bg)}
           <div class="body">
             <span class="tag">Iniciantes</span>
             <h3>Primeira Onda</h3>
-            <p>Aula em grupo de 2h: teoria na areia, segurança, remada e a primeira onda em pé.</p>
+            <p>Aula em grupo de 2h: teoria na areia, segurança, remada.</p>
             <div class="meta"><span>⏱ <b>2h</b></span><span>👥 <b>até 4 alunos</b></span></div>
           </div>
         </article>
@@ -669,8 +670,8 @@ footer{background:var(--bg)}
           <div class="body">
             <span class="tag">Privativa</span>
             <h3>Aula Particular</h3>
-            <p>1 instrutor, 1 aluno. Foco em correções de postura, remada e leitura da série.</p>
-            <div class="meta"><span>⏱ <b>1h30</b></span><span>👤 <b>1 aluno</b></span><span>🎥 <b>vídeo análise</b></span></div>
+            <p>1 instrutor, 1 aluno. Foco em correções de posturas.</p>
+            <div class="meta"><span>⏱ <b>1h30</b></span><span>👤 <b>1 aluno</b></span><span>🎥 <b></b></span></div>
           </div>
         </article>
         <article class="class-card">
@@ -684,12 +685,12 @@ footer{background:var(--bg)}
         </article>
         <article class="class-card">
           <div class="media"><div class="ph-block"><span>Coaching avançado · foto</span></div></div>
-          <div class="body">
+          {{-- <div class="body">
             <span class="tag">Intermediário+</span>
             <h3>Coaching Avançado</h3>
             <p>Pacote de 8 aulas para evoluir em manobras com plano semanal.</p>
             <div class="meta"><span>⏱ <b>Sessões</b></span><span>📈 <b>Com plano personalizado</b></span></div>
-          </div>
+          </div> --}}
         </article>
       @endif
     </div>
