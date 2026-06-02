@@ -293,6 +293,11 @@
                                 <li><a href="{{ route('integracoes.mercadopago') }}">Mercado Pago</a></li>
                                 <li><a href="{{ route('integracoes.configuracoes') }}">Configurações Gerais</a></li>
                                 <li><a href="{{ route('integracoes.relatorios') }}">Relatórios de Pagamentos</a></li>
+                                <li>
+                                    <a href="{{ route('admin.social.index') }}">
+                                        <i class="fab fa-facebook me-1"></i><i class="fab fa-instagram me-1"></i> Redes Sociais
+                                    </a>
+                                </li>
                             </ul>
                         </li>
                     @endisset
