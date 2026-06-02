@@ -13,7 +13,10 @@
                 </div>
             </div>
 
-            <div class="text-right mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <a href="{{ route('admin.social.index') }}" class="btn btn-outline-secondary btn-sm">
+                    <i class="fab fa-facebook me-1"></i><i class="fab fa-instagram me-1"></i> Redes Sociais
+                </a>
                 <a href="{{ route('admin.site.artigos.create') }}" class="btn btn-primary">
                     <i class="fas fa-plus"></i> Novo Artigo
                 </a>
@@ -61,6 +64,15 @@
                                             <a href="{{ route('admin.site.artigos.edit', $artigo) }}" class="btn btn-sm btn-warning mr-1">
                                                 Editar
                                             </a>
+                                            @if($artigo->status === \App\Models\SiteArtigo::STATUS_PUBLICADO)
+                                                <button type="button" class="btn btn-sm btn-primary mr-1"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#modalCompartilhar"
+                                                    data-artigo-id="{{ $artigo->id }}"
+                                                    data-artigo-titulo="{{ $artigo->titulo }}">
+                                                    <i class="fas fa-share-alt"></i>
+                                                </button>
+                                            @endif
                                             <form action="{{ route('admin.site.artigos.destroy', $artigo) }}" method="POST"
                                                 style="display: inline-block;"
                                                 onsubmit="return confirm('Deseja remover este artigo?');">
@@ -86,4 +98,67 @@
             </div>
         </div>
     </div>
+
+    {{-- Modal Compartilhar nas Redes Sociais --}}
+    <div class="modal fade" id="modalCompartilhar" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-share-alt me-2 text-primary"></i> Compartilhar Artigo
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="formCompartilhar" method="POST" action="">
+                    @csrf
+                    <div class="modal-body">
+                        <p class="text-muted mb-3" id="modalArtigoTitulo"></p>
+
+                        <label class="form-label fw-semibold">Compartilhar em:</label>
+
+                        <div class="d-flex flex-column gap-2">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" name="redes[]" value="facebook" id="checkFacebook" checked>
+                                <label class="form-check-label" for="checkFacebook">
+                                    <i class="fab fa-facebook text-primary me-1"></i> Facebook
+                                </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" name="redes[]" value="instagram" id="checkInstagram" checked>
+                                <label class="form-check-label" for="checkInstagram">
+                                    <i class="fab fa-instagram text-danger me-1"></i> Instagram
+                                    <small class="text-muted">(requer imagem no artigo)</small>
+                                </label>
+                            </div>
+                        </div>
+
+                        @php $social = \App\Models\SocialConnection::where('empresa_id', auth()->user()->empresa_id ?? 0)->first(); @endphp
+                        @if(!$social)
+                            <div class="alert alert-warning mt-3 mb-0 py-2">
+                                <i class="fas fa-exclamation-triangle me-1"></i>
+                                Contas não conectadas.
+                                <a href="{{ route('admin.social.index') }}">Conectar agora</a>
+                            </div>
+                        @endif
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary btn-sm" {{ !$social ? 'disabled' : '' }}>
+                            <i class="fas fa-paper-plane me-1"></i> Publicar nas redes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.getElementById('modalCompartilhar').addEventListener('show.bs.modal', function (e) {
+        const btn     = e.relatedTarget;
+        const id      = btn.dataset.artigoId;
+        const titulo  = btn.dataset.artigoTitulo;
+        document.getElementById('modalArtigoTitulo').textContent = '"' + titulo + '"';
+        document.getElementById('formCompartilhar').action = '/admin/social/artigo/' + id;
+    });
+    </script>
 </x-admin.layout>

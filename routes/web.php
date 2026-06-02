@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\PerfilController;
+use App\Http\Controllers\Admin\SocialMetaController;
 use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SocialLiteController;
@@ -394,6 +395,15 @@ Route::prefix('admin/bot')->name('admin.bot.')->middleware('auth')->group(functi
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('conversas', [ConversationController::class, 'index'])->name('conversations.index');
     Route::get('conversas/{id}', [ConversationController::class, 'show'])->name('conversations.show');
+});
+
+// Redes Sociais — Meta (Facebook + Instagram)
+Route::prefix('admin/social')->name('admin.social.')->middleware(['auth'])->group(function () {
+    Route::get('/',            [SocialMetaController::class, 'index'])->name('index');
+    Route::get('/connect',     [SocialMetaController::class, 'connect'])->name('connect');
+    Route::get('/callback',    [SocialMetaController::class, 'callback'])->name('callback');
+    Route::delete('/disconnect',[SocialMetaController::class, 'disconnect'])->name('disconnect');
+    Route::post('/artigo/{artigo}', [SocialMetaController::class, 'postArtigo'])->name('post.artigo');
 });
 
 Route::post('/admin/bot/{bot}/chat', [BotController::class, 'chat'])->name('admin.bot.chat');
