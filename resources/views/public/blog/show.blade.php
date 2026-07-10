@@ -4,6 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $artigo->titulo }} - Blog</title>
+
+    @php
+        $ogImage = $artigo->imagem_capa
+            ? url('storage/' . $artigo->imagem_capa)
+            : ($site?->og_image_url ? url('storage/' . $site->og_image_url) : null);
+        $ogDescription = $artigo->resumo ?? strip_tags(Str::limit($artigo->conteudo ?? '', 160));
+        $ogUrl = url()->current();
+    @endphp
+
+    <meta property="og:type"        content="article">
+    <meta property="og:title"       content="{{ $artigo->titulo }}">
+    <meta property="og:description" content="{{ $ogDescription }}">
+    <meta property="og:url"         content="{{ $ogUrl }}">
+    @if($ogImage)
+    <meta property="og:image"       content="{{ $ogImage }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    @endif
+    <meta property="article:published_time" content="{{ $artigo->publicado_em?->toIso8601String() }}">
+
+    <meta name="twitter:card"        content="summary_large_image">
+    <meta name="twitter:title"       content="{{ $artigo->titulo }}">
+    <meta name="twitter:description" content="{{ $ogDescription }}">
+    @if($ogImage)
+    <meta name="twitter:image"       content="{{ $ogImage }}">
+    @endif
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
