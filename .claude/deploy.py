@@ -1,5 +1,5 @@
 """
-deploy.py — Git push local + pull na VPS via SSH
+deploy.py -- Git push local + pull na VPS via SSH
 Uso: python deploy.py "mensagem do commit"
 """
 
@@ -7,13 +7,13 @@ import sys
 import subprocess
 import paramiko
 
-# ── Configuração ──────────────────────────────────────────
+# -- Configuracao ------------------------------------------
 VPS_HOST   = "85.31.61.143"
 VPS_USER   = "deploy"
 VPS_PASS   = "Um57121214@123"
 VPS_DIR    = "/agendamento"
 GIT_BRANCH = "crm"
-# ──────────────────────────────────────────────────────────
+# ----------------------------------------------------------
 
 
 def run_local(cmd: list[str], cwd: str = None) -> str:
@@ -37,26 +37,26 @@ def ssh_run(client: paramiko.SSHClient, cmd: str) -> tuple[str, int]:
 
 
 def git_push(commit_msg: str, project_dir: str):
-    print("\n📦 Git — adicionando arquivos...")
+    print("\n[Git] Adicionando arquivos...")
     run_local(["git", "add", "-A"], cwd=project_dir)
 
-    print("📝 Criando commit...")
+    print("[Git] Criando commit...")
     try:
         out = run_local(["git", "commit", "-m", commit_msg], cwd=project_dir)
         print(f"  {out.splitlines()[0]}")
     except RuntimeError as e:
         if "nothing to commit" in str(e):
-            print("  Nada para commitar — usando último commit.")
+            print("  Nada para commitar -- usando ultimo commit.")
         else:
             raise
 
-    print(f"🚀 Pushing para origin/{GIT_BRANCH}...")
+    print(f"[Git] Pushing para origin/{GIT_BRANCH}...")
     out = run_local(["git", "push", "origin", GIT_BRANCH], cwd=project_dir)
     print(f"  {out.splitlines()[-1] if out else 'ok'}")
 
 
 def vps_deploy():
-    print(f"\n🌐 Conectando à VPS {VPS_HOST}...")
+    print(f"\n[VPS] Conectando a {VPS_HOST}...")
     client = paramiko.SSHClient()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     client.connect(VPS_HOST, username=VPS_USER, password=VPS_PASS, timeout=15)
@@ -69,24 +69,24 @@ def vps_deploy():
         f"docker exec agendamento_app php artisan view:clear",
     ]
 
-    print("\n🐳 Executando na VPS...")
+    print("\n[Docker] Executando na VPS...")
     for cmd in cmds:
         out, code = ssh_run(client, cmd)
         if code != 0 and "nothing to commit" not in out and "Already up to date" not in out:
-            print(f"  ⚠️  Exit code {code}")
+            print(f"  AVISO: Exit code {code}")
 
     client.close()
-    print("\n✅ Deploy concluído!")
+    print("\n[OK] Deploy concluido!")
 
 
 if __name__ == "__main__":
     import os
 
     project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    commit_msg  = " ".join(sys.argv[1:]) if len(sys.argv) > 1 else "deploy: atualização"
+    commit_msg  = " ".join(sys.argv[1:]) if len(sys.argv) > 1 else "deploy: atualizacao"
 
-    print(f"🔧 Projeto: {project_dir}")
-    print(f"💬 Commit:  {commit_msg}")
+    print(f"[Info] Projeto: {project_dir}")
+    print(f"[Info] Commit:  {commit_msg}")
 
     git_push(commit_msg, project_dir)
     vps_deploy()

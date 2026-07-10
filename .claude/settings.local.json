@@ -20,7 +20,13 @@
       "Bash(git add *)",
       "Read(//c/laragon/www/agendamento/**)",
       "Bash(grep -E \"^MAIL_\" .env)",
-      "Bash(grep -E \"^MAIL_\" .env.example)"
+      "Bash(grep -E \"^MAIL_\" .env.example)",
+      "Bash(git pull *)",
+      "Bash(git push *)",
+      "Bash(python -c ' *)",
+      "mcp__claude-in-chrome__navigate",
+      "mcp__claude-in-chrome__computer",
+      "Bash(git commit *)"
     ]
   }
 }
