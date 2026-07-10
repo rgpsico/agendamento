@@ -64,7 +64,7 @@ def vps_deploy():
     print("  Conectado!")
 
     cmds = [
-        f"cd {VPS_DIR} && git pull origin {GIT_BRANCH}",
+        f"su - deploy -c 'cd {VPS_DIR} && git pull origin {GIT_BRANCH}'",
         f"docker exec agendamento_app php artisan config:cache",
         f"docker exec agendamento_app php artisan route:cache",
         f"docker exec agendamento_app php artisan view:clear",
