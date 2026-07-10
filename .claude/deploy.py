@@ -9,7 +9,7 @@ import paramiko
 
 # -- Configuracao ------------------------------------------
 VPS_HOST   = "85.31.61.143"
-VPS_USER   = "deploy"
+VPS_USER   = "root"
 VPS_PASS   = "Um57121214@123"
 VPS_DIR    = "/agendamento"
 GIT_BRANCH = "crm"
