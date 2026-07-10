@@ -40,9 +40,17 @@ class SocialMetaController extends Controller
      ──────────────────────────────────────────────────────── */
     public function callback(Request $request)
     {
-        if ($request->has('error')) {
+        if ($request->has('error') || $request->has('error_code')) {
+            $desc = $request->error_description ?? $request->error_message ?? $request->error ?? 'erro desconhecido';
+            Log::warning('SocialMeta: OAuth cancelado', $request->all());
             return redirect()->route('admin.social.index')
-                ->with('error', 'Autorização cancelada: ' . $request->error_description);
+                ->with('error', 'Autorização cancelada: ' . $desc);
+        }
+
+        if (!$request->filled('code')) {
+            Log::warning('SocialMeta: callback sem code', $request->all());
+            return redirect()->route('admin.social.index')
+                ->with('error', 'Facebook não retornou o código de autorização. Verifique as configurações do app.');
         }
 
         $empresaId   = $this->resolverEmpresaId();
