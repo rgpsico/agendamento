@@ -12,8 +12,6 @@ class MetaGraphService
     private string $appSecret;
     private string $apiVersion = 'v19.0';
     private string $baseUrl;
-    private string $configId = '27846887451574518'; // Facebook Login for Business config ID
-
     public function __construct()
     {
         $this->appId     = config('services.meta.app_id', '');
@@ -26,13 +24,12 @@ class MetaGraphService
      ──────────────────────────────────────────────────────── */
     public function getOAuthUrl(string $redirectUri): string
     {
-        // Facebook Login for Business usa config_id em vez de scope manual
         return "https://www.facebook.com/dialog/oauth?"
             . http_build_query([
                 'client_id'     => $this->appId,
                 'redirect_uri'  => $redirectUri,
                 'response_type' => 'code',
-                'config_id'     => $this->configId,
+                'scope'         => 'pages_show_list,pages_read_engagement,pages_manage_posts,instagram_basic,instagram_content_publish,public_profile',
             ]);
     }
 
