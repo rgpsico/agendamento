@@ -11,7 +11,7 @@ import paramiko
 VPS_HOST   = "85.31.61.143"
 VPS_USER   = "root"
 VPS_PASS   = "Um57121214@123"
-VPS_DIR    = "/agendamento"
+VPS_DIR    = "/home/deploy/agendamento"
 GIT_BRANCH = "crm"
 # ----------------------------------------------------------
 
@@ -28,11 +28,12 @@ def ssh_run(client: paramiko.SSHClient, cmd: str) -> tuple[str, int]:
     print(f"  $ {cmd}")
     _, stdout, stderr = client.exec_command(cmd)
     exit_code = stdout.channel.recv_exit_status()
-    out = stdout.read().decode().strip()
-    err = stderr.read().decode().strip()
+    out = stdout.read().decode("utf-8", errors="replace").strip()
+    err = stderr.read().decode("utf-8", errors="replace").strip()
     combined = (out + "\n" + err).strip()
     if combined:
-        print(f"    {combined}")
+        safe = combined.encode("ascii", errors="replace").decode("ascii")
+        print(f"    {safe}")
     return combined, exit_code
 
 
