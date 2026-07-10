@@ -30,8 +30,8 @@
                         <table class="table table-hover table-center mb-0">
                             <thead>
                                 <tr>
+                                    <th style="width:80px">Thumb</th>
                                     <th>Título</th>
-                                    <th>Resumo</th>
                                     <th>Status</th>
                                     <th>Publicado em</th>
                                     <th>Atualizado em</th>
@@ -42,10 +42,20 @@
                                 @forelse ($artigos as $artigo)
                                     <tr>
                                         <td>
-                                            <strong>{{ $artigo->titulo }}</strong>
-                                            <div class="text-muted small">Slug: {{ $artigo->slug }}</div>
+                                            @if($artigo->imagem_capa)
+                                                <img src="{{ $artigo->imagem_capa }}"
+                                                     alt="{{ $artigo->titulo }}"
+                                                     style="width:70px;height:50px;object-fit:cover;border-radius:6px;">
+                                            @else
+                                                <div style="width:70px;height:50px;border-radius:6px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;">
+                                                    <i class="fas fa-image text-muted"></i>
+                                                </div>
+                                            @endif
                                         </td>
-                                        <td>{{ \Illuminate\Support\Str::limit($artigo->resumo ?? '', 80) }}</td>
+                                        <td>
+                                            <strong>{{ $artigo->titulo }}</strong>
+                                            <div class="text-muted small">{{ \Illuminate\Support\Str::limit($artigo->resumo ?? '', 60) }}</div>
+                                        </td>
                                         <td>
                                             @if ($artigo->status === \App\Models\SiteArtigo::STATUS_PUBLICADO)
                                                 <span class="badge badge-success">Publicado</span>
