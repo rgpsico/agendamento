@@ -27,9 +27,9 @@ class SocialMetaController extends Controller
     /* ─────────────────────────────────────────────────────────
      |  Redireciona para OAuth do Facebook
      ──────────────────────────────────────────────────────── */
-    public function connect()
+    public function connect(Request $request)
     {
-        $redirectUri = route('admin.social.callback');
+        $redirectUri = $request->getSchemeAndHttpHost() . route('admin.social.callback', [], false);
         $url = $this->meta->getOAuthUrl($redirectUri);
 
         return redirect($url);
@@ -54,7 +54,7 @@ class SocialMetaController extends Controller
         }
 
         $empresaId   = $this->resolverEmpresaId();
-        $redirectUri = route('admin.social.callback');
+        $redirectUri = $request->getSchemeAndHttpHost() . route('admin.social.callback', [], false);
 
         try {
             // Troca code por token longo
