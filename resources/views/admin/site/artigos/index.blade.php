@@ -141,7 +141,14 @@
                             </div>
                         </div>
 
-                        @php $social = \App\Models\SocialConnection::where('empresa_id', auth()->user()->empresa_id ?? 0)->first(); @endphp
+                        @php
+                            $u = auth()->user();
+                            $eid = $u->empresa_id
+                                ?? $u->professor?->empresa_id
+                                ?? \App\Models\Empresa::where('user_id', $u->id)->value('id')
+                                ?? 0;
+                            $social = \App\Models\SocialConnection::where('empresa_id', $eid)->first();
+                        @endphp
                         @if(!$social)
                             <div class="alert alert-warning mt-3 mb-0 py-2">
                                 <i class="fas fa-exclamation-triangle me-1"></i>
