@@ -75,16 +75,31 @@ class MetaGraphService
      ──────────────────────────────────────────────────────── */
     public function getUserPages(string $userToken): array
     {
-        $res = Http::get("{$this->baseUrl}/me/accounts", [
+        $all  = [];
+        $url  = "{$this->baseUrl}/me/accounts";
+        $params = [
             'access_token' => $userToken,
             'fields'       => 'id,name,access_token,instagram_business_account',
-        ]);
+            'limit'        => 100,
+        ];
 
-        if (!$res->successful()) {
-            throw new \Exception('Erro ao buscar páginas: ' . $res->body());
-        }
+        do {
+            $res = Http::get($url, $params);
 
-        return $res->json('data', []);
+            if (!$res->successful()) {
+                throw new \Exception('Erro ao buscar páginas: ' . $res->body());
+            }
+
+            $all  = array_merge($all, $res->json('data', []));
+            $next = $res->json('paging.next');
+
+            // nas próximas páginas a URL já vem completa com todos os params
+            $url    = $next ?? '';
+            $params = [];
+
+        } while ($next);
+
+        return $all;
     }
 
     /* ─────────────────────────────────────────────────────────
