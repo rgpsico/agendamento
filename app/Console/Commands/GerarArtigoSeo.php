@@ -68,7 +68,7 @@ class GerarArtigoSeo extends Command
 
     public function handle(): int
     {
-        $apiKey = env('DEEP_SEEK_API_KEY');
+        $apiKey = config('services.deepseek.key');
         if (!$apiKey) {
             $this->error('DEEP_SEEK_API_KEY não configurada no .env');
             return self::FAILURE;
