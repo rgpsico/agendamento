@@ -90,15 +90,23 @@ class MetaGraphService
                 throw new \Exception('Erro ao buscar páginas: ' . $res->body());
             }
 
-            $all  = array_merge($all, $res->json('data', []));
-            $next = $res->json('paging.next');
+            $batch = $res->json('data', []);
+            $all   = array_merge($all, $batch);
+            $next  = $res->json('paging.next');
 
-            // nas próximas páginas a URL já vem completa com todos os params
+            Log::info('MetaGraph: páginas buscadas', [
+                'batch_count' => count($batch),
+                'total_so_far' => count($all),
+                'has_next' => (bool) $next,
+                'pages' => array_column($batch, 'name'),
+            ]);
+
             $url    = $next ?? '';
             $params = [];
 
         } while ($next);
 
+        Log::info('MetaGraph: total páginas retornadas', ['total' => count($all)]);
         return $all;
     }
 
