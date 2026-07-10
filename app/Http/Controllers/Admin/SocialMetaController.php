@@ -70,42 +70,95 @@ class SocialMetaController extends Controller
                     ->with('error', 'Nenhuma Página do Facebook encontrada. Você precisa administrar uma Página.');
             }
 
-            // Pega a primeira página (ou deixa o usuário escolher no futuro)
-            $page         = $pages[0];
-            $pageId       = $page['id'];
-            $pageName     = $page['name'];
-            $pageToken    = $page['access_token'];
-            $igAccountId  = $page['instagram_business_account']['id'] ?? null;
-            $igUsername   = '';
-
-            if ($igAccountId) {
-                $igUsername = $this->meta->getInstagramUsername($igAccountId, $pageToken);
+            // Se mais de uma página, deixa o usuário escolher
+            if (count($pages) > 1) {
+                session([
+                    'meta_pages'      => $pages,
+                    'meta_user_token' => $userToken,
+                    'meta_expires_at' => $expiresAt->toDateTimeString(),
+                    'meta_empresa_id' => $empresaId,
+                ]);
+                return redirect()->route('admin.social.select-page');
             }
 
-            // Salva ou atualiza
-            SocialConnection::updateOrCreate(
-                ['empresa_id' => $empresaId],
-                [
-                    'facebook_page_id'    => $pageId,
-                    'facebook_page_name'  => $pageName,
-                    'facebook_page_token' => $pageToken,
-                    'instagram_account_id' => $igAccountId,
-                    'instagram_username'  => $igUsername,
-                    'user_access_token'   => $userToken,
-                    'token_expires_at'    => $expiresAt,
-                ]
-            );
-
-            Log::info('SocialMeta: conexão salva', ['empresa_id' => $empresaId, 'page' => $pageName]);
-
-            return redirect()->route('admin.social.index')
-                ->with('success', "Conectado com sucesso! Página: {$pageName}" . ($igUsername ? " | Instagram: @{$igUsername}" : ''));
+            // Só uma página — conecta direto
+            return $this->salvarPagina($pages[0], $userToken, $expiresAt, $empresaId);
 
         } catch (\Exception $e) {
             Log::error('SocialMeta: erro no callback', ['erro' => $e->getMessage()]);
             return redirect()->route('admin.social.index')
                 ->with('error', 'Erro ao conectar: ' . $e->getMessage());
         }
+    }
+
+    /* ─────────────────────────────────────────────────────────
+     |  Seleção de página — exibe lista
+     ──────────────────────────────────────────────────────── */
+    public function selectPage()
+    {
+        $pages = session('meta_pages');
+        if (empty($pages)) {
+            return redirect()->route('admin.social.index')
+                ->with('error', 'Sessão expirada. Conecte novamente.');
+        }
+        return view('admin.social.select-page', compact('pages'));
+    }
+
+    /* ─────────────────────────────────────────────────────────
+     |  Seleção de página — salva escolha
+     ──────────────────────────────────────────────────────── */
+    public function storePage(Request $request)
+    {
+        $request->validate(['page_id' => 'required|string']);
+
+        $pages     = session('meta_pages', []);
+        $userToken = session('meta_user_token');
+        $expiresAt = session('meta_expires_at') ? \Carbon\Carbon::parse(session('meta_expires_at')) : now()->addDays(60);
+        $empresaId = session('meta_empresa_id') ?? $this->resolverEmpresaId();
+
+        $page = collect($pages)->firstWhere('id', $request->page_id);
+        if (!$page) {
+            return redirect()->route('admin.social.index')
+                ->with('error', 'Página não encontrada. Conecte novamente.');
+        }
+
+        session()->forget(['meta_pages', 'meta_user_token', 'meta_expires_at', 'meta_empresa_id']);
+
+        return $this->salvarPagina($page, $userToken, $expiresAt, $empresaId);
+    }
+
+    /* ─────────────────────────────────────────────────────────
+     |  Salva conexão de uma página escolhida
+     ──────────────────────────────────────────────────────── */
+    private function salvarPagina(array $page, string $userToken, $expiresAt, int $empresaId)
+    {
+        $pageId      = $page['id'];
+        $pageName    = $page['name'];
+        $pageToken   = $page['access_token'];
+        $igAccountId = $page['instagram_business_account']['id'] ?? null;
+        $igUsername  = '';
+
+        if ($igAccountId) {
+            $igUsername = $this->meta->getInstagramUsername($igAccountId, $pageToken);
+        }
+
+        SocialConnection::updateOrCreate(
+            ['empresa_id' => $empresaId],
+            [
+                'facebook_page_id'     => $pageId,
+                'facebook_page_name'   => $pageName,
+                'facebook_page_token'  => $pageToken,
+                'instagram_account_id' => $igAccountId,
+                'instagram_username'   => $igUsername,
+                'user_access_token'    => $userToken,
+                'token_expires_at'     => $expiresAt,
+            ]
+        );
+
+        Log::info('SocialMeta: conexão salva', ['empresa_id' => $empresaId, 'page' => $pageName]);
+
+        return redirect()->route('admin.social.index')
+            ->with('success', "Conectado com sucesso! Página: {$pageName}" . ($igUsername ? " | Instagram: @{$igUsername}" : ''));
     }
 
     /* ─────────────────────────────────────────────────────────

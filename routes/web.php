@@ -401,7 +401,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
 Route::prefix('admin/social')->name('admin.social.')->middleware(['auth'])->group(function () {
     Route::get('/',            [SocialMetaController::class, 'index'])->name('index');
     Route::get('/connect',     [SocialMetaController::class, 'connect'])->name('connect');
-    Route::get('/callback',    [SocialMetaController::class, 'callback'])->name('callback');
+    Route::get('/callback',     [SocialMetaController::class, 'callback'])->name('callback');
+    Route::get('/select-page',  [SocialMetaController::class, 'selectPage'])->name('select-page');
+    Route::post('/select-page', [SocialMetaController::class, 'storePage'])->name('store-page');
     Route::delete('/disconnect',[SocialMetaController::class, 'disconnect'])->name('disconnect');
     Route::post('/artigo/{artigo}', [SocialMetaController::class, 'postArtigo'])->name('post.artigo');
 });
