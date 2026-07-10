@@ -54,7 +54,6 @@
                                         </td>
                                         <td>
                                             <strong>{{ $artigo->titulo }}</strong>
-                                            <div class="text-muted small">{{ \Illuminate\Support\Str::limit($artigo->resumo ?? '', 60) }}</div>
                                         </td>
                                         <td>
                                             @if ($artigo->status === \App\Models\SiteArtigo::STATUS_PUBLICADO)
