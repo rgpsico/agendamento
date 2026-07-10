@@ -169,23 +169,8 @@ class MetaGraphService
             throw new \Exception('Facebook não conectado.');
         }
 
-        // Com imagem: posta como foto com legenda
-        if ($imageUrl) {
-            $res = Http::post("{$this->baseUrl}/{$conn->facebook_page_id}/photos", [
-                'url'          => $imageUrl,
-                'caption'      => $mensagem,
-                'access_token' => $conn->facebook_page_token,
-            ]);
-
-            if (!$res->successful()) {
-                Log::error('MetaGraph: erro ao postar foto no Facebook', ['body' => $res->body()]);
-                throw new \Exception('Erro ao postar foto no Facebook: ' . ($res->json('error.message') ?? $res->body()));
-            }
-
-            return ['post_id' => $res->json('post_id') ?? $res->json('id'), 'rede' => 'facebook'];
-        }
-
-        // Sem imagem: posta texto com link
+        // Posta no /feed com link — o Facebook gera o preview OG automaticamente
+        // (imagem, título e descrição vêm das metatags do artigo ao clicar no card)
         $payload = [
             'message'      => $mensagem,
             'access_token' => $conn->facebook_page_token,
