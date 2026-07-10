@@ -30,7 +30,7 @@
                         <table class="table table-hover table-center mb-0">
                             <thead>
                                 <tr>
-                                    <th style="width:80px">Thumb</th>
+                                    <th style="width:56px">Thumb</th>
                                     <th>Título</th>
                                     <th>Status</th>
                                     <th>Publicado em</th>
@@ -45,9 +45,9 @@
                                             @if($artigo->imagem_capa)
                                                 <img src="{{ $artigo->imagem_capa }}"
                                                      alt="{{ $artigo->titulo }}"
-                                                     style="width:70px;height:50px;object-fit:cover;border-radius:6px;">
+                                                     style="width:48px;height:36px;object-fit:cover;border-radius:6px;">
                                             @else
-                                                <div style="width:70px;height:50px;border-radius:6px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;">
+                                                <div style="width:48px;height:36px;border-radius:6px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;">
                                                     <i class="fas fa-image text-muted"></i>
                                                 </div>
                                             @endif
