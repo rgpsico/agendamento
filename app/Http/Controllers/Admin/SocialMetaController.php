@@ -29,7 +29,7 @@ class SocialMetaController extends Controller
      ──────────────────────────────────────────────────────── */
     public function connect(Request $request)
     {
-        $redirectUri = $request->getSchemeAndHttpHost() . route('admin.social.callback', [], false);
+        $redirectUri = 'https://' . $request->getHost() . route('admin.social.callback', [], false);
         $url = $this->meta->getOAuthUrl($redirectUri);
 
         return redirect($url);
@@ -54,7 +54,7 @@ class SocialMetaController extends Controller
         }
 
         $empresaId   = $this->resolverEmpresaId();
-        $redirectUri = $request->getSchemeAndHttpHost() . route('admin.social.callback', [], false);
+        $redirectUri = 'https://' . $request->getHost() . route('admin.social.callback', [], false);
 
         try {
             // Troca code por token longo
