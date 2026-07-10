@@ -43,7 +43,7 @@
                                     <tr>
                                         <td>
                                             @if($artigo->imagem_capa)
-                                                <img src="{{ $artigo->imagem_capa }}"
+                                                <img src="{{ \Illuminate\Support\Facades\Storage::url($artigo->imagem_capa) }}"
                                                      alt="{{ $artigo->titulo }}"
                                                      style="width:48px;height:36px;object-fit:cover;border-radius:6px;">
                                             @else
