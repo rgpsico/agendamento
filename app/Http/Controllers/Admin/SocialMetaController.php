@@ -205,14 +205,18 @@ class SocialMetaController extends Controller
         foreach ($request->redes as $rede) {
             try {
                 if ($rede === 'facebook') {
-                    $res = $this->meta->postToFacebook($connection, $texto, $urlArtigo);
+                    $fbImageUrl = $artigo->imagem_capa
+                        ? url('storage/' . $artigo->imagem_capa)
+                        : ($site?->og_image_url ? url('storage/' . $site->og_image_url) : null);
+                    $res = $this->meta->postToFacebook($connection, $texto, $urlArtigo, $fbImageUrl);
                     $resultados[] = "Facebook ✅ (post #{$res['post_id']})";
                 }
 
                 if ($rede === 'instagram') {
                     // Instagram precisa de imagem — usa imagem do artigo ou OG do site
-                    $imageUrl = $artigo->imagem_url
-                        ?? ($site?->og_image_url ? url('storage/' . $site->og_image_url) : null);
+                    $imageUrl = $artigo->imagem_capa
+                        ? url('storage/' . $artigo->imagem_capa)
+                        : ($site?->og_image_url ? url('storage/' . $site->og_image_url) : null);
 
                     if (!$imageUrl) {
                         $erros[] = 'Instagram: artigo sem imagem. Adicione uma imagem ao artigo.';
