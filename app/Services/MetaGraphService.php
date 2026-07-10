@@ -29,7 +29,7 @@ class MetaGraphService
                 'client_id'     => $this->appId,
                 'redirect_uri'  => $redirectUri,
                 'response_type' => 'code',
-                'scope'         => 'pages_show_list,pages_read_engagement,pages_manage_posts,instagram_basic,instagram_content_publish,public_profile',
+                'scope'         => 'pages_show_list,pages_read_engagement,pages_manage_posts,instagram_basic,instagram_content_publish,public_profile,business_management',
             ]);
     }
 
@@ -107,6 +107,43 @@ class MetaGraphService
         } while ($next);
 
         Log::info('MetaGraph: total páginas retornadas', ['total' => count($all)]);
+
+        // Busca também páginas do Business Manager
+        try {
+            $bizRes = Http::get("{$this->baseUrl}/me/businesses", [
+                'access_token' => $userToken,
+                'fields'       => 'id,name',
+                'limit'        => 50,
+            ]);
+
+            if ($bizRes->successful()) {
+                foreach ($bizRes->json('data', []) as $biz) {
+                    foreach (['/owned_pages', '/client_pages'] as $endpoint) {
+                        $pageRes = Http::get("{$this->baseUrl}/{$biz['id']}{$endpoint}", [
+                            'access_token' => $userToken,
+                            'fields'       => 'id,name,access_token,instagram_business_account',
+                            'limit'        => 100,
+                        ]);
+                        if ($pageRes->successful()) {
+                            $bizPages = $pageRes->json('data', []);
+                            // evita duplicatas
+                            $existingIds = array_column($all, 'id');
+                            foreach ($bizPages as $p) {
+                                if (!in_array($p['id'], $existingIds)) {
+                                    $all[] = $p;
+                                    $existingIds[] = $p['id'];
+                                }
+                            }
+                            Log::info("MetaGraph: Business Manager {$biz['name']}{$endpoint}", ['count' => count($bizPages)]);
+                        }
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::warning('MetaGraph: erro ao buscar páginas do Business Manager', ['erro' => $e->getMessage()]);
+        }
+
+        Log::info('MetaGraph: total final com Business Manager', ['total' => count($all)]);
         return $all;
     }
 
