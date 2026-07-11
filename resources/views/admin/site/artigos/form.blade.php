@@ -41,7 +41,7 @@
                 </button>
                 <small class="text-muted ml-2" id="ia-status"></small>
             </div>
-            <textarea name="conteudo" id="conteudo" rows="8" class="form-control tinymce-editor" required>{{ old('conteudo', optional($artigo)->conteudo) }}</textarea>
+            <textarea name="conteudo" id="conteudo" rows="8" class="form-control tinymce-editor">{{ old('conteudo', optional($artigo)->conteudo) }}</textarea>
         </div>
 
         <div class="row">
@@ -132,6 +132,11 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         if (!window.tinymce) return;
+
+        // Copia conteudo do TinyMCE para o textarea antes de submeter
+        document.querySelector('form').addEventListener('submit', function() {
+            tinymce.triggerSave();
+        });
 
         tinymce.init({
             selector: 'textarea.tinymce-editor',
