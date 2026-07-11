@@ -31,7 +31,7 @@
                             <thead>
                                 <tr>
                                     <th style="width:56px">Thumb</th>
-                                    <th>Título</th>
+                                    <th style="width:260px">Título</th>
                                     <th style="width:110px">Status</th>
                                     <th style="width:110px">Publicado em</th>
                                     <th style="width:110px">Atualizado em</th>
