@@ -32,10 +32,10 @@
                                 <tr>
                                     <th style="width:56px">Thumb</th>
                                     <th>Título</th>
-                                    <th>Status</th>
-                                    <th>Publicado em</th>
-                                    <th>Atualizado em</th>
-                                    <th class="text-right">Ações</th>
+                                    <th style="width:110px">Status</th>
+                                    <th style="width:110px">Publicado em</th>
+                                    <th style="width:110px">Atualizado em</th>
+                                    <th style="width:160px" class="text-right">Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -63,9 +63,9 @@
                                             @endif
                                         </td>
                                         <td>
-                                            {{ $artigo->publicado_em ? $artigo->publicado_em->format('d/m/Y H:i') : '—' }}
+                                            {{ $artigo->publicado_em ? $artigo->publicado_em->format('d/m/Y') : '—' }}
                                         </td>
-                                        <td>{{ $artigo->updated_at->format('d/m/Y H:i') }}</td>
+                                        <td>{{ $artigo->updated_at->format('d/m/Y') }}</td>
                                         <td class="text-right">
                                             <a href="{{ route('admin.site.artigos.preview', $artigo) }}" class="btn btn-sm btn-info mr-1">
                                                 Ver
