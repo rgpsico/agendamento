@@ -98,18 +98,26 @@
             $.ajax({
                 method: 'POST',
                 url: '{{ route('admin.site.artigos.generate') }}',
-                headers: { 'Accept': 'application/json' },
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                },
                 data: { titulo },
                 success: function(response) {
                     if (response.conteudo) {
-                        $conteudo.val(response.conteudo);
-                        $status.text('Conteúdo gerado com sucesso.');
+                        // Atualiza o TinyMCE se estiver ativo, senão o textarea direto
+                        if (typeof tinymce !== 'undefined' && tinymce.get('conteudo')) {
+                            tinymce.get('conteudo').setContent(response.conteudo);
+                        } else {
+                            $conteudo.val(response.conteudo);
+                        }
+                        $status.text('Conteudo gerado com sucesso.');
                     }
                 },
                 error: function(xhr) {
                     const message = xhr.responseJSON && xhr.responseJSON.message
                         ? xhr.responseJSON.message
-                        : 'Não foi possível gerar o conteúdo agora.';
+                        : 'Nao foi possivel gerar o conteudo agora.';
                     $status.text(message);
                 },
                 complete: function() {
