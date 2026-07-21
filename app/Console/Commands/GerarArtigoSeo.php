@@ -244,7 +244,6 @@ Requisitos:
 
     private function escolherTema(EmpresaSite $site): string
     {
-        // Detecta nicho do site
         $nicho = strtolower($site->segmento ?? $site->nicho ?? '');
 
         $temas = collect($this->temasPorNicho)
@@ -255,27 +254,48 @@ Requisitos:
             $temas = collect($this->temasPorNicho['geral']);
         }
 
-        // Evita repetir temas já usados recentemente (últimos 30 dias)
-        $usados = SiteArtigo::where('site_id', $site->id)
-            ->where('created_at', '>=', now()->subDays(30))
+        // Busca TODOS os títulos já gerados (sem limite de data)
+        $titulosExistentes = SiteArtigo::where('site_id', $site->id)
             ->pluck('titulo')
             ->map(fn($t) => strtolower($t))
             ->toArray();
 
-        $disponiveis = $temas->filter(function ($tema) use ($usados) {
-            foreach ($usados as $usado) {
-                if (str_contains($usado, strtolower(substr($tema, 0, 20)))) {
+        $disponiveis = $temas->filter(function ($tema) use ($titulosExistentes) {
+            $palavrasChave = $this->extrairPalavrasChave($tema);
+
+            foreach ($titulosExistentes as $titulo) {
+                $matches = 0;
+                foreach ($palavrasChave as $palavra) {
+                    if (str_contains($titulo, $palavra)) {
+                        $matches++;
+                    }
+                }
+                // Considera repetido se mais da metade das palavras-chave coincidir
+                if ($matches >= ceil(count($palavrasChave) / 2)) {
                     return false;
                 }
             }
             return true;
         });
 
-        // Se todos foram usados, volta à lista completa
+        // Se todos os temas já foram usados, reinicia o ciclo
         if ($disponiveis->isEmpty()) {
+            $this->warn('  Todos os temas já foram usados — reiniciando ciclo.');
             $disponiveis = $temas;
         }
 
         return $disponiveis->random();
+    }
+
+    private function extrairPalavrasChave(string $texto): array
+    {
+        $stopwords = ['como', 'para', 'que', 'uma', 'uns', 'dos', 'das', 'com', 'por', 'seu', 'sua', 'são', 'nao', 'mais', 'mas', 'isso', 'este', 'esta', 'cada', 'todo', 'toda', 'versus'];
+
+        $palavras = explode(' ', strtolower($texto));
+
+        return array_values(array_filter(
+            $palavras,
+            fn($p) => strlen($p) > 3 && !in_array($p, $stopwords)
+        ));
     }
 }
