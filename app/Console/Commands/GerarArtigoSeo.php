@@ -24,46 +24,108 @@ class GerarArtigoSeo extends Command
      ─────────────────────────────────────────────────── */
     private array $temasPorNicho = [
         'surf' => [
-            'Como escolher a prancha certa para o nível de surf',
-            'Melhores praias para aprender a surfar no Brasil',
-            'Dicas de aquecimento antes de entrar no mar',
-            'Etiqueta no line-up: regras não escritas do surf',
-            'Como ler as ondas: guia para iniciantes',
-            'Benefícios físicos e mentais do surf',
-            'Equipamentos essenciais para quem está começando no surf',
-            'Como evoluir do surf iniciante para intermediário',
-            'Surf em família: como introduzir crianças ao esporte',
-            'Segurança no mar: o que todo surfista deve saber',
-            'Cuidados com a prancha e o leash',
-            'A importância do preparo físico para surfistas',
+            // SEO local — Arpoador
+            'Aula de surf no Arpoador: tudo o que você precisa saber antes de começar',
+            'Por que o Arpoador é o melhor lugar para aprender a surfar no Rio',
+            'Aula de surf no Arpoador para iniciantes: como é e quanto custa',
+            'Arpoador surf: guia completo para quem quer pegar a primeira onda',
+            'Como escolher uma escola de surf no Arpoador',
+
+            // SEO local — Ipanema
+            'Aula de surf em Ipanema: o que esperar da sua primeira aula',
+            'Surf em Ipanema: melhores pontos e escolas para iniciantes',
+            'Por que aprender a surfar em Ipanema é uma experiência única',
+            'Aula de surf em Ipanema para adultos: nunca é tarde para começar',
+            'Ipanema e o surf: história, cultura e onde aprender',
+
+            // Bodyboard — Arpoador
+            'Aula de bodyboard no Arpoador: guia completo para iniciantes',
+            'Por que fazer aula de bodyboard no Arpoador: veja os motivos',
+            'Bodyboard no Arpoador: como são as ondas e o que esperar das aulas',
+            'Aula de bodyboard no Arpoador para adultos e crianças',
+            'Diferença entre surf e bodyboard: qual escolher no Arpoador',
+
+            // Bodyboard — Praia do Diabo
+            'Aula de bodyboard na Praia do Diabo: ondas perfeitas para iniciantes',
+            'Por que a Praia do Diabo é ideal para aprender bodyboard',
+            'Praia do Diabo: tudo sobre o point de bodyboard mais famoso do Rio',
+            'Bodyboard na Praia do Diabo: como se preparar para sua primeira aula',
+
+            // Bodyboard infantil
+            'Aula de bodyboard infantil: a partir de que idade a criança pode começar',
+            'Bodyboard para crianças: benefícios e cuidados nas aulas',
+            'Como introduzir seu filho ao bodyboard de forma segura e divertida',
+            'Aula de bodyboard infantil no Rio: o que os pais precisam saber',
+            'Esportes aquáticos para crianças: por que o bodyboard é uma ótima escolha',
+
+            // Benefícios e saúde
+            'Benefícios físicos e mentais de praticar surf regularmente',
+            'Como o surf melhora a saúde mental e o equilíbrio emocional',
+            'Surf como terapia: como as ondas transformam vidas',
+            'Por que surfar faz bem para a mente, o corpo e a alma',
+            'Surf e saúde: o que acontece com seu corpo quando você pega uma onda',
+
+            // Esportes de praia — vida e estilo
+            'Esportes de praia em Ipanema: opções para todos os perfis',
+            'Esportes de praia para saúde mental e equilíbrio emocional',
+            'Como os esportes de praia transformam sua qualidade de vida',
+            'Esportes de praia para a vida: por que criar esse hábito ainda jovem',
+            'Viver melhor com esportes de praia: guia para quem mora no Rio',
+            'Esportes aquáticos no Rio de Janeiro: onde praticar e como começar',
+            'Como os esportes de praia ajudam no controle da ansiedade',
+            'Esportes de praia para toda a família: opções no Rio de Janeiro',
+
+            // Técnica e evolução
+            'Como evoluir do surf iniciante para intermediário mais rápido',
+            'Etiqueta no line-up: regras não escritas do surf que todo iniciante deve saber',
+            'Como ler as ondas: guia prático para surfistas iniciantes',
+            'Equipamentos essenciais para quem está começando no surf ou bodyboard',
+            'Segurança no mar: o que todo praticante de esportes aquáticos deve saber',
+            'Como escolher a prancha certa para o seu nível e peso',
+            'Preparo físico para surf e bodyboard: exercícios fora da água',
+            'Surf em família: como envolver todos no esporte',
         ],
+
         'pilates' => [
             'Pilates para iniciantes: por onde começar',
             'Benefícios do pilates para a postura no dia a dia',
-            'Pilates versus academia: qual escolher',
+            'Pilates versus academia: qual escolher para o seu objetivo',
             'Como o pilates ajuda na recuperação de lesões',
             'Pilates na gravidez: benefícios e cuidados',
             'Frequência ideal de treinos de pilates por semana',
-            'Diferenças entre pilates solo e aparelho',
+            'Diferenças entre pilates solo e no aparelho',
+            'Pilates para atletas: como complementa o desempenho esportivo',
+            'Por que o pilates melhora a saúde mental além do físico',
+            'Pilates para idosos: benefícios e cuidados na terceira idade',
         ],
+
         'natacao' => [
-            'Como aprender a nadar do zero: guia completo',
+            'Como aprender a nadar do zero: guia completo para adultos',
             'Benefícios da natação para todas as idades',
             'Estilos de natação e quando usar cada um',
             'Como melhorar o fôlego na natação',
+            'Natação para crianças: quando começar e quais os benefícios',
+            'Natação e saúde mental: por que nadar faz bem para a mente',
         ],
+
         'esportes' => [
-            'Como criar o hábito de praticar esportes',
-            'Benefícios dos esportes aquáticos para a saúde',
-            'Como escolher o esporte certo para o seu perfil',
-            'A importância do alongamento no esporte',
+            'Esportes de praia em Ipanema: guia completo para iniciantes',
+            'Esportes de praia para saúde mental e equilíbrio emocional',
+            'Como os esportes de praia transformam sua qualidade de vida',
+            'Esportes de praia para a vida: por que criar esse hábito',
+            'Como criar o hábito de praticar esportes aquáticos no Rio',
+            'Benefícios dos esportes aquáticos para corpo e mente',
+            'Como escolher o esporte de praia certo para o seu perfil',
+            'Esportes de praia para toda a família no Rio de Janeiro',
         ],
+
         'geral' => [
-            'Como escolher uma escola de esportes de qualidade',
+            'Como escolher uma escola de esportes aquáticos de qualidade',
             'Benefícios de praticar esportes desde a infância',
-            'Dicas para manter a consistência nos treinos',
-            'Como a atividade física melhora a saúde mental',
-            'Por que investir em aulas com professores profissionais',
+            'Dicas para manter a consistência nos treinos esportivos',
+            'Como a atividade física melhora a saúde mental e emocional',
+            'Por que investir em aulas com instrutores profissionais',
+            'Esportes aquáticos no Rio: onde praticar e como começar',
         ],
     ];
 
@@ -206,22 +268,24 @@ CONTEUDO: [artigo completo em HTML semântico usando <h2>, <h3>, <p>, <ul>, <li>
     private function montarPrompt(string $tema, EmpresaSite $site): string
     {
         $empresa = $site->nome_empresa ?? 'nossa escola';
-        $cidade  = $site->cidade ?? '';
-        $locStr  = $cidade ? " em {$cidade}" : '';
+        $cidade  = $site->cidade ?? 'Rio de Janeiro';
 
         return "Escreva um artigo SEO completo sobre: \"{$tema}\"
 
-Contexto: para a escola '{$empresa}'{$locStr}.
+Contexto: para a escola '{$empresa}' localizada em {$cidade}.
 
-Requisitos:
-- Título com a keyword principal no início
-- Meta description de 150-160 caracteres
-- Artigo com pelo menos 800 palavras em HTML semântico
-- Use h2 e h3 para estruturar o conteúdo
-- Inclua listas (ul/li) onde fizer sentido
-- Mencione '{$empresa}' naturalmente 2-3 vezes
-- Termine com um call-to-action para agendar uma aula
-- NÃO use markdown, use apenas HTML";
+Requisitos SEO obrigatórios:
+- TÍTULO: use a keyword \"{$tema}\" no início do título
+- RESUMO: meta description de 150-160 caracteres com a keyword principal
+- A keyword \"{$tema}\" deve aparecer no primeiro parágrafo e em pelo menos 2 subtítulos
+- Artigo com pelo menos 900 palavras em HTML semântico
+- Use <h2> e <h3> para estruturar o conteúdo
+- Inclua listas <ul>/<li> onde fizer sentido
+- Mencione '{$empresa}' naturalmente 2-3 vezes ao longo do texto
+- Inclua dados práticos: quanto custa, duração das aulas, o que levar, faixa etária
+- Termine com um call-to-action convidando o leitor a agendar uma aula em '{$empresa}'
+- NÃO use markdown, use apenas HTML
+- Escreva em português do Brasil, tom informativo e acolhedor";
     }
 
     private function parsearResposta(string $content, string $temaFallback): array
