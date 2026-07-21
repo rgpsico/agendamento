@@ -282,7 +282,8 @@ Requisitos SEO obrigatórios:
 - Use <h2> e <h3> para estruturar o conteúdo
 - Inclua listas <ul>/<li> onde fizer sentido
 - Mencione '{$empresa}' naturalmente 2-3 vezes ao longo do texto
-- Inclua dados práticos: quanto custa, duração das aulas, o que levar, faixa etária
+- Inclua dados práticos: duração das aulas, o que levar, faixa etária
+- Ao mencionar valores, use a faixa de R$ 280 a R$ 600 por pacote de aulas — NUNCA cite valores abaixo disso
 - Termine com um call-to-action convidando o leitor a agendar uma aula em '{$empresa}'
 - NÃO use markdown, use apenas HTML
 - Escreva em português do Brasil, tom informativo e acolhedor";
