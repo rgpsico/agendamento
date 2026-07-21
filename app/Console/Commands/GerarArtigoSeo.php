@@ -7,6 +7,7 @@ use App\Models\SiteArtigo;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class GerarArtigoSeo extends Command
 {
@@ -165,7 +166,14 @@ class GerarArtigoSeo extends Command
                 'status'   => $status,
             ]);
 
-            $this->info("  ✓ Artigo #{$registro->id} salvo como '{$status}': {$artigo['titulo']}");
+            // Busca imagem no Unsplash e salva como capa
+            $imagemPath = $this->buscarImagemUnsplash($artigo['titulo'], $tema);
+            if ($imagemPath) {
+                $registro->update(['imagem_capa' => $imagemPath]);
+                $this->line("  Imagem: {$imagemPath}");
+            }
+
+            $this->info("  Artigo #{$registro->id} salvo como '{$status}': {$artigo['titulo']}");
 
             Log::info('GerarArtigoSeo: artigo criado', [
                 'site_id'    => $site->id,
@@ -285,6 +293,58 @@ Requisitos:
         }
 
         return $disponiveis->random();
+    }
+
+    private function buscarImagemUnsplash(string $titulo, string $tema): ?string
+    {
+        $accessKey = config('services.unsplash.access_key');
+        if (!$accessKey) {
+            $this->warn('  UNSPLASH_ACCESS_KEY nao configurada — sem imagem.');
+            return null;
+        }
+
+        // Usa palavras-chave do tema para busca mais precisa
+        $query = implode(' ', array_slice($this->extrairPalavrasChave($tema), 0, 3));
+
+        try {
+            $res = Http::withHeaders(['Accept-Version' => 'v1'])
+                ->get('https://api.unsplash.com/search/photos', [
+                    'client_id'   => $accessKey,
+                    'query'       => $query,
+                    'per_page'    => 10,
+                    'orientation' => 'landscape',
+                ]);
+
+            if (!$res->successful()) {
+                $this->warn('  Unsplash: erro na busca — ' . $res->status());
+                return null;
+            }
+
+            $fotos = $res->json('results', []);
+            if (empty($fotos)) {
+                $this->warn("  Unsplash: nenhuma foto para '{$query}'.");
+                return null;
+            }
+
+            // Pega uma foto aleatória entre os resultados para variar
+            $foto    = $fotos[array_rand($fotos)];
+            $url     = $foto['urls']['regular'] ?? null;
+            if (!$url) return null;
+
+            // Baixa e salva no storage
+            $imagem   = Http::get($url)->body();
+            $filename = 'artigos/' . uniqid('unsplash_') . '.jpg';
+            Storage::disk('public')->put($filename, $imagem);
+
+            // Notifica o Unsplash do download (obrigatório pelos termos de uso)
+            Http::get($foto['links']['download_location'] ?? '', ['client_id' => $accessKey]);
+
+            return $filename;
+
+        } catch (\Throwable $e) {
+            $this->warn('  Unsplash: excecao — ' . $e->getMessage());
+            return null;
+        }
     }
 
     private function extrairPalavrasChave(string $texto): array

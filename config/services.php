@@ -44,5 +44,9 @@ return [
         'app_secret' => env('META_APP_SECRET'),
     ],
 
+    'unsplash' => [
+        'access_key' => env('UNSPLASH_ACCESS_KEY'),
+    ],
+
 
 ];
