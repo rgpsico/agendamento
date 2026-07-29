@@ -24,66 +24,75 @@ class GerarArtigoSeo extends Command
      ─────────────────────────────────────────────────── */
     private array $temasPorNicho = [
         'surf' => [
-            // SEO local — Arpoador
-            'Aula de surf no Arpoador: tudo o que você precisa saber antes de começar',
-            'Por que o Arpoador é o melhor lugar para aprender a surfar no Rio',
+            // Surf — Arpoador
             'Aula de surf no Arpoador para iniciantes: como é e quanto custa',
+            'Por que o Arpoador é o melhor lugar para aprender a surfar no Rio',
             'Arpoador surf: guia completo para quem quer pegar a primeira onda',
             'Como escolher uma escola de surf no Arpoador',
+            'Aula de surf no Arpoador para adultos: nunca é tarde para começar',
+            'Surf no Arpoador: os melhores horários e condições para iniciantes',
+            'O que levar na primeira aula de surf no Arpoador',
+            'Aula de surf no Arpoador em família: como aproveitar com crianças',
 
-            // SEO local — Ipanema
+            // Surf — Ipanema e Zona Sul
             'Aula de surf em Ipanema: o que esperar da sua primeira aula',
-            'Surf em Ipanema: melhores pontos e escolas para iniciantes',
+            'Surf em Ipanema: melhores pontos e dicas para iniciantes',
             'Por que aprender a surfar em Ipanema é uma experiência única',
-            'Aula de surf em Ipanema para adultos: nunca é tarde para começar',
-            'Ipanema e o surf: história, cultura e onde aprender',
+            'As melhores praias da Zona Sul do Rio para aprender a surfar',
+            'Surf na Zona Sul do Rio: guia completo de praias e escolas',
 
-            // Bodyboard — Arpoador
+            // Bodyboard — Arpoador e Praia do Diabo
             'Aula de bodyboard no Arpoador: guia completo para iniciantes',
-            'Por que fazer aula de bodyboard no Arpoador: veja os motivos',
-            'Bodyboard no Arpoador: como são as ondas e o que esperar das aulas',
-            'Aula de bodyboard no Arpoador para adultos e crianças',
-            'Diferença entre surf e bodyboard: qual escolher no Arpoador',
-
-            // Bodyboard — Praia do Diabo
+            'Por que fazer aula de bodyboard no Arpoador',
+            'Bodyboard no Arpoador: como são as ondas e o que esperar',
             'Aula de bodyboard na Praia do Diabo: ondas perfeitas para iniciantes',
             'Por que a Praia do Diabo é ideal para aprender bodyboard',
-            'Praia do Diabo: tudo sobre o point de bodyboard mais famoso do Rio',
-            'Bodyboard na Praia do Diabo: como se preparar para sua primeira aula',
+            'Praia do Diabo: o point de bodyboard mais famoso do Rio',
+            'Diferença entre surf e bodyboard: qual escolher para começar',
 
             // Bodyboard infantil
-            'Aula de bodyboard infantil: a partir de que idade a criança pode começar',
-            'Bodyboard para crianças: benefícios e cuidados nas aulas',
+            'Aula de bodyboard infantil no Arpoador: a partir de que idade começar',
+            'Bodyboard para crianças no Rio: benefícios e cuidados nas aulas',
             'Como introduzir seu filho ao bodyboard de forma segura e divertida',
-            'Aula de bodyboard infantil no Rio: o que os pais precisam saber',
-            'Esportes aquáticos para crianças: por que o bodyboard é uma ótima escolha',
+            'Esportes aquáticos para crianças na Zona Sul do Rio de Janeiro',
+            'Bodyboard infantil: por que é o esporte ideal para crianças no Rio',
 
-            // Benefícios e saúde
-            'Benefícios físicos e mentais de praticar surf regularmente',
-            'Como o surf melhora a saúde mental e o equilíbrio emocional',
-            'Surf como terapia: como as ondas transformam vidas',
-            'Por que surfar faz bem para a mente, o corpo e a alma',
-            'Surf e saúde: o que acontece com seu corpo quando você pega uma onda',
+            // Passeios e experiências no Rio
+            'Passeios de stand up paddle no Rio de Janeiro: onde e como fazer',
+            'Passeio de caiaque em Ipanema: uma experiência única no Rio',
+            'Os melhores passeios aquáticos para fazer no Rio de Janeiro',
+            'Passeio de barco pela orla carioca: o que esperar e como reservar',
+            'Mergulho no Rio de Janeiro: onde praticar e o que ver',
+            'Pesca esportiva no Rio: guia para iniciantes na Zona Sul',
+            'Snorkeling no Rio de Janeiro: praias e pontos recomendados',
 
-            // Esportes de praia — vida e estilo
+            // Esportes de praia — Rio de Janeiro
             'Esportes de praia em Ipanema: opções para todos os perfis',
-            'Esportes de praia para saúde mental e equilíbrio emocional',
-            'Como os esportes de praia transformam sua qualidade de vida',
-            'Esportes de praia para a vida: por que criar esse hábito ainda jovem',
-            'Viver melhor com esportes de praia: guia para quem mora no Rio',
-            'Esportes aquáticos no Rio de Janeiro: onde praticar e como começar',
-            'Como os esportes de praia ajudam no controle da ansiedade',
-            'Esportes de praia para toda a família: opções no Rio de Janeiro',
+            'Os melhores esportes para praticar na Praia do Arpoador',
+            'Esportes aquáticos no Rio de Janeiro: guia completo para iniciantes',
+            'Beach tennis no Rio: onde aprender e como são as aulas',
+            'Vôlei de praia em Ipanema: onde jogar e como encontrar parceiros',
+            'Frescobol em Ipanema: a tradição carioca que todo turista deve conhecer',
+            'Esportes de praia para a saúde mental: por que o mar transforma vidas',
+            'Como os esportes de praia ajudam no controle da ansiedade e do estresse',
+            'Esportes de praia para toda a família no Rio de Janeiro',
+            'Atividades na praia para fazer no Rio de Janeiro além de tomar sol',
 
             // Técnica e evolução
-            'Como evoluir do surf iniciante para intermediário mais rápido',
-            'Etiqueta no line-up: regras não escritas do surf que todo iniciante deve saber',
-            'Como ler as ondas: guia prático para surfistas iniciantes',
-            'Equipamentos essenciais para quem está começando no surf ou bodyboard',
-            'Segurança no mar: o que todo praticante de esportes aquáticos deve saber',
+            'Como evoluir no surf mais rápido: dicas de instrutores do Arpoador',
+            'Como ler as ondas do Arpoador: guia para iniciantes',
+            'Equipamentos essenciais para começar no surf ou bodyboard no Rio',
+            'Segurança no mar: o que todo iniciante precisa saber antes de surfar',
             'Como escolher a prancha certa para o seu nível e peso',
             'Preparo físico para surf e bodyboard: exercícios fora da água',
-            'Surf em família: como envolver todos no esporte',
+            'Etiqueta no line-up do Arpoador: regras que todo surfista deve saber',
+
+            // Surf, saúde e estilo de vida carioca
+            'Surf como terapia: como as ondas do Arpoador transformam vidas',
+            'Por que surfar faz bem para a mente, o corpo e a alma',
+            'Surf e saúde mental: o que acontece no seu cérebro quando você pega uma onda',
+            'O estilo de vida carioca e a cultura do surf na Zona Sul',
+            'Por que o Rio de Janeiro é um dos melhores lugares do mundo para surfar',
         ],
 
         'pilates' => [
@@ -109,23 +118,20 @@ class GerarArtigoSeo extends Command
         ],
 
         'esportes' => [
-            'Esportes de praia em Ipanema: guia completo para iniciantes',
-            'Esportes de praia para saúde mental e equilíbrio emocional',
-            'Como os esportes de praia transformam sua qualidade de vida',
-            'Esportes de praia para a vida: por que criar esse hábito',
-            'Como criar o hábito de praticar esportes aquáticos no Rio',
-            'Benefícios dos esportes aquáticos para corpo e mente',
+            'Esportes de praia em Ipanema: guia completo',
+            'Os melhores esportes aquáticos para praticar no Rio de Janeiro',
             'Como escolher o esporte de praia certo para o seu perfil',
             'Esportes de praia para toda a família no Rio de Janeiro',
+            'Passeios e atividades aquáticas imperdíveis no Rio de Janeiro',
+            'Atividades ao ar livre na Zona Sul do Rio: um guia completo',
         ],
 
         'geral' => [
-            'Como escolher uma escola de esportes aquáticos de qualidade',
-            'Benefícios de praticar esportes desde a infância',
-            'Dicas para manter a consistência nos treinos esportivos',
-            'Como a atividade física melhora a saúde mental e emocional',
-            'Por que investir em aulas com instrutores profissionais',
-            'Esportes aquáticos no Rio: onde praticar e como começar',
+            'Como escolher uma escola de esportes aquáticos de qualidade no Rio',
+            'O que fazer na Praia do Arpoador além de tomar sol',
+            'Ipanema e Arpoador: o guia definitivo de atividades esportivas',
+            'Turismo esportivo no Rio de Janeiro: experiências imperdíveis',
+            'Zona Sul do Rio de Janeiro: o paraíso dos esportes de praia',
         ],
     ];
 
