@@ -133,6 +133,48 @@ class GerarArtigoSeo extends Command
             'Turismo esportivo no Rio de Janeiro: experiências imperdíveis',
             'Zona Sul do Rio de Janeiro: o paraíso dos esportes de praia',
         ],
+
+        // Temas em inglês — SEO para turistas internacionais
+        'surf_en' => [
+            // Surf lessons — Rio de Janeiro
+            'Surf lessons in Rio de Janeiro: the complete guide for beginners',
+            'Best surf lessons in Rio de Janeiro: what to expect and how to book',
+            'Surf lessons Rio de Janeiro: tips from local instructors',
+            'Learning to surf in Rio de Janeiro: everything you need to know',
+            'Rio de Janeiro surf lessons for adults: it is never too late to start',
+            'Surf lessons in Rio de Janeiro for kids: safe, fun and unforgettable',
+            'How much do surf lessons cost in Rio de Janeiro',
+            'Best beaches in Rio de Janeiro to learn how to surf',
+            'Surf school in Rio de Janeiro: how to choose the right one',
+            'Surf lessons in Rio de Janeiro: a complete tourist guide',
+
+            // Surf lessons — Arpoador
+            'Surf lessons at Praia do Arpoador: the ultimate beginner guide',
+            'Arpoador surf lessons: what makes this beach perfect for beginners',
+            'Best surf school at Arpoador beach in Rio de Janeiro',
+            'Surf lessons Arpoador Rio de Janeiro: prices, schedule and tips',
+            'Learning to surf at Arpoador: a step-by-step guide',
+            'Arpoador beach surf experience: everything tourists should know',
+            'Why Arpoador is the best place to take surf lessons in Rio',
+            'Surf lessons near Ipanema and Arpoador: top schools and instructors',
+
+            // Bodyboard lessons — English
+            'Bodyboard lessons in Rio de Janeiro: the beginner guide',
+            'Bodyboard lessons at Arpoador beach: what to expect',
+            'Bodyboard vs surfing: which one should you try first in Rio',
+            'Best bodyboard spots in Rio de Janeiro for beginners',
+            'Bodyboard lessons for kids in Rio de Janeiro: age, safety and fun',
+
+            // Experiences and activities
+            'Top water sports to try in Rio de Janeiro',
+            'Best beach activities in Ipanema and Arpoador for tourists',
+            'Things to do at Arpoador beach in Rio de Janeiro',
+            'Stand up paddle in Rio de Janeiro: where to rent and learn',
+            'Water sports in Rio de Janeiro: the complete tourist guide',
+            'Rio de Janeiro beach guide: sports, activities and hidden gems',
+            'Why Rio de Janeiro is one of the best surf destinations in the world',
+            'Surf culture in Rio de Janeiro: history, spots and local vibe',
+        ],
     ];
 
     public function handle(): int
@@ -184,7 +226,7 @@ class GerarArtigoSeo extends Command
                 'temperature' => 0.7,
                 'max_tokens'  => 3000,
                 'messages'    => [
-                    ['role' => 'system', 'content' => $this->systemPrompt($site)],
+                    ['role' => 'system', 'content' => $this->systemPrompt($site, $tema)],
                     ['role' => 'user',   'content' => $prompt],
                 ],
             ]);
@@ -200,7 +242,6 @@ class GerarArtigoSeo extends Command
                 return;
             }
 
-            // Extrai título, resumo e conteúdo do retorno
             $artigo = $this->parsearResposta($content, $tema);
 
             if ($this->option('dry-run')) {
@@ -256,10 +297,34 @@ class GerarArtigoSeo extends Command
         }
     }
 
-    private function systemPrompt(EmpresaSite $site): string
+    private function isEnglish(string $tema): bool
+    {
+        $englishWords = ['surf', 'lessons', 'learn', 'beach', 'guide', 'best', 'how', 'what', 'why', 'tips', 'school', 'beginners', 'complete', 'ultimate', 'water', 'sports', 'things', 'try'];
+        $lower = strtolower($tema);
+        $matches = 0;
+        foreach ($englishWords as $word) {
+            if (str_contains($lower, $word)) {
+                $matches++;
+            }
+        }
+        return $matches >= 2;
+    }
+
+    private function systemPrompt(EmpresaSite $site, string $tema = ''): string
     {
         $empresa = $site->nome_empresa ?? 'nossa escola';
         $nicho   = $site->segmento ?? $site->nicho ?? 'esportes';
+
+        if ($this->isEnglish($tema)) {
+            return "You are an SEO content writer specialized in surf, bodyboard and beach sports in Rio de Janeiro, Brazil.
+Write for the school '{$empresa}'.
+Your goal is to create articles that rank on Google for English-speaking tourists visiting Rio de Janeiro.
+Write ALWAYS in English. Use a friendly, informative and enthusiastic tone.
+Mandatory response format:
+TÍTULO: [article title with main keyword]
+RESUMO: [meta description with 150-160 characters, natural and persuasive]
+CONTEUDO: [complete article in semantic HTML using <h2>, <h3>, <p>, <ul>, <li>, <strong>. Minimum 900 words.]";
+        }
 
         return "Você é um redator especializado em SEO para o nicho de {$nicho}.
 Escreva para a empresa '{$empresa}'.
@@ -275,6 +340,26 @@ CONTEUDO: [artigo completo em HTML semântico usando <h2>, <h3>, <p>, <ul>, <li>
     {
         $empresa = $site->nome_empresa ?? 'nossa escola';
         $cidade  = $site->cidade ?? 'Rio de Janeiro';
+
+        if ($this->isEnglish($tema)) {
+            return "Write a complete SEO article about: \"{$tema}\"
+
+Context: for the school '{$empresa}' located in {$cidade}, Brazil.
+
+Mandatory SEO requirements:
+- TÍTULO: use the keyword \"{$tema}\" at the beginning of the title
+- RESUMO: meta description with 150-160 characters including the main keyword
+- The keyword \"{$tema}\" must appear in the first paragraph and at least 2 subheadings
+- Article with at least 900 words in semantic HTML
+- Use <h2> and <h3> to structure the content
+- Include <ul>/<li> lists where appropriate
+- Mention '{$empresa}' naturally 2-3 times throughout the text
+- Include practical info: lesson duration, what to bring, age range, location
+- When mentioning prices, use the range of R\$ 280 to R\$ 600 per lesson package
+- End with a call-to-action inviting the reader to book a lesson at '{$empresa}'
+- Do NOT use markdown, use HTML only
+- Write in English, friendly and informative tone";
+        }
 
         return "Escreva um artigo SEO completo sobre: \"{$tema}\"
 
@@ -326,11 +411,16 @@ Requisitos SEO obrigatórios:
         $nicho = strtolower($site->segmento ?? $site->nicho ?? '');
 
         $temas = collect($this->temasPorNicho)
-            ->filter(fn($_, $key) => str_contains($nicho, $key))
+            ->filter(fn($_, $key) => $key !== 'surf_en' && str_contains($nicho, $key))
             ->flatten();
 
         if ($temas->isEmpty()) {
             $temas = collect($this->temasPorNicho['geral']);
+        }
+
+        // Sites de surf também recebem temas em inglês (50% de chance)
+        if (str_contains($nicho, 'surf') && isset($this->temasPorNicho['surf_en'])) {
+            $temas = $temas->merge($this->temasPorNicho['surf_en']);
         }
 
         // Busca TODOS os títulos já gerados (sem limite de data)
