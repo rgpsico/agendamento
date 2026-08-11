@@ -35,7 +35,33 @@
                             <p><strong>Origem:</strong> {{ $lead->origem_label }}</p>
                             <p><strong>Interesse:</strong> {{ $lead->interesse ?? '-' }}</p>
                             <p><strong>Status:</strong> {{ $lead->pipeline_status_label }}</p>
-                            <p><strong>WhatsApp:</strong> {{ $lead->whatsapp_enviado_em ? 'Enviado em ' . $lead->whatsapp_enviado_em->format('d/m/Y H:i') : 'Pendente' }}</p>
+                            @php
+                                $waBadges = [
+                                    'enviado'      => ['success', 'Enviado'],
+                                    'respondeu'    => ['info',    'Respondeu'],
+                                    'confirmado'   => ['primary', 'Confirmado'],
+                                    'nao_respondeu'=> ['danger',  'Nao respondeu'],
+                                ];
+                                $waBadge = $waBadges[$lead->whatsapp_confirmado] ?? null;
+                            @endphp
+                            <p class="mb-1">
+                                <strong>WhatsApp:</strong>
+                                {{ $lead->whatsapp_enviado_em ? 'Enviado em ' . $lead->whatsapp_enviado_em->format('d/m/Y H:i') : 'Pendente' }}
+                                @if($waBadge)
+                                    <span class="badge bg-{{ $waBadge[0] }} ms-1">{{ $waBadge[1] }}</span>
+                                @endif
+                            </p>
+                            <form method="POST" action="{{ route('crm.leads.whatsapp-status', $lead) }}" class="d-flex align-items-center gap-2 mb-2">
+                                @csrf @method('PATCH')
+                                <select name="whatsapp_confirmado" class="form-select form-select-sm" style="max-width:180px;">
+                                    <option value="" {{ !$lead->whatsapp_confirmado ? 'selected' : '' }}>-- Status WA --</option>
+                                    <option value="enviado" {{ $lead->whatsapp_confirmado === 'enviado' ? 'selected' : '' }}>Enviado</option>
+                                    <option value="respondeu" {{ $lead->whatsapp_confirmado === 'respondeu' ? 'selected' : '' }}>Respondeu</option>
+                                    <option value="confirmado" {{ $lead->whatsapp_confirmado === 'confirmado' ? 'selected' : '' }}>Confirmado</option>
+                                    <option value="nao_respondeu" {{ $lead->whatsapp_confirmado === 'nao_respondeu' ? 'selected' : '' }}>Nao respondeu</option>
+                                </select>
+                                <button type="submit" class="btn btn-sm btn-outline-secondary">Salvar</button>
+                            </form>
                             <p><strong>E-mail:</strong> {{ $lead->email_enviado_em ? 'Enviado em ' . $lead->email_enviado_em->format('d/m/Y H:i') : 'Pendente' }}</p>
                             <p><strong>Campanha:</strong> {{ $lead->campanha->nome ?? '-' }}</p>
                             <p><strong>Responsavel:</strong> {{ $lead->responsavel->nome ?? '-' }}</p>

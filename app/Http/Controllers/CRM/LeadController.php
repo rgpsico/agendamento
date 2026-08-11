@@ -99,6 +99,22 @@ class LeadController extends Controller
         return redirect()->away($lead->whatsapp_url);
     }
 
+    public function updateWhatsappStatus(Request $request, Lead $lead)
+    {
+        $this->authorize('update', $lead);
+
+        $allowed = ['enviado', 'respondeu', 'confirmado', 'nao_respondeu', ''];
+        $status = $request->input('whatsapp_confirmado', '');
+
+        if (!in_array($status, $allowed)) {
+            return back()->with('error', 'Status invalido.');
+        }
+
+        $lead->update(['whatsapp_confirmado' => $status ?: null]);
+
+        return back()->with('success', 'Status do WhatsApp atualizado.');
+    }
+
     public function edit(Lead $lead)
     {
         $this->authorize('update', $lead);

@@ -158,6 +158,7 @@ Route::prefix('crm')->middleware(['auth', 'tenant'])->name('crm.')->group(functi
     Route::patch('/pipeline/{lead}/mover', [PipelineController::class, 'move'])->name('pipeline.move');
 
     Route::post('leads/{lead}/whatsapp', [CRMLeadController::class, 'whatsapp'])->name('leads.whatsapp');
+    Route::patch('leads/{lead}/whatsapp-status', [CRMLeadController::class, 'updateWhatsappStatus'])->name('leads.whatsapp-status');
     Route::resource('leads', CRMLeadController::class);
     Route::resource('campanhas', CRMCampanhaController::class)->only(['index', 'store', 'update']);
     Route::get('formularios', [FormularioCampanhaController::class, 'index'])->name('formularios.index');

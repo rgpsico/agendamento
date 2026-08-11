@@ -95,12 +95,29 @@
                                     <td><a href="{{ route('crm.leads.show', $lead) }}"><strong>{{ $lead->nome }}</strong></a><div class="text-muted small">{{ $lead->interesse }}</div></td>
                                     <td>{{ $lead->telefone ?? '-' }}<div class="text-muted small">{{ $lead->email }}</div></td>
                                     <td>
-                                        @if($lead->whatsapp_enviado_em)
-                                            <span class="badge bg-success">Enviado</span>
-                                            <div class="text-muted small">{{ $lead->whatsapp_enviado_em->format('d/m/Y H:i') }}</div>
-                                        @else
-                                            <span class="badge bg-secondary">Pendente</span>
-                                        @endif
+                                        @php
+                                            $waBadges = ['enviado'=>['success','Enviado'],'respondeu'=>['info','Respondeu'],'confirmado'=>['primary','Confirmado'],'nao_respondeu'=>['danger','N. respondeu']];
+                                            $wbConf = $waBadges[$lead->whatsapp_confirmado] ?? null;
+                                        @endphp
+                                        <a href="#" class="text-decoration-none btn-abrir-wa-modal"
+                                            data-lead-id="{{ $lead->id }}"
+                                            data-lead-nome="{{ $lead->nome }}"
+                                            data-wa-enviado="{{ $lead->whatsapp_enviado_em ? $lead->whatsapp_enviado_em->format('d/m/Y H:i') : '' }}"
+                                            data-wa-confirmado="{{ $lead->whatsapp_confirmado ?? '' }}"
+                                            data-wa-url="{{ $lead->whatsapp_url ?? '' }}"
+                                            data-wa-status-url="{{ route('crm.leads.whatsapp-status', $lead) }}"
+                                            data-wa-send-url="{{ route('crm.leads.whatsapp', $lead) }}"
+                                            data-bs-toggle="modal" data-bs-target="#modalWhatsappStatus">
+                                            @if($lead->whatsapp_enviado_em)
+                                                <span class="badge bg-success">Enviado</span>
+                                                <div class="text-muted small">{{ $lead->whatsapp_enviado_em->format('d/m/Y H:i') }}</div>
+                                            @else
+                                                <span class="badge bg-secondary">Pendente</span>
+                                            @endif
+                                            @if($wbConf)
+                                                <span class="badge bg-{{ $wbConf[0] }} mt-1 d-block">{{ $wbConf[1] }}</span>
+                                            @endif
+                                        </a>
                                     </td>
                                     <td>
                                         @if($lead->email_enviado_em)
@@ -181,9 +198,89 @@
         </div>
     </div>
 
+    {{-- Modal WhatsApp Status (único, compartilhado entre todos os leads) --}}
+    <div class="modal fade" id="modalWhatsappStatus" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">WhatsApp — <span id="waModalNome"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted small mb-3" id="waModalEnviado"></p>
+
+                    <label class="form-label fw-semibold">Status da conversa</label>
+                    <div class="d-flex flex-wrap gap-2 mb-3" id="waModalBotoes">
+                        <button type="button" class="btn btn-outline-secondary btn-wa-status" data-value="">Nenhum</button>
+                        <button type="button" class="btn btn-outline-success btn-wa-status" data-value="enviado">Enviado</button>
+                        <button type="button" class="btn btn-outline-info btn-wa-status" data-value="respondeu">Respondeu</button>
+                        <button type="button" class="btn btn-outline-primary btn-wa-status" data-value="confirmado">Confirmado</button>
+                        <button type="button" class="btn btn-outline-danger btn-wa-status" data-value="nao_respondeu">Nao respondeu</button>
+                    </div>
+
+                    <form id="waModalForm" method="POST">
+                        @csrf @method('PATCH')
+                        <input type="hidden" name="whatsapp_confirmado" id="waModalInput">
+                    </form>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <form id="waModalSendForm" method="POST" target="_blank">
+                        @csrf
+                        <button type="submit" class="btn btn-success" id="waModalBtnAbrir">
+                            Abrir WhatsApp
+                        </button>
+                    </form>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary" id="waModalBtnSalvar">Salvar status</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     @include('crm.email-templates._preview-script')
 
     <script>
+    // Modal WhatsApp Status
+    (function () {
+        const modal = document.getElementById('modalWhatsappStatus');
+
+        modal.addEventListener('show.bs.modal', function (e) {
+            const btn = e.relatedTarget.closest('[data-lead-id]') || e.relatedTarget;
+            const nome        = btn.dataset.leadNome;
+            const enviado     = btn.dataset.waEnviado;
+            const confirmado  = btn.dataset.waConfirmado;
+            const statusUrl   = btn.dataset.waStatusUrl;
+            const sendUrl     = btn.dataset.waSendUrl;
+
+            document.getElementById('waModalNome').textContent    = nome;
+            document.getElementById('waModalEnviado').textContent = enviado ? 'Ultimo envio: ' + enviado : 'Ainda nao enviado pelo sistema.';
+            document.getElementById('waModalInput').value         = confirmado;
+            document.getElementById('waModalForm').action         = statusUrl;
+            document.getElementById('waModalSendForm').action     = sendUrl;
+
+            // Destaca o botão de status atual
+            document.querySelectorAll('.btn-wa-status').forEach(function (b) {
+                b.classList.toggle('active', b.dataset.value === confirmado);
+            });
+        });
+
+        // Botões de status clicáveis (seleção visual)
+        document.querySelectorAll('.btn-wa-status').forEach(function (b) {
+            b.addEventListener('click', function () {
+                document.querySelectorAll('.btn-wa-status').forEach(x => x.classList.remove('active'));
+                b.classList.add('active');
+                document.getElementById('waModalInput').value = b.dataset.value;
+            });
+        });
+
+        // Salvar status via submit normal do form
+        document.getElementById('waModalBtnSalvar').addEventListener('click', function () {
+            document.getElementById('waModalForm').submit();
+        });
+    })();
+
     (function () {
         const checkboxes = () => document.querySelectorAll('.checkbox-lead:not([disabled])');
         const barra = document.getElementById('barraAcoesMassa');
