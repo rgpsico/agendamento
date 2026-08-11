@@ -316,7 +316,7 @@
             .then(function (data) {
                 // Atualiza a célula na linha sem refresh
                 atualizarCelula(currentTrigger, data);
-                bsModal.hide();
+                fecharModal();
                 mostrarToast('Status atualizado!', 'success');
             })
             .catch(function () {
@@ -351,6 +351,17 @@
             }
 
             trigger.innerHTML = html;
+        }
+
+        function fecharModal() {
+            bsModal.hide();
+            // Garante limpeza do backdrop mesmo em chamadas assíncronas
+            modal.addEventListener('hidden.bs.modal', function limpar() {
+                document.querySelectorAll('.modal-backdrop').forEach(function (el) { el.remove(); });
+                document.body.classList.remove('modal-open');
+                document.body.style.removeProperty('padding-right');
+                modal.removeEventListener('hidden.bs.modal', limpar);
+            }, { once: true });
         }
 
         function mostrarToast(msg, tipo) {
