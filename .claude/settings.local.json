@@ -27,7 +27,8 @@
       "mcp__claude-in-chrome__navigate",
       "mcp__claude-in-chrome__computer",
       "Bash(git commit *)",
-      "Bash(python .claude/deploy.py)"
+      "Bash(python .claude/deploy.py)",
+      "Bash(xargs grep -l \"lead\\\\|Lead\\\\|whatsapp\\\\|Whatsapp\")"
     ]
   }
 }
