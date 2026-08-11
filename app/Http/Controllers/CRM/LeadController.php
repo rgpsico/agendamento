@@ -110,7 +110,13 @@ class LeadController extends Controller
             return back()->with('error', 'Status invalido.');
         }
 
-        $lead->update(['whatsapp_confirmado' => $status ?: null]);
+        $data = ['whatsapp_confirmado' => $status ?: null];
+
+        if ($status && !$lead->whatsapp_enviado_em) {
+            $data['whatsapp_enviado_em'] = now();
+        }
+
+        $lead->update($data);
 
         return back()->with('success', 'Status do WhatsApp atualizado.');
     }
