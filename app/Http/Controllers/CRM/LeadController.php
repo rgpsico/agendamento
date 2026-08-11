@@ -103,11 +103,13 @@ class LeadController extends Controller
     {
         $this->authorize('update', $lead);
 
-        $allowed = ['enviado', 'respondeu', 'confirmado', 'nao_respondeu', ''];
-        $status = $request->input('whatsapp_confirmado', '');
+        $allowed = ['enviado', 'respondeu', 'confirmado', 'nao_respondeu', 'numero_invalido', ''];
+        $status  = $request->input('whatsapp_confirmado', '');
 
         if (!in_array($status, $allowed)) {
-            return back()->with('error', 'Status invalido.');
+            return $request->expectsJson()
+                ? response()->json(['message' => 'Status invalido.'], 422)
+                : back()->with('error', 'Status invalido.');
         }
 
         $data = ['whatsapp_confirmado' => $status ?: null];
@@ -117,6 +119,16 @@ class LeadController extends Controller
         }
 
         $lead->update($data);
+        $lead->refresh();
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'whatsapp_confirmado' => $lead->whatsapp_confirmado,
+                'whatsapp_enviado_em' => $lead->whatsapp_enviado_em
+                    ? $lead->whatsapp_enviado_em->format('d/m/Y H:i')
+                    : null,
+            ]);
+        }
 
         return back()->with('success', 'Status do WhatsApp atualizado.');
     }
