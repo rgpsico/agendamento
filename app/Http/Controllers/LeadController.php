@@ -27,6 +27,10 @@ class LeadController extends Controller
             $query->where('origem', $request->origem);
         }
 
+        if ($request->filled('campanha_origem')) {
+            $query->where('campanha_origem', $request->campanha_origem);
+        }
+
         if ($request->filled('bairro')) {
             $query->where('bairro', $request->bairro);
         }

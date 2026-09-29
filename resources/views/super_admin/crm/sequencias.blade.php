@@ -16,6 +16,15 @@
         .sidebar .nav-link i { width: 16px; }
         .sidebar .nav-section { padding: 16px 24px 4px; font-size: .68rem; text-transform: uppercase; letter-spacing: .1em; color: #4a5568; }
         .main { margin-left: 240px; padding: 32px; }
+        .sidebar-toggle-btn { display: none; position: fixed; top: 14px; left: 16px; z-index: 1051; width: 42px; height: 42px; border-radius: 10px; background: #1a1f36; color: #fff; border: none; align-items: center; justify-content: center; font-size: 1.1rem; }
+        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 1049; }
+        @media (max-width: 991px) {
+            .sidebar-toggle-btn { display: flex; }
+            .sidebar { transform: translateX(-100%); transition: transform 0.25s ease; z-index: 1050; }
+            .sidebar.open { transform: translateX(0); }
+            .sidebar-overlay.show { display: block; }
+            .main { margin-left: 0; padding: 76px 16px 20px; }
+        }
         .seq-card { background: #fff; border-radius: 12px; border: 1px solid #e9ecf0; padding: 20px; }
         .seq-card .etapa-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .75rem; font-weight: 700; color: #fff; }
         .etapa-email { background: #6366f1; }
@@ -26,6 +35,8 @@
     </style>
 </head>
 <body>
+<button class="sidebar-toggle-btn" type="button" onclick="document.querySelector('.sidebar').classList.toggle('open'); document.querySelector('.sidebar-overlay').classList.toggle('show');"><i class="fas fa-bars"></i></button>
+<div class="sidebar-overlay" onclick="document.querySelector('.sidebar').classList.remove('open'); this.classList.remove('show');"></div>
 <div class="sidebar">
     <div class="logo"><i class="fas fa-layer-group me-2"></i> Super Admin<small>{{ auth()->user()->email }}</small></div>
     <nav class="mt-2">

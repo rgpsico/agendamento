@@ -15,6 +15,7 @@ class Lead extends Model
         'empresa',
         'bairro',
         'origem',
+        'campanha_origem',
         'status',
         'pipeline_status',
         'interesse',

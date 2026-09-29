@@ -16,6 +16,15 @@
         .sidebar .nav-link i { width: 16px; }
         .sidebar .nav-section { padding: 16px 24px 4px; font-size: 0.68rem; text-transform: uppercase; letter-spacing: .1em; color: #4a5568; }
         .main { margin-left: 240px; padding: 32px; }
+        .sidebar-toggle-btn { display: none; position: fixed; top: 14px; left: 16px; z-index: 1051; width: 42px; height: 42px; border-radius: 10px; background: #1a1f36; color: #fff; border: none; align-items: center; justify-content: center; font-size: 1.1rem; }
+        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 1049; }
+        @media (max-width: 991px) {
+            .sidebar-toggle-btn { display: flex; }
+            .sidebar { transform: translateX(-100%); transition: transform 0.25s ease; z-index: 1050; }
+            .sidebar.open { transform: translateX(0); }
+            .sidebar-overlay.show { display: block; }
+            .main { margin-left: 0; padding: 76px 16px 20px; }
+        }
         .nicho-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 100px; font-size: 0.75rem; font-weight: 600; }
         .nicho-surf    { background: #dbeafe; color: #1e40af; }
         .nicho-pilates { background: #d1fae5; color: #065f46; }
@@ -49,6 +58,8 @@
 </head>
 <body>
 
+<button class="sidebar-toggle-btn" type="button" onclick="document.querySelector('.sidebar').classList.toggle('open'); document.querySelector('.sidebar-overlay').classList.toggle('show');"><i class="fas fa-bars"></i></button>
+<div class="sidebar-overlay" onclick="document.querySelector('.sidebar').classList.remove('open'); this.classList.remove('show');"></div>
 <div class="sidebar">
     <div class="logo">
         <i class="fas fa-layer-group me-2"></i> Super Admin
@@ -135,6 +146,16 @@
                     @endforeach
                 </select>
             </div>
+            @if($campanhas->isNotEmpty())
+            <div class="col-md-3">
+                <select name="campanha_origem" class="form-select form-select-sm">
+                    <option value="">Todas as campanhas</option>
+                    @foreach($campanhas as $camp)
+                        <option value="{{ $camp }}" @selected(request('campanha_origem') === $camp)>{{ $camp }}</option>
+                    @endforeach
+                </select>
+            </div>
+            @endif
             <div class="col-md-2 d-flex gap-2">
                 <button type="submit" class="btn btn-primary btn-sm w-100"><i class="fas fa-search me-1"></i>Filtrar</button>
                 <a href="{{ route('super.admin.crm.leads') }}" class="btn btn-outline-secondary btn-sm"><i class="fas fa-times"></i></a>
@@ -177,6 +198,9 @@
                                 @else 🌐 @endif
                                 {{ ucfirst($lead->origem) }}
                             </span>
+                            @if($lead->campanha_origem)
+                                <br><span class="badge bg-light text-dark border mt-1" style="font-size:.68rem">{{ $lead->campanha_origem }}</span>
+                            @endif
                         </td>
                         <td>
                             @if($lead->telefone)

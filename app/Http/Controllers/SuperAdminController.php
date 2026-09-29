@@ -230,6 +230,10 @@ class SuperAdminController extends Controller
             $query->where('origem', $request->nicho);
         }
 
+        if ($request->filled('campanha_origem')) {
+            $query->where('campanha_origem', $request->campanha_origem);
+        }
+
         if ($request->filled('pipeline_status')) {
             $query->where('pipeline_status', $request->pipeline_status);
         }
@@ -248,10 +252,16 @@ class SuperAdminController extends Controller
             ->groupBy('origem')
             ->pluck('total', 'origem');
 
+        $campanhas = Lead::whereNull('tenant_id')
+            ->whereNotNull('campanha_origem')
+            ->distinct()
+            ->orderBy('campanha_origem')
+            ->pluck('campanha_origem');
+
         $templates  = EmailTemplate::whereNull('tenant_id')->where('ativo', true)->orderBy('nome')->get();
         $sequencias = AutomacaoSequencia::whereNull('tenant_id')->where('ativo', true)->orderBy('nome')->get();
 
-        return view('super_admin.crm.leads', compact('leads', 'totais', 'templates', 'sequencias'));
+        return view('super_admin.crm.leads', compact('leads', 'totais', 'campanhas', 'templates', 'sequencias'));
     }
 
     public function crmPipeline(Request $request)

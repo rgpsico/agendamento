@@ -44,6 +44,7 @@ class ValidadorWebhookController extends Controller
                 'email' => $data['email'] ?? null,
                 'telefone' => $data['whatsapp'] ?? null,
                 'origem' => 'validador',
+                'campanha_origem' => $data['campaign_slug'],
                 'status' => 'novo',
                 'pipeline_status' => 'novo_lead',
                 'interesse' => $data['classificacao'],

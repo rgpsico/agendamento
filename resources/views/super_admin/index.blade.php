@@ -15,6 +15,15 @@
         .sidebar .nav-link:hover, .sidebar .nav-link.active { color: #fff; background: #2d3354; }
         .sidebar .nav-link i { width: 16px; }
         .main { margin-left: 240px; padding: 32px; }
+        .sidebar-toggle-btn { display: none; position: fixed; top: 14px; left: 16px; z-index: 1051; width: 42px; height: 42px; border-radius: 10px; background: #1a1f36; color: #fff; border: none; align-items: center; justify-content: center; font-size: 1.1rem; }
+        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 1049; }
+        @media (max-width: 991px) {
+            .sidebar-toggle-btn { display: flex; }
+            .sidebar { transform: translateX(-100%); transition: transform 0.25s ease; z-index: 1050; }
+            .sidebar.open { transform: translateX(0); }
+            .sidebar-overlay.show { display: block; }
+            .main { margin-left: 0; padding: 76px 16px 20px; }
+        }
         .stat-card { background: #fff; border-radius: 12px; padding: 24px; border: 1px solid #e9ecf0; }
         .stat-card .number { font-size: 2rem; font-weight: 800; color: #1a1f36; }
         .stat-card .label { font-size: 0.8rem; color: #8892b0; text-transform: uppercase; letter-spacing: .05em; }
@@ -29,6 +38,8 @@
 <body>
 
 {{-- Sidebar --}}
+<button class="sidebar-toggle-btn" type="button" onclick="document.querySelector('.sidebar').classList.toggle('open'); document.querySelector('.sidebar-overlay').classList.toggle('show');"><i class="fas fa-bars"></i></button>
+<div class="sidebar-overlay" onclick="document.querySelector('.sidebar').classList.remove('open'); this.classList.remove('show');"></div>
 <div class="sidebar">
     <div class="logo">
         <i class="fas fa-layer-group me-2"></i> Super Admin
