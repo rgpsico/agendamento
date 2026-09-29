@@ -478,3 +478,6 @@ Route::post('/deepseek/image', [DeepSeekController::class, 'analyzeImage']);
 Route::post('/device/token', [DeviceTokenController::class, 'store']);
 Route::delete('/device/token', [DeviceTokenController::class, 'destroy']);
 Route::post('/push/test', [PushTestController::class, 'send']);
+
+use App\Http\Controllers\Api\ValidadorWebhookController;
+Route::post('/webhooks/validador-lead', [ValidadorWebhookController::class, 'store']);

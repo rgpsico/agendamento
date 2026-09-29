@@ -48,5 +48,8 @@ return [
         'access_key' => env('UNSPLASH_ACCESS_KEY'),
     ],
 
+    'validador' => [
+        'webhook_secret' => env('VALIDADOR_WEBHOOK_SECRET'),
+    ],
 
 ];
