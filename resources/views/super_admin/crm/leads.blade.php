@@ -28,6 +28,7 @@
         .nicho-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 100px; font-size: 0.75rem; font-weight: 600; }
         .nicho-surf    { background: #dbeafe; color: #1e40af; }
         .nicho-pilates { background: #d1fae5; color: #065f46; }
+        .nicho-turismo { background: #ccfbf1; color: #115e59; }
         .nicho-landing { background: #f3f4f6; color: #374151; }
         .pipeline-badge { font-size: 0.72rem; padding: 3px 8px; border-radius: 100px; font-weight: 600; }
         .pipeline-novo_lead       { background: #e0e7ff; color: #3730a3; }
@@ -103,7 +104,7 @@
     {{-- Cards por nicho --}}
     <div class="row g-3 mb-4">
         @php
-            $nichos = ['surf' => '🏄 Surf', 'pilates' => '🧘 Pilates', 'landing' => '🌐 Outros'];
+            $nichos = ['surf' => '🏄 Surf', 'pilates' => '🧘 Pilates', 'turismo' => '🌴 Turismo', 'landing' => '🌐 Outros'];
         @endphp
         <div class="col-md-3">
             <div class="stat-chip">
@@ -195,6 +196,7 @@
                             <span class="nicho-badge nicho-{{ $lead->origem }}">
                                 @if($lead->origem === 'surf') 🏄
                                 @elseif($lead->origem === 'pilates') 🧘
+                                @elseif($lead->origem === 'turismo') 🌴
                                 @else 🌐 @endif
                                 {{ ucfirst($lead->origem) }}
                             </span>

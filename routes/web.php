@@ -78,6 +78,12 @@ Route::get('/', function (\Illuminate\Http\Request $request) {
         return view('site/surf_landing');
     }
 
+    // Domínio do nicho Turismo → landing page de captação
+    $dominiosTurismo = ['rjpasseios.com.br', 'www.rjpasseios.com.br'];
+    if (in_array($host, $dominiosTurismo)) {
+        return view('site/turismo_landing');
+    }
+
     // Tenant via domínio personalizado de escola cadastrada
     $site = app()->has('currentSite') ? app('currentSite') : null;
     if ($site) {

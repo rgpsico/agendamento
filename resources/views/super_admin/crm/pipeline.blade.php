@@ -37,6 +37,7 @@
         .nicho-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 7px; border-radius: 100px; font-size: 0.7rem; font-weight: 600; }
         .nicho-surf    { background: #dbeafe; color: #1e40af; }
         .nicho-pilates { background: #d1fae5; color: #065f46; }
+        .nicho-turismo { background: #ccfbf1; color: #115e59; }
         .nicho-landing { background: #f3f4f6; color: #374151; }
         .col-novo_lead         .kanban-col-header { color: #3730a3; }
         .col-em_contato        .kanban-col-header { color: #92400e; }
@@ -89,7 +90,7 @@
     {{-- Filtro por nicho --}}
     <div class="filter-bar">
         <label>Nicho:</label>
-        @php $nichos = ['todos' => '🌐 Todos', 'surf' => '🏄 Surf', 'pilates' => '🧘 Pilates']; @endphp
+        @php $nichos = ['todos' => '🌐 Todos', 'surf' => '🏄 Surf', 'pilates' => '🧘 Pilates', 'turismo' => '🌴 Turismo']; @endphp
         @foreach($nichos as $key => $label)
             <a href="{{ route('super.admin.crm.pipeline', ['nicho' => $key]) }}"
                class="nicho-btn {{ $nicho === $key ? 'active' : '' }}">
@@ -118,6 +119,7 @@
                     <span class="nicho-badge nicho-{{ $lead->origem }}" style="margin-left:4px;flex-shrink:0">
                         @if($lead->origem === 'surf') 🏄
                         @elseif($lead->origem === 'pilates') 🧘
+                        @elseif($lead->origem === 'turismo') 🌴
                         @else 🌐 @endif
                     </span>
                 </div>

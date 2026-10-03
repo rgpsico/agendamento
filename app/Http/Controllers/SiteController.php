@@ -44,6 +44,8 @@ class SiteController extends Controller
             'surfgestao.com.br'    => 'surf',
             'www.surfgestao.com.br'=> 'surf',
             'pilatesgestao.com.br' => 'pilates',
+            'rjpasseios.com.br'    => 'turismo',
+            'www.rjpasseios.com.br'=> 'turismo',
         ];
         $origem = $nichosPorDominio[$request->getHost()]
             ?? $data['origem']
@@ -61,7 +63,7 @@ class SiteController extends Controller
         ]);
 
         // Mantém o registro no UserEvent para rastreamento
-        UserEvent::create([
+        $evento = UserEvent::create([
             'user_id'    => null,
             'event_type' => 'site.landing.lead',
             'payload'    => array_merge($data, ['origem' => $origem]),
@@ -85,8 +87,8 @@ class SiteController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Lead recebido com sucesso.',
-            'data' => $lead->payload,
-            'id' => $lead->id,
+            'data' => $evento->payload,
+            'id' => $evento->id,
         ], 201);
     }
 

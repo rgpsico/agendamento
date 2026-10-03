@@ -70,6 +70,7 @@ return [
             'path' => storage_path('logs/laravel.log'),
             'level' => env('LOG_LEVEL', 'debug'),
             'days' => 14,
+            'permission' => 0666, // o scheduler (root) e o PHP-FPM (www-data) escrevem no mesmo arquivo
             'replace_placeholders' => true,
         ],
 
