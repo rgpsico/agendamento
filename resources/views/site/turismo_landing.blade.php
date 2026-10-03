@@ -402,64 +402,14 @@
         </div>
       </div>
 
-      <!-- Formulário -->
+      <!-- Chamada pro funil -->
       <div class="form-card">
-        <div id="form-content">
-          <h2>Comece seu teste grátis agora 🌴</h2>
-          <p>Preencha abaixo e receba seu acesso em instantes.</p>
-
-          <form id="lead-form" novalidate>
-            @csrf
-            <div class="form-group">
-
-              <div class="input-wrap">
-                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                  <circle cx="12" cy="7" r="4"/>
-                </svg>
-                <input type="text" id="nome" name="nome" placeholder="Seu nome" autocomplete="name" required />
-              </div>
-
-              <div class="input-wrap">
-                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <rect width="20" height="16" x="2" y="4" rx="2"/>
-                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
-                </svg>
-                <input type="email" id="email" name="email" placeholder="Seu melhor e-mail" autocomplete="email" required />
-              </div>
-
-              <div class="input-wrap">
-                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.15 12 19.79 19.79 0 0 1 1.08 3.18 2 2 0 0 1 3.07 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.27 8.91a16 16 0 0 0 5.82 5.82l1.06-1.06a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-                </svg>
-                <input type="tel" id="whatsapp" name="whatsapp" placeholder="WhatsApp (ex: 11 99999-9999)" autocomplete="tel" required />
-              </div>
-
-            </div>
-
-            <button type="submit" class="btn-cta" id="btn-submit">
-              <span class="btn-label">Quero testar agora →</span>
-              <div class="spinner"></div>
-            </button>
-          </form>
-
-          <p class="privacy-note">
-            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-            </svg>
-            Seus dados estão seguros. Sem spam, prometemos.
-          </p>
-        </div>
-
-        <div class="success-state" id="success-state">
-          <div class="success-icon">🌴</div>
-          <h3>Tudo certo! Acesso enviado.</h3>
-          <p>
-            Verifique seu e-mail e WhatsApp.<br/>
-            Em breve nossa equipe entrará em contato.
-          </p>
-        </div>
+        <h2>Descubra em 1 minuto se serve pro seu negócio 🌴</h2>
+        <p>Responda 8 perguntas rápidas e já abra o seu teste grátis de 14 dias.</p>
+        <a href="/comecar" class="btn-cta" id="btn-comecar" style="display:flex;align-items:center;justify-content:center;text-decoration:none;">
+          <span class="btn-label">Quero começar agora →</span>
+        </a>
+        <p class="privacy-note">Sem cartão de crédito. Cancele quando quiser.</p>
       </div>
 
     </div>
@@ -473,78 +423,10 @@
   </footer>
 
   <script>
-    // Máscara do WhatsApp
-    const whatsappInput = document.getElementById('whatsapp');
-    whatsappInput.addEventListener('input', function () {
-      let v = this.value.replace(/\D/g, '').slice(0, 11);
-      if (v.length > 6) {
-        v = v.replace(/^(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
-      } else if (v.length > 2) {
-        v = v.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
-      } else if (v.length > 0) {
-        v = v.replace(/^(\d{0,2})/, '($1');
-      }
-      this.value = v;
-    });
-
-    const form    = document.getElementById('lead-form');
-    const btn     = document.getElementById('btn-submit');
-    const content = document.getElementById('form-content');
-    const success = document.getElementById('success-state');
-
-    form.addEventListener('submit', async function (e) {
-      e.preventDefault();
-
-      const nome     = document.getElementById('nome').value.trim();
-      const email    = document.getElementById('email').value.trim();
-      const whatsapp = whatsappInput.value.trim();
-
-      if (!nome || !email || !whatsapp) { shake(form); return; }
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        shake(document.getElementById('email').parentElement);
-        document.getElementById('email').focus();
-        return;
-      }
-
-      btn.classList.add('loading');
-
-      try {
-        const token = document.querySelector('input[name="_token"]').value;
-        await fetch('{{ route("site.landing.lead") }}', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': token,
-          },
-          body: JSON.stringify({ nome, email, whatsapp, origem: 'turismo' }),
-        });
-      } catch (_) {}
-
-      setTimeout(() => {
-        btn.classList.remove('loading');
-        content.style.display = 'none';
-        success.style.display = 'flex';
-      }, 1200);
-    });
-
-    function shake(el) {
-      el.style.animation = 'none';
-      el.offsetHeight;
-      el.style.animation = 'shake 0.35s ease';
-    }
-
-    const style = document.createElement('style');
-    style.textContent = `
-      @keyframes shake {
-        0%, 100% { transform: translateX(0); }
-        20%       { transform: translateX(-6px); }
-        40%       { transform: translateX(6px); }
-        60%       { transform: translateX(-4px); }
-        80%       { transform: translateX(4px); }
-      }
-    `;
-    document.head.appendChild(style);
+    // Leva junto a origem do anúncio (utm_source, utm_medium, utm_campaign) pro funil
+    document.getElementById('btn-comecar').href = '/comecar' + window.location.search;
   </script>
+  @include('validador._pixel')
 
 </body>
 </html>

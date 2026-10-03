@@ -104,6 +104,16 @@ Route::get('/', function (\Illuminate\Http\Request $request) {
         ->home($request);
 })->name('home');
 
+// Funil automático: entrada pública, oferta, teste grátis e assinatura
+Route::get('/comecar', [\App\Http\Controllers\FunilController::class, 'comecar'])->middleware('throttle:30,1')->name('funil.comecar');
+Route::get('/validador/{token}/oferta', [\App\Http\Controllers\FunilController::class, 'oferta'])->where('token', '[A-Za-z0-9]{20,64}')->name('validador.oferta');
+Route::post('/validador/{token}/teste', [\App\Http\Controllers\FunilController::class, 'iniciarTeste'])->where('token', '[A-Za-z0-9]{20,64}')->middleware('throttle:10,1')->name('validador.teste');
+Route::middleware('auth')->group(function () {
+    Route::get('/teste-iniciado', [\App\Http\Controllers\FunilController::class, 'testeIniciado'])->name('funil.teste_iniciado');
+    Route::get('/teste-iniciado/continuar', [\App\Http\Controllers\FunilController::class, 'onboarding'])->name('funil.onboarding');
+    Route::get('/assinar', [\App\Http\Controllers\AssinaturaController::class, 'assinar'])->name('assinar');
+});
+
 // Wizard público do validador de leads (link enviado pro lead)
 Route::get('/validador/{token}', [\App\Http\Controllers\ValidadorLeadController::class, 'show'])->where('token', '[A-Za-z0-9]{20,64}')->name('validador.public');
 Route::post('/validador/{token}', [\App\Http\Controllers\ValidadorLeadController::class, 'responder'])->where('token', '[A-Za-z0-9]{20,64}')->middleware('throttle:20,1')->name('validador.responder');

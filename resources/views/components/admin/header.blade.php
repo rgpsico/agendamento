@@ -54,6 +54,7 @@
         <div class="header">
 
             <x-admin.marca-logo />
+            <x-admin.trial-banner />
 
             <a href="javascript:void(0);" id="toggle_btn">
                 <i class="fe fe-text-align-left"></i>

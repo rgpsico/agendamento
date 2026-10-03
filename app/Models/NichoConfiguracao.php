@@ -17,6 +17,7 @@ class NichoConfiguracao extends Model
         'emoji',
         'cor_primaria',
         'cor_secundaria',
+        'pixel_id',
         'logo',
         'login_imagem',
         'registro_imagem',

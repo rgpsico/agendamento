@@ -15,10 +15,34 @@
 </div>
 
 <div class="row g-3 mb-4">
-    <div class="col-6 col-md-3"><div class="stat-chip"><div class="lbl">Links</div><div class="num">{{ $totais['total'] }}</div></div></div>
-    <div class="col-6 col-md-3"><div class="stat-chip"><div class="lbl">Respondidos</div><div class="num">{{ $totais['respondido'] }}</div></div></div>
-    <div class="col-6 col-md-3"><div class="stat-chip"><div class="lbl">Aguardando</div><div class="num">{{ $totais['pendente'] }}</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-chip"><div class="lbl">Entradas</div><div class="num">{{ $totais['total'] }}</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-chip"><div class="lbl">Responderam</div><div class="num">{{ $totais['respondido'] }}</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-chip"><div class="lbl">Abriram teste</div><div class="num">{{ $totais['trial'] }}</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-chip"><div class="lbl">Clientes</div><div class="num">{{ $totais['cliente'] }}</div></div></div>
 </div>
+
+@if($campanhas->isNotEmpty())
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-white fw-bold border-0 pt-3">Funil por campanha</div>
+    <div class="table-responsive">
+        <table class="table table-sm mb-0 align-middle">
+            <thead class="table-light"><tr><th>Campanha (utm_campaign)</th><th class="text-end">Entradas</th><th class="text-end">Responderam</th><th class="text-end">Teste</th><th class="text-end">Clientes</th><th class="text-end">Conversão</th></tr></thead>
+            <tbody>
+            @foreach($campanhas as $c)
+                <tr>
+                    <td>{{ $c->campanha }}</td>
+                    <td class="text-end">{{ $c->entradas }}</td>
+                    <td class="text-end">{{ $c->respondidos }}</td>
+                    <td class="text-end">{{ $c->testes }}</td>
+                    <td class="text-end fw-bold">{{ $c->clientes }}</td>
+                    <td class="text-end text-muted">{{ $c->entradas ? round($c->clientes / $c->entradas * 100, 1) : 0 }}%</td>
+                </tr>
+            @endforeach
+            </tbody>
+        </table>
+    </div>
+</div>
+@endif
 
 <form method="GET" class="card border-0 shadow-sm p-3 mb-4">
     <div class="row g-2 align-items-end">
@@ -26,8 +50,9 @@
         <div class="col-md-2">
             <select name="status" class="form-select form-select-sm">
                 <option value="">Todos os status</option>
-                <option value="respondido" @selected(request('status') === 'respondido')>Respondidos</option>
-                <option value="pendente" @selected(request('status') === 'pendente')>Aguardando</option>
+                @foreach(LQ::STATUS as $k => $r)
+                    <option value="{{ $k }}" @selected(request('status') === $k)>{{ $r }}</option>
+                @endforeach
             </select>
         </div>
         <div class="col-md-3">
@@ -72,8 +97,9 @@
                     <td><small>{{ LQ::CAMPANHA[$q->ja_fez_campanha] ?? '—' }}</small></td>
                     <td>@if($q->nivel_digital)<span class="pill pill-{{ $q->nivel_digital }}">{{ LQ::NIVEL[$q->nivel_digital] }}</span>@else — @endif</td>
                     <td>
-                        <span class="pill pill-{{ $q->status }}">{{ $q->respondido() ? 'Respondido' : 'Aguardando' }}</span>
-                        <div><small class="text-muted">{{ ($q->respondido_em ?? $q->created_at)->format('d/m H:i') }}</small></div>
+                        <span class="pill pill-{{ $q->status }}">{{ LQ::STATUS[$q->status] ?? $q->status }}</span>
+                        @if($q->concluiuFormulario() && $q->precisaOnboarding())<div><span class="badge text-bg-warning" style="font-size:.65rem">Onboarding</span></div>@endif
+                        <div><small class="text-muted">{{ ($q->respondido_em ?? $q->created_at)->format('d/m H:i') }}</small>@if($q->utm_campaign)<div><small class="text-muted">{{ $q->utm_campaign }}</small></div>@endif</div>
                     </td>
                     <td class="text-end"><a href="{{ route('super.admin.validador.show', $q) }}" class="btn btn-sm btn-outline-primary">Abrir</a></td>
                 </tr>

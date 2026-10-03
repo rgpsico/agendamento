@@ -34,6 +34,8 @@
         .pill-avancado { background: #d1fae5; color: #065f46; }
         .pill-pendente { background: #e5e7eb; color: #374151; }
         .pill-respondido { background: #dbeafe; color: #1e40af; }
+        .pill-trial { background: #fef3c7; color: #92400e; }
+        .pill-cliente { background: #d1fae5; color: #065f46; }
         .leitura-ok { color: #047857; } .leitura-neutro { color: #92400e; } .leitura-alerta { color: #b91c1c; }
     </style>
 </head>

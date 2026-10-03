@@ -7,7 +7,8 @@
     <div>
         <a href="{{ route('super.admin.validador.index') }}" class="text-decoration-none small"><i class="fas fa-arrow-left me-1"></i>Voltar</a>
         <h4 class="mb-0 fw-bold mt-1">{{ $q->nome ?: ($q->lead->nome ?? 'Link avulso') }}</h4>
-        <span class="pill pill-{{ $q->status }}">{{ $q->respondido() ? 'Respondido em ' . $q->respondido_em->format('d/m/Y H:i') : 'Aguardando resposta' }}</span>
+        <span class="pill pill-{{ $q->status }}">{{ $q->concluiuFormulario() ? (LQ::STATUS[$q->status] . ' · respondeu em ' . $q->respondido_em->format('d/m/Y H:i')) : 'Aguardando resposta' }}</span>
+        @if($q->concluiuFormulario() && $q->precisaOnboarding())<span class="badge text-bg-warning ms-1">Vale uma ligação no onboarding</span>@endif
         @if($q->lead)<span class="ms-2 small text-muted">Lead do CRM: {{ $q->lead->nome }}</span>@endif
     </div>
 </div>
@@ -24,7 +25,7 @@
     @unless($whatsapp)<small class="text-muted mt-2">Sem telefone cadastrado: copie o link e envie manualmente.</small>@endunless
 </div>
 
-@if($q->respondido())
+@if($q->concluiuFormulario())
 <div class="row g-3">
     <div class="col-lg-7">
         <div class="card border-0 shadow-sm p-3 h-100">
@@ -37,6 +38,10 @@
                 <dt class="col-sm-5 text-muted fw-normal">Já fez campanha</dt><dd class="col-sm-7">{{ LQ::CAMPANHA[$q->ja_fez_campanha] ?? '—' }}</dd>
                 <dt class="col-sm-5 text-muted fw-normal">Nível digital</dt><dd class="col-sm-7"><span class="pill pill-{{ $q->nivel_digital }}">{{ LQ::NIVEL[$q->nivel_digital] ?? '—' }}</span></dd>
                 <dt class="col-sm-5 text-muted fw-normal">Sobre o negócio</dt><dd class="col-sm-7">{!! nl2br(e($q->sobre_negocio ?: '—')) !!}</dd>
+                @if($q->negocio_nome)<dt class="col-sm-5 text-muted fw-normal">Nome do negócio</dt><dd class="col-sm-7">{{ $q->negocio_nome }}</dd>@endif
+                <dt class="col-sm-5 text-muted fw-normal">Origem</dt><dd class="col-sm-7">{{ $q->utm_campaign ?: ($q->utm_source ?: 'direto') }}@if($q->utm_medium) <small class="text-muted">({{ $q->utm_medium }})</small>@endif</dd>
+                @if($q->trial_inicio)<dt class="col-sm-5 text-muted fw-normal">Teste</dt><dd class="col-sm-7">{{ $q->trial_inicio->format('d/m/Y') }} → {{ $q->trial_fim->format('d/m/Y') }}@if($q->diasDeTeste() !== null) <small class="text-muted">({{ $q->diasDeTeste() }} dia(s) restantes)</small>@endif</dd>@endif
+                @if($q->cliente_desde)<dt class="col-sm-5 text-muted fw-normal">Cliente desde</dt><dd class="col-sm-7">{{ $q->cliente_desde->format('d/m/Y') }}</dd>@endif
                 <dt class="col-sm-5 text-muted fw-normal">WhatsApp</dt><dd class="col-sm-7">{{ $q->whatsapp ?: '—' }}</dd>
                 @if($q->observacao)<dt class="col-sm-5 text-muted fw-normal">Observação</dt><dd class="col-sm-7">{!! nl2br(e($q->observacao)) !!}</dd>@endif
             </dl>

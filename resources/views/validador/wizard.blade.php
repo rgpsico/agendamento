@@ -99,7 +99,7 @@
     <div class="done" id="done" hidden>
       <div class="big">🎉</div>
       <h1>Obrigado!</h1>
-      <p class="hint">Recebi suas respostas e já vou entrar em contato.</p>
+      <p class="hint">Recebi suas respostas. Já estou montando a sua oferta…</p>
     </div>
   </main>
 
@@ -200,7 +200,10 @@
         body: JSON.stringify(answers),
       });
       if (!res.ok) throw new Error((await res.json().catch(() => ({}))).message || 'Não foi possível enviar.');
+      const dados = await res.json().catch(() => ({}));
+      if (window.fbq) fbq('track', 'Lead');
       $('wizard').hidden = true; $('done').hidden = false;
+      setTimeout(() => { window.location.href = dados.oferta || window.location.href; }, 900);
     } catch (e) {
       $('err').textContent = e.message + ' Tente de novo.';
       $('next').disabled = false; $('next').textContent = 'Enviar';
@@ -222,5 +225,6 @@
   }
   $('start').addEventListener('click', comecar);
 </script>
+@include('validador._pixel')
 </body>
 </html>

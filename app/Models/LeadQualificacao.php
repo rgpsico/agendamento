@@ -15,10 +15,24 @@ class LeadQualificacao extends Model
         'nome', 'whatsapp', 'cidade', 'nicho', 'nicho_outro',
         'tem_google_meu_negocio', 'ja_fez_campanha', 'nivel_digital', 'sobre_negocio', 'observacao',
         'respondido_em', 'ip', 'user_agent',
+        'utm_source', 'utm_medium', 'utm_campaign', 'host',
+        'usuario_id', 'empresa_id', 'negocio_nome',
+        'trial_inicio', 'trial_fim', 'asaas_subscription_id', 'asaas_customer_id', 'cliente_desde',
     ];
 
     protected $casts = [
         'respondido_em' => 'datetime',
+        'trial_inicio'  => 'datetime',
+        'trial_fim'     => 'datetime',
+        'cliente_desde' => 'datetime',
+    ];
+
+    // pendente → respondido → trial → cliente
+    public const STATUS = [
+        'pendente'   => 'Aguardando',
+        'respondido' => 'Respondido',
+        'trial'      => 'Em teste',
+        'cliente'    => 'Cliente',
     ];
 
     public const NICHOS = [
@@ -64,6 +78,27 @@ class LeadQualificacao extends Model
     public function respondido(): bool
     {
         return $this->status === 'respondido';
+    }
+
+    /** Já passou do formulário (respondido, em teste ou cliente). */
+    public function concluiuFormulario(): bool
+    {
+        return in_array($this->status, ['respondido', 'trial', 'cliente'], true);
+    }
+
+    /** Perfil que costuma travar sozinho: vale uma ligação no onboarding. */
+    public function precisaOnboarding(): bool
+    {
+        return $this->nivel_digital === 'basico' || $this->tem_google_meu_negocio !== 'sim';
+    }
+
+    public function diasDeTeste(): ?int
+    {
+        if ($this->status !== 'trial' || ! $this->trial_fim) {
+            return null;
+        }
+
+        return max(0, (int) ceil(now()->floatDiffInDays($this->trial_fim, false)));
     }
 
     public function nichoRotulo(): ?string

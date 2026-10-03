@@ -159,6 +159,14 @@
                     <small class="text-muted mt-1 d-block">Preview do gradiente de login</small>
                 </div>
 
+                {{-- Pixel do Meta --}}
+                <div class="form-card">
+                    <label class="form-label fw-semibold">Pixel do Meta (opcional)</label>
+                    <input type="text" name="pixel_id" class="form-control" maxlength="20" inputmode="numeric"
+                           value="{{ old('pixel_id', $nicho->pixel_id ?? '') }}" placeholder="Ex: 1368776575052514">
+                    <small class="text-muted">Mede a página, o formulário e o teste grátis deste nicho nos anúncios do Facebook e Instagram.</small>
+                </div>
+
                 {{-- Status --}}
                 <div class="form-card">
                     <div class="section-title">Status</div>

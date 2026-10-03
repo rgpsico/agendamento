@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\LeadQualificacao;
+use App\Services\FunilService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -14,9 +15,14 @@ class ValidadorLeadController extends Controller
     {
         $q = LeadQualificacao::where('token', $token)->firstOrFail();
 
+        // Quem já respondeu volta pra oferta; quem já abriu teste ou é cliente vê o agradecimento
+        if ($q->respondido()) {
+            return redirect()->route('validador.oferta', $q->token);
+        }
+
         $nicho = app()->has('currentNicho') ? app('currentNicho') : null;
 
-        return view($q->respondido() ? 'validador.obrigado' : 'validador.wizard', [
+        return view($q->concluiuFormulario() ? 'validador.obrigado' : 'validador.wizard', [
             'q'      => $q,
             'marca'  => $nicho?->nome ?? 'PilatesGestão',
             'emoji'  => $nicho?->emoji ?? '🧘',
@@ -28,12 +34,12 @@ class ValidadorLeadController extends Controller
         ]);
     }
 
-    public function responder(Request $request, string $token): JsonResponse
+    public function responder(Request $request, string $token, FunilService $funil): JsonResponse
     {
         $q = LeadQualificacao::where('token', $token)->firstOrFail();
 
-        if ($q->respondido()) {
-            return response()->json(['ok' => true, 'ja_respondido' => true]);
+        if ($q->concluiuFormulario()) {
+            return response()->json(['ok' => true, 'ja_respondido' => true, 'oferta' => route('validador.oferta', $q->token)]);
         }
 
         $data = $request->validate([
@@ -61,8 +67,9 @@ class ValidadorLeadController extends Controller
         ])->save();
 
         $this->anexarAoLead($q);
+        $funil->aoResponder($q->fresh());
 
-        return response()->json(['ok' => true]);
+        return response()->json(['ok' => true, 'oferta' => route('validador.oferta', $q->token)]);
     }
 
     /** Deixa um resumo nas observações do lead pra aparecer no CRM. */

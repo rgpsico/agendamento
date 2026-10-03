@@ -33,9 +33,17 @@ class SuperAdminValidadorController extends Controller
             'itens'     => $itens,
             'totais'    => [
                 'total'      => LeadQualificacao::count(),
-                'respondido' => LeadQualificacao::where('status', 'respondido')->count(),
-                'pendente'   => LeadQualificacao::where('status', 'pendente')->count(),
+                'respondido' => LeadQualificacao::whereIn('status', ['respondido', 'trial', 'cliente'])->count(),
+                'trial'      => LeadQualificacao::whereIn('status', ['trial', 'cliente'])->count(),
+                'cliente'    => LeadQualificacao::where('status', 'cliente')->count(),
             ],
+            // Funil por campanha: quantos entraram, responderam, abriram teste e compraram
+            'campanhas' => LeadQualificacao::selectRaw("coalesce(utm_campaign, '(sem campanha)') as campanha,
+                    count(*) as entradas,
+                    sum(status in ('respondido','trial','cliente')) as respondidos,
+                    sum(status in ('trial','cliente')) as testes,
+                    sum(status = 'cliente') as clientes")
+                ->groupBy('campanha')->orderByDesc('entradas')->limit(10)->get(),
         ]);
     }
 

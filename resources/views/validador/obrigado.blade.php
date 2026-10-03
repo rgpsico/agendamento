@@ -17,7 +17,11 @@
   <main class="card">
     <div class="big">🎉</div>
     <h1>Já recebi suas respostas!</h1>
-    <p>Obrigado{{ $q->nome ? ', ' . e(strtok($q->nome, ' ')) : '' }}. Em breve entro em contato.</p>
+    @if(in_array($q->status, ['trial', 'cliente']))
+      <p>Obrigado{{ $q->nome ? ', ' . e(strtok($q->nome, ' ')) : '' }}. O seu teste já está aberto: <a href="{{ route('home.login') }}">entre na sua conta</a>.</p>
+    @else
+      <p>Obrigado{{ $q->nome ? ', ' . e(strtok($q->nome, ' ')) : '' }}. Em breve entro em contato.</p>
+    @endif
   </main>
 </body>
 </html>

@@ -481,3 +481,4 @@ Route::post('/push/test', [PushTestController::class, 'send']);
 
 use App\Http\Controllers\Api\ValidadorWebhookController;
 Route::post('/webhooks/validador-lead', [ValidadorWebhookController::class, 'store']);
+Route::post('/webhooks/asaas-saas', \App\Http\Controllers\Api\AsaasSaasWebhookController::class);

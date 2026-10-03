@@ -117,7 +117,7 @@ class Empresa extends Model
 
     public static function createEmpresa(array $data)
     {
-        return self::create([
+        $empresa = self::create([
             'nome'          => $data['nome'],
             'descricao'     => $data['descricao'],
             'telefone'      => $data['telefone'],
@@ -129,6 +129,15 @@ class Empresa extends Model
             'avatar'        => $data['avatar'] ?? 'avatar/default.png',
             'banners'       => $data['banners'] ?? 'banner/default.jpg',
         ]);
+
+        // Quem veio pelo funil herda a data do teste grátis
+        try {
+            app(\App\Services\FunilService::class)->vincularEmpresa($empresa);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Funil: falha ao vincular empresa', ['erro' => $e->getMessage()]);
+        }
+
+        return $empresa;
     }
 
 
