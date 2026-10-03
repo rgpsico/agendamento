@@ -1,6 +1,6 @@
 @extends('layouts.legal')
 
-@section('title', 'LGPD — PilatesGestão')
+@section('title', 'LGPD — ' . $marca)
 @section('page_title', 'LGPD')
 @section('page_subtitle', 'Lei Geral de Proteção de Dados — Lei nº 13.709/2018')
 @section('nav_lgpd', 'active')
@@ -14,7 +14,7 @@
 
 <h2>1. Nosso compromisso</h2>
 <p>
-    O PilatesGestão está em conformidade com a Lei Geral de Proteção de Dados (Lei nº 13.709/2018).
+    O {{ $marca }} está em conformidade com a Lei Geral de Proteção de Dados (Lei nº 13.709/2018).
     Tratamos dados pessoais com transparência, finalidade legítima, segurança e respeito aos direitos
     do titular.
 </p>
@@ -23,7 +23,7 @@
 <p>
     <strong>Nome:</strong> <span class="placeholder-tag">[NOME COMPLETO]</span><br>
     <strong>E-mail:</strong> <a href="mailto:dpo@pilatesgestao.com.br">dpo@pilatesgestao.com.br</a><br>
-    O DPO é o canal direto entre você, o PilatesGestão e a Autoridade Nacional de Proteção de Dados (ANPD).
+    O DPO é o canal direto entre você, o {{ $marca }} e a Autoridade Nacional de Proteção de Dados (ANPD).
 </p>
 
 <h2>3. Seus direitos (Art. 18 da LGPD)</h2>
@@ -35,7 +35,7 @@
     <li><strong>Anonimização, bloqueio ou eliminação</strong> de dados desnecessários, excessivos ou tratados em desconformidade;</li>
     <li><strong>Portabilidade</strong> dos dados a outro fornecedor de serviço ou produto;</li>
     <li><strong>Eliminação</strong> dos dados pessoais tratados com base em consentimento;</li>
-    <li><strong>Informação</strong> sobre as entidades públicas e privadas com as quais o PilatesGestão compartilhou seus dados;</li>
+    <li><strong>Informação</strong> sobre as entidades públicas e privadas com as quais o {{ $marca }} compartilhou seus dados;</li>
     <li><strong>Informação</strong> sobre a possibilidade de não fornecer consentimento e suas consequências;</li>
     <li><strong>Revogação</strong> do consentimento a qualquer momento;</li>
     <li><strong>Revisão</strong> de decisões tomadas unicamente com base em tratamento automatizado que afetem seus interesses.</li>
@@ -59,7 +59,7 @@
 
 <h2>5. Bases legais que utilizamos</h2>
 <p>
-    O tratamento de dados pessoais pelo PilatesGestão é fundamentado nas seguintes bases legais
+    O tratamento de dados pessoais pelo {{ $marca }} é fundamentado nas seguintes bases legais
     previstas na LGPD (detalhamento na <a href="{{ url('/privacidade') }}">Política de Privacidade</a>):
 </p>
 <ul>
@@ -85,7 +85,7 @@
 <h2>7. Incidentes de segurança</h2>
 <p>
     Em caso de incidente de segurança que possa acarretar risco ou dano relevante aos titulares,
-    o PilatesGestão comunicará a ANPD e os titulares afetados em prazo razoável, conforme o
+    o {{ $marca }} comunicará a ANPD e os titulares afetados em prazo razoável, conforme o
     art. 48 da LGPD. A comunicação incluirá, no mínimo:
 </p>
 <ul>

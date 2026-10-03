@@ -1,6 +1,6 @@
 @extends('layouts.legal')
 
-@section('title', 'Política de Privacidade — PilatesGestão')
+@section('title', 'Política de Privacidade — ' . $marca)
 @section('page_title', 'Política de Privacidade')
 @section('page_subtitle', 'Como tratamos seus dados pessoais')
 @section('nav_privacidade', 'active')
@@ -13,7 +13,7 @@
 </div>
 
 <p>
-    O PilatesGestão respeita sua privacidade e está comprometido com a proteção dos seus dados pessoais.
+    O {{ $marca }} respeita sua privacidade e está comprometido com a proteção dos seus dados pessoais.
     Esta Política descreve quais dados coletamos, para quais finalidades, com quem compartilhamos e quais
     são seus direitos como titular.
 </p>

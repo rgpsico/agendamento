@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@yield('title', 'PilatesGestão')</title>
+    <title>@yield('title', $marca)</title>
     <meta name="robots" content="index, follow">
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -116,7 +116,7 @@
     <div class="container d-flex align-items-center justify-content-between">
         <a href="{{ url('/') }}" class="d-flex align-items-center gap-2 text-decoration-none">
             <i class="fa-solid fa-calendar-check" style="color: var(--primary); font-size: 1.4rem;"></i>
-            <span class="navbar-brand-text">PilatesGestão</span>
+            <span class="navbar-brand-text">{{ $marca }}</span>
         </a>
         <a href="{{ url('/') }}" class="btn-back">
             <i class="fa-solid fa-arrow-left me-1"></i> Voltar para o site
@@ -143,7 +143,7 @@
 
 <footer>
     <div class="container">
-        <div class="brand"><i class="fa-solid fa-calendar-check me-2"></i><span>PilatesGestão</span></div>
+        <div class="brand"><i class="fa-solid fa-calendar-check me-2"></i><span>{{ $marca }}</span></div>
         <div class="links">
             <a href="{{ url('/') }}">Home</a>
             <a href="{{ url('/termos') }}">Termos</a>
@@ -151,7 +151,7 @@
             <a href="{{ url('/lgpd') }}">LGPD</a>
             <a href="mailto:contato@pilatesgestao.com.br">Contato</a>
         </div>
-        <div class="copy">© {{ date('Y') }} PilatesGestão. Todos os direitos reservados.</div>
+        <div class="copy">© {{ date('Y') }} {{ $marca }}. Todos os direitos reservados.</div>
     </div>
 </footer>
 

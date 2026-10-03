@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\View;
 use Illuminate\Pagination\Paginator;
 
 class AppServiceProvider extends ServiceProvider
@@ -28,6 +29,19 @@ class AppServiceProvider extends ServiceProvider
         }
 
         Paginator::useBootstrapFive();
+
+        // Páginas legais (termos, privacidade, LGPD): marca, domínio e público do nicho do domínio acessado.
+        // O nicho original (pilates) mantém o texto de sempre.
+        View::composer(['layouts.legal', 'legal.*'], function ($view) {
+            $nicho = app()->has('currentNicho') ? app('currentNicho') : null;
+            $proprio = $nicho && ! $nicho->usaMarcaGlobal();
+
+            $view->with([
+                'marca'        => $proprio ? $nicho->nome : 'PilatesGestão',
+                'marcaDominio' => $proprio ? ($nicho->dominio ?: request()->getHost()) : 'pilatesgestao.com.br',
+                'marcaPublico' => $proprio ? 'empresas e profissionais do segmento' : 'estúdios de pilates',
+            ]);
+        });
 
         Blade::if('masterUser', function () {
             return auth()->check() && auth()->user()->isMasterUser();
