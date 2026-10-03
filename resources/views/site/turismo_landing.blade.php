@@ -347,6 +347,7 @@
 
   <div class="top-strip">
     🌴 Oferta por tempo limitado — 14 dias totalmente grátis, sem cartão de crédito
+    &nbsp;·&nbsp; <a href="https://admin.rjpasseios.com.br" style="color:#fff;text-decoration:underline;font-weight:600;">Já sou cliente: entrar</a>
   </div>
 
   <main class="hero">

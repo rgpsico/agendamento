@@ -36,13 +36,26 @@ class NichoConfiguracao extends Model
         $host = strtolower(trim($host));
 
         return Cache::remember("nicho_config:{$host}", 600, function () use ($host) {
-            return static::where('ativo', true)
+            $config = static::where('ativo', true)
                 ->where(function ($q) use ($host) {
                     $q->where('dominio', $host)
                       ->orWhere('dominio_www', $host);
                 })
                 ->first();
+
+            // admin.<dominio> abre o sistema do mesmo nicho (ex: admin.rjpasseios.com.br)
+            if (! $config && self::isAdminHost($host)) {
+                $base = substr($host, strlen('admin.'));
+                $config = static::where('ativo', true)->where('dominio', $base)->first();
+            }
+
+            return $config;
         });
+    }
+
+    public static function isAdminHost(string $host): bool
+    {
+        return str_starts_with(strtolower(trim($host)), 'admin.');
     }
 
     /**

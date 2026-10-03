@@ -84,6 +84,14 @@ Route::get('/', function (\Illuminate\Http\Request $request) {
         return view('site/turismo_landing');
     }
 
+    // admin.<dominio do nicho> → direto pro sistema (login ou painel), sem landing
+    if (\App\Models\NichoConfiguracao::isAdminHost($host) && app()->has('currentNicho')) {
+        if (auth()->check()) {
+            return redirect()->route(auth()->user()->tipo_usuario == 'Professor' ? 'cliente.dashboard' : 'alunos.aulas');
+        }
+        return redirect()->route('home.login');
+    }
+
     // Tenant via domínio personalizado de escola cadastrada
     $site = app()->has('currentSite') ? app('currentSite') : null;
     if ($site) {
