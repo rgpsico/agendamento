@@ -13,7 +13,7 @@ class LeadQualificacao extends Model
     protected $fillable = [
         'lead_id', 'token', 'status',
         'nome', 'whatsapp', 'cidade', 'nicho', 'nicho_outro',
-        'tem_google_meu_negocio', 'ja_fez_campanha', 'nivel_digital', 'observacao',
+        'tem_google_meu_negocio', 'ja_fez_campanha', 'nivel_digital', 'sobre_negocio', 'observacao',
         'respondido_em', 'ip', 'user_agent',
     ];
 

@@ -44,6 +44,7 @@ class ValidadorLeadController extends Controller
             'tem_google_meu_negocio' => ['required', Rule::in(array_keys(LeadQualificacao::GOOGLE))],
             'ja_fez_campanha'        => ['required', Rule::in(array_keys(LeadQualificacao::CAMPANHA))],
             'nivel_digital'          => ['required', Rule::in(array_keys(LeadQualificacao::NIVEL))],
+            'sobre_negocio'          => 'required|string|min:10|max:2000',
             'whatsapp'               => 'nullable|string|max:30',
             'observacao'             => 'nullable|string|max:1000',
         ]);
@@ -73,7 +74,7 @@ class ValidadorLeadController extends Controller
         }
 
         $resumo = sprintf(
-            "[Validador %s] %s, de %s. Nicho: %s. Google Meu Negócio: %s. Campanha: %s. Nível digital: %s.%s",
+            "[Validador %s] %s, de %s. Nicho: %s. Google Meu Negócio: %s. Campanha: %s. Nível digital: %s. Sobre o negócio: %s%s",
             now()->format('d/m/Y'),
             $q->nome,
             $q->cidade,
@@ -81,6 +82,7 @@ class ValidadorLeadController extends Controller
             LeadQualificacao::GOOGLE[$q->tem_google_meu_negocio] ?? '-',
             LeadQualificacao::CAMPANHA[$q->ja_fez_campanha] ?? '-',
             LeadQualificacao::NIVEL[$q->nivel_digital] ?? '-',
+            $q->sobre_negocio,
             $q->observacao ? " Obs: {$q->observacao}" : ''
         );
 

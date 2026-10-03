@@ -117,7 +117,7 @@
     {k:'ja_fez_campanha', type:'choice', q:'Você já fez alguma campanha de anúncio?', hint:'No Instagram, Facebook ou Google.', opts:CAMPANHA},
     {k:'nivel_digital', type:'choice', q:'Como você se considera no digital?', hint:'Pode ser sincero(a), isso me ajuda a te atender melhor.', opts:NIVEL},
     {k:'whatsapp', type:'tel', q:'Qual é o seu WhatsApp?', hint:'Opcional, só pra eu te chamar se precisar.', ph:'(21) 99999-9999', req:false, auto:'tel'},
-    {k:'observacao', type:'textarea', q:'Quer me contar mais alguma coisa?', hint:'Opcional.', ph:'Ex: o que você espera do sistema…', req:false},
+    {k:'sobre_negocio', type:'textarea', q:'Me fale um pouco do seu negócio', hint:'Escreva do seu jeito: o que você faz, quantos clientes atende por mês e o que mais te atrapalha hoje.', ph:'Ex: Faço passeio de barco em Paraty, atendo uns 40 clientes por mês pelo WhatsApp e perco muita reserva por demorar a responder…', req:true, min:10},
   ];
 
   const answers = {
@@ -146,7 +146,7 @@
            <span class="em">${o.e}</span><span><strong>${o.t}</strong>${o.s ? `<small>${o.s}</small>` : ''}</span>
          </button>`).join('') + '</div>';
     } else if (s.type === 'textarea') {
-      html += `<textarea id="f" maxlength="1000" placeholder="${s.ph || ''}"></textarea>`;
+      html += `<textarea id="f" maxlength="2000" placeholder="${s.ph || ''}"></textarea>`;
     } else {
       html += `<input id="f" type="${s.type}" ${s.type === 'tel' ? 'inputmode="tel"' : ''} maxlength="${s.type === 'tel' ? 20 : 120}" placeholder="${s.ph || ''}" autocomplete="${s.auto || 'off'}">`;
     }
@@ -171,6 +171,7 @@
     if (!fromChoice && s.type !== 'choice') {
       const val = ($('f').value || '').trim();
       if (s.req && !val) { $('err').textContent = 'Preencha pra continuar.'; return; }
+      if (s.min && val.length < s.min) { $('err').textContent = 'Conte um pouquinho mais (pelo menos ' + s.min + ' letras).'; return; }
       answers[s.k] = val;
     }
     if (idx < visibles().length - 1) { idx++; render(); } else { enviar(); }

@@ -36,8 +36,9 @@
                 <dt class="col-sm-5 text-muted fw-normal">Google Meu Negócio</dt><dd class="col-sm-7">{{ LQ::GOOGLE[$q->tem_google_meu_negocio] ?? '—' }}</dd>
                 <dt class="col-sm-5 text-muted fw-normal">Já fez campanha</dt><dd class="col-sm-7">{{ LQ::CAMPANHA[$q->ja_fez_campanha] ?? '—' }}</dd>
                 <dt class="col-sm-5 text-muted fw-normal">Nível digital</dt><dd class="col-sm-7"><span class="pill pill-{{ $q->nivel_digital }}">{{ LQ::NIVEL[$q->nivel_digital] ?? '—' }}</span></dd>
+                <dt class="col-sm-5 text-muted fw-normal">Sobre o negócio</dt><dd class="col-sm-7">{!! nl2br(e($q->sobre_negocio ?: '—')) !!}</dd>
                 <dt class="col-sm-5 text-muted fw-normal">WhatsApp</dt><dd class="col-sm-7">{{ $q->whatsapp ?: '—' }}</dd>
-                <dt class="col-sm-5 text-muted fw-normal">Observação</dt><dd class="col-sm-7">{!! nl2br(e($q->observacao ?: '—')) !!}</dd>
+                @if($q->observacao)<dt class="col-sm-5 text-muted fw-normal">Observação</dt><dd class="col-sm-7">{!! nl2br(e($q->observacao)) !!}</dd>@endif
             </dl>
         </div>
     </div>
