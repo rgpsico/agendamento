@@ -1,0 +1,90 @@
+@extends('super_admin.validador.layout')
+@section('titulo', 'Validador de leads')
+
+@section('content')
+@php use App\Models\LeadQualificacao as LQ; @endphp
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h4 class="mb-0 fw-bold">Validador de leads</h4>
+        <small class="text-muted">Envie o formulário pro lead e veja as respostas aqui</small>
+    </div>
+    <form method="POST" action="{{ route('super.admin.validador.store') }}">
+        @csrf
+        <button class="btn btn-primary btn-sm"><i class="fas fa-link me-1"></i> Novo link avulso</button>
+    </form>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3"><div class="stat-chip"><div class="lbl">Links</div><div class="num">{{ $totais['total'] }}</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-chip"><div class="lbl">Respondidos</div><div class="num">{{ $totais['respondido'] }}</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-chip"><div class="lbl">Aguardando</div><div class="num">{{ $totais['pendente'] }}</div></div></div>
+</div>
+
+<form method="GET" class="card border-0 shadow-sm p-3 mb-4">
+    <div class="row g-2 align-items-end">
+        <div class="col-md-3"><input type="text" name="busca" class="form-control form-control-sm" placeholder="Nome, cidade ou WhatsApp" value="{{ request('busca') }}"></div>
+        <div class="col-md-2">
+            <select name="status" class="form-select form-select-sm">
+                <option value="">Todos os status</option>
+                <option value="respondido" @selected(request('status') === 'respondido')>Respondidos</option>
+                <option value="pendente" @selected(request('status') === 'pendente')>Aguardando</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select name="nicho" class="form-select form-select-sm">
+                <option value="">Todos os nichos</option>
+                @foreach(LQ::NICHOS as $k => $n)
+                    <option value="{{ $k }}" @selected(request('nicho') === $k)>{{ $n['emoji'] }} {{ $n['rotulo'] }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="col-md-2">
+            <select name="nivel" class="form-select form-select-sm">
+                <option value="">Nível digital</option>
+                @foreach(LQ::NIVEL as $k => $r)
+                    <option value="{{ $k }}" @selected(request('nivel') === $k)>{{ $r }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="col-md-2 d-flex gap-2">
+            <button class="btn btn-primary btn-sm w-100"><i class="fas fa-search me-1"></i>Filtrar</button>
+            <a href="{{ route('super.admin.validador.index') }}" class="btn btn-outline-secondary btn-sm"><i class="fas fa-times"></i></a>
+        </div>
+    </div>
+</form>
+
+<div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0 align-middle">
+            <thead class="table-light">
+                <tr><th>Lead</th><th>De onde</th><th>Nicho</th><th>Google</th><th>Campanha</th><th>Digital</th><th>Status</th><th></th></tr>
+            </thead>
+            <tbody>
+            @forelse($itens as $q)
+                <tr>
+                    <td>
+                        <div class="fw-semibold">{{ $q->nome ?: ($q->lead->nome ?? '—') }}</div>
+                        <small class="text-muted">{{ $q->whatsapp ?: ($q->lead->telefone ?? '') }}</small>
+                    </td>
+                    <td>{{ $q->cidade ?: '—' }}</td>
+                    <td>{!! $q->nicho ? e($q->nichoEmoji() . ' ' . $q->nichoRotulo()) : '—' !!}</td>
+                    <td><small>{{ LQ::GOOGLE[$q->tem_google_meu_negocio] ?? '—' }}</small></td>
+                    <td><small>{{ LQ::CAMPANHA[$q->ja_fez_campanha] ?? '—' }}</small></td>
+                    <td>@if($q->nivel_digital)<span class="pill pill-{{ $q->nivel_digital }}">{{ LQ::NIVEL[$q->nivel_digital] }}</span>@else — @endif</td>
+                    <td>
+                        <span class="pill pill-{{ $q->status }}">{{ $q->respondido() ? 'Respondido' : 'Aguardando' }}</span>
+                        <div><small class="text-muted">{{ ($q->respondido_em ?? $q->created_at)->format('d/m H:i') }}</small></div>
+                    </td>
+                    <td class="text-end"><a href="{{ route('super.admin.validador.show', $q) }}" class="btn btn-sm btn-outline-primary">Abrir</a></td>
+                </tr>
+            @empty
+                <tr><td colspan="8" class="text-center text-muted py-5">Nenhum registro ainda. Crie um link e envie pro lead.</td></tr>
+            @endforelse
+            </tbody>
+        </table>
+    </div>
+    @if($itens->hasPages())
+        <div class="card-footer bg-white border-top-0 py-3 px-3">{{ $itens->links() }}</div>
+    @endif
+</div>
+@endsection

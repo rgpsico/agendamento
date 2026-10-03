@@ -53,6 +53,7 @@
         <div class="nav-section">CRM</div>
         <a href="{{ route('super.admin.crm.leads') }}"    class="nav-link"><i class="fas fa-users"></i> Leads</a>
         <a href="{{ route('super.admin.crm.pipeline') }}" class="nav-link"><i class="fas fa-columns"></i> Pipeline</a>
+        <a href="{{ route('super.admin.validador.index') }}" class="nav-link"><i class="fas fa-clipboard-check"></i> Validador</a>
         <a href="{{ route('home') }}" class="nav-link mt-3"><i class="fas fa-arrow-left"></i> Voltar</a>
     </nav>
 </div>

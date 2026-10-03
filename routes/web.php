@@ -104,6 +104,10 @@ Route::get('/', function (\Illuminate\Http\Request $request) {
         ->home($request);
 })->name('home');
 
+// Wizard público do validador de leads (link enviado pro lead)
+Route::get('/validador/{token}', [\App\Http\Controllers\ValidadorLeadController::class, 'show'])->where('token', '[A-Za-z0-9]{20,64}')->name('validador.public');
+Route::post('/validador/{token}', [\App\Http\Controllers\ValidadorLeadController::class, 'responder'])->where('token', '[A-Za-z0-9]{20,64}')->middleware('throttle:20,1')->name('validador.responder');
+
 Route::get('/create', [UserManagementController::class, 'create'])->name('register.professor');
 
 Route::post('/pagamentos/presencial', [PagamentoController::class, 'criarPagamentoPresencial'])->name('empresa.pagamento.presencial');
@@ -462,6 +466,12 @@ Route::prefix('super-admin')->name('super.admin.')->middleware(['auth', 'master'
     // Modalidades por nicho
     Route::post('/nichos/{nicho}/modalidades',                        [SuperAdminController::class, 'nichoModalidadeStore'])->name('nichos.modalidades.store');
     Route::delete('/nichos/{nicho}/modalidades/{modalidade}',         [SuperAdminController::class, 'nichoModalidadeDestroy'])->name('nichos.modalidades.destroy');
+
+    // Validador de leads (wizard que o lead responde + respostas)
+    Route::get('/validador',                      [\App\Http\Controllers\SuperAdminValidadorController::class, 'index'])->name('validador.index');
+    Route::post('/validador',                     [\App\Http\Controllers\SuperAdminValidadorController::class, 'store'])->name('validador.store');
+    Route::get('/validador/{qualificacao}',       [\App\Http\Controllers\SuperAdminValidadorController::class, 'show'])->name('validador.show');
+    Route::delete('/validador/{qualificacao}',    [\App\Http\Controllers\SuperAdminValidadorController::class, 'destroy'])->name('validador.destroy');
 
     // CRM — leads das landing pages (SaaS)
     Route::get('/crm',                            [SuperAdminController::class, 'crmLeads'])->name('crm.leads');

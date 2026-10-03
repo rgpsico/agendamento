@@ -75,6 +75,7 @@
         <div class="nav-section">CRM</div>
         <a href="{{ route('super.admin.crm.leads') }}"      class="nav-link active"><i class="fas fa-users"></i> Leads</a>
         <a href="{{ route('super.admin.crm.pipeline') }}"   class="nav-link"><i class="fas fa-columns"></i> Pipeline</a>
+        <a href="{{ route('super.admin.validador.index') }}" class="nav-link"><i class="fas fa-clipboard-check"></i> Validador</a>
         <a href="{{ route('super.admin.crm.sequencias') }}" class="nav-link"><i class="fas fa-robot"></i> Sequências</a>
         <a href="{{ route('super.admin.crm.templates') }}"  class="nav-link"><i class="fas fa-envelope-open-text"></i> Templates</a>
         <a href="{{ route('home') }}" class="nav-link mt-3"><i class="fas fa-arrow-left"></i> Voltar</a>
@@ -229,8 +230,13 @@
                         </td>
                         <td><small class="text-muted">{{ $lead->created_at->format('d/m/Y H:i') }}</small></td>
                         <td>
+                            <form method="POST" action="{{ route('super.admin.validador.store') }}" class="d-inline-block align-middle me-1">
+                                @csrf
+                                <input type="hidden" name="lead_id" value="{{ $lead->id }}">
+                                <button class="btn btn-sm btn-outline-success" title="Enviar formulário de validação pro lead"><i class="fas fa-clipboard-check"></i></button>
+                            </form>
                             {{-- Mover estágio --}}
-                            <form method="POST" action="{{ route('super.admin.crm.mover', $lead) }}" class="d-flex gap-1">
+                            <form method="POST" action="{{ route('super.admin.crm.mover', $lead) }}" class="d-inline-flex align-items-center gap-1 align-middle">
                                 @csrf @method('PATCH')
                                 <select name="pipeline_status" class="form-select form-select-sm" style="font-size:.75rem;width:130px">
                                     @foreach(\App\Models\Lead::$pipelineStatus as $val => $lbl)
