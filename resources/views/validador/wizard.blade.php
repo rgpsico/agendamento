@@ -59,6 +59,11 @@
     .btn-main { background: var(--a); color: #fff; }
     .btn-main:disabled { opacity: .55; cursor: not-allowed; }
     .btn-ghost { flex: 0 0 auto; padding: 0 18px; background: #fff; border: 2px solid var(--line); color: var(--soft); }
+    .welcome { text-align: center; padding: 6px 0 2px; }
+    .welcome .wave { font-size: 3rem; line-height: 1; margin-bottom: 10px; }
+    .welcome h1 { font-size: 1.5rem; margin-bottom: 10px; }
+    .welcome p { color: var(--soft); font-size: .95rem; line-height: 1.5; margin-bottom: 8px; }
+    .welcome .tempo { display: inline-block; margin: 6px 0 18px; padding: 6px 14px; border-radius: 99px; font-size: .8rem; font-weight: 600; background: color-mix(in srgb, var(--a) 12%, #fff); color: var(--ink); }
     .done { text-align: center; padding: 14px 0 6px; }
     .done .big { font-size: 3rem; }
     [hidden] { display: none !important; }
@@ -71,7 +76,16 @@
       <span>{{ $marca }}</span>
     </div>
 
-    <div id="wizard">
+    <div class="welcome" id="welcome">
+      <div class="wave">👋</div>
+      <h1 id="welcomeTitle">Olá!</h1>
+      <p>Que bom ter você por aqui. Pra eu te conhecer melhor e te atender do jeito certo, preciso de algumas respostas rápidas sobre você e o seu negócio.</p>
+      <p>É simples, não tem resposta certa ou errada.</p>
+      <span class="tempo" id="welcomeTempo">⏱️ Leva cerca de 1 minuto</span>
+      <div class="nav"><button type="button" class="btn btn-main" id="start">Vamos começar</button></div>
+    </div>
+
+    <div id="wizard" hidden>
       <div class="progress"><i id="bar"></i></div>
       <div class="count" id="count"></div>
       <div id="step"></div>
@@ -195,7 +209,18 @@
 
   $('next').addEventListener('click', () => avancar());
   $('back').addEventListener('click', () => { if (idx > 0) { idx--; render(); } });
-  render();
+
+  // Boas-vindas: cumprimenta pelo primeiro nome quando o link é de um lead conhecido
+  const primeiroNome = (answers.nome || '').trim().split(/\s+/)[0];
+  if (primeiroNome) $('welcomeTitle').textContent = 'Olá, ' + primeiroNome + '!';
+  $('welcomeTempo').textContent = '⏱️ ' + visibles().length + ' perguntas rápidas · cerca de 1 minuto';
+
+  function comecar() {
+    $('welcome').hidden = true;
+    $('wizard').hidden = false;
+    render();
+  }
+  $('start').addEventListener('click', comecar);
 </script>
 </body>
 </html>
