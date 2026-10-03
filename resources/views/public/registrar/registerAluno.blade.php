@@ -15,7 +15,9 @@
 							
 							<div class="col-md-7 col-lg-6 login-left">
 								
-								<img src="{{ $registerImage }}" class="img-fluid" alt="Imagem da tela de registro" height="400px">	
+								@if($registerImage)
+								<img src="{{ $registerImage }}" class="img-fluid" alt="Imagem da tela de registro" height="400px">
+								@endif	
 							</div>
 							<div class="col-md-12 col-lg-6 login-right">
 								<x-alert/>

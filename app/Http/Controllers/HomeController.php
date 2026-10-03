@@ -70,6 +70,21 @@ class HomeController extends Controller
         return view('home_landing');
     }
     
+    /**
+     * Imagem de login/cadastro: nicho que não é o original usa só a imagem própria
+     * (ou nenhuma), nunca a imagem global, que é a do pilates.
+     */
+    private function imagemDaTela(string $campoNicho, ?string $imagemGlobal): ?string
+    {
+        $nicho = app()->has('currentNicho') ? app('currentNicho') : null;
+
+        if ($nicho && ! $nicho->usaMarcaGlobal()) {
+            return $nicho->{$campoNicho . '_url'};
+        }
+
+        return $imagemGlobal;
+    }
+
     public function index()
     {
        
@@ -258,8 +273,8 @@ class HomeController extends Controller
                 'view' => $this->view,
                 'route' => $this->route,
                 'modalidade' => $modalidade,
-                'loginImage' => $config->login_image ? asset('storage/' . $config->login_image) : null,
-                'registerImage' => $config->register_image ? asset('storage/' . $config->register_image) : null,
+                'loginImage' => $this->imagemDaTela('login_imagem', $config->login_image ? asset('storage/' . $config->login_image) : null),
+                'registerImage' => $this->imagemDaTela('registro_imagem', $config->register_image ? asset('storage/' . $config->register_image) : null),
             ]
         );
     }
@@ -276,9 +291,9 @@ class HomeController extends Controller
                 'view' => $this->view,
                 'modalidade' => $modalidade,
                 'route' => $this->route,
-                'registerImage' => optional($config)->register_image
+                'registerImage' => $this->imagemDaTela('registro_imagem', optional($config)->register_image
                     ? asset('storage/' . $config->register_image)
-                    : asset('admin/img/register.png'),
+                    : asset('admin/img/register.png')),
             ]
         );
     }
@@ -294,9 +309,9 @@ class HomeController extends Controller
                 'pageTitle' => $this->pageTitle,
                 'modalidade' => $modalidade,
                 'view' => $this->view,
-                'loginImage' => optional($config)->login_image 
-                    ? asset('storage/' . $config->login_image) 
-                    : null,
+                'loginImage' => $this->imagemDaTela('login_imagem', optional($config)->login_image
+                    ? asset('storage/' . $config->login_image)
+                    : null),
                 'route' => $this->route
             ]
         );
