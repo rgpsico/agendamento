@@ -53,6 +53,21 @@ class NichoConfiguracao extends Model
         });
     }
 
+    /**
+     * O nicho original (pilates) usa a marca da configuração global (logo, título e capa da home).
+     * Qualquer outro nicho usa só a marca própria e nunca herda a do pilates.
+     */
+    public function usaMarcaGlobal(): bool
+    {
+        return $this->nicho === 'pilates';
+    }
+
+    /** Emoji + nome para exibir quando o nicho não tem logo em imagem. */
+    public function marcaTexto(): string
+    {
+        return trim(($this->emoji ? $this->emoji . ' ' : '') . $this->nome);
+    }
+
     public static function isAdminHost(string $host): bool
     {
         return str_starts_with(strtolower(trim($host)), 'admin.');

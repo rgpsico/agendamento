@@ -4,7 +4,11 @@
     .breadcrumb-bar-modern {
         position: relative;
         background: linear-gradient(135deg, rgba(0,0,0,0.75), rgba(0,0,0,0.55)),
+            @if($banner)
             url('{{ $banner }}') no-repeat center center;
+            @else
+            linear-gradient(135deg, {{ $corNicho ?? '#0f172a' }}, #0f172a);
+            @endif
         background-size: cover;
         background-attachment: fixed;
         min-height: 450px;

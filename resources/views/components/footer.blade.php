@@ -14,16 +14,18 @@
                                     $footerLogoSrc = null;
                                     if (!empty($currentNicho?->logo)) {
                                         $footerLogoSrc = $currentNicho->logo_url;
-                                    } elseif ($config && $config->logo_footer) {
-                                        $footerLogoSrc = asset('storage/' . $config->logo_footer);
-                                    } elseif ($config && $config->logo_header) {
-                                        $footerLogoSrc = asset('storage/' . $config->logo_header);
+                                    } elseif ($config && (!$currentNicho || $currentNicho->usaMarcaGlobal())) {
+                                        if ($config->logo_footer) {
+                                            $footerLogoSrc = asset('storage/' . $config->logo_footer);
+                                        } elseif ($config->logo_header) {
+                                            $footerLogoSrc = asset('storage/' . $config->logo_header);
+                                        }
                                     }
                                 @endphp
                                 @if($footerLogoSrc)
                                     <img src="{{ $footerLogoSrc }}" class="img-fluid" alt="Logo">
                                 @else
-                                    <span class="fw-bold text-white fs-5">{{ $currentNicho?->nome ?? config('app.name') }}</span>
+                                    <span class="fw-bold text-white fs-5">{{ $currentNicho?->marcaTexto() ?? config('app.name') }}</span>
                                 @endif
                             </a>
                         </div>

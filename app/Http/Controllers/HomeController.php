@@ -74,7 +74,13 @@ class HomeController extends Controller
     {
        
        
-        $model = $this->model::with('modalidade', 'endereco', 'galeria', 'avaliacao')->where('status', 'ativo')->get();
+        $nichoAtual = app()->has('currentNicho') ? app('currentNicho')->nicho : null;
+
+        // A vitrine só lista empresas do nicho do domínio (pela modalidade delas)
+        $model = $this->model::with('modalidade', 'endereco', 'galeria', 'avaliacao')
+            ->where('status', 'ativo')
+            ->when($nichoAtual, fn ($q) => $q->whereHas('modalidade', fn ($m) => $m->where('nicho', $nichoAtual)))
+            ->get();
         $modalidade = Modalidade::doNichoAtual()->get();
         $bairros = Bairros::all();
 

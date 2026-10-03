@@ -21,14 +21,14 @@
                                 $logoSrc = null;
                                 if (!empty($currentNicho?->logo)) {
                                     $logoSrc = $currentNicho->logo_url;
-                                } elseif (!empty($config->logo_header)) {
+                                } elseif ((!$currentNicho || $currentNicho->usaMarcaGlobal()) && !empty($config->logo_header)) {
                                     $logoSrc = asset('storage/' . $config->logo_header);
                                 }
                             @endphp
                             @if($logoSrc)
                                 <img src="{{ $logoSrc }}" class="img-fluid" alt="Logo">
                             @else
-                                <span class="fw-bold fs-5 text-dark">{{ $currentNicho?->nome ?? config('app.name') }}</span>
+                                <span class="fw-bold fs-5 text-dark">{{ $currentNicho?->marcaTexto() ?? config('app.name') }}</span>
                             @endif
                         </a>
                     </div>
@@ -39,7 +39,7 @@
                                 @if($logoSrc ?? null)
                                     <img src="{{ $logoSrc }}" class="img-fluid" alt="Logo">
                                 @else
-                                    <span class="fw-bold fs-5 text-dark">{{ $currentNicho?->nome ?? config('app.name') }}</span>
+                                    <span class="fw-bold fs-5 text-dark">{{ $currentNicho?->marcaTexto() ?? config('app.name') }}</span>
                                 @endif
                             </a>
                             <a id="menu_close" class="menu-close" href="javascript:void(0);">

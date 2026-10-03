@@ -11,6 +11,7 @@ class Breadcrumb extends Component
     public $subtitle;
     public $breadcrumbs;
     public $banner;
+    public $corNicho = null;
 
     public function __construct($title = null, $subtitle = null, $breadcrumbs = [])
     {
@@ -27,6 +28,14 @@ class Breadcrumb extends Component
 
         // Se o título não for passado, pega o home_title da configuração
         $this->title = $title ?? ($config->home_title ?? 'Home');
+
+        // Nicho que não é o original: usa o nome e a imagem do próprio nicho, nunca a capa/título do pilates
+        $nicho = app()->has('currentNicho') ? app('currentNicho') : null;
+        if ($nicho && ! $nicho->usaMarcaGlobal()) {
+            $this->banner = $nicho->registro_imagem_url ?? $nicho->login_imagem_url;
+            $this->corNicho = $nicho->cor_primaria;
+            $this->title = $title ?? $nicho->nome;
+        }
     }
 
     public function render()
