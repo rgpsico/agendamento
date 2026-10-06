@@ -275,6 +275,7 @@ Route::prefix('admin')->group(function () {
 });
 
 Route::get('/site/{slug}', [SiteController::class, 'mostrar'])->name('site.publico');
+Route::post('/site/{slug}/contato', [SiteController::class, 'contato'])->middleware('throttle:8,1')->name('site.contato');
 
 Route::get('/landing', [SiteController::class, 'landing'])->name('site.landing');
 Route::post('/landing/lead', [SiteController::class, 'lead'])->name('site.landing.lead');

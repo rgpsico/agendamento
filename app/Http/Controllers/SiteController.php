@@ -25,6 +25,70 @@ class SiteController extends Controller
 
 
 
+    /**
+     * POST /site/{slug}/contato — formulário do site da empresa.
+     * Grava o contato como lead no CRM da própria empresa (tenant = empresa)
+     * e avisa o dono por e-mail. Nunca falha a requisição do visitante por causa do e-mail.
+     */
+    public function contato(Request $request, string $slug)
+    {
+        $site = EmpresaSite::with('empresa')->where('slug', $slug)->firstOrFail();
+
+        // Honeypot: bots preenchem, pessoas não veem o campo.
+        if ($request->filled('website')) {
+            return response()->json(['ok' => true]);
+        }
+
+        $data = $request->validate([
+            'nome'     => 'required|string|max:120',
+            'email'    => 'required|email|max:160',
+            'whatsapp' => 'nullable|string|max:30',
+            'pais'     => 'nullable|string|max:80',
+            'data'     => 'nullable|string|max:20',
+            'pessoas'  => 'nullable|integer|min:1|max:500',
+            'passeio'  => 'nullable|string|max:160',
+            'mensagem' => 'nullable|string|max:2000',
+        ]);
+
+        $obs = collect([
+            'País'             => $data['pais'] ?? null,
+            'Data da viagem'   => $data['data'] ?? null,
+            'Pessoas'          => $data['pessoas'] ?? null,
+            'Passeio'          => $data['passeio'] ?? null,
+            'Mensagem'         => $data['mensagem'] ?? null,
+        ])->filter(fn ($v) => filled($v))->map(fn ($v, $k) => "{$k}: {$v}")->implode("\n");
+
+        $lead = \App\Models\Lead::create([
+            'tenant_id'       => $site->empresa_id,
+            'nome'            => $data['nome'],
+            'email'           => $data['email'],
+            'telefone'        => $data['whatsapp'] ?? null,
+            'origem'          => 'site',
+            'status'          => 'novo',
+            'pipeline_status' => 'novo_lead',
+            'interesse'       => \Illuminate\Support\Str::limit($data['passeio'] ?? '', 120, ''),
+            'observacoes'     => $obs,
+            'token'           => (string) \Illuminate\Support\Str::uuid(),
+        ]);
+
+        try {
+            $dono = \App\Models\Usuario::find($site->empresa->user_id ?? null);
+            if ($dono?->email) {
+                Mail::raw(
+                    "Novo contato pelo seu site ({$site->titulo}).\n\n" .
+                    "Nome: {$data['nome']}\nE-mail: {$data['email']}\n" .
+                    'WhatsApp: ' . ($data['whatsapp'] ?? '-') . "\n" . $obs . "\n\n" .
+                    'Veja no CRM: ' . url('/admin/crm/leads'),
+                    fn ($m) => $m->to($dono->email)->subject("Novo contato pelo site: {$data['nome']}")
+                );
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Falha ao avisar contato do site', ['lead' => $lead->id, 'erro' => $e->getMessage()]);
+        }
+
+        return response()->json(['ok' => true]);
+    }
+
     public function landing()
     {
         return view('site.landing');
