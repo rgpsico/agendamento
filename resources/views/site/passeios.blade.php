@@ -6,17 +6,37 @@
     $sobreUrl = $site->sobre_imagem ? asset('storage/' . $site->sobre_imagem) : null;
     $galeria = collect(\Illuminate\Support\Facades\Storage::disk('public')->files('sites/galeria/' . $site->id))->sort()->values()
         ->map(fn ($f) => asset('storage/' . $f));
-    $passeios = $site->servicos ?? collect();
-    $depoimentos = $site->depoimentos ?? collect();
-    $temSobre = filled($site->sobre_titulo) || filled($site->sobre_descricao) || !empty($site->sobre_itens);
-    $contatos = collect($site->contatos ?? [])->keyBy(fn ($c) => strtolower($c->tipo));
-    $instagram = $contatos->get('instagram')?->valor;
-    $emailContato = $contatos->get('email')?->valor;
     $duracao = function ($min) {
         if (!$min) return null;
         $h = intdiv((int) $min, 60); $m = (int) $min % 60;
         return $h ? $h . 'h' . ($m ? sprintf('%02d', $m) : '') : $m . ' min';
     };
+    // Passeios do site (site_servicos); se não houver, usa os serviços agendáveis da empresa.
+    $svRows = $site->siteServicos ?? collect();
+    if ($svRows->count()) {
+        $passeios = $svRows->sortBy('id')->values()->map(fn ($x) => (object) [
+            'id' => $x->id, 'titulo' => $x->titulo, 'descricao' => $x->descricao,
+            'img' => $x->imagem ? (str_starts_with($x->imagem, 'sites/') ? asset('storage/' . $x->imagem) : asset('servico/' . $x->imagem)) : null,
+            'credito' => $x->imagem_credito, 'credito_url' => $x->imagem_credito_url,
+            'principal' => (bool) $x->destaque, 'tr' => $x->traducoes ?? [],
+            'preco' => (float) $x->preco, 'duracao_txt' => $x->duracao ?: null,
+        ]);
+    } else {
+        $passeios = ($site->servicos ?? collect())->map(fn ($x) => (object) [
+            'id' => 's' . $x->id, 'titulo' => $x->titulo, 'descricao' => $x->descricao,
+            'img' => ($x->imagem && !str_contains($x->imagem, 'passeio_padrao')) ? asset('servico/' . $x->imagem) : null,
+            'credito' => null, 'credito_url' => null, 'principal' => true, 'tr' => [],
+            'preco' => (float) $x->preco, 'duracao_txt' => $duracao($x->tempo_de_aula),
+        ]);
+    }
+    $principais = $passeios->where('principal', true)->values();
+    $outros = $passeios->where('principal', false)->values();
+    $svMap = $passeios->mapWithKeys(fn ($x) => [(string) $x->id => array_merge(['pt' => ['t' => $x->titulo, 'd' => $x->descricao]], $x->tr)]);
+    $depoimentos = $site->depoimentos ?? collect();
+    $temSobre = filled($site->sobre_titulo) || filled($site->sobre_descricao) || !empty($site->sobre_itens);
+    $contatos = collect($site->contatos ?? [])->keyBy(fn ($c) => strtolower($c->tipo));
+    $instagram = $contatos->get('instagram')?->valor;
+    $emailContato = $contatos->get('email')?->valor;
     $descSeo = $site->descricao ?: 'Passeios e experiências no Rio de Janeiro.';
 @endphp
 <!DOCTYPE html>
@@ -134,6 +154,14 @@
         .chip { background:#e6f4f6; color:var(--turq-dark); font:600 .85rem var(--body); padding:5px 12px; border-radius:999px; }
         .price { margin-top:auto; font-size:.85rem; color:var(--muted); }
         .price strong { display:block; font:800 1.5rem var(--head); color:var(--navy); }
+        .tour .ph { position:relative; }
+        .credit { position:absolute; right:8px; bottom:8px; font:500 .7rem var(--body); background:rgba(0,0,0,.55); color:#fff; padding:3px 9px; border-radius:99px; text-decoration:none; backdrop-filter:blur(4px); }
+        .credit:hover { background:rgba(0,0,0,.8); }
+        .tour:not(.small) .ph { aspect-ratio:4/3; }
+        .tour .ph img { object-position:center 62%; }
+        .tour.small .ph { aspect-ratio:16/9; } .tour.small .ph img { object-position:center; }
+        .tour .ph img[src*="festa-favela"] { object-position:center 92%; }
+        @media (min-width:760px) { .tours.main { grid-template-columns:repeat(2,1fr); } }
         .tour .actions { display:flex; gap:10px; flex-wrap:wrap; }
         .tour .actions .btn { flex:1; min-height:48px; padding:12px 18px; }
 
@@ -301,28 +329,18 @@
             <div class="eyebrow" data-i18n="tours_eyebrow">Passeios</div>
             <h2 class="title" data-i18n="tours_title">Experiências que você vai amar</h2>
         </div>
-        <div class="tours">
-            @foreach($passeios as $p)
-                @php $temFoto = $p->imagem && !str_contains($p->imagem, 'passeio_padrao'); @endphp
-                <article class="tour reveal">
-                    <div class="ph">
-                        @if($temFoto)<img src="{{ asset('servico/' . $p->imagem) }}" alt="{{ $p->titulo }}" loading="lazy">
-                        @else<svg aria-hidden="true"><use href="#i-compass"/></svg>@endif
-                    </div>
-                    <div class="bd">
-                        <h3>{{ $p->titulo }}</h3>
-                        @if($p->descricao)<p>{{ $p->descricao }}</p>@endif
-                        @if($duracao($p->tempo_de_aula))<div class="chips"><span class="chip"><span data-i18n="duration">Duração</span>: {{ $duracao($p->tempo_de_aula) }}</span></div>@endif
-                        @if((float) $p->preco > 0)
-                            <div class="price"><span data-i18n="from">a partir de</span><strong>R$ {{ number_format((float) $p->preco, 2, ',', '.') }}</strong></div>
-                        @endif
-                        <div class="actions">
-                            <a class="btn btn--ocean" href="#contato" data-tour="{{ $p->titulo }}" data-i18n="view_exp">Ver experiência</a>
-                        </div>
-                    </div>
-                </article>
-            @endforeach
+        <div class="tours main">
+            @foreach($principais as $p) @include('site._passeio_card', ['p' => $p]) @endforeach
         </div>
+        @if($outros->count())
+            <div class="reveal" style="margin-top:64px">
+                <div class="eyebrow" data-i18n="tours_other_eyebrow">Também organizamos</div>
+                <h2 class="title" style="font-size:clamp(1.4rem,3.4vw,2rem)" data-i18n="tours_other_title">Outros passeios no Rio</h2>
+            </div>
+            <div class="tours">
+                @foreach($outros as $p) @include('site._passeio_card', ['p' => $p]) @endforeach
+            </div>
+        @endif
     </div>
 </section>
 @endif
@@ -431,7 +449,7 @@
             <label class="full"><span data-i18n="f_tour">Passeio de interesse</span>
                 <select name="passeio" id="f-passeio">
                     <option value="" data-i18n="f_tour_any">Ainda não sei</option>
-                    @foreach($passeios as $p)<option value="{{ $p->titulo }}">{{ $p->titulo }}</option>@endforeach
+                    @foreach($passeios as $p)<option value="{{ $p->titulo }}" data-sv="{{ $p->id }}" data-f="t">{{ $p->titulo }}</option>@endforeach
                 </select>
             </label>
             <label class="full"><span data-i18n="f_msg">Mensagem</span><textarea name="mensagem" maxlength="2000"></textarea></label>
@@ -501,11 +519,12 @@
 </a>
 @endif
 
+<script>window.SV = {!! json_encode($svMap, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) !!};</script>
 @verbatim
 <script>
 (function () {
   var T = {
-    pt: { skip:'Ir para o conteúdo', nav_home:'Início', nav_tours:'Passeios', nav_gallery:'Galeria', nav_about:'Sobre nós', nav_contact:'Contato',
+    pt: { skip:'Ir para o conteúdo', tours_other_eyebrow:'Também organizamos', tours_other_title:'Outros passeios no Rio', photo:'Foto', nav_home:'Início', nav_tours:'Passeios', nav_gallery:'Galeria', nav_about:'Sobre nós', nav_contact:'Contato',
       hero_title:'Viva experiências que você nunca vai esquecer.', hero_sub:'Descubra passeios, praias e experiências incríveis e encontre a aventura perfeita para sua viagem.',
       btn_explore:'Explorar passeios', btn_whats:'Falar pelo WhatsApp', trust1:'Atendimento rápido', trust2:'Reserva fácil', trust3:'Suporte durante sua experiência',
       tours_eyebrow:'Passeios', tours_title:'Experiências que você vai amar', duration:'Duração', from:'a partir de', view_exp:'Ver experiência',
@@ -525,7 +544,7 @@
       ok:'Recebemos seu contato! Para agilizar, continue pelo WhatsApp:', ok_btn:'Continuar no WhatsApp', err:'Não foi possível enviar agora. Tente de novo ou fale pelo WhatsApp.', err_req:'Preencha nome e um e-mail válido.',
       final_title:'Sua próxima história começa aqui.', final_sub:'Descubra experiências incríveis e transforme sua viagem em uma lembrança inesquecível.',
       foot_blurb:'Passeios e experiências no Rio de Janeiro.', foot_menu:'Menu', fab_tip:'Fale conosco pelo WhatsApp', hello:'Olá! Vi o site da {s} e gostaria de saber mais.' },
-    en: { skip:'Skip to content', nav_home:'Home', nav_tours:'Tours', nav_gallery:'Gallery', nav_about:'About us', nav_contact:'Contact',
+    en: { skip:'Skip to content', tours_other_eyebrow:'We also arrange', tours_other_title:'More ways to see Rio', photo:'Photo', nav_home:'Home', nav_tours:'Tours', nav_gallery:'Gallery', nav_about:'About us', nav_contact:'Contact',
       hero_title:'Live experiences you will never forget.', hero_sub:'Discover tours, beaches and amazing experiences and find the perfect adventure for your trip.',
       btn_explore:'Explore tours', btn_whats:'Chat on WhatsApp', trust1:'Fast response', trust2:'Easy booking', trust3:'Support during your experience',
       tours_eyebrow:'Tours', tours_title:'Experiences you will love', duration:'Duration', from:'from', view_exp:'View experience',
@@ -545,7 +564,7 @@
       ok:'We received your message! To speed things up, continue on WhatsApp:', ok_btn:'Continue on WhatsApp', err:'We could not send it now. Try again or chat on WhatsApp.', err_req:'Please enter your name and a valid e-mail.',
       final_title:'Your next story starts here.', final_sub:'Discover amazing experiences and turn your trip into an unforgettable memory.',
       foot_blurb:'Tours and experiences in Rio de Janeiro.', foot_menu:'Menu', fab_tip:'Chat with us on WhatsApp', hello:'Hello! I saw the {s} website and would like to know more.' },
-    es: { skip:'Ir al contenido', nav_home:'Inicio', nav_tours:'Paseos', nav_gallery:'Galería', nav_about:'Sobre nosotros', nav_contact:'Contacto',
+    es: { skip:'Ir al contenido', tours_other_eyebrow:'También organizamos', tours_other_title:'Más formas de conocer Río', photo:'Foto', nav_home:'Inicio', nav_tours:'Paseos', nav_gallery:'Galería', nav_about:'Sobre nosotros', nav_contact:'Contacto',
       hero_title:'Vive experiencias que nunca vas a olvidar.', hero_sub:'Descubre paseos, playas y experiencias increíbles y encuentra la aventura perfecta para tu viaje.',
       btn_explore:'Explorar paseos', btn_whats:'Hablar por WhatsApp', trust1:'Atención rápida', trust2:'Reserva fácil', trust3:'Soporte durante tu experiencia',
       tours_eyebrow:'Paseos', tours_title:'Experiencias que vas a amar', duration:'Duración', from:'desde', view_exp:'Ver experiencia',
@@ -565,7 +584,7 @@
       ok:'¡Recibimos tu contacto! Para agilizar, continúa por WhatsApp:', ok_btn:'Continuar en WhatsApp', err:'No pudimos enviarlo ahora. Inténtalo de nuevo o habla por WhatsApp.', err_req:'Completa tu nombre y un correo válido.',
       final_title:'Tu próxima historia empieza aquí.', final_sub:'Descubre experiencias increíbles y convierte tu viaje en un recuerdo inolvidable.',
       foot_blurb:'Paseos y experiencias en Río de Janeiro.', foot_menu:'Menú', fab_tip:'Habla con nosotros por WhatsApp', hello:'¡Hola! Vi el sitio de {s} y me gustaría saber más.' },
-    it: { skip:'Vai al contenuto', nav_home:'Home', nav_tours:'Tour', nav_gallery:'Galleria', nav_about:'Chi siamo', nav_contact:'Contatti',
+    it: { skip:'Vai al contenuto', tours_other_eyebrow:'Organizziamo anche', tours_other_title:'Altri modi per scoprire Rio', photo:'Foto', nav_home:'Home', nav_tours:'Tour', nav_gallery:'Galleria', nav_about:'Chi siamo', nav_contact:'Contatti',
       hero_title:'Vivi esperienze che non dimenticherai mai.', hero_sub:'Scopri tour, spiagge ed esperienze incredibili e trova l’avventura perfetta per il tuo viaggio.',
       btn_explore:'Esplora i tour', btn_whats:'Scrivici su WhatsApp', trust1:'Risposta rapida', trust2:'Prenotazione facile', trust3:'Assistenza durante la tua esperienza',
       tours_eyebrow:'Tour', tours_title:'Esperienze che amerai', duration:'Durata', from:'da', view_exp:'Vedi l’esperienza',
@@ -599,6 +618,11 @@
       $('.cur', box).textContent = CODES[l];
       $('button > svg use', box).setAttribute('href', FLAGS[l]);
       $$('li button', box).forEach(function (b) { b.setAttribute('aria-current', b.dataset.l === l ? 'true' : 'false'); });
+    });
+    $$('[data-sv]').forEach(function (el) {
+      var d = (window.SV || {})[el.dataset.sv]; if (!d) return;
+      var v = d[l] && d[l][el.dataset.f] ? d[l][el.dataset.f] : (d.pt ? d.pt[el.dataset.f] : null);
+      if (v) el.textContent = v;
     });
     var hello = T[l].hello.replace('{s}', siteName);
     $$('[data-wa="hello"]').forEach(function (a) { a.href = 'https://wa.me/' + zap + '?text=' + encodeURIComponent(hello); });
