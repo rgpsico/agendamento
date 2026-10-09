@@ -19,6 +19,11 @@ class SiteServico extends Model
         'traducoes' => 'array',
     ];
 
+    public function fotos()
+    {
+        return $this->hasMany(SiteServicoFoto::class, 'site_servico_id')->orderBy('ordem')->orderBy('id');
+    }
+
     public function site()
     {
         return $this->belongsTo(EmpresaSite::class, 'site_id');

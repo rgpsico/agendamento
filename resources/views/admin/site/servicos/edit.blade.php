@@ -129,6 +129,41 @@
                             </form>
                         </div>
                     </div>
+
+                    {{-- Fotos do serviço (aparecem no modal do site ao clicar no passeio) --}}
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h4 class="card-title">Fotos do serviço</h4>
+                            <small class="text-muted">Aparecem na galeria do modal quando o visitante clica neste serviço no site. A imagem principal (capa) é a do campo "Imagem" acima.</small>
+                        </div>
+                        <div class="card-body">
+                            <form action="{{ route('admin.site.servicos.fotos.store', $servico->id) }}" method="POST" enctype="multipart/form-data" class="mb-3">
+                                @csrf
+                                <div class="input-group">
+                                    <input type="file" name="fotos[]" class="form-control @error('fotos') is-invalid @enderror @error('fotos.*') is-invalid @enderror" accept="image/*" multiple required>
+                                    <button type="submit" class="btn btn-primary">Enviar fotos</button>
+                                </div>
+                                <small class="text-muted">Você pode escolher várias de uma vez (até 20, 6 MB cada).</small>
+                                @error('fotos')<div class="text-danger small">{{ $message }}</div>@enderror
+                                @error('fotos.*')<div class="text-danger small">{{ $message }}</div>@enderror
+                            </form>
+
+                            <div class="d-flex flex-wrap gap-3">
+                                @forelse($servico->fotos as $foto)
+                                    <div class="text-center" style="width:130px">
+                                        <img src="{{ asset('storage/' . $foto->caminho) }}" alt="Foto {{ $loop->iteration }}" style="width:130px;height:96px;object-fit:cover;border-radius:8px">
+                                        @if($foto->credito)<small class="d-block text-muted" style="font-size:.65rem">{{ $foto->credito }}</small>@endif
+                                        <form action="{{ route('admin.site.servicos.fotos.destroy', $foto->id) }}" method="POST" class="mt-1" onsubmit="return confirm('Remover esta foto?')">
+                                            @csrf @method('DELETE')
+                                            <button class="btn btn-sm btn-outline-danger">Remover</button>
+                                        </form>
+                                    </div>
+                                @empty
+                                    <p class="text-muted mb-0">Nenhuma foto extra ainda.</p>
+                                @endforelse
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 

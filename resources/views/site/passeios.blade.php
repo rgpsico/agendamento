@@ -12,7 +12,7 @@
         return $h ? $h . 'h' . ($m ? sprintf('%02d', $m) : '') : $m . ' min';
     };
     // Passeios do site (site_servicos); se não houver, usa os serviços agendáveis da empresa.
-    $svRows = $site->siteServicos ?? collect();
+    $svRows = ($site->siteServicos ?? collect())->load('fotos');
     if ($svRows->count()) {
         $passeios = $svRows->sortBy('id')->values()->map(fn ($x) => (object) [
             'id' => $x->id, 'titulo' => $x->titulo, 'descricao' => $x->descricao,
@@ -20,6 +20,9 @@
             'credito' => $x->imagem_credito, 'credito_url' => $x->imagem_credito_url,
             'principal' => (bool) $x->destaque, 'tr' => $x->traducoes ?? [],
             'preco' => (float) $x->preco, 'duracao_txt' => $x->duracao ?: null,
+            'fotos' => collect([$x->imagem ? ['s' => str_starts_with($x->imagem, 'sites/') ? asset('storage/' . $x->imagem) : asset('servico/' . $x->imagem), 'c' => $x->imagem_credito, 'u' => $x->imagem_credito_url] : null])
+                ->merge($x->fotos->map(fn ($f) => ['s' => asset('storage/' . $f->caminho), 'c' => $f->credito, 'u' => $f->credito_url]))
+                ->filter()->values()->all(),
         ]);
     } else {
         $passeios = ($site->servicos ?? collect())->map(fn ($x) => (object) [
@@ -27,10 +30,12 @@
             'img' => ($x->imagem && !str_contains($x->imagem, 'passeio_padrao')) ? asset('servico/' . $x->imagem) : null,
             'credito' => null, 'credito_url' => null, 'principal' => true, 'tr' => [],
             'preco' => (float) $x->preco, 'duracao_txt' => $duracao($x->tempo_de_aula),
+            'fotos' => ($x->imagem && !str_contains($x->imagem, 'passeio_padrao')) ? [['s' => asset('servico/' . $x->imagem), 'c' => null, 'u' => null]] : [],
         ]);
     }
     $principais = $passeios->where('principal', true)->values();
     $outros = $passeios->where('principal', false)->values();
+    $svm = $passeios->mapWithKeys(fn ($x) => [(string) $x->id => ['f' => $x->fotos, 'dur' => $x->duracao_txt, 'p' => $x->preco]]);
     $svMap = $passeios->mapWithKeys(fn ($x) => [(string) $x->id => array_merge(['pt' => ['t' => $x->titulo, 'd' => $x->descricao]], $x->tr)]);
     $depoimentos = $site->depoimentos ?? collect();
     $temSobre = filled($site->sobre_titulo) || filled($site->sobre_descricao) || !empty($site->sobre_itens);
@@ -162,6 +167,25 @@
         .tour.small .ph { aspect-ratio:16/9; } .tour.small .ph img { object-position:center; }
         .tour .ph img[src*="festa-favela"] { object-position:center 92%; }
         @media (min-width:760px) { .tours.main { grid-template-columns:repeat(2,1fr); } }
+        .tour .ph[data-open], .tour h3[data-open] { cursor:pointer; }
+        .svm { position:fixed; inset:0; z-index:190; background:rgba(5,15,30,.86); display:none; align-items:center; justify-content:center; padding:16px; overflow-y:auto; }
+        .svm.open { display:flex; }
+        .svm__box { position:relative; background:#fff; border-radius:20px; width:min(1000px,100%); max-height:calc(100svh - 32px); overflow:auto; display:grid; grid-template-columns:1fr; }
+        @media (min-width:860px) { .svm__box { grid-template-columns:1.25fr 1fr; overflow:hidden; } .svm__body { overflow:auto; } }
+        .svm__x { position:absolute; top:10px; right:10px; z-index:3; width:44px; height:44px; border-radius:50%; border:0; background:rgba(255,255,255,.92); color:var(--navy); font-size:1.6rem; cursor:pointer; box-shadow:0 4px 14px rgba(0,0,0,.25); }
+        .svm__media { position:relative; background:#0a1a30; display:flex; flex-direction:column; min-height:260px; }
+        .svm__main { position:relative; flex:1; min-height:260px; display:grid; place-items:center; touch-action:pan-y; }
+        .svm__main img { width:100%; height:100%; max-height:70svh; object-fit:contain; display:block; }
+        .svm__nav { position:absolute; top:50%; transform:translateY(-50%); width:44px; height:44px; border-radius:50%; border:0; background:rgba(255,255,255,.88); color:var(--navy); font-size:1.5rem; cursor:pointer; }
+        .svm__nav.pv { left:10px; } .svm__nav.nx { right:10px; }
+        .svm__ct { position:absolute; left:12px; top:12px; background:rgba(0,0,0,.55); color:#fff; font:600 .75rem var(--body); padding:3px 10px; border-radius:99px; }
+        .svm__th { display:flex; gap:8px; padding:10px; overflow-x:auto; background:#0a1a30; }
+        .svm__th button { flex:0 0 64px; height:48px; padding:0; border:2px solid transparent; border-radius:8px; overflow:hidden; cursor:pointer; background:none; opacity:.7; }
+        .svm__th button[aria-current="true"] { border-color:var(--gold); opacity:1; }
+        .svm__th img { width:100%; height:100%; object-fit:cover; display:block; }
+        .svm__body { padding:26px 24px 24px; display:flex; flex-direction:column; gap:12px; }
+        .svm__body h3 { font-size:1.5rem; padding-right:36px; } .svm__body p { margin:0; color:var(--muted); }
+        .svm__cta { display:grid; gap:10px; margin-top:auto; padding-top:8px; }
         .tour .actions { display:flex; gap:10px; flex-wrap:wrap; }
         .tour .actions .btn { flex:1; min-height:48px; padding:12px 18px; }
 
@@ -472,6 +496,31 @@
 </section>
 </main>
 
+<div class="svm" id="svm" role="dialog" aria-modal="true" aria-labelledby="svm-t">
+    <div class="svm__box">
+        <button class="svm__x" type="button" aria-label="Fechar">×</button>
+        <div class="svm__media">
+            <div class="svm__main" id="svm-main">
+                <img id="svm-img" src="" alt="">
+                <button class="svm__nav pv" type="button" aria-label="Foto anterior">‹</button>
+                <button class="svm__nav nx" type="button" aria-label="Próxima foto">›</button>
+                <span class="svm__ct" id="svm-ct"></span>
+                <a class="credit" id="svm-credit" href="#" target="_blank" rel="noopener" style="display:none"></a>
+            </div>
+            <div class="svm__th" id="svm-th"></div>
+        </div>
+        <div class="svm__body">
+            <h3 id="svm-t"></h3>
+            <p id="svm-d"></p>
+            <div class="chips" id="svm-chips"></div>
+            <div class="svm__cta">
+                @if($zapBase)<a class="btn btn--zap" id="svm-wa" href="#" target="_blank" rel="noopener"><svg><use href="#i-zap"/></svg><span data-i18n="btn_whats">Falar pelo WhatsApp</span></a>@endif
+                <a class="btn btn--ocean" id="svm-form" href="#contato" data-i18n="f_send">Quero saber mais</a>
+            </div>
+        </div>
+    </div>
+</div>
+
 <footer class="site">
     <div class="wrap">
         <div class="cols">
@@ -519,12 +568,12 @@
 </a>
 @endif
 
-<script>window.SV = {!! json_encode($svMap, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) !!};</script>
+<script>window.SV = {!! json_encode($svMap, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) !!}; window.SVM = {!! json_encode($svm, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) !!};</script>
 @verbatim
 <script>
 (function () {
   var T = {
-    pt: { skip:'Ir para o conteúdo', tours_other_eyebrow:'Também organizamos', tours_other_title:'Outros passeios no Rio', photo:'Foto', nav_home:'Início', nav_tours:'Passeios', nav_gallery:'Galeria', nav_about:'Sobre nós', nav_contact:'Contato',
+    pt: { skip:'Ir para o conteúdo', ask:'Olá! Quero saber mais sobre o passeio: {t}', tours_other_eyebrow:'Também organizamos', tours_other_title:'Outros passeios no Rio', photo:'Foto', nav_home:'Início', nav_tours:'Passeios', nav_gallery:'Galeria', nav_about:'Sobre nós', nav_contact:'Contato',
       hero_title:'Viva experiências que você nunca vai esquecer.', hero_sub:'Descubra passeios, praias e experiências incríveis e encontre a aventura perfeita para sua viagem.',
       btn_explore:'Explorar passeios', btn_whats:'Falar pelo WhatsApp', trust1:'Atendimento rápido', trust2:'Reserva fácil', trust3:'Suporte durante sua experiência',
       tours_eyebrow:'Passeios', tours_title:'Experiências que você vai amar', duration:'Duração', from:'a partir de', view_exp:'Ver experiência',
@@ -544,7 +593,7 @@
       ok:'Recebemos seu contato! Para agilizar, continue pelo WhatsApp:', ok_btn:'Continuar no WhatsApp', err:'Não foi possível enviar agora. Tente de novo ou fale pelo WhatsApp.', err_req:'Preencha nome e um e-mail válido.',
       final_title:'Sua próxima história começa aqui.', final_sub:'Descubra experiências incríveis e transforme sua viagem em uma lembrança inesquecível.',
       foot_blurb:'Passeios e experiências no Rio de Janeiro.', foot_menu:'Menu', fab_tip:'Fale conosco pelo WhatsApp', hello:'Olá! Vi o site da {s} e gostaria de saber mais.' },
-    en: { skip:'Skip to content', tours_other_eyebrow:'We also arrange', tours_other_title:'More ways to see Rio', photo:'Photo', nav_home:'Home', nav_tours:'Tours', nav_gallery:'Gallery', nav_about:'About us', nav_contact:'Contact',
+    en: { skip:'Skip to content', ask:'Hello! I would like to know more about: {t}', tours_other_eyebrow:'We also arrange', tours_other_title:'More ways to see Rio', photo:'Photo', nav_home:'Home', nav_tours:'Tours', nav_gallery:'Gallery', nav_about:'About us', nav_contact:'Contact',
       hero_title:'Live experiences you will never forget.', hero_sub:'Discover tours, beaches and amazing experiences and find the perfect adventure for your trip.',
       btn_explore:'Explore tours', btn_whats:'Chat on WhatsApp', trust1:'Fast response', trust2:'Easy booking', trust3:'Support during your experience',
       tours_eyebrow:'Tours', tours_title:'Experiences you will love', duration:'Duration', from:'from', view_exp:'View experience',
@@ -564,7 +613,7 @@
       ok:'We received your message! To speed things up, continue on WhatsApp:', ok_btn:'Continue on WhatsApp', err:'We could not send it now. Try again or chat on WhatsApp.', err_req:'Please enter your name and a valid e-mail.',
       final_title:'Your next story starts here.', final_sub:'Discover amazing experiences and turn your trip into an unforgettable memory.',
       foot_blurb:'Tours and experiences in Rio de Janeiro.', foot_menu:'Menu', fab_tip:'Chat with us on WhatsApp', hello:'Hello! I saw the {s} website and would like to know more.' },
-    es: { skip:'Ir al contenido', tours_other_eyebrow:'También organizamos', tours_other_title:'Más formas de conocer Río', photo:'Foto', nav_home:'Inicio', nav_tours:'Paseos', nav_gallery:'Galería', nav_about:'Sobre nosotros', nav_contact:'Contacto',
+    es: { skip:'Ir al contenido', ask:'¡Hola! Quisiera saber más sobre: {t}', tours_other_eyebrow:'También organizamos', tours_other_title:'Más formas de conocer Río', photo:'Foto', nav_home:'Inicio', nav_tours:'Paseos', nav_gallery:'Galería', nav_about:'Sobre nosotros', nav_contact:'Contacto',
       hero_title:'Vive experiencias que nunca vas a olvidar.', hero_sub:'Descubre paseos, playas y experiencias increíbles y encuentra la aventura perfecta para tu viaje.',
       btn_explore:'Explorar paseos', btn_whats:'Hablar por WhatsApp', trust1:'Atención rápida', trust2:'Reserva fácil', trust3:'Soporte durante tu experiencia',
       tours_eyebrow:'Paseos', tours_title:'Experiencias que vas a amar', duration:'Duración', from:'desde', view_exp:'Ver experiencia',
@@ -584,7 +633,7 @@
       ok:'¡Recibimos tu contacto! Para agilizar, continúa por WhatsApp:', ok_btn:'Continuar en WhatsApp', err:'No pudimos enviarlo ahora. Inténtalo de nuevo o habla por WhatsApp.', err_req:'Completa tu nombre y un correo válido.',
       final_title:'Tu próxima historia empieza aquí.', final_sub:'Descubre experiencias increíbles y convierte tu viaje en un recuerdo inolvidable.',
       foot_blurb:'Paseos y experiencias en Río de Janeiro.', foot_menu:'Menú', fab_tip:'Habla con nosotros por WhatsApp', hello:'¡Hola! Vi el sitio de {s} y me gustaría saber más.' },
-    it: { skip:'Vai al contenuto', tours_other_eyebrow:'Organizziamo anche', tours_other_title:'Altri modi per scoprire Rio', photo:'Foto', nav_home:'Home', nav_tours:'Tour', nav_gallery:'Galleria', nav_about:'Chi siamo', nav_contact:'Contatti',
+    it: { skip:'Vai al contenuto', ask:'Ciao! Vorrei saperne di più su: {t}', tours_other_eyebrow:'Organizziamo anche', tours_other_title:'Altri modi per scoprire Rio', photo:'Foto', nav_home:'Home', nav_tours:'Tour', nav_gallery:'Galleria', nav_about:'Chi siamo', nav_contact:'Contatti',
       hero_title:'Vivi esperienze che non dimenticherai mai.', hero_sub:'Scopri tour, spiagge ed esperienze incredibili e trova l’avventura perfetta per il tuo viaggio.',
       btn_explore:'Esplora i tour', btn_whats:'Scrivici su WhatsApp', trust1:'Risposta rapida', trust2:'Prenotazione facile', trust3:'Assistenza durante la tua esperienza',
       tours_eyebrow:'Tour', tours_title:'Esperienze che amerai', duration:'Durata', from:'da', view_exp:'Vedi l’esperienza',
@@ -624,6 +673,7 @@
       var v = d[l] && d[l][el.dataset.f] ? d[l][el.dataset.f] : (d.pt ? d.pt[el.dataset.f] : null);
       if (v) el.textContent = v;
     });
+    if (typeof svFill === 'function') { svFill(); if (typeof svShow === 'function' && svOpen) svShow(svI); }
     var hello = T[l].hello.replace('{s}', siteName);
     $$('[data-wa="hello"]').forEach(function (a) { a.href = 'https://wa.me/' + zap + '?text=' + encodeURIComponent(hello); });
   }
@@ -651,8 +701,44 @@
     rev.forEach(function (el) { io.observe(el); });
   } else { rev.forEach(function (el) { el.classList.add('in'); }); }
 
-  // "Ver experiência" pré-seleciona o passeio no formulário
-  $$('[data-tour]').forEach(function (a) { a.addEventListener('click', function () { var s = $('#f-passeio'); if (s) s.value = a.dataset.tour; }); });
+  // Modal do passeio (fotos vêm do cadastro do serviço no sistema)
+  var svm = $('#svm'), svId = null, svI = 0, svLast = null, svOpen = false;
+  function svText(f) { var d = (window.SV || {})[svId] || {}; return (d[lang] && d[lang][f]) || (d.pt && d.pt[f]) || ''; }
+  function svFill() {
+    if (!svOpen) return;
+    var m = (window.SVM || {})[svId] || {}, t = T[lang], title = svText('t');
+    $('#svm-t').textContent = title; $('#svm-d').textContent = svText('d');
+    var chips = $('#svm-chips'); chips.innerHTML = '';
+    if (m.dur) { var a = document.createElement('span'); a.className = 'chip'; a.textContent = t.duration + ': ' + m.dur; chips.appendChild(a); }
+    if (m.p > 0) { var b = document.createElement('span'); b.className = 'chip'; b.textContent = t.from + ' R$ ' + m.p.toFixed(2).replace('.', ','); chips.appendChild(b); }
+    var wa = $('#svm-wa'); if (wa) wa.href = 'https://wa.me/' + zap + '?text=' + encodeURIComponent(t.ask.replace('{t}', title));
+    var fm = $('#svm-form'); fm.dataset.tour = ((window.SV || {})[svId] || {}).pt ? window.SV[svId].pt.t : title;
+  }
+  function svShow(i) {
+    var m = (window.SVM || {})[svId] || {}, fotos = m.f || []; if (!fotos.length) { $('#svm-main').style.display = 'none'; $('#svm-th').style.display = 'none'; return; }
+    $('#svm-main').style.display = ''; svI = (i + fotos.length) % fotos.length;
+    var f = fotos[svI], img = $('#svm-img'); img.src = f.s; img.alt = svText('t');
+    $('#svm-ct').textContent = fotos.length > 1 ? (svI + 1) + ' / ' + fotos.length : ''; $('#svm-ct').style.display = fotos.length > 1 ? '' : 'none';
+    $$('#svm .svm__nav').forEach(function (b) { b.style.display = fotos.length > 1 ? '' : 'none'; });
+    var cr = $('#svm-credit'); if (f.c) { cr.style.display = ''; cr.textContent = T[lang].photo + ': ' + f.c; cr.href = f.u || '#'; } else { cr.style.display = 'none'; }
+    $$('#svm-th button').forEach(function (b, k) { b.setAttribute('aria-current', k === svI ? 'true' : 'false'); });
+  }
+  function svOpenFn(id) {
+    svId = String(id); svOpen = true; svLast = document.activeElement;
+    var fotos = ((window.SVM || {})[svId] || {}).f || [], th = $('#svm-th'); th.innerHTML = ''; th.style.display = fotos.length > 1 ? '' : 'none';
+    fotos.forEach(function (f, k) { var b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-label', 'Foto ' + (k + 1)); var im = document.createElement('img'); im.src = f.s; im.alt = ''; b.appendChild(im); b.addEventListener('click', function () { svShow(k); }); th.appendChild(b); });
+    svm.classList.add('open'); document.body.style.overflow = 'hidden'; svFill(); svShow(0); $('.svm__x', svm).focus();
+  }
+  function svClose() { svOpen = false; svm.classList.remove('open'); document.body.style.overflow = ''; if (svLast && svLast.focus) svLast.focus(); }
+  $$('[data-open]').forEach(function (el) { el.addEventListener('click', function (e) { if (e.target.closest('a.credit')) return; svOpenFn(el.dataset.open); }); });
+  $('.svm__x', svm).addEventListener('click', svClose);
+  svm.addEventListener('click', function (e) { if (e.target === svm) svClose(); });
+  $('.pv', svm).addEventListener('click', function () { svShow(svI - 1); }); $('.nx', svm).addEventListener('click', function () { svShow(svI + 1); });
+  $('#svm-form').addEventListener('click', function () { var sel = $('#f-passeio'); if (sel && this.dataset.tour) sel.value = this.dataset.tour; svClose(); });
+  document.addEventListener('keydown', function (e) { if (!svOpen) return; if (e.key === 'Escape') svClose(); if (e.key === 'ArrowLeft') svShow(svI - 1); if (e.key === 'ArrowRight') svShow(svI + 1); });
+  var sx = null; var sm = $('#svm-main');
+  sm.addEventListener('touchstart', function (e) { sx = e.touches[0].clientX; }, { passive: true });
+  sm.addEventListener('touchend', function (e) { if (sx === null) return; var dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 45) svShow(svI + (dx < 0 ? 1 : -1)); sx = null; });
 
   // Lightbox
   var lb = $('#lb');

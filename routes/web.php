@@ -322,6 +322,8 @@ Route::prefix('admin/site/servicos')->middleware(['auth'])->name('admin.site.ser
     Route::get('{servico}/edit', [SiteServicoController::class, 'edit'])->name('edit');
     Route::put('{servico}/update', [SiteServicoController::class, 'update'])->name('update');
     Route::any('{servico}/destroy', [SiteServicoController::class, 'destroy'])->name('destroy');
+    Route::post('{servico}/fotos', [SiteServicoController::class, 'fotosStore'])->name('fotos.store');
+    Route::delete('fotos/{foto}', [SiteServicoController::class, 'fotosDestroy'])->name('fotos.destroy');
 });
 
 
