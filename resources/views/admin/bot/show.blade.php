@@ -56,15 +56,12 @@ form.addEventListener('submit', async (e) => {
     input.value = '';
 
     try {
-        const response = await fetch(`/api/bots/{{ $bot->id }}/chat`, {
+        const response = await fetch(`/admin/bot/{{ $bot->id }}/chat`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json", "Accept": "application/json", "X-CSRF-TOKEN": "{{ csrf_token() }}" },
             body: JSON.stringify({
                 message: message,
-                empresa_id: "{{ auth()->user()->empresa->id ?? '' }}",
-                user_id: "{{ auth()->user()->id ?? '' }}",
-                conversation_id: conversationId ,
-                bot_id: "{{ $bot->id }}"
+                conversation_id: conversationId
             })
         });
 

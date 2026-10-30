@@ -23,6 +23,11 @@ class BotService extends Model
         return $this->belongsTo(Bot::class);
     }
 
+    public function servico()
+    {
+        return $this->belongsTo(Servicos::class, 'servico_id');
+    }
+
     public function services()
     {
         return $this->belongsToMany(Servicos::class, 'bot_services', 'bot_id', 'servico_id');

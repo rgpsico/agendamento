@@ -36,7 +36,7 @@ class BotWidgetController extends Controller
 
         // Pega ou cria conversa
         $conversation = $conversationId
-            ? \App\Models\Conversation::find($conversationId)
+            ? \App\Models\Conversation::where('bot_id', $bot->id)->find($conversationId)
             : null;
 
         if (! $conversation) {

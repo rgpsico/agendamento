@@ -42,6 +42,12 @@ class Bot extends Model
         });
     }
 
+    /** Bots de uma empresa; usar sempre que a lista/busca vier do painel. */
+    public function scopeDaEmpresa($query, $empresaId)
+    {
+        return $query->where('empresa_id', $empresaId);
+    }
+
     public function widgetUrl(): string
     {
         // Gera e persiste o token se ainda não existir (bots criados antes da migration)

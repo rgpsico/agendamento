@@ -424,7 +424,7 @@ Route::prefix('admin/bot')->name('admin.bot.')->middleware('auth')->group(functi
     Route::get('/{bot}', [BotController::class, 'show'])->name('show');
 });
 
-Route::prefix('admin')->name('admin.')->group(function () {
+Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('conversas', [ConversationController::class, 'index'])->name('conversations.index');
     Route::get('conversas/{id}', [ConversationController::class, 'show'])->name('conversations.show');
 });
@@ -440,7 +440,7 @@ Route::prefix('admin/social')->name('admin.social.')->middleware(['auth'])->grou
     Route::post('/artigo/{artigo}', [SocialMetaController::class, 'postArtigo'])->name('post.artigo');
 });
 
-Route::post('/admin/bot/{bot}/chat', [BotController::class, 'chat'])->name('admin.bot.chat');
+Route::post('/admin/bot/{bot}/chat', [BotController::class, 'chat'])->middleware('auth')->name('admin.bot.chat');
 
 Route::post('/chat/store', [ChatController::class, 'store'])->name('chat.store');
 
@@ -626,7 +626,7 @@ Route::prefix('financeiro')->name('financeiro.')->group(function () {
 });
 
 
-Route::prefix('admin/botservice')->name('admin.botservice.')->group(function () {
+Route::prefix('admin/botservice')->name('admin.botservice.')->middleware('auth')->group(function () {
     Route::get('/', [BotServiceController::class, 'index'])->name('index');
     Route::get('/create', [BotServiceController::class, 'create'])->name('create');
     Route::post('/store', [BotServiceController::class, 'store'])->name('store');

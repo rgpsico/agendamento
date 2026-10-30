@@ -28,26 +28,50 @@ class BotController extends Controller
         $this->deepSeekService = $deepSeekService;
     }
 
+    /** Empresa do usuário logado; sem empresa não há bots para mostrar. */
+    private function empresaId(): int
+    {
+        $id = auth()->user()?->empresa?->id;
+        abort_unless($id, 403, 'Empresa não identificada.');
+
+        return (int) $id;
+    }
+
+    /** Bot que pertence à empresa logada; de outra empresa vira 404 (não revela que existe). */
+    private function meuBot($id): Bot
+    {
+        return Bot::daEmpresa($this->empresaId())->findOrFail($id);
+    }
+
+    /** Só IDs de serviços da própria empresa (impede ligar o bot a serviço de outra empresa). */
+    private function servicosDaEmpresa($ids): array
+    {
+        return Servicos::where('empresa_id', $this->empresaId())
+            ->whereIn('id', (array) $ids)
+            ->pluck('id')
+            ->all();
+    }
+
     public function dashboard()
     {
         // Bots ativos
 
-        $botsAtivos = Bot::where('status', true)->count();
+        $empresaId = $this->empresaId();
+        $botsAtivos = Bot::daEmpresa($empresaId)->where('status', true)->count();
 
         // Tokens consumidos
-        $totalTokens = TokenUsage::sum('tokens_usados');
+        $totalTokens = TokenUsage::where('empresa_id', $empresaId)->sum('tokens_usados');
 
         // Valor total cobrado
-        $totalCusto = TokenUsage::sum('valor_cobrado');
+        $totalCusto = TokenUsage::where('empresa_id', $empresaId)->sum('valor_cobrado');
 
         // Custo estimado por padrão (ex: R$ 0,002 por 1k tokens)
         $custoEstimado = ($totalTokens / 1000) * 0.002;
 
         // Conversas de hoje
-        $conversasHoje = Conversation::whereDate('created_at', today())->count();
+        $conversasHoje = Conversation::where('empresa_id', $empresaId)->whereDate('created_at', today())->count();
 
         // Serviços cadastrados
-        $empresaId = auth()->user()->empresa->id ?? null;
         $services = Servicos::where('empresa_id', $empresaId)->get();
 
         // Consumo de tokens nos últimos 7 dias
@@ -56,7 +80,7 @@ class BotController extends Controller
         for ($i = 6; $i >= 0; $i--) {
             $day = now()->subDays($i)->toDateString();
             $labels[] = now()->subDays($i)->format('d/m');
-            $dataTokens[] = TokenUsage::whereDate('created_at', $day)->sum('tokens_usados');
+            $dataTokens[] = TokenUsage::where('empresa_id', $empresaId)->whereDate('created_at', $day)->sum('tokens_usados');
         }
 
 
@@ -77,7 +101,7 @@ class BotController extends Controller
 
     public function index()
     {
-        $bots = Bot::all();
+        $bots = Bot::daEmpresa($this->empresaId())->get();
         return view('admin.bot.index', compact('bots'));
     }
 
@@ -90,8 +114,14 @@ class BotController extends Controller
 
     public function store(Request $request)
     {
-        // Cria o Bot
-        $bot = Bot::create($request->all());
+        // Cria o Bot na empresa logada (empresa_id nunca vem do formulário)
+        $bot = Bot::create($request->only([
+            'nome', 'segmento', 'tom', 'token_deepseek', 'status', 'prompt',
+            'widget_nome_bot', 'widget_saudacao', 'widget_cor', 'widget_posicao', 'widget_avatar_url',
+        ]) + [
+            'empresa_id' => $this->empresaId(),
+            'widget_ativo' => $request->boolean('widget_ativo'),
+        ]);
 
         // Registra o evento de criação
         EventLogger::log('bot_store', [
@@ -109,13 +139,21 @@ class BotController extends Controller
     {
         $query = TokenUsage::with(['bot', 'empresa']);
 
+        // Usuário master (plataforma) vê todas as empresas; os demais, só a própria.
+        $master = auth()->user()->isMasterUser();
+        $empresaId = $master ? null : $this->empresaId();
+
+        if ($empresaId) {
+            $query->where('empresa_id', $empresaId);
+        }
+
         // Filtro por Bot
         if ($request->filled('bot_id')) {
             $query->where('bot_id', $request->bot_id);
         }
 
-        // Filtro por Empresa
-        if ($request->filled('empresa_id')) {
+        // Filtro por Empresa (só faz sentido para o master)
+        if ($master && $request->filled('empresa_id')) {
             $query->where('empresa_id', $request->empresa_id);
         }
 
@@ -123,15 +161,18 @@ class BotController extends Controller
         $TokenUsage = $query->orderBy('created_at', 'desc')->paginate(20);
 
         // Para filtros, também precisamos enviar bots e empresas para o select
-        $bots = Bot::where('status', true)->get();
-        $empresas = Empresa::all();
+        $bots = Bot::when($empresaId, fn ($q) => $q->daEmpresa($empresaId))->where('status', true)->get();
+        $empresas = $master ? Empresa::all() : Empresa::where('id', $this->empresaId())->get();
 
         return view('admin.bot.tokens', compact('TokenUsage', 'bots', 'empresas'));
     }
 
     public function logs()
     {
-        $logs = BotLog::with('bot')->get();
+        $master = auth()->user()->isMasterUser();
+        $logs = BotLog::with('bot')
+            ->when(! $master, fn ($q) => $q->whereHas('bot', fn ($b) => $b->daEmpresa($this->empresaId())))
+            ->get();
 
 
         return view('admin.bot.log', compact('logs'));
@@ -141,15 +182,16 @@ class BotController extends Controller
     // Mostrar formulário de edição
     public function edit($id)
     {
-        $bot = Bot::with('services')->findOrFail($id);
-        $empresaId = auth()->user()->empresa->id ?? null;
-        $services = Servicos::where('empresa_id', $empresaId)->get();
+        $bot = $this->meuBot($id)->load('services');
+        $services = Servicos::where('empresa_id', $this->empresaId())->get();
         return view('admin.bot.edit', compact('bot', 'services'));
     }
 
     // Mostrar formulário de edição
-    public function show(Bot $bot)
+    public function show($bot)
     {
+        $bot = $this->meuBot($bot);
+
         return view('admin.bot.show', compact('bot'));
     }
 
@@ -157,8 +199,8 @@ class BotController extends Controller
     // Atualizar bot
     public function update(Request $request, $id)
     {
-        // Busca o bot
-        $bot = Bot::findOrFail($id);
+        // Busca o bot (só da empresa logada)
+        $bot = $this->meuBot($id);
 
         // Atualiza os dados do bot
         $bot->update($request->only([
@@ -188,7 +230,7 @@ class BotController extends Controller
         // Atualiza os serviços que o bot conhece (pivot)
         if ($request->has('services')) {
             // $request->services deve ser um array de IDs de serviços
-            $bot->services()->sync($request->services);
+            $bot->services()->sync($this->servicosDaEmpresa($request->services));
         } else {
             // Se nenhum serviço for enviado, remove todos os serviços atuais
             $bot->services()->sync([]);
@@ -202,7 +244,7 @@ class BotController extends Controller
     // Excluir bot
     public function destroy(Request $request)
     {
-        $bot = Bot::findOrFail($request->id);
+        $bot = $this->meuBot($request->id);
         $bot->delete();
 
         EventLogger::log('bot_delete', [
@@ -244,7 +286,8 @@ class BotController extends Controller
     {
         $bot = Bot::findOrFail($botId);
         $question = $request->input('question');
-        $empresa_id = $request->empresa_id;
+        // A empresa é sempre a dona do bot; o cliente não escolhe.
+        $empresa_id = $bot->empresa_id;
 
         if (!$bot->status) {
             return response()->json(['error' => 'Bot está inativo'], 403);
@@ -255,24 +298,26 @@ class BotController extends Controller
         return response()->json(['response' => $response]);
     }
 
+    /** Chat de teste do painel: só o dono do bot (usuário logado da empresa) conversa com ele. */
     public function chat(Request $request, Bot $bot)
     {
-
+        $bot = $this->meuBot($bot->id);
 
         $request->validate([
-            'message' => 'required|string',
-            'empresa_id' => 'required|integer',
-            'user_id' => 'nullable|integer',
+            'message' => 'required|string|max:2000',
             'conversation_id' => 'nullable|integer',
         ]);
 
-        $empresa_id = $request->input('empresa_id');
+        // Empresa e usuário vêm do login/bot, nunca do corpo da requisição.
+        $empresa_id = $bot->empresa_id;
         $userMessage = $request->input('message');
-        $userId = $request->input('user_id');
+        $userId = auth()->id();
 
-        // 1️⃣ Pega ou cria a conversa
+        // 1️⃣ Pega ou cria a conversa (só uma conversa deste bot e desta empresa)
         $conversation = $request->filled('conversation_id')
-            ? \App\Models\Conversation::find($request->input('conversation_id'))
+            ? \App\Models\Conversation::where('bot_id', $bot->id)
+                ->where('empresa_id', $empresa_id)
+                ->find($request->input('conversation_id'))
             : null;
 
         if (!$conversation) {

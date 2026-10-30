@@ -8,9 +8,18 @@ use App\Models\Message;
 
 class ConversationController extends Controller
 {
+    private function empresaId(): int
+    {
+        $id = auth()->user()?->empresa?->id;
+        abort_unless($id, 403, 'Empresa não identificada.');
+
+        return (int) $id;
+    }
+
     public function index()
     {
         $conversas = Conversation::with('bot', 'user')
+            ->where('empresa_id', $this->empresaId())
             ->orderBy('id', 'desc')
             ->paginate(15);
 
@@ -21,6 +30,7 @@ class ConversationController extends Controller
     {
         // Carrega a conversa com mensagens e usuário/bot relacionados
         $conversa = Conversation::with('messages', 'user', 'bot')
+            ->where('empresa_id', $this->empresaId())
             ->findOrFail($conversation_id);
 
         return view('admin.conversations.show', compact('conversa'));

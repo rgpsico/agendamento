@@ -354,7 +354,7 @@ Route::post('/webhook/deepseek', [TwilioWebhookController::class, 'askDeepSeek']
 
 
 Route::post('bot/{botId}/interact', [BotController::class, 'interact'])->name('bot.interact');
-Route::post('/bots/{bot}/chat', [BotController::class, 'chat']);
+// Chat de teste do bot agora é só do painel: POST /admin/bot/{bot}/chat (autenticado)
 
 
 Route::get('/conversations/aberta', [ChatProfessorController::class, 'verificarConversaAlunoEmpresa']);
