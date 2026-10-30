@@ -12,6 +12,7 @@ use App\Models\Servicos;
 use App\Models\TokenUsage;
 use App\Models\Usuario;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 
 class DeepSeekService
@@ -153,15 +154,20 @@ class DeepSeekService
         $systemPrompt .= "\n## Data e hora atual\n";
         $systemPrompt .= "Hoje é " . now()->locale('pt_BR')->isoFormat('dddd, D [de] MMMM [de] YYYY') . " (" . now()->format('Y-m-d') . ").\n";
         $systemPrompt .= "Use SEMPRE o ano correto (" . now()->year . ") ao passar datas para as ferramentas. NUNCA use um ano passado.\n";
+        $calendario = collect(range(0, 20))->map(fn ($i) => now()->addDays($i)->locale('pt_BR')->isoFormat('ddd DD/MM/YYYY'))->implode('; ');
+        $systemPrompt .= "Calendário dos próximos dias: {$calendario}.\n";
+        $systemPrompt .= "Se o cliente disser um dia da semana que não bate com a data (ex.: 'sábado 01/11' quando 01/11 é domingo), avise e peça para confirmar qual vale antes de agendar.\n";
         $systemPrompt .= "\n## Regras OBRIGATÓRIAS — leia com atenção\n";
         $systemPrompt .= "- As ferramentas (tools) são a ÚNICA fonte de verdade. NUNCA invente ou assuma dados.\n";
         $systemPrompt .= "- SEMPRE chame `listar_servicos` antes de falar sobre serviços.\n";
         $systemPrompt .= "- NÃO chame `verificar_disponibilidade`. O agendamento é livre — qualquer data e horário são válidos.\n";
         $systemPrompt .= "- Se o aluno não for encontrado por telefone, colete nome completo e e-mail e chame `cadastrar_aluno`.\n";
+        $systemPrompt .= "- Memória da conversa: quando `buscar_aluno_por_telefone` ou `cadastrar_aluno` devolver um `aluno_id`, GUARDE esse aluno_id. NÃO peça de novo nome, telefone, e-mail nem refaça o cadastro nesta conversa; siga para data, horário e `criar_agendamento`.\n";
+        $systemPrompt .= "- Se `buscar_aluno_por_telefone` devolver `multiplos: true`, pergunte qual dos nomes listados é o cliente (nunca escolha sozinho).\n";
         $systemPrompt .= "\n## Fluxo de agendamento — siga EXATAMENTE esta ordem\n";
         $systemPrompt .= "1. Chame `listar_servicos` para obter o servico_id correto.\n";
         $systemPrompt .= "2. Colete do usuário: nome/telefone do aluno, data desejada e horário.\n";
-        $systemPrompt .= "3. Se tiver telefone, chame `buscar_aluno_por_telefone`.\n";
+        $systemPrompt .= "3. Se tiver telefone, chame `buscar_aluno_por_telefone` (passe também `nome` e `email` quando o cliente já informou).\n";
         $systemPrompt .= "   - Se `encontrado: false`: peça nome completo e e-mail, depois chame `cadastrar_aluno`. Use o aluno_id retornado.\n";
         $systemPrompt .= "4. Chame `listar_professores` para obter o professor_id.\n";
         $systemPrompt .= "5. Mostre o resumo: aluno, serviço, data, horário, professor, valor. Pergunte: 'Confirma o agendamento?'\n";
@@ -173,22 +179,42 @@ class DeepSeekService
         $systemPrompt .= "- PROIBIDO inventar dados. Sempre use as tools.\n";
         $systemPrompt .= "- Sempre responda em português.";
 
-        // 2. Histórico da conversa
-        $history = $conversation->messages()
-            ->orderBy('created_at', 'asc')
-            ->take($contextMessages)
-            ->get();
+        // 2. Histórico da conversa.
+        // As chamadas de ferramenta e seus resultados (aluno_id, servico_id, professor_id...) não ficam na
+        // tabela de mensagens; guardamos os turnos completos em cache para o bot não "esquecer" o que já fez.
+        $cacheKey = 'botconv:' . $conversation->id;
+        $turns    = Cache::get($cacheKey, []);
 
         $messages = [['role' => 'system', 'content' => $systemPrompt]];
 
-        foreach ($history as $msg) {
-            $role = ($msg->role === 'assistant') ? 'assistant' : 'user';
-            if (!empty($msg->body)) {
-                $messages[] = ['role' => $role, 'content' => $msg->body];
+        if (!empty($turns)) {
+            foreach ($turns as $turn) {
+                foreach ($turn as $m) {
+                    $messages[] = $m;
+                }
+            }
+        } else {
+            // Conversas antigas (sem cache): usa o texto salvo, sem repetir a pergunta atual
+            $history = $conversation->messages()
+                ->orderBy('created_at', 'asc')
+                ->take($contextMessages)
+                ->get();
+
+            foreach ($history as $msg) {
+                $role = ($msg->role === 'assistant') ? 'assistant' : 'user';
+                if (!empty($msg->body)) {
+                    $messages[] = ['role' => $role, 'content' => $msg->body];
+                }
+            }
+
+            $ultima = end($messages);
+            if ($ultima && $ultima['role'] === 'user' && $ultima['content'] === $question) {
+                array_pop($messages);
             }
         }
 
         $messages[] = ['role' => 'user', 'content' => $question];
+        $turnoAtual = [['role' => 'user', 'content' => $question]];
 
         // 3. Loop de function calling
         $tools               = $this->definirTools();
@@ -211,6 +237,7 @@ class DeepSeekService
             if (($choice['finish_reason'] ?? '') === 'tool_calls') {
                 $assistantMsg = $choice['message'];
                 $messages[]   = $assistantMsg;
+                $turnoAtual[] = $assistantMsg;
 
                 foreach ($assistantMsg['tool_calls'] as $toolCall) {
                     $nome      = $toolCall['function']['name'];
@@ -227,11 +254,13 @@ class DeepSeekService
                         'result'    => $resultado,
                     ];
 
-                    $messages[] = [
+                    $msgTool = [
                         'role'         => 'tool',
                         'tool_call_id' => $toolCall['id'],
                         'content'      => json_encode($resultado, JSON_UNESCAPED_UNICODE),
                     ];
+                    $messages[]   = $msgTool;
+                    $turnoAtual[] = $msgTool;
                 }
 
                 continue;
@@ -252,6 +281,11 @@ class DeepSeekService
                 ];
                 continue;
             }
+
+            // Guarda o turno completo (últimos 8) para a próxima mensagem desta conversa
+            $turnoAtual[] = ['role' => 'assistant', 'content' => $cleanResponse];
+            $turns[]      = $turnoAtual;
+            Cache::put($cacheKey, array_slice($turns, -8), now()->addHours(12));
 
             $bot->logs()->create([
                 'bot_id'            => $bot->id,
@@ -323,6 +357,14 @@ class DeepSeekService
                             'telefone' => [
                                 'type'        => 'string',
                                 'description' => 'Telefone do aluno. Pode conter espaços, traços ou parênteses — serão normalizados.',
+                            ],
+                            'nome' => [
+                                'type'        => 'string',
+                                'description' => 'Nome que o cliente informou (opcional). Ajuda a escolher o cadastro certo quando o telefone é compartilhado.',
+                            ],
+                            'email' => [
+                                'type'        => 'string',
+                                'description' => 'E-mail que o cliente informou (opcional). Se bater com um cadastro, ele é escolhido.',
                             ],
                         ],
                         'required' => ['telefone'],
@@ -412,7 +454,7 @@ class DeepSeekService
                 $args['data'],
                 $bot
             ),
-            'buscar_aluno_por_telefone' => $this->toolBuscarAlunoPorTelefone($args['telefone']),
+            'buscar_aluno_por_telefone' => $this->toolBuscarAlunoPorTelefone($args['telefone'] ?? '', $args['nome'] ?? null, $args['email'] ?? null),
             'cadastrar_aluno'           => $this->toolCadastrarAluno(
                 $args['nome'] ?? '',
                 $args['telefone'] ?? '',
@@ -460,39 +502,90 @@ class DeepSeekService
         ];
     }
 
-    private function toolBuscarAlunoPorTelefone(string $telefone): array
+    private function toolBuscarAlunoPorTelefone(string $telefone, ?string $nome = null, ?string $email = null): array
     {
         // Normaliza: remove tudo que não é dígito
         $telefoneNormalizado = preg_replace('/\D/', '', $telefone);
 
-        // Busca pelo número completo ou pelos últimos 9 dígitos (sem DDD)
-        $usuario = Usuario::where(function ($q) use ($telefoneNormalizado) {
-            $q->whereRaw("REGEXP_REPLACE(telefone, '[^0-9]', '') = ?", [$telefoneNormalizado])
-              ->orWhereRaw("RIGHT(REGEXP_REPLACE(telefone, '[^0-9]', ''), 9) = ?", [substr($telefoneNormalizado, -9)]);
-        })->first();
+        if ($telefoneNormalizado === '') {
+            return ['encontrado' => false, 'mensagem' => 'Telefone inválido.'];
+        }
 
-        if (!$usuario) {
+        // Só contam usuários que têm perfil de aluno (um professor com o mesmo número não pode "esconder" o aluno).
+        // Busca pelo número completo ou pelos últimos 9 dígitos (sem DDD).
+        $alunos = Alunos::query()
+            ->join('usuarios', 'usuarios.id', '=', 'alunos.usuario_id')
+            ->where(function ($q) use ($telefoneNormalizado) {
+                $q->whereRaw("REGEXP_REPLACE(usuarios.telefone, '[^0-9]', '') = ?", [$telefoneNormalizado])
+                  ->orWhereRaw("RIGHT(REGEXP_REPLACE(usuarios.telefone, '[^0-9]', ''), 9) = ?", [substr($telefoneNormalizado, -9)]);
+            })
+            ->orderBy('alunos.id')
+            ->get(['alunos.id as aluno_id', 'usuarios.nome', 'usuarios.telefone', 'usuarios.email']);
+
+        if ($alunos->isEmpty()) {
             return [
-                'encontrado'       => false,
+                'encontrado'        => false,
                 'precisa_cadastrar' => true,
-                'mensagem'         => 'Nenhum aluno encontrado com esse telefone. Peça o nome completo e o e-mail do cliente e chame `cadastrar_aluno` para criar o cadastro.',
+                'mensagem'          => 'Nenhum aluno encontrado com esse telefone. Peça o nome completo e o e-mail do cliente e chame `cadastrar_aluno` para criar o cadastro.',
             ];
         }
 
-        $aluno = Alunos::where('usuario_id', $usuario->id)->first();
+        // Telefone compartilhado: usa e-mail ou nome já informados para escolher o cadastro.
+        if ($alunos->count() > 1) {
+            if ($email) {
+                $porEmail = $alunos->first(fn ($a) => mb_strtolower(trim($a->email)) === mb_strtolower(trim($email)));
+                if ($porEmail) {
+                    $alunos = collect([$porEmail]);
+                }
+            }
+        }
 
-        if (!$aluno) {
+        if ($alunos->count() > 1 && $nome) {
+            $norm = fn (string $t) => preg_replace('/[^a-z0-9 ]/', '', strtolower(\Illuminate\Support\Str::ascii($t)));
+            $palavras = array_filter(explode(' ', $norm($nome)));
+            $porNome = $alunos->filter(function ($a) use ($norm, $palavras) {
+                $n = ' ' . $norm($a->nome) . ' ';
+                foreach ($palavras as $w) {
+                    if (!str_contains($n, ' ' . $w . ' ')) {
+                        return false;
+                    }
+                }
+                return $palavras !== [];
+            });
+            if ($porNome->isNotEmpty()) {
+                $alunos = $porNome;
+                // Nome completo idêntico ao informado vence nomes que apenas o contêm
+                $exato = $alunos->filter(fn ($a) => $norm($a->nome) === $norm($nome));
+                if ($exato->isNotEmpty()) {
+                    $alunos = $exato;
+                }
+            }
+        }
+
+        // Cadastros com o mesmo nome (duplicados) contam como uma pessoa só: fica o mais recente.
+        if ($alunos->count() > 1) {
+            $alunos = $alunos->sortByDesc('aluno_id')
+                ->unique(fn ($a) => \Illuminate\Support\Str::lower(\Illuminate\Support\Str::ascii(trim($a->nome))))
+                ->sortBy('aluno_id')
+                ->values();
+        }
+
+        if ($alunos->count() > 1) {
             return [
-                'encontrado' => false,
-                'mensagem'   => 'Usuário encontrado mas não possui perfil de aluno.',
+                'encontrado' => true,
+                'multiplos'  => true,
+                'mensagem'   => 'Há mais de um aluno com esse telefone. Pergunte ao cliente qual destes nomes é o dele e use o aluno_id correspondente.',
+                'alunos'     => $alunos->map(fn ($a) => ['aluno_id' => $a->aluno_id, 'nome' => $a->nome])->values()->toArray(),
             ];
         }
+
+        $a = $alunos->first();
 
         return [
             'encontrado' => true,
-            'aluno_id'   => $aluno->id,
-            'nome'       => $usuario->nome,
-            'telefone'   => $usuario->telefone,
+            'aluno_id'   => $a->aluno_id,
+            'nome'       => $a->nome,
+            'telefone'   => $a->telefone,
         ];
     }
 
@@ -504,10 +597,24 @@ class DeepSeekService
 
         $telefoneNormalizado = preg_replace('/\D/', '', $telefone);
 
-        if (Usuario::where('email', $email)->exists()) {
+        $existente = Usuario::where('email', $email)->first();
+
+        if ($existente) {
+            $mesmoTelefone = preg_replace('/\D/', '', (string) $existente->telefone) === $telefoneNormalizado;
+            $perfil = $mesmoTelefone ? Alunos::where('usuario_id', $existente->id)->first() : null;
+
+            // Mesmo e-mail e mesmo telefone = é a mesma pessoa: reaproveita o cadastro em vez de falhar.
+            if ($perfil) {
+                return [
+                    'cadastrado' => true,
+                    'aluno_id'   => $perfil->id,
+                    'mensagem'   => 'Cadastro já existia com esses dados. Prossiga com o agendamento usando este aluno_id.',
+                ];
+            }
+
             return [
                 'cadastrado' => false,
-                'erro'       => 'Já existe um cadastro com esse e-mail. Verifique ou tente outro e-mail.',
+                'erro'       => 'Esse e-mail já está em uso por outro cadastro. Peça outro e-mail ao cliente.',
             ];
         }
 
