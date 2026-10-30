@@ -573,6 +573,7 @@ class SiteController extends Controller
             'sobre_itens.*.titulo' => 'nullable|string|max:255',
             'sobre_itens.*.descricao' => 'nullable|string',
             'whatsapp' => 'nullable|string|max:20',
+            'galeria_url' => 'nullable|url:http,https|max:500',
             'template_id' => 'required|exists:site_templates,id',
 
 
@@ -622,6 +623,7 @@ class SiteController extends Controller
             'sobre_descricao' => $request->sobre_descricao,
             'sobre_itens' => $request->input('sobre_itens', []),
             'whatsapp' => $request->whatsapp,
+            'galeria_url' => $request->input('galeria_url') ?: null,
             'bot_id' => $request->input('atendimento_com_ia') == 'on'
                 ? $request->input('bot_id')
                 : null,

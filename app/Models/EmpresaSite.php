@@ -27,6 +27,7 @@ class EmpresaSite extends Model
         'sobre_imagem',
         'sobre_itens',
         'whatsapp',
+        'galeria_url',
         'vhost_criado',
         'atendimento_com_ia',
         'atendimento_com_whatsapp',

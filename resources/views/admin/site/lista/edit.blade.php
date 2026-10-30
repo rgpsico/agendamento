@@ -99,6 +99,17 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="form-group">
+                                                <label for="galeria_url" class="form-label">
+                                                    <i class="fas fa-images me-1"></i>Link da galeria completa (opcional)
+                                                </label>
+                                                <input type="url" name="galeria_url" id="galeria_url" value="{{ old('galeria_url', $site->galeria_url ?? '') }}" class="form-control modern-input" placeholder="https://mediahub.comunidadeppg.com.br/g/...">
+                                                <small class="text-muted">Mostra o botão "Ver galeria completa" no site de passeios (menu, seção Galeria e rodapé).</small>
+                                            </div>
+                                        </div>
+                                    </div>
 
                                     <div class="form-group">
                                         <label for="descricao" class="form-label">

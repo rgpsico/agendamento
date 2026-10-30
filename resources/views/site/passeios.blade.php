@@ -6,6 +6,8 @@
     $sobreUrl = $site->sobre_imagem ? asset('storage/' . $site->sobre_imagem) : null;
     $galeria = collect(\Illuminate\Support\Facades\Storage::disk('public')->files('sites/galeria/' . $site->id))->sort()->values()
         ->map(fn ($f) => asset('storage/' . $f));
+    $galeriaUrl = filled($site->galeria_url) ? $site->galeria_url : null;
+    $temGaleria = $galeria->count() > 0 || $galeriaUrl;
     $duracao = function ($min) {
         if (!$min) return null;
         $h = intdiv((int) $min, 60); $m = (int) $min % 60;
@@ -194,6 +196,7 @@
         .masonry button { flex:0 0 calc((100% - 12px)/2); padding:0; border:0; background:none; cursor:zoom-in; border-radius:14px; overflow:hidden; position:relative; aspect-ratio:4/5; }
         .masonry button:nth-child(3n+1) { aspect-ratio:1/1; }
         .masonry img { width:100%; height:100%; object-fit:cover; object-position:center 30%; transition:transform .5s; }
+        .gal-more { text-align:center; margin:28px 0 0; }
         .masonry button:hover img { transform:scale(1.05); }
         @media (min-width:820px) { .masonry { gap:16px; } .masonry button { flex-basis:calc((100% - 32px)/3); aspect-ratio:4/5; } .masonry button:nth-child(3n+1) { aspect-ratio:4/5; } }
         .lb { position:fixed; inset:0; background:rgba(5,15,30,.94); z-index:200; display:none; align-items:center; justify-content:center; padding:20px; }
@@ -308,7 +311,7 @@
         <nav class="menu" id="menu" aria-label="Menu">
             <a href="#inicio" data-i18n="nav_home">Início</a>
             @if($passeios->count())<a href="#passeios" data-i18n="nav_tours">Passeios</a>@endif
-            @if($galeria->count())<a href="#galeria" data-i18n="nav_gallery">Galeria</a>@endif
+            @if($temGaleria)<a href="#galeria" data-i18n="nav_gallery">Galeria</a>@endif
             @if($temSobre)<a href="#sobre" data-i18n="nav_about">Sobre nós</a>@endif
             <a href="#contato" data-i18n="nav_contact">Contato</a>
         </nav>
@@ -369,20 +372,26 @@
 </section>
 @endif
 
-@if($galeria->count())
+@if($temGaleria)
 <section id="galeria" style="padding-top:0">
     <div class="wrap">
         <div class="reveal">
             <div class="eyebrow" data-i18n="gal_eyebrow">Galeria</div>
             <h2 class="title" data-i18n="gal_title">Momentos inesquecíveis</h2>
         </div>
+        @if($galeria->count())
         <div class="masonry reveal" id="masonry">
             @foreach($galeria as $i => $foto)
                 <button type="button" data-i="{{ $i }}" aria-label="Foto {{ $i + 1 }}"><img src="{{ $foto }}" alt="Foto de um passeio da {{ $site->titulo }}" loading="lazy"></button>
             @endforeach
         </div>
+        @endif
+        @if($galeriaUrl)
+        <p class="gal-more reveal"><a class="btn btn--ocean" href="{{ $galeriaUrl }}" target="_blank" rel="noopener"><span data-i18n="gal_cta">Ver galeria completa</span> <span aria-hidden="true">→</span></a></p>
+        @endif
     </div>
 </section>
+@if($galeria->count())
 <div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Galeria">
     <button class="x" type="button" aria-label="Fechar">×</button>
     <button class="pv" type="button" aria-label="Anterior">‹</button>
@@ -390,6 +399,7 @@
     <button class="nx" type="button" aria-label="Próxima">›</button>
     <div class="ct" id="lbct"></div>
 </div>
+@endif
 @endif
 
 <section class="why">
@@ -532,7 +542,8 @@
                 <h4 data-i18n="foot_menu">Menu</h4>
                 <ul>
                     @if($passeios->count())<li><a href="#passeios" data-i18n="nav_tours">Passeios</a></li>@endif
-                    @if($galeria->count())<li><a href="#galeria" data-i18n="nav_gallery">Galeria</a></li>@endif
+                    @if($temGaleria)<li><a href="#galeria" data-i18n="nav_gallery">Galeria</a></li>@endif
+                    @if($galeriaUrl)<li><a href="{{ $galeriaUrl }}" target="_blank" rel="noopener" data-i18n="gal_cta">Ver galeria completa</a></li>@endif
                     @if($temSobre)<li><a href="#sobre" data-i18n="nav_about">Sobre nós</a></li>@endif
                     <li><a href="#contato" data-i18n="nav_contact">Contato</a></li>
                 </ul>
@@ -577,7 +588,7 @@
       hero_title:'Viva experiências que você nunca vai esquecer.', hero_sub:'Descubra passeios, praias e experiências incríveis e encontre a aventura perfeita para sua viagem.',
       btn_explore:'Explorar passeios', btn_whats:'Falar pelo WhatsApp', trust1:'Atendimento rápido', trust2:'Reserva fácil', trust3:'Suporte durante sua experiência',
       tours_eyebrow:'Passeios', tours_title:'Experiências que você vai amar', duration:'Duração', from:'a partir de', view_exp:'Ver experiência',
-      gal_eyebrow:'Galeria', gal_title:'Momentos inesquecíveis', why_eyebrow:'Por que escolher a gente', why_title:'Viaje com tranquilidade',
+      gal_eyebrow:'Galeria', gal_title:'Momentos inesquecíveis', gal_cta:'Ver galeria completa',  why_eyebrow:'Por que escolher a gente', why_title:'Viaje com tranquilidade',
       why1_t:'Experiências selecionadas', why1_d:'Passeios escolhidos com cuidado para você aproveitar o melhor do Rio.',
       why2_t:'Reserva segura', why2_d:'Você combina tudo direto com a gente, com clareza sobre data e valor.',
       why3_t:'Atendimento rápido', why3_d:'Tire suas dúvidas pelo WhatsApp, sem complicação.',
@@ -597,7 +608,7 @@
       hero_title:'Live experiences you will never forget.', hero_sub:'Discover tours, beaches and amazing experiences and find the perfect adventure for your trip.',
       btn_explore:'Explore tours', btn_whats:'Chat on WhatsApp', trust1:'Fast response', trust2:'Easy booking', trust3:'Support during your experience',
       tours_eyebrow:'Tours', tours_title:'Experiences you will love', duration:'Duration', from:'from', view_exp:'View experience',
-      gal_eyebrow:'Gallery', gal_title:'Unforgettable moments', why_eyebrow:'Why choose us', why_title:'Travel with peace of mind',
+      gal_eyebrow:'Gallery', gal_title:'Unforgettable moments', gal_cta:'See the full gallery',  why_eyebrow:'Why choose us', why_title:'Travel with peace of mind',
       why1_t:'Selected experiences', why1_d:'Tours chosen with care so you can enjoy the best of Rio.',
       why2_t:'Safe booking', why2_d:'You arrange everything directly with us, with clear date and price.',
       why3_t:'Fast response', why3_d:'Ask your questions on WhatsApp, no hassle.',
@@ -617,7 +628,7 @@
       hero_title:'Vive experiencias que nunca vas a olvidar.', hero_sub:'Descubre paseos, playas y experiencias increíbles y encuentra la aventura perfecta para tu viaje.',
       btn_explore:'Explorar paseos', btn_whats:'Hablar por WhatsApp', trust1:'Atención rápida', trust2:'Reserva fácil', trust3:'Soporte durante tu experiencia',
       tours_eyebrow:'Paseos', tours_title:'Experiencias que vas a amar', duration:'Duración', from:'desde', view_exp:'Ver experiencia',
-      gal_eyebrow:'Galería', gal_title:'Momentos inolvidables', why_eyebrow:'Por qué elegirnos', why_title:'Viaja con tranquilidad',
+      gal_eyebrow:'Galería', gal_title:'Momentos inolvidables', gal_cta:'Ver la galería completa',  why_eyebrow:'Por qué elegirnos', why_title:'Viaja con tranquilidad',
       why1_t:'Experiencias seleccionadas', why1_d:'Paseos elegidos con cuidado para que disfrutes lo mejor de Río.',
       why2_t:'Reserva segura', why2_d:'Acuerdas todo directamente con nosotros, con claridad en fecha y precio.',
       why3_t:'Atención rápida', why3_d:'Resuelve tus dudas por WhatsApp, sin complicaciones.',
@@ -637,7 +648,7 @@
       hero_title:'Vivi esperienze che non dimenticherai mai.', hero_sub:'Scopri tour, spiagge ed esperienze incredibili e trova l’avventura perfetta per il tuo viaggio.',
       btn_explore:'Esplora i tour', btn_whats:'Scrivici su WhatsApp', trust1:'Risposta rapida', trust2:'Prenotazione facile', trust3:'Assistenza durante la tua esperienza',
       tours_eyebrow:'Tour', tours_title:'Esperienze che amerai', duration:'Durata', from:'da', view_exp:'Vedi l’esperienza',
-      gal_eyebrow:'Galleria', gal_title:'Momenti indimenticabili', why_eyebrow:'Perché sceglierci', why_title:'Viaggia con serenità',
+      gal_eyebrow:'Galleria', gal_title:'Momenti indimenticabili', gal_cta:'Vedi la galleria completa',  why_eyebrow:'Perché sceglierci', why_title:'Viaggia con serenità',
       why1_t:'Esperienze selezionate', why1_d:'Tour scelti con cura per vivere il meglio di Rio.',
       why2_t:'Prenotazione sicura', why2_d:'Organizzi tutto direttamente con noi, con date e prezzi chiari.',
       why3_t:'Risposta rapida', why3_d:'Chiedi quello che vuoi su WhatsApp, senza complicazioni.',
