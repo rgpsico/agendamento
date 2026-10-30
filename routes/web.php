@@ -276,6 +276,9 @@ Route::prefix('admin')->group(function () {
 
 Route::get('/site/{slug}', [SiteController::class, 'mostrar'])->name('site.publico');
 Route::post('/site/{slug}/contato', [SiteController::class, 'contato'])->middleware('throttle:8,1')->name('site.contato');
+// Página pública e compartilhável com as datas e horários livres da escola
+Route::get('/site/{slug}/horarios', [\App\Http\Controllers\SiteHorariosController::class, 'mostrar'])->name('site.horarios');
+Route::get('/horarios', [\App\Http\Controllers\SiteHorariosController::class, 'dominio'])->name('site.horarios.dominio');
 
 Route::get('/landing', [SiteController::class, 'landing'])->name('site.landing');
 Route::post('/landing/lead', [SiteController::class, 'lead'])->name('site.landing.lead');

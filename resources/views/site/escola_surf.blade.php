@@ -537,6 +537,7 @@ footer{background:var(--bg)}
       <nav class="nav-links">
         @if($sobreItens->isNotEmpty() || $sobreDesc)<a href="#sobre">Sobre</a>@endif
         @if($servicos->isNotEmpty())<a href="#aulas">Aulas</a>@endif
+        @if($servicos->isNotEmpty())<a href="{{ route('site.horarios', $site->slug) }}">Horários</a>@endif
         @if($galeria->isNotEmpty())<a href="#galeria">Galeria</a>@endif
         @if($depoimentos->isNotEmpty())<a href="#depoimentos">Depoimentos</a>@endif
         @if($artigos->isNotEmpty())<a href="#blog">Blog</a>@endif
@@ -643,7 +644,10 @@ footer{background:var(--bg)}
         <span class="kicker">Nossas aulas</span>
         <h2 class="title">Para cada pé <em>na areia.</em></h2>
       </div>
-      <p class="section-lead">Escolha o formato que combina com você e chame a gente no WhatsApp para combinar dia, horário e valores.</p>
+      <div>
+        <p class="section-lead">Escolha o formato que combina com você e chame a gente no WhatsApp para combinar dia, horário e valores.</p>
+        <a href="{{ route('site.horarios', $site->slug) }}" class="btn btn-primary" style="margin-top:18px;display:inline-flex">Ver datas e horários disponíveis →</a>
+      </div>
     </div>
     <div class="classes">
       @foreach($servicos as $srv)
