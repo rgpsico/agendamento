@@ -41,6 +41,7 @@ class ConversationController extends Controller
 {
     // Carrega a conversa com mensagens, usuário e bot relacionados
     $conversa = Conversation::with('messages', 'user', 'bot')
+        ->where('empresa_id', $this->empresaId())
         ->findOrFail($conversation_id);
 
     // Retorna em JSON

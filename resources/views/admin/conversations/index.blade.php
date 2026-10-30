@@ -787,7 +787,8 @@
             </div>`;
             modal.show();
 
-            fetch(`/api/conversations/${conversationId}`, {
+            const esc = (t) => String(t ?? '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+            fetch(`/admin/conversas/${conversationId}/json`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -802,8 +803,8 @@
                     const isUser = msg.role === 'user';
                     messagesHtml += `
                         <div class="mb-2 p-2 rounded ${isUser ? 'bg-light text-dark text-end' : 'bg-primary text-white text-start'}">
-                            <strong>${isUser ? data.user?.name ?? data.user?.email ?? 'Cliente' : data.bot?.nome ?? 'Bot'}</strong>
-                            <div>${msg.body}</div>
+                            <strong>${esc(isUser ? data.user?.name ?? data.user?.email ?? 'Cliente' : data.bot?.nome ?? 'Bot')}</strong>
+                            <div>${esc(msg.body)}</div>
                             <small class="text-muted">${new Date(msg.created_at).toLocaleString('pt-BR')}</small>
                         </div>
                     `;

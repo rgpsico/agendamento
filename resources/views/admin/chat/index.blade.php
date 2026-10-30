@@ -787,7 +787,7 @@ $(document).ready(function() {
     function updateHumanControl(isHuman, feedbackMsg = null) {
         humanToggle.prop('checked', isHuman);
 
-        fetch(`/api/conversations/${conversation_id}/human-control`, {
+        fetch(`/admin/conversas/${conversation_id}/human-control`, {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json",

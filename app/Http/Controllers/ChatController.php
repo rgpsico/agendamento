@@ -1094,9 +1094,10 @@ class ChatController extends Controller
             'human_controlled' => 'boolean',
         ]);
 
-        $conversation = Conversation::findOrFail($id);
-
-
+        // Só conversas da empresa do usuário logado
+        $empresaId = auth()->user()?->empresa?->id;
+        abort_unless($empresaId, 403, 'Empresa não identificada.');
+        $conversation = Conversation::where('empresa_id', $empresaId)->findOrFail($id);
 
         $conversation->update([
             'human_controlled' => $request->human_controlled,

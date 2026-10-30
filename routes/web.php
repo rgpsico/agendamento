@@ -408,7 +408,8 @@ Route::get('/debug-host', function (\Illuminate\Http\Request $request) {
 });
 
 Route::get('/treino', [AgendaController::class, 'treino'])->name('treino');
-Route::get('/logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
+// Logs da aplicação: só usuário master logado (antes estava aberto na internet)
+Route::get('/logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index')->middleware(['auth', 'master']);
 
 Route::get('/viacep/{cep}', [ViaCepController::class, 'getCep']);
 
@@ -429,6 +430,9 @@ Route::prefix('admin/bot')->name('admin.bot.')->middleware('auth')->group(functi
 
 Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('conversas', [ConversationController::class, 'index'])->name('conversations.index');
+    Route::get('conversas/{id}/json', [ConversationController::class, 'showapi'])->whereNumber('id')->name('conversations.json');
+    Route::patch('conversas/{id}/human-control', [\App\Http\Controllers\ChatController::class, 'toggleHumanControl'])->whereNumber('id')->name('conversations.human-control');
+    Route::post('site/fill-fields', [BotController::class, 'fillSiteFields'])->name('site.fill-fields');
     Route::get('conversas/{id}', [ConversationController::class, 'show'])->name('conversations.show');
 });
 

@@ -860,7 +860,7 @@
             $('#loading-spinner').show();
 
             $.ajax({
-                url: '/api/fill-site-fields', // Ajuste para a rota correta
+                url: '/admin/site/fill-fields',
                 type: 'POST',
                 data: {
                     _token: $('meta[name="csrf-token"]').attr('content'),

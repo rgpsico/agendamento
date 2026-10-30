@@ -353,7 +353,7 @@ Route::post('/webhook/openai', [TwilioWebhookController::class, 'testOpenAI']);
 Route::post('/webhook/deepseek', [TwilioWebhookController::class, 'askDeepSeek']);
 
 
-Route::post('bot/{botId}/interact', [BotController::class, 'interact'])->name('bot.interact');
+Route::post('bot/{botId}/interact', [BotController::class, 'interact'])->middleware('auth:sanctum')->name('bot.interact');
 // Chat de teste do bot agora é só do painel: POST /admin/bot/{bot}/chat (autenticado)
 
 
@@ -364,14 +364,13 @@ Route::get('/conversations/lista', [ChatController::class, 'listByEmpresaOrProfe
 Route::post('/conversations/last/opened', [ChatController::class, 'markLastConversationOpened']);
 
 
-Route::get('/conversations/{id}', [ConversationController::class, 'showapi'])->whereNumber('id');
+// /conversations/{id} (leitura) e /conversations/{id}/human-control agora são do painel: /admin/conversas/{id}/json e /human-control (com login)
 
 
-Route::post('/fill-site-fields', [BotController::class, 'fillSiteFields'])->name('fill.site.fields');
+// /fill-site-fields foi para o painel: POST /admin/site/fill-fields (com login)
 
 
-Route::get('/professoresteste', [ChatController::class, 'listarProfessores']);
-Route::get('/alunosteste', [ChatController::class, 'listarAlunos']);
+// removidas: /professoresteste e /alunosteste listavam nome e e-mail de todos, sem login
 
 Route::get('/listarconversasaluno', [ChatController::class, 'listarConversasAluno']);
 Route::get('/aluno/conversas', [ChatAlunoController::class, 'listarConversasDoAluno']);
@@ -406,15 +405,15 @@ Route::middleware('auth:sanctum')->group(function () {
 
 use App\Http\Controllers\DeepSeekController;
 
-Route::post('/bots/{bot_id}/message', [DeepSeekController::class, 'sendMessage']);
+Route::post('/bots/{bot_id}/message', [DeepSeekController::class, 'sendMessage'])->middleware('auth:sanctum');
 
 
 
 use App\Http\Controllers\EventController;
 
-Route::patch('/conversations/{id}/human-control', [ChatController::class, 'toggleHumanControl']);
 
-Route::post('/generate-image', [ChatController::class, 'generateImage']);
+
+Route::post('/generate-image', [ChatController::class, 'generateImage'])->middleware('auth:sanctum');
 
 
 
