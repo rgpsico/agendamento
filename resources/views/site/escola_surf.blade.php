@@ -22,6 +22,12 @@
   $endRel     = $site->endereco ?? null;
   $telefone   = $empresa->telefone ?? null;
   $emailSite  = $empresa->email    ?? null;
+  // Local da escola vindo do endereco cadastrado ("Praia do Arpoador" -> "no Arpoador"); nada fixo de uma escola especifica
+  $enderecoLocal = trim((string) ($endRel->endereco ?? ''));
+  $localNome  = trim(preg_replace('/^(praia|bairro)\s+(?:(?:de|do|da)\s+)?/iu', '', $enderecoLocal));
+  $localNome  = $localNome !== '' ? $localNome : trim((string) ($endRel->cidade ?? ''));
+  $localPrep  = preg_match('/^(?:praia|bairro)\s+do\s/iu', $enderecoLocal) ? 'no' : (preg_match('/^(?:praia|bairro)\s+da\s/iu', $enderecoLocal) ? 'na' : 'em');
+  $localCidade = trim(($endRel->cidade ?? '').(($endRel->uf ?? null) ? ' · '.$endRel->uf : ''));
   $endStr     = $endRel ? trim(($endRel->endereco ?? '').(($endRel->cidade ?? null) ? ' — '.$endRel->cidade : '')) : null;
   $instagram  = ltrim((string) ($site->instagram ?? ''), '@');
   $galeria    = $empresa ? $empresa->galeria : collect();
@@ -35,7 +41,7 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <meta name="csrf-token" content="{{ csrf_token() }}">
-<title>{{ $nomeEscola }} — Escola de Surf em Ipanema</title>
+<title>{{ $nomeEscola }} — Escola de Surf{{ $localNome ? ' '.$localPrep.' '.$localNome : '' }}</title>
 <meta name="description" content="{{ $descricao }}">
 <meta name="robots" content="index, follow">
 <meta name="google-site-verification" content="PENdq3tzLGfpwMXRvoiqISI5uM6cRsIe0Wvm77kL6K0">
@@ -559,10 +565,10 @@ footer{background:var(--bg)}
 <section class="hero">
   <div class="wrap hero-grid">
     <div>
-      <span class="eyebrow">Escola de Surf · Ipanema</span>
+      <span class="eyebrow">Escola de Surf{{ $localNome ? ' · '.$localNome : '' }}</span>
       <h1 class="headline">
         Aprenda a surfar<br/>
-        <em>em Ipanema</em><br/>
+        @if($localNome)<em>{{ $localPrep }} {{ $localNome }}</em><br/>@endif
         com a {{ $nomeEscola }}
       </h1>
       <p class="sub">{{ $descricao }}</p>
@@ -580,12 +586,12 @@ footer{background:var(--bg)}
       </div>
       <div class="hero-stats">
         <div class="s"><strong>Em grupo</strong><span>ou individual, você escolhe</span></div>
-        <div class="s"><strong>Ipanema</strong><span>Rio de Janeiro · RJ</span></div>
+        @if($localNome)<div class="s"><strong>{{ $localNome }}</strong><span>{{ $localCidade }}</span></div>@endif
       </div>
     </div>
     <div class="hero-art">
       @if($capaUrl)
-        <img src="{{ $capaUrl }}" alt="Aula de surf da {{ $nomeEscola }} em Ipanema">
+        <img src="{{ $capaUrl }}" alt="Aula de surf da {{ $nomeEscola }}{{ $localNome ? ' '.$localPrep.' '.$localNome : '' }}">
       @else
         <div class="ph-block"><span>Imagem principal</span></div>
       @endif
@@ -985,7 +991,7 @@ footer{background:var(--bg)}
           <span>{{ $nomeEscola }}<span style="color:var(--coral)">.</span></span>
           @endif
         </a>
-        <p>Escola de surf em Ipanema, Rio de Janeiro. Aulas em grupo e individuais.</p>
+        <p>Escola de surf{{ $localNome ? ' '.$localPrep.' '.$localNome : '' }}{{ ($endRel->cidade ?? null) ? ', '.$endRel->cidade : '' }}. Aulas em grupo e individuais.</p>
       </div>
       <div>
         <h5>Escola</h5>
