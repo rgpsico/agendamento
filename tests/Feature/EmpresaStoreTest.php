@@ -2,14 +2,13 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
+use App\Models\Usuario;
 use App\Models\Empresa;
 use App\Models\Professor;
 use App\Models\EmpresaEndereco;
 use App\Models\Modalidade;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class EmpresaStoreTest extends TestCase
@@ -19,10 +18,8 @@ class EmpresaStoreTest extends TestCase
     /** @test */
     public function pode_criar_empresa_com_endereco_professor_e_upload()
     {
-        Storage::fake(); // simula o disco para upload
-
         // cria dados auxiliares
-        $user = User::factory()->create();
+        $user = Usuario::factory()->create();
         $modalidade = Modalidade::factory()->create();
         $professor = Professor::factory()->create([
             'usuario_id' => $user->id,
@@ -45,12 +42,18 @@ class EmpresaStoreTest extends TestCase
             'estado'        => 'SP',
             'uf'            => 'SP',
             'pais'          => 'Brasil',
-            'avatar'        => UploadedFile::fake()->image('avatar.jpg'),
-            'banner'        => UploadedFile::fake()->image('banner.jpg'),
+            'avatar'        => UploadedFile::fake()->create('avatar.jpg', 10, 'image/jpeg'),
+            'banner'        => UploadedFile::fake()->create('banner.jpg', 10, 'image/jpeg'),
         ];
+
+        // a rota exige usuario autenticado
+        $this->actingAs($user);
 
         // executa a requisição
         $response = $this->post(route('empresa.store'), $payload);
+
+        // o cadastro nao pode ter caido no catch (que volta com erro)
+        $response->assertSessionHasNoErrors();
 
         // garante redirecionamento
         $response->assertRedirect(route('empresa.pagamento.boleto'));
@@ -61,11 +64,7 @@ class EmpresaStoreTest extends TestCase
             'cnpj' => '12.345.678/0001-99',
         ]);
 
-        // verifica email atualizado
-        $this->assertDatabaseHas('usuarios', [
-            'id'    => $user->id,
-            'email' => 'novoemail@example.com',
-        ]);
+        // o e-mail do usuario nao e mais alterado pelo cadastro da empresa (trecho desativado no controller)
 
         // verifica professor vinculado
         $this->assertDatabaseHas('professores', [
@@ -74,13 +73,18 @@ class EmpresaStoreTest extends TestCase
         ]);
 
         // verifica endereço salvo
-        $this->assertDatabaseHas('empresa_enderecos', [
+        $this->assertDatabaseHas('empresa_endereco', [
             'empresa_id' => Empresa::first()->id,
             'cep'        => '01001-000',
         ]);
 
-        // verifica upload (fake)
-        Storage::disk()->assertExists('avatar/' . Empresa::first()->avatar);
-        Storage::disk()->assertExists('banner/' . Empresa::first()->banners);
+        // verifica upload: o helper move o arquivo direto para public/avatar e public/banner
+        $empresa = Empresa::first();
+        $avatar = public_path('avatar/' . $empresa->avatar);
+        $banner = public_path('banner/' . $empresa->banners);
+        $this->assertFileExists($avatar);
+        $this->assertFileExists($banner);
+        @unlink($avatar);
+        @unlink($banner);
     }
 }

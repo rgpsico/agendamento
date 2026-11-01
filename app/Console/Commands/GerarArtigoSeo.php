@@ -437,10 +437,7 @@ Requisitos SEO obrigatórios:
 
         // Temas ainda não usados: prefere os que nenhum site do mesmo nicho usou (evita o mesmo artigo em vários sites)
         $usadosNoSite = $this->titulosDoSite([$site->id]);
-        $idsIrmaos = EmpresaSite::where('id', '!=', $site->id)
-            ->whereHas('empresa', fn($q) => $q->where('modalidade_id', $site->empresa->modalidade_id ?? 0))
-            ->pluck('id')->all();
-        $usadosNoNicho = array_merge($usadosNoSite, $this->titulosDoSite($idsIrmaos));
+        $usadosNoNicho = $this->titulosParaEvitar($site);
 
         // Tema novo proposto pela IA (nunca acaba); a lista fixa só entra se a IA falhar
         if (!$sortearIngles) {
@@ -549,8 +546,9 @@ Requisitos SEO obrigatórios:
     /** Títulos já publicados no site e nos outros sites do mesmo nicho. */
     private function titulosParaEvitar(EmpresaSite $site): array
     {
+        // Sites do mesmo nicho (surf e bodyboard sao modalidades diferentes do nicho "surf")
         $ids = EmpresaSite::where('id', '!=', $site->id)
-            ->whereHas('empresa', fn($q) => $q->where('modalidade_id', $site->empresa->modalidade_id ?? 0))
+            ->whereHas('empresa.modalidade', fn($q) => $q->where('nicho', $site->nicho))
             ->pluck('id')->push($site->id)->all();
 
         return $this->titulosDoSite($ids);
