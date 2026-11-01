@@ -122,7 +122,7 @@ Route::get('/create', [UserManagementController::class, 'create'])->name('regist
 
 Route::post('/pagamentos/presencial', [PagamentoController::class, 'criarPagamentoPresencial'])->name('empresa.pagamento.presencial');
 
-Route::prefix('admin/usuarios')->name('admin.usuarios.')->group(function () {
+Route::prefix('admin/usuarios')->name('admin.usuarios.')->middleware('auth')->group(function () {
     Route::get('/', [UserManagementController::class, 'index'])->name('index');
     Route::get('/create', [UserManagementController::class, 'create'])->name('create');
     Route::post('/', [UserManagementController::class, 'store'])->name('store');
@@ -132,10 +132,10 @@ Route::prefix('admin/usuarios')->name('admin.usuarios.')->group(function () {
 
     // Rotas para permissões
     Route::get('/{user}/permissions', [UserManagementController::class, 'getPermissions'])->name('permissions.get');
-    Route::post('/{user}/permissions', [UserManagementController::class, 'updatePermissions'])->name('permissions.update');
+    Route::post('/{user}/permissions', [UserManagementController::class, 'updatePermissions'])->middleware('master')->name('permissions.update');
 });
 
-Route::prefix('admin/perfis')->name('admin.perfis.')->group(function () {
+Route::prefix('admin/perfis')->name('admin.perfis.')->middleware(['auth', 'master'])->group(function () {
     Route::get('/', [PerfilController::class, 'index'])->name('index');
     Route::get('/create', [PerfilController::class, 'create'])->name('create');
     Route::post('/', [PerfilController::class, 'store'])->name('store');
@@ -144,7 +144,7 @@ Route::prefix('admin/perfis')->name('admin.perfis.')->group(function () {
     Route::delete('/{perfil}', [PerfilController::class, 'destroy'])->name('destroy');
 });
 
-Route::prefix('admin/roles')->name('admin.roles.')->group(function () {
+Route::prefix('admin/roles')->name('admin.roles.')->middleware(['auth', 'master'])->group(function () {
     Route::get('/', [RoleController::class, 'index'])->name('index');
     Route::get('/create', [RoleController::class, 'create'])->name('create');
     Route::post('/', [RoleController::class, 'store'])->name('store');
@@ -252,10 +252,10 @@ Route::get('/google/callback', [SocialLiteController::class, 'alunoGoogleCallbac
 Route::get('/auth/callback/google', [SocialLiteController::class, 'alunoGoogleCallback'])->name('aluno.googleAuth.handle');
 
 
-Route::get('/empresa/pagamento/boleto', [BoletoController::class, 'boleto'])->name('empresa.pagamento.boleto');
+Route::get('/empresa/pagamento/boleto', [BoletoController::class, 'boleto'])->middleware('auth')->name('empresa.pagamento.boleto');
 
-// Route::get('/google-calendar/auth', [GoogleCalendarController::class, 'authenticate'])->name('google.calendar.auth');
-// Route::get('/google-calendar/events', [GoogleCalendarController::class, 'listEvents'])->name('google.calendar.events');
+// Route::get('/google-calendar/auth', [GoogleCalendarController::class, 'authenticate'])->middleware('auth')->name('google.calendar.auth');
+// Route::get('/google-calendar/events', [GoogleCalendarController::class, 'listEvents'])->middleware('auth')->name('google.calendar.events');
 
 
 
@@ -265,7 +265,7 @@ Route::middleware('auth')->post('/subcontas', [ProfessoresAsaasController::class
 
 
 
-Route::prefix('admin')->group(function () {
+Route::prefix('admin')->middleware('auth')->group(function () {
     Route::get('/usuarios', [UserManagementController::class, 'index'])->name('admin.usuarios.index');
     Route::get('/usuarios/criar', [UserManagementController::class, 'create'])->name('admin.usuarios.create');
     Route::post('/usuarios', [UserManagementController::class, 'store'])->name('admin.usuarios.store');
@@ -295,9 +295,11 @@ Route::prefix('admin/site/ssl')->middleware(['auth'])->name('admin.site.dominios
 });
 // routes/web.php
 Route::post('/admin/site/{site}/dominio', [SiteController::class, 'atualizarDominio'])
+    ->middleware('auth')
     ->name('admin.site.dominios.update');
 
 Route::put('/admin/site/{site}/configuracoes', [SiteController::class, 'atualizarConfiguracoes'])
+    ->middleware('auth')
     ->name('admin.site.configuracoes.update');
 
 Route::prefix('admin/site')->middleware(['auth'])->group(function () {
@@ -370,13 +372,13 @@ Route::prefix('admin/site/artigos')->middleware('auth')->name('admin.site.artigo
 });
 
 
-Route::get('/google-calendar/auth', [GoogleCalendarController::class, 'authenticate'])->name('google.calendar.auth');
-Route::get('/google-calendar/callback', [GoogleCalendarController::class, 'authenticate']);
-Route::get('/google-calendar/events', [GoogleCalendarController::class, 'listEvents'])->name('google.calendar.events');
-Route::get('/google-calendar/create-event', [GoogleCalendarController::class, 'createEvent']);
+Route::get('/google-calendar/auth', [GoogleCalendarController::class, 'authenticate'])->middleware('auth')->name('google.calendar.auth');
+Route::get('/google-calendar/callback', [GoogleCalendarController::class, 'authenticate'])->middleware('auth');
+Route::get('/google-calendar/events', [GoogleCalendarController::class, 'listEvents'])->middleware('auth')->name('google.calendar.events');
+Route::get('/google-calendar/create-event', [GoogleCalendarController::class, 'createEvent'])->middleware('auth');
 
-Route::get('/events', [GoogleCalendarController::class, 'getAllEvents'])->name('google.calendar.events');
-Route::get('/google-calendar/create-event', [GoogleCalendarController::class, 'createEvent']);
+Route::get('/events', [GoogleCalendarController::class, 'getAllEvents'])->middleware('auth')->name('google.calendar.events');
+Route::get('/google-calendar/create-event', [GoogleCalendarController::class, 'createEvent'])->middleware('auth');
 
 
 
@@ -391,21 +393,6 @@ Route::get('/check-payment-status/{cobranca_id}', [PagamentoController::class, '
 Route::post('/asaas', [PixQrController::class, 'fazerAgendamentoPix'])->name('empresa.pagamento.asaas');
 Route::post('/contato/enviar/{site}', [EmailController::class, 'enviar'])->name('site.email.enviar');
 
-
-Route::get('/test', function () {
-    return Inertia::render('Test');
-});
-
-// Rota temporária de debug — remover após confirmar o domínio
-Route::get('/debug-host', function (\Illuminate\Http\Request $request) {
-    return response()->json([
-        'host'            => $request->getHost(),
-        'full_url'        => $request->fullUrl(),
-        'header_host'     => $request->header('Host'),
-        'header_x_forwarded_host' => $request->header('X-Forwarded-Host'),
-        'in_dominios_surf' => in_array($request->getHost(), DOMINIOS_SURF),
-    ]);
-});
 
 Route::get('/treino', [AgendaController::class, 'treino'])->name('treino');
 // Logs da aplicação: só usuário master logado (antes estava aberto na internet)
@@ -533,13 +520,15 @@ Route::prefix('super-admin')->name('super.admin.')->middleware(['auth', 'master'
     Route::post('/conteudos/{conteudo}/publicado',[SuperAdminController::class, 'conteudoMarcarPublicado'])->name('conteudos.publicado');
 });
 
-Route::resource('virtualhosts', VirtualHostController::class)->except(['show']);
-Route::get('/virtualhosts', [VirtualHostController::class, 'index'])->name('virtualhosts.index');
-Route::delete('/virtualhosts/{file}', [VirtualHostController::class, 'destroy'])->name('virtualhosts.destroy');
-Route::get('/virtualhosts', [VirtualHostController::class, 'index'])->name('virtualhosts.index');
-Route::get('/virtualhosts/{file}/json', [VirtualHostController::class, 'json'])->name('virtualhosts.json')->where('file', '.*');
-Route::put('/virtualhosts/{file}', [VirtualHostController::class, 'update'])->name('virtualhosts.update')->where('file', '.*');
-Route::delete('/virtualhosts/{file}', [VirtualHostController::class, 'destroy'])->name('virtualhosts.destroy');
+Route::middleware(['auth', 'master'])->group(function () {
+    Route::resource('virtualhosts', VirtualHostController::class)->except(['show']);
+    Route::get('/virtualhosts', [VirtualHostController::class, 'index'])->name('virtualhosts.index');
+    Route::delete('/virtualhosts/{file}', [VirtualHostController::class, 'destroy'])->name('virtualhosts.destroy');
+    Route::get('/virtualhosts', [VirtualHostController::class, 'index'])->name('virtualhosts.index');
+    Route::get('/virtualhosts/{file}/json', [VirtualHostController::class, 'json'])->name('virtualhosts.json')->where('file', '.*');
+});
+Route::put('/virtualhosts/{file}', [VirtualHostController::class, 'update'])->middleware(['auth', 'master'])->name('virtualhosts.update')->where('file', '.*');
+Route::delete('/virtualhosts/{file}', [VirtualHostController::class, 'destroy'])->middleware(['auth', 'master'])->name('virtualhosts.destroy');
 
 
 
@@ -588,42 +577,48 @@ Route::prefix('financeiro')->middleware(['auth'])->group(function () {
 
 
 
-Route::prefix('financeiro')->name('financeiro.')->group(function () {
+Route::prefix('financeiro')->name('financeiro.')->middleware('auth')->group(function () {
     Route::resource('categorias', FinanceiroCategoriaController::class);
 });
 
 
 
-Route::get('/financeiro/despesas_recorrentes/index', [DespesasRecorrenteController::class, 'index'])->name('financeiro.despesas_recorrentes.index');
+Route::get('/financeiro/despesas_recorrentes/index', [DespesasRecorrenteController::class, 'index'])->middleware('auth')->name('financeiro.despesas_recorrentes.index');
 
 
 
 // Listar todas as despesas recorrentes
 Route::get('financeiro/despesas_recorrentes', [DespesasRecorrenteController::class, 'index'])
+    ->middleware('auth')
     ->name('financeiro.despesas_recorrentes.index');
 
 // Mostrar formulário para criar nova despesa recorrente
 Route::get('financeiro/despesas_recorrentes/create', [DespesasRecorrenteController::class, 'create'])
+    ->middleware('auth')
     ->name('financeiro.despesas_recorrentes.create');
 
 // Salvar nova despesa recorrente
 Route::post('financeiro/despesas_recorrentes', [DespesasRecorrenteController::class, 'store'])
+    ->middleware('auth')
     ->name('financeiro.despesas_recorrentes.store');
 
 // Mostrar formulário para editar despesa recorrente existente
 Route::get('financeiro/despesas_recorrentes/{despesaRecorrente}/edit', [DespesasRecorrenteController::class, 'edit'])
+    ->middleware('auth')
     ->name('financeiro.despesas_recorrentes.edit');
 
 // Atualizar despesa recorrente existente
 Route::put('financeiro/despesas_recorrentes/{despesaRecorrente}', [DespesasRecorrenteController::class, 'update'])
+    ->middleware('auth')
     ->name('financeiro.despesas_recorrentes.update');
 
 // Deletar despesa recorrente
 Route::delete('financeiro/despesas_recorrentes/{despesaRecorrente}', [DespesasRecorrenteController::class, 'destroy'])
+    ->middleware('auth')
     ->name('financeiro.despesas_recorrentes.destroy');
 
 
-Route::prefix('financeiro')->name('financeiro.')->group(function () {
+Route::prefix('financeiro')->name('financeiro.')->middleware('auth')->group(function () {
     Route::get('receitas_recorrentes', [ReceitaRecorrenteController::class, 'index'])->name('receitas_recorrentes.index');
     Route::get('receitas_recorrentes/create', [ReceitaRecorrenteController::class, 'create'])->name('receitas_recorrentes.create');
     Route::post('receitas_recorrentes', [ReceitaRecorrenteController::class, 'store'])->name('receitas_recorrentes.store');
@@ -647,26 +642,26 @@ Route::prefix('admin/botservice')->name('admin.botservice.')->middleware('auth')
 use App\Http\Controllers\PlanoController;
 
 
-Route::get('planos', [PlanoController::class, 'index'])->name('admin.planos.index');
-Route::get('planos/create', [PlanoController::class, 'create'])->name('admin.planos.create');
-Route::post('planos', [PlanoController::class, 'store'])->name('admin.planos.store');
-Route::get('planos/{plano}', [PlanoController::class, 'show'])->name('admin.planos.show');
-Route::get('planos/{plano}/edit', [PlanoController::class, 'edit'])->name('admin.planos.edit');
-Route::put('planos/{plano}', [PlanoController::class, 'update'])->name('admin.planos.update');
-Route::delete('planos/{plano}', [PlanoController::class, 'destroy'])->name('admin.planos.destroy');
+Route::get('planos', [PlanoController::class, 'index'])->middleware('auth')->name('admin.planos.index');
+Route::get('planos/create', [PlanoController::class, 'create'])->middleware(['auth', 'master'])->name('admin.planos.create');
+Route::post('planos', [PlanoController::class, 'store'])->middleware(['auth', 'master'])->name('admin.planos.store');
+Route::get('planos/{plano}', [PlanoController::class, 'show'])->middleware('auth')->name('admin.planos.show');
+Route::get('planos/{plano}/edit', [PlanoController::class, 'edit'])->middleware(['auth', 'master'])->name('admin.planos.edit');
+Route::put('planos/{plano}', [PlanoController::class, 'update'])->middleware(['auth', 'master'])->name('admin.planos.update');
+Route::delete('planos/{plano}', [PlanoController::class, 'destroy'])->middleware(['auth', 'master'])->name('admin.planos.destroy');
 
 
 use App\Http\Controllers\EmpresaPlanoController;
 use App\Http\Controllers\FinanceiroDashboardController;
 
-Route::prefix('admin/empresas/{empresa}')->group(function () {
+Route::prefix('admin/empresas/{empresa}')->middleware('auth')->group(function () {
     Route::get('planos', [EmpresaPlanoController::class, 'index'])->name('admin.empresas.planos.index');
     Route::post('planos', [EmpresaPlanoController::class, 'store'])->name('admin.empresas.planos.store');
 });
 
 
 
-Route::get('/admin/financeiro/detalhes', [FinanceiroDashboardController::class, 'detalhes'])->name('financeiro.detalhes');
+Route::get('/admin/financeiro/detalhes', [FinanceiroDashboardController::class, 'detalhes'])->middleware('auth')->name('financeiro.detalhes');
 
 use Prometheus\CollectorRegistry;
 use Prometheus\RenderTextFormat;
@@ -753,7 +748,7 @@ Route::prefix('admin/agendamentos')->middleware(['auth'])->name('admin.agendamen
     Route::get('chat/debug',     [AgendamentoChatController::class, 'debug'])->name('chat.debug');
 });
 
-Route::prefix('admin')->group(function () {
+Route::prefix('admin')->middleware('auth')->group(function () {
     Route::get('planos', [PlanoAlunoController::class, 'indexView'])->name('alunos.planos.index');
     Route::get('planos/create', [PlanoAlunoController::class, 'create'])->name('alunos.planos.create');
     Route::post('planos', [PlanoAlunoController::class, 'store'])->name('alunos.planos.store');

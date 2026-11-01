@@ -87,7 +87,7 @@ Route::get('/checkout/sucesso/{id}', [HomeController::class, 'checkoutSucesso'])
 // Rota para página de erro no pagamento (já mencionada no seu controlador)
 Route::get('/erro/pagamento', [PagamentoController::class, 'erroPagamento'])->name('erroPagamento');
 
-Route::prefix('empresa/pagamento')->group(function () {
+Route::prefix('empresa/pagamento')->middleware(['auth'])->group(function () {
     Route::get('/', [PagamentoController::class, 'index'])->name('empresa.pagamento.index');
     Route::get('/create', [PagamentoController::class, 'create'])->name('empresa.pagamento.create');
     Route::post('/store', [PagamentoController::class, 'store'])->name('empresa.pagamento.store');
@@ -96,7 +96,7 @@ Route::prefix('empresa/pagamento')->group(function () {
 });
 
 
-Route::prefix('integracoes')->group(function () {
+Route::prefix('integracoes')->middleware('auth')->group(function () {
     Route::get('/asaas', [IntegrationsController::class, 'asaas'])->name('integracoes.asaas');
     Route::get('/stripe', [IntegrationsController::class, 'stripe'])->name('integracoes.stripe');
     Route::get('/mercadopago', [IntegrationsController::class, 'mercadopago'])->name('integracoes.mercadopago');
@@ -105,7 +105,7 @@ Route::prefix('integracoes')->group(function () {
     Route::post('/salvar', [IntegrationsController::class, 'salvar'])->name('integracoes.asaas.salvar');
 });
 
-Route::prefix('configuracoes')->group(function () {
+Route::prefix('configuracoes')->middleware('auth')->group(function () {
     Route::get('/admin', [ConfiguracoesController::class, 'indexAdmin'])->name('configuracoes.indexAdmin');
     Route::get('/configuracoes', [ConfiguracoesController::class, 'index'])->name('configuracoes.index');
     Route::post('/configuracoes/salvar', [ConfiguracoesController::class, 'salvar'])->name('configuracoes.salvar');
@@ -120,7 +120,7 @@ Route::prefix('configuracoes')->group(function () {
     Route::get('/sistema', [ConfiguracoesController::class, 'sistema'])->name('configuracoes.sistema');
     Route::get('/configuracoes', [ConfiguracoesController::class, 'index'])->name('configuracoes.index');
     Route::post('/configuracoes/salvar', [ConfiguracoesController::class, 'salvar'])->name('configuracoes.salvar');
-    Route::post('/seeds/run/{nicho}', [ConfiguracoesController::class, 'runSeed'])->name('configuracoes.runSeed');
+    Route::post('/seeds/run/{nicho}', [ConfiguracoesController::class, 'runSeed'])->middleware('master')->name('configuracoes.runSeed');
 });
 
 Route::prefix('cliente')->middleware('auth')->group(function () {
@@ -237,7 +237,7 @@ Route::prefix('pagamento')->middleware('auth')->group(function () {
     Route::post('/stripe', [PagamentoController::class, 'pagamentoStripe'])->name('pagamento.stripe');
 });
 
-Route::group(['prefix' => '/manager'], function () {
+Route::group(['prefix' => '/manager', 'middleware' => 'auth'], function () {
     Route::get('/', [EmpresaController::class, 'dashboard'])->name('admin.dashboard');
     // Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     // Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
@@ -246,7 +246,7 @@ Route::group(['prefix' => '/manager'], function () {
 
 Route::post('/analytics/event', [\App\Http\Controllers\AnalyticsController::class, 'recordEvent'])->name('analytics.event');
 
-Route::resource('site-templates', SiteTemplateController::class);
+Route::resource('site-templates', SiteTemplateController::class)->middleware(['auth', 'master']);
 
 
 
