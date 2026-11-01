@@ -338,8 +338,9 @@ Route::post('/visualizacao', [SiteVisualizacaoController::class, 'store']);
 
 
 Route::get('/site-artigos', [SiteArtigoPublicController::class, 'index']);
-Route::post('/site-artigos', [SiteArtigoPublicController::class, 'store']);
-Route::post('/teste/artigos', [TesteController::class, 'store']);
+// Criar artigo exige token (antes qualquer pessoa publicava HTML livre em qualquer site)
+Route::post('/site-artigos', [SiteArtigoPublicController::class, 'store'])->middleware('auth:sanctum');
+Route::post('/teste/artigos', [TesteController::class, 'store'])->middleware('auth:sanctum');
 Route::get('/teste/artigos/exemplo', [TesteController::class, 'exemplo']);
 
 

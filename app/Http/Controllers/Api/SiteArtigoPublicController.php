@@ -12,7 +12,9 @@ class SiteArtigoPublicController extends Controller
 
     public function index(Request $request)
     {
+        // so artigos publicados; rascunhos nao sao publicos
         $artigos = SiteArtigo::query()
+            ->where('status', SiteArtigo::STATUS_PUBLICADO)
             ->when(
                 $request->filled('site_id'),
                 fn ($query) => $query->where('site_id', $request->integer('site_id'))
