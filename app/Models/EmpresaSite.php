@@ -111,6 +111,22 @@ class EmpresaSite extends Model
         return $this->hasMany(SiteDepoimento::class, 'site_id');
     }
 
+    // Dados que o gerador de artigos SEO espera; vêm do cadastro real da empresa (o site não tem colunas próprias).
+    public function getNomeEmpresaAttribute(): string
+    {
+        return $this->empresa->nome ?? $this->titulo ?? '';
+    }
+
+    public function getNichoAttribute(): string
+    {
+        return strtolower((string) ($this->empresa->modalidade->nicho ?? ''));
+    }
+
+    public function getCidadeAttribute(): ?string
+    {
+        return $this->endereco->cidade ?? null;
+    }
+
     public function artigos()
     {
         return $this->hasMany(SiteArtigo::class, 'site_id');

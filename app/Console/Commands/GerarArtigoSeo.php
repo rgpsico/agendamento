@@ -210,6 +210,10 @@ class GerarArtigoSeo extends Command
 
         // Escolhe tema
         $tema = $this->option('tema') ?: $this->escolherTema($site);
+        if ($tema === '') {
+            $this->warn('  Sem temas para o nicho "' . ($site->nicho ?: 'não definido') . '" — pulando.');
+            return;
+        }
         $this->line("  Tema: {$tema}");
 
         // Monta prompt SEO
@@ -312,8 +316,8 @@ class GerarArtigoSeo extends Command
 
     private function systemPrompt(EmpresaSite $site, string $tema = ''): string
     {
-        $empresa = $site->nome_empresa ?? 'nossa escola';
-        $nicho   = $site->segmento ?? $site->nicho ?? 'esportes';
+        $empresa = $site->nome_empresa ?: 'nossa empresa';
+        $nicho   = $site->nicho ?: 'serviços';
 
         if ($this->isEnglish($tema)) {
             return "You are an SEO content writer specialized in surf, bodyboard and beach sports in Rio de Janeiro, Brazil.
@@ -338,8 +342,8 @@ CONTEUDO: [artigo completo em HTML semântico usando <h2>, <h3>, <p>, <ul>, <li>
 
     private function montarPrompt(string $tema, EmpresaSite $site): string
     {
-        $empresa = $site->nome_empresa ?? 'nossa escola';
-        $cidade  = $site->cidade ?? 'Rio de Janeiro';
+        $empresa = $site->nome_empresa ?: 'nossa empresa';
+        $cidade  = $site->cidade ?: 'Rio de Janeiro';
 
         if ($this->isEnglish($tema)) {
             return "Write a complete SEO article about: \"{$tema}\"
@@ -355,7 +359,7 @@ Mandatory SEO requirements:
 - Include <ul>/<li> lists where appropriate
 - Mention '{$empresa}' naturally 2-3 times throughout the text
 - Include practical info: lesson duration, what to bring, age range, location
-- When mentioning prices, use the range of R\$ 280 to R\$ 600 per lesson package
+- Do NOT mention prices, discounts or promotions
 - End with a call-to-action inviting the reader to book a lesson at '{$empresa}'
 - Do NOT use markdown, use HTML only
 - Write in English, friendly and informative tone";
@@ -374,7 +378,7 @@ Requisitos SEO obrigatórios:
 - Inclua listas <ul>/<li> onde fizer sentido
 - Mencione '{$empresa}' naturalmente 2-3 vezes ao longo do texto
 - Inclua dados práticos: duração das aulas, o que levar, faixa etária
-- Ao mencionar valores, use a faixa de R$ 280 a R$ 600 por pacote de aulas — NUNCA cite valores abaixo disso
+- NÃO cite preços, descontos nem promoções
 - Termine com um call-to-action convidando o leitor a agendar uma aula em '{$empresa}'
 - NÃO use markdown, use apenas HTML
 - Escreva em português do Brasil, tom informativo e acolhedor";
@@ -408,14 +412,15 @@ Requisitos SEO obrigatórios:
 
     private function escolherTema(EmpresaSite $site): string
     {
-        $nicho = strtolower($site->segmento ?? $site->nicho ?? '');
+        // Usa só os temas do nicho real da empresa (modalidade); sem tema do nicho, não gera artigo.
+        $nicho = $site->nicho;
 
         $temas = collect($this->temasPorNicho)
-            ->filter(fn($_, $key) => $key !== 'surf_en' && str_contains($nicho, $key))
+            ->filter(fn($_, $key) => $key !== 'geral' && $key !== 'surf_en' && $nicho !== '' && str_contains($nicho, $key))
             ->flatten();
 
         if ($temas->isEmpty()) {
-            $temas = collect($this->temasPorNicho['geral']);
+            return '';
         }
 
         // Sites de surf também recebem temas em inglês (50% de chance)
@@ -423,13 +428,38 @@ Requisitos SEO obrigatórios:
             $temas = $temas->merge($this->temasPorNicho['surf_en']);
         }
 
-        // Busca TODOS os títulos já gerados (sem limite de data)
-        $titulosExistentes = SiteArtigo::where('site_id', $site->id)
-            ->pluck('titulo')
-            ->map(fn($t) => strtolower($t))
-            ->toArray();
+        // Temas ainda não usados: prefere os que nenhum site do mesmo nicho usou (evita o mesmo artigo em vários sites)
+        $usadosNoSite = $this->titulosDoSite([$site->id]);
+        $idsIrmaos = EmpresaSite::where('id', '!=', $site->id)
+            ->whereHas('empresa', fn($q) => $q->where('modalidade_id', $site->empresa->modalidade_id ?? 0))
+            ->pluck('id')->all();
+        $usadosNoNicho = array_merge($usadosNoSite, $this->titulosDoSite($idsIrmaos));
 
-        $disponiveis = $temas->filter(function ($tema) use ($titulosExistentes) {
+        $disponiveis = $this->temasNaoUsados($temas, $usadosNoNicho);
+        if ($disponiveis->isEmpty()) {
+            $disponiveis = $this->temasNaoUsados($temas, $usadosNoSite);
+        }
+
+        // Se todos os temas já foram usados, reinicia o ciclo
+        if ($disponiveis->isEmpty()) {
+            $this->warn('  Todos os temas já foram usados — reiniciando ciclo.');
+            $disponiveis = $temas;
+        }
+
+        return $disponiveis->random();
+    }
+
+    private function titulosDoSite(array $siteIds): array
+    {
+        if (empty($siteIds)) {
+            return [];
+        }
+        return SiteArtigo::whereIn('site_id', $siteIds)->pluck('titulo')->map(fn($t) => strtolower($t))->all();
+    }
+
+    private function temasNaoUsados($temas, array $titulosExistentes)
+    {
+        return $temas->filter(function ($tema) use ($titulosExistentes) {
             $palavrasChave = $this->extrairPalavrasChave($tema);
 
             foreach ($titulosExistentes as $titulo) {
@@ -446,14 +476,6 @@ Requisitos SEO obrigatórios:
             }
             return true;
         });
-
-        // Se todos os temas já foram usados, reinicia o ciclo
-        if ($disponiveis->isEmpty()) {
-            $this->warn('  Todos os temas já foram usados — reiniciando ciclo.');
-            $disponiveis = $temas;
-        }
-
-        return $disponiveis->random();
     }
 
     private function buscarImagemUnsplash(string $titulo, string $tema): ?string
