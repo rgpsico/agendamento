@@ -42,6 +42,15 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\HandleInertiaRequests::class,
         ],
 
+        // Rotas da API de uso interno: login pela sessao do painel (ou token Sanctum) e escrita so via AJAX/JSON
+        'painel' => [
+            \App\Http\Middleware\EncryptCookies::class,
+            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+            \Illuminate\Session\Middleware\StartSession::class,
+            'auth:web,sanctum',
+            \App\Http\Middleware\PainelApiWrites::class,
+        ],
+
         'api' => [
             // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
             \Illuminate\Routing\Middleware\ThrottleRequests::class . ':api',
