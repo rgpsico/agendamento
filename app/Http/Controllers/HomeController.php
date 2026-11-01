@@ -123,7 +123,7 @@ class HomeController extends Controller
 
     public function show($id)
     {
-        $model = $this->model->where('user_id', $id)->first();
+        $model = $this->model->where('user_id', $id)->firstOrFail();
 
         // Obtendo a configuração de agendamento da empresa
         $tipoAgendamento = Configuracao::get($model->id, 'agendamento_tipo', 'horarios');

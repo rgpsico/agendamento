@@ -22,8 +22,9 @@ class DetectTenant
         $nichoConfig = NichoConfiguracao::resolveByHost($host);
         if ($nichoConfig) {
             app()->instance('currentNicho', $nichoConfig);
-            View::share('currentNicho', $nichoConfig);
         }
+        // Sempre compartilha (null quando o host nao tem nicho): as views usam $currentNicho?->...
+        View::share('currentNicho', $nichoConfig);
 
         // 2. Tenant (escola específica) pelo domínio personalizado
         $site = EmpresaSite::resolveByHost($host);
