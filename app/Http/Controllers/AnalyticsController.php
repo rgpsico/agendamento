@@ -13,8 +13,9 @@ class AnalyticsController extends Controller
     {
         $data = $request->validate([
             'empresa_id' => 'nullable|integer',
-            'event_type' => 'required|string',
-            'value' => 'nullable|numeric',
+            'event_type' => 'required|in:visit,whatsapp_click,page_load_time',
+            // tempo em ms; a coluna e double(8,2), entao valor fora dessa faixa derrubava o insert
+            'value' => 'nullable|numeric|between:0,600000',
         ]);
 
         AnalyticsEvent::create($data);
