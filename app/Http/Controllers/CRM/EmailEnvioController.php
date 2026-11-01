@@ -67,14 +67,15 @@ class EmailEnvioController extends Controller
         $enviados = 0;
         $falhas   = 0;
 
-        foreach ($leads as $lead) {
+        foreach ($leads->values() as $i => $lead) {
             try {
                 if (empty($lead->token)) {
                     $lead->update(['token' => Str::uuid()]);
                     $lead->refresh();
                 }
 
-                Mail::to($lead->email)->queue(new LeadTemplateMail($lead, $template));
+                // espalha o envio em ate 4 por segundo (limite do Resend: 5/s)
+                Mail::to($lead->email)->later(now()->addSeconds(intdiv($i, 4)), new LeadTemplateMail($lead, $template));
                 $lead->update(['email_enviado_em' => now()]);
                 $enviados++;
             } catch (\Exception $e) {

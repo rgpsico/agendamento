@@ -14,6 +14,10 @@ class LeadTemplateMail extends Mailable
 {
     use Queueable, SerializesModels;
 
+    // O Resend aceita 5 envios por segundo; se recusar (429) tenta de novo com espera crescente em vez de falhar o job
+    public int $tries = 6;
+    public array $backoff = [2, 5, 10, 30, 60];
+
     public string $assuntoRendered;
     public string $corpoRendered;
 
