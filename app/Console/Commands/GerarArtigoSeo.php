@@ -257,6 +257,12 @@ class GerarArtigoSeo extends Command
                 return;
             }
 
+            // Não publica artigo do mesmo assunto de outro já publicado (neste site ou em outro do mesmo nicho)
+            if ($this->tituloRepetido($artigo['titulo'], $this->titulosParaEvitar($site))) {
+                $this->warn("  Título parecido com um já publicado — pulando: {$artigo['titulo']}");
+                return;
+            }
+
             // Evita duplicata pelo título
             $jaExiste = SiteArtigo::where('site_id', $site->id)
                 ->where('titulo', $artigo['titulo'])
@@ -280,7 +286,7 @@ class GerarArtigoSeo extends Command
             ]);
 
             // Busca imagem no Unsplash e salva como capa
-            $imagemPath = $this->buscarImagemUnsplash($artigo['titulo'], $tema);
+            $imagemPath = $this->buscarImagemUnsplash($artigo['titulo'], $tema, $site->nicho);
             if ($imagemPath) {
                 $registro->update(['imagem_capa' => $imagemPath]);
                 $this->line("  Imagem: {$imagemPath}");
@@ -423,9 +429,10 @@ Requisitos SEO obrigatórios:
             return '';
         }
 
-        // Sites de surf também recebem temas em inglês (50% de chance)
-        if (str_contains($nicho, 'surf') && isset($this->temasPorNicho['surf_en'])) {
-            $temas = $temas->merge($this->temasPorNicho['surf_en']);
+        // Sites de surf também recebem temas em inglês (25% das vezes), vindos da lista fixa
+        $sortearIngles = str_contains($nicho, 'surf') && isset($this->temasPorNicho['surf_en']) && random_int(1, 100) <= 25;
+        if ($sortearIngles) {
+            $temas = collect($this->temasPorNicho['surf_en']);
         }
 
         // Temas ainda não usados: prefere os que nenhum site do mesmo nicho usou (evita o mesmo artigo em vários sites)
@@ -434,6 +441,15 @@ Requisitos SEO obrigatórios:
             ->whereHas('empresa', fn($q) => $q->where('modalidade_id', $site->empresa->modalidade_id ?? 0))
             ->pluck('id')->all();
         $usadosNoNicho = array_merge($usadosNoSite, $this->titulosDoSite($idsIrmaos));
+
+        // Tema novo proposto pela IA (nunca acaba); a lista fixa só entra se a IA falhar
+        if (!$sortearIngles) {
+            $proposto = $this->proporTemaComIA($site, $usadosNoNicho, $temas);
+            if ($proposto !== null) {
+                return $proposto;
+            }
+            $this->warn('  IA não propôs tema novo — usando a lista fixa.');
+        }
 
         $disponiveis = $this->temasNaoUsados($temas, $usadosNoNicho);
         if ($disponiveis->isEmpty()) {
@@ -447,6 +463,97 @@ Requisitos SEO obrigatórios:
         }
 
         return $disponiveis->random();
+    }
+
+    private function proporTemaComIA(EmpresaSite $site, array $jaPublicados, $exemplos): ?string
+    {
+        $apiKey = config('services.deepseek.key');
+        if (!$apiKey) {
+            return null;
+        }
+
+        $empresa = $site->nome_empresa ?: 'a empresa';
+        $cidade  = $site->cidade ?: 'Rio de Janeiro';
+        $recentes = array_slice(array_values(array_unique($jaPublicados)), -60);
+        $lista = $recentes ? '- ' . implode("\n- ", $recentes) : '(nenhum ainda)';
+        $modelos = '- ' . $exemplos->shuffle()->take(5)->implode("\n- ");
+
+        $prompt = "Você planeja a pauta do blog de SEO de '{$empresa}' (nicho: {$site->nicho}, cidade: {$cidade}).\n\n"
+            . "Temas já publicados (NÃO repita nem faça variação próxima de nenhum):\n{$lista}\n\n"
+            . "Exemplos do estilo de tema desejado:\n{$modelos}\n\n"
+            . "Proponha UM tema novo e específico, que uma pessoa realmente buscaria no Google, com um ângulo diferente dos já publicados. "
+            . "Responda só com o tema, em uma linha, até 110 caracteres, sem aspas e sem numeração.";
+
+        for ($tentativa = 1; $tentativa <= 3; $tentativa++) {
+            try {
+                $res = Http::withHeaders(['Authorization' => 'Bearer ' . $apiKey])->timeout(60)
+                    ->post('https://api.deepseek.com/v1/chat/completions', [
+                        'model'       => 'deepseek-chat',
+                        'temperature' => 1.0,
+                        'max_tokens'  => 80,
+                        'messages'    => [['role' => 'user', 'content' => $prompt]],
+                    ]);
+                if (!$res->successful()) {
+                    continue;
+                }
+                $tema = trim(strtok(trim((string) $res->json('choices.0.message.content')), "\n"), " \t\"'-•*0123456789.");
+            } catch (\Throwable $e) {
+                continue;
+            }
+
+            $tam = mb_strlen($tema);
+            if ($tam < 15 || $tam > 140 || $this->tituloRepetido($tema, $jaPublicados)) {
+                continue;
+            }
+            return $tema;
+        }
+
+        return null;
+    }
+
+    /** Palavras relevantes (sem acento, minúsculas, sem stopwords) de um título. */
+    private function palavrasDoTitulo(string $texto): array
+    {
+        $texto = strtolower(\Illuminate\Support\Str::ascii($texto));
+        $palavras = preg_split('/[^a-z0-9]+/', $texto, -1, PREG_SPLIT_NO_EMPTY);
+        $stop = ['como', 'para', 'que', 'uma', 'uns', 'dos', 'das', 'com', 'por', 'seu', 'sua', 'sao', 'nao', 'mais', 'mas', 'isso', 'este', 'esta', 'cada', 'todo', 'toda', 'versus', 'guia', 'completo', 'melhor', 'melhores'];
+
+        // Tira o plural simples ("dores" -> "dor", "ondas" -> "onda") para comparar singular com plural
+        $palavras = array_map(fn($p) => strlen($p) > 4 ? preg_replace('/(es|s)$/', '', $p) : $p, $palavras);
+
+        return array_values(array_unique(array_filter($palavras, fn($p) => strlen($p) > 3 && !in_array($p, $stop))));
+    }
+
+    /** Título é "o mesmo assunto" de algum já publicado: 3+ palavras em comum e 80%+ do menor título. */
+    private function tituloRepetido(string $titulo, array $existentes): bool
+    {
+        $a = $this->palavrasDoTitulo($titulo);
+        if (count($a) < 2) {
+            return false;
+        }
+
+        foreach ($existentes as $outro) {
+            $b = $this->palavrasDoTitulo($outro);
+            if (count($b) < 2) {
+                continue;
+            }
+            $comuns = count(array_intersect($a, $b));
+            if ($comuns >= 3 && $comuns / min(count($a), count($b)) >= 0.8) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /** Títulos já publicados no site e nos outros sites do mesmo nicho. */
+    private function titulosParaEvitar(EmpresaSite $site): array
+    {
+        $ids = EmpresaSite::where('id', '!=', $site->id)
+            ->whereHas('empresa', fn($q) => $q->where('modalidade_id', $site->empresa->modalidade_id ?? 0))
+            ->pluck('id')->push($site->id)->all();
+
+        return $this->titulosDoSite($ids);
     }
 
     private function titulosDoSite(array $siteIds): array
@@ -478,7 +585,7 @@ Requisitos SEO obrigatórios:
         });
     }
 
-    private function buscarImagemUnsplash(string $titulo, string $tema): ?string
+    private function buscarImagemUnsplash(string $titulo, string $tema, string $nichoBase = ''): ?string
     {
         $accessKey = config('services.unsplash.access_key');
         if (!$accessKey) {
@@ -486,8 +593,10 @@ Requisitos SEO obrigatórios:
             return null;
         }
 
-        // Usa palavras-chave do tema para busca mais precisa
+        // Usa palavras-chave do tema para busca mais precisa; sem resultado, tenta um termo amplo do nicho
         $query = implode(' ', array_slice($this->extrairPalavrasChave($tema), 0, 3));
+        $amplos = ['surf' => 'surfing beach', 'pilates' => 'pilates studio', 'natacao' => 'swimming pool', 'esportes' => 'beach sports'];
+        $amplo = $amplos[$nichoBase] ?? null;
 
         try {
             $res = Http::withHeaders(['Accept-Version' => 'v1'])
@@ -504,6 +613,12 @@ Requisitos SEO obrigatórios:
             }
 
             $fotos = $res->json('results', []);
+            if (empty($fotos) && $amplo && $amplo !== $query) {
+                $res2 = Http::withHeaders(['Accept-Version' => 'v1'])->get('https://api.unsplash.com/search/photos', [
+                    'client_id' => $accessKey, 'query' => $amplo, 'per_page' => 10, 'orientation' => 'landscape',
+                ]);
+                $fotos = $res2->successful() ? $res2->json('results', []) : [];
+            }
             if (empty($fotos)) {
                 $this->warn("  Unsplash: nenhuma foto para '{$query}'.");
                 return null;
