@@ -477,7 +477,7 @@ Route::middleware('auth:sanctum')->group(function () {});
 use App\Http\Controllers\PlanoAlunoController;
 
 Route::apiResource('planos-alunos', PlanoAlunoController::class)->only(['index', 'show']);
-Route::apiResource('planos-alunos', PlanoAlunoController::class)->only(['store', 'update', 'destroy'])->middleware(['painel', 'dono:master']);
+Route::apiResource('planos-alunos', PlanoAlunoController::class)->only(['store', 'update', 'destroy'])->middleware(['painel', 'dono:planos']);
 
 
 

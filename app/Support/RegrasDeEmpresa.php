@@ -30,6 +30,9 @@ class RegrasDeEmpresa
         '#^cliente/empresa/alunos/\{id\}/#' => 'aluno',
         '#^cliente/empresa/modalidade/\{id\}/#' => 'master', // modalidade e global (compartilhada entre empresas)
         '#^admin/empresas/\{empresa\}/planos$#' => 'empresas',
+        '#^admin/planos$#' => 'corpo', // criar plano: o empresa_id do corpo precisa ser da minha empresa
+        '#^admin/planos/\{plano\}(/edit)?$#' => 'planos',
+        '#^admin/planos/vincular$#' => 'corpo', // plano_id e aluno_id do corpo sao conferidos
 
         // financeiro
         '#^financeiro/despesas/\{id\}#' => 'direto,despesas',

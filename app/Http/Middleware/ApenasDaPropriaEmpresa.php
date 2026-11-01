@@ -57,13 +57,7 @@ class ApenasDaPropriaEmpresa
     /** Empresas que o usuario possui + a empresa em que ele e professor. */
     private function empresasDoUsuario(Usuario $usuario): array
     {
-        $ids = Empresa::where('user_id', $usuario->id)->pluck('id')->all();
-
-        if ($empresaDoProfessor = Professor::where('usuario_id', $usuario->id)->value('empresa_id')) {
-            $ids[] = (int) $empresaDoProfessor;
-        }
-
-        return array_values(array_unique(array_map('intval', $ids)));
+        return \App\Support\EmpresasDoUsuario::ids($usuario);
     }
 
     private function minha(?int $empresaId): bool
@@ -130,6 +124,7 @@ class ApenasDaPropriaEmpresa
             'disponibilidade' => $id === null || $this->dono($this->empresaDoProfessor(Disponibilidade::where('id', $id)->value('id_professor'))),
             'agendamento' => $id === null || $this->dono($this->empresaDoProfessor(Agendamento::where('id', $id)->value('professor_id'))),
             'gallery' => $id === null || $this->dono(EmpresaGaleria::where('id', $id)->value('empresa_id')),
+            'planos' => $id === null || $this->dono(\App\Models\PlanoAluno::where('id', $id)->value('empresa_id')),
             'pagamento' => $id === null || $this->dono(PagamentoGateway::where('id', $id)->value('empresa_id')),
             'users' => $id !== null && $this->usuarioEhDaMinhaEmpresa($id), // listar todos os usuarios (sem id) e so do master
             'usuarios' => $id === null || $this->usuarioEhDaMinhaEmpresa($id), // telas web: lista/criacao (sem id) liberadas
@@ -191,6 +186,11 @@ class ApenasDaPropriaEmpresa
         }
 
         if ($request->filled('servico_id') && ! $this->minha(Servicos::where('id', $this->id($request->input('servico_id')))->value('empresa_id') ?: null)) {
+            return false;
+        }
+
+        // plano de alunos: so planos da minha empresa (vincular aluno a plano)
+        if ($request->filled('plano_id') && ! $this->minha(\App\Models\PlanoAluno::where('id', $this->id($request->input('plano_id')))->value('empresa_id') ?: null)) {
             return false;
         }
 

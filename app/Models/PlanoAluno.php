@@ -12,6 +12,7 @@ class PlanoAluno extends Model
     protected $table = 'planos_alunos';
 
     protected $fillable = [
+        'empresa_id',
         'nome',
         'descricao',
         'valor',
@@ -42,6 +43,17 @@ class PlanoAluno extends Model
     }
 
     /* ── Relacionamentos ── */
+    public function empresa()
+    {
+        return $this->belongsTo(Empresa::class, 'empresa_id');
+    }
+
+    /** Planos das empresas informadas (o master enxerga todos: passe null). */
+    public function scopeDasEmpresas($query, ?array $empresaIds)
+    {
+        return $empresaIds === null ? $query : $query->whereIn('empresa_id', $empresaIds ?: [0]);
+    }
+
     public function alunos()
     {
         return $this->belongsToMany(Alunos::class, 'aluno_planos', 'plano_id', 'aluno_id')

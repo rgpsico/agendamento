@@ -54,7 +54,7 @@ class RelatorioController extends Controller
             ->count();
         $churnMensal = $aulasMes > 0 ? round(($aulasCanceladasMes / $aulasMes) * 100, 1) : 0;
 
-        $ltvMedio = class_exists(PlanoAluno::class) ? (float) PlanoAluno::avg('valor') : 0;
+        $ltvMedio = class_exists(PlanoAluno::class) ? (float) PlanoAluno::dasEmpresas(auth()->user()->isMasterUser() ? null : \App\Support\EmpresasDoUsuario::ids(auth()->user()))->avg('valor') : 0;
 
         return view('crm.relatorios.index', compact('conversaoPorOrigem', 'evolucaoMatriculas', 'churnMensal', 'ltvMedio'));
     }

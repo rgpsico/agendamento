@@ -142,7 +142,6 @@ class IsolamentoEmpresaTest extends TestCase
             ['POST', '/api/google-ads/create-campaign'], ['POST', '/api/admin/asaas/limpar-sandbox'], ['POST', '/api/pix-simulate'],
             ['POST', '/api/pix/key/delete'], ['DELETE', '/api/pix/keys/1'], ['POST', '/api/send-whatsapp'], ['POST', '/api/whatsapp/send'],
             ['POST', '/api/email/teste'], ['POST', '/api/push/test'], ['POST', '/api/openai/test'], ['POST', '/api/events'],
-            ['POST', '/api/planos-alunos'], ['PUT', '/api/planos-alunos/1'], ['DELETE', '/api/planos-alunos/1'],
         ];
 
         return array_combine(array_map(fn ($x) => "$x[0] $x[1]", $l), $l);

@@ -2,16 +2,52 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AlunoProfessor;
 use App\Models\Alunos;
 use App\Models\Pagamento;
 use App\Models\PlanoAluno;
+use App\Models\Professor;
+use App\Support\EmpresasDoUsuario;
 use Illuminate\Http\Request;
 
 class PlanoAlunoController extends Controller
 {
+    /** Empresas que o usuario logado pode ver; null = master (todas). */
+    private function empresas(): ?array
+    {
+        $usuario = auth()->user();
+
+        return $usuario->isMasterUser() ? null : EmpresasDoUsuario::ids($usuario);
+    }
+
+    /** Empresa dona do plano novo: a informada (ja conferida pelo middleware) ou a primeira do usuario. */
+    private function empresaDoNovoPlano(Request $request): int
+    {
+        $ids = EmpresasDoUsuario::ids(auth()->user());
+        $empresaId = $request->filled('empresa_id') ? (int) $request->input('empresa_id') : ($ids[0] ?? null);
+
+        abort_unless($empresaId, 422, 'Cadastre a sua empresa antes de criar planos.');
+
+        return $empresaId;
+    }
+
+    /** Alunos que o usuario pode ver: os ligados a professores das suas empresas (master: todos). */
+    private function alunosVisiveis()
+    {
+        $query = Alunos::with('usuario')
+            ->whereHas('usuario', fn($q) => $q->whereRaw('LOWER(tipo_usuario) = ?', ['aluno']));
+
+        if (($ids = $this->empresas()) !== null) {
+            $professores = Professor::whereIn('empresa_id', $ids ?: [0])->select('id');
+            $query->whereIn('alunos.id', AlunoProfessor::whereIn('professor_id', $professores)->select('aluno_id'));
+        }
+
+        return $query;
+    }
+
     public function indexView()
     {
-        $planos = PlanoAluno::orderBy('nome')->get();
+        $planos = PlanoAluno::dasEmpresas($this->empresas())->orderBy('nome')->get();
         return view('admin.aluno.planos.index', compact('planos'));
     }
 
@@ -42,6 +78,7 @@ class PlanoAlunoController extends Controller
             ]);
 
             PlanoAluno::create([
+                'empresa_id'    => $this->empresaDoNovoPlano($request),
                 'nome'          => $validated['nome'],
                 'valor'         => $validated['valor'],
                 'dias_semana'   => json_encode($validated['dias_semana']),
@@ -63,6 +100,7 @@ class PlanoAlunoController extends Controller
             ]);
 
             PlanoAluno::create([
+                'empresa_id'    => $this->empresaDoNovoPlano($request),
                 'nome'          => $validated['nome'],
                 'valor'         => $validated['valor'],
                 'descricao'     => $validated['descricao'] ?? null,
@@ -78,7 +116,7 @@ class PlanoAlunoController extends Controller
 
     public function update(Request $request, $id)
     {
-        $plano = PlanoAluno::findOrFail($id);
+        $plano = PlanoAluno::dasEmpresas($this->empresas())->findOrFail($id);
         $tipo  = $request->input('tipo', $plano->tipo ?? 'livre');
 
         if ($tipo === 'semanal') {
@@ -131,16 +169,21 @@ class PlanoAlunoController extends Controller
 
     public function destroy($id)
     {
-        PlanoAluno::findOrFail($id)->delete();
+        PlanoAluno::dasEmpresas($this->empresas())->findOrFail($id)->delete();
         return redirect()->route('alunos.planos.index')
             ->with('success', 'Plano removido com sucesso!');
     }
 
     /* ── API endpoints (mantidos para compatibilidade) ─── */
 
-    public function index()
+    /** Publico: lista os planos de UMA empresa (?empresa_id=); sem o filtro nao lista nada. */
+    public function index(Request $request)
     {
-        return response()->json(PlanoAluno::orderBy('nome')->get());
+        if (! $request->filled('empresa_id')) {
+            return response()->json([]);
+        }
+
+        return response()->json(PlanoAluno::where('empresa_id', $request->integer('empresa_id'))->orderBy('nome')->get());
     }
 
     public function show($id)
@@ -154,8 +197,7 @@ class PlanoAlunoController extends Controller
     {
         $busca = $request->query('busca');
 
-        $alunosQuery = Alunos::with('usuario')
-            ->whereHas('usuario', fn($q) => $q->whereRaw('LOWER(tipo_usuario) = ?', ['aluno']));
+        $alunosQuery = $this->alunosVisiveis();
 
         if ($busca) {
             $alunosQuery->whereHas('usuario', fn($q) =>
@@ -171,8 +213,7 @@ class PlanoAlunoController extends Controller
         $pagamentos       = collect();
 
         if ($request->filled('aluno_id')) {
-            $alunoSelecionado = Alunos::with([
-                'usuario',
+            $alunoSelecionado = $this->alunosVisiveis()->with([
                 'planos' => fn($q) => $q->orderByDesc('aluno_planos.created_at'),
             ])->find($request->query('aluno_id'));
 
@@ -185,7 +226,7 @@ class PlanoAlunoController extends Controller
             }
         }
 
-        $planos = PlanoAluno::orderBy('nome')->get();
+        $planos = PlanoAluno::dasEmpresas($this->empresas())->orderBy('nome')->get();
 
         return view('admin.aluno.planos.vincular', compact(
             'planos', 'alunos', 'alunoSelecionado', 'historicoPlanos', 'pagamentos', 'busca'
@@ -204,7 +245,12 @@ class PlanoAlunoController extends Controller
             'forma_pagamento' => 'nullable|string|max:255',
         ]);
 
-        Alunos::findOrFail($validated['aluno_id'])->planos()->syncWithoutDetaching([
+        // aluno e plano precisam ser da(s) empresa(s) do usuario (alem do middleware, confere aqui tambem)
+        abort_unless(PlanoAluno::dasEmpresas($this->empresas())->whereKey($validated['plano_id'])->exists(), 403);
+        $aluno = $this->alunosVisiveis()->find($validated['aluno_id']);
+        abort_unless($aluno, 403);
+
+        $aluno->planos()->syncWithoutDetaching([
             $validated['plano_id'] => [
                 'data_inicio'     => $validated['data_inicio'] ?? null,
                 'data_fim'        => $validated['data_fim'] ?? null,
