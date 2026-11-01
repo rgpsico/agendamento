@@ -46,6 +46,8 @@ class ApiProtegidaTest extends TestCase
 
     public function test_usuario_logado_so_escreve_por_ajax_ou_json(): void
     {
+        // master passa pela regra de "so a propria empresa"; aqui so se testa a exigencia de AJAX/JSON
+        config(['master_users.emails' => ['a@teste.com']]);
         $u = Usuario::forceCreate(['nome' => 'A', 'email' => 'a@teste.com', 'password' => 'x', 'tipo_usuario' => 'Professor']);
 
         // formulario comum de outro site (sem X-Requested-With e sem JSON) e recusado
@@ -58,6 +60,7 @@ class ApiProtegidaTest extends TestCase
 
     public function test_token_sanctum_tambem_autentica(): void
     {
+        config(['master_users.emails' => ['b@teste.com']]);
         Sanctum::actingAs(Usuario::forceCreate(['nome' => 'B', 'email' => 'b@teste.com', 'password' => 'x', 'tipo_usuario' => 'Professor']));
 
         $status = $this->deleteJson('/api/servicos/999999')->getStatusCode();

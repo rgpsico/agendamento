@@ -73,7 +73,7 @@ Route::post('enviar-boleto', [BoletoController::class, 'sendBoletoToClient'])->n
 
 
 
-Route::post('/events', [GoogleCalendarController::class, 'createEvent'])->middleware('painel');
+Route::post('/events', [GoogleCalendarController::class, 'createEvent'])->middleware(['painel', 'dono:master']);
 Route::post('/pagarComCartao', [PagamentoController::class, 'pagarComCartao'])->name('empresa.pagamento.cartao');
 
 
@@ -88,8 +88,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 
-Route::delete('/gallery/{id}', [EmpresaController::class, 'galleryDestroy'])->middleware('painel')->name('gallery.destroy');
-Route::prefix('permissions')->middleware('painel')->group(function () {
+Route::delete('/gallery/{id}', [EmpresaController::class, 'galleryDestroy'])->middleware(['painel', 'dono:gallery'])->name('gallery.destroy');
+Route::prefix('permissions')->middleware(['painel', 'dono:master'])->group(function () {
     Route::get('/', [PermissionApiController::class, 'index']);
     Route::get('/{id}', [PermissionApiController::class, 'show']);
     Route::post('/store', [PermissionApiController::class, 'store']);
@@ -114,16 +114,16 @@ Route::options('frontend/{any}', function () {
 Route::prefix('frontend')->group(function () {
     Route::get('agendamentos/empresa/{empresaId}', [AgendamentoFrontendController::class, 'byEmpresa']);
     Route::post('agendamentos', [AgendamentoFrontendController::class, 'store']);
-    Route::put('agendamentos/{id}', [AgendamentoFrontendController::class, 'update'])->middleware('painel');
-    Route::patch('agendamentos/{id}', [AgendamentoFrontendController::class, 'update'])->middleware('painel');
-    Route::delete('agendamentos/{id}', [AgendamentoFrontendController::class, 'destroy'])->middleware('painel');
+    Route::put('agendamentos/{id}', [AgendamentoFrontendController::class, 'update'])->middleware(['painel', 'dono:agendamento']);
+    Route::patch('agendamentos/{id}', [AgendamentoFrontendController::class, 'update'])->middleware(['painel', 'dono:agendamento']);
+    Route::delete('agendamentos/{id}', [AgendamentoFrontendController::class, 'destroy'])->middleware(['painel', 'dono:agendamento']);
 
     Route::get('disponibilidades/empresa/{empresaId}', [DisponibilidadeFrontendController::class, 'byEmpresa']);
     Route::get('disponibilidades/professor/{professorId}', [DisponibilidadeFrontendController::class, 'byProfessor']);
-    Route::post('disponibilidades', [DisponibilidadeFrontendController::class, 'store'])->middleware('painel');
-    Route::put('disponibilidades/{id}', [DisponibilidadeFrontendController::class, 'update'])->middleware('painel');
-    Route::patch('disponibilidades/{id}', [DisponibilidadeFrontendController::class, 'update'])->middleware('painel');
-    Route::delete('disponibilidades/{id}', [DisponibilidadeFrontendController::class, 'destroy'])->middleware('painel');
+    Route::post('disponibilidades', [DisponibilidadeFrontendController::class, 'store'])->middleware(['painel', 'dono:corpo']);
+    Route::put('disponibilidades/{id}', [DisponibilidadeFrontendController::class, 'update'])->middleware(['painel', 'dono:disponibilidade']);
+    Route::patch('disponibilidades/{id}', [DisponibilidadeFrontendController::class, 'update'])->middleware(['painel', 'dono:disponibilidade']);
+    Route::delete('disponibilidades/{id}', [DisponibilidadeFrontendController::class, 'destroy'])->middleware(['painel', 'dono:disponibilidade']);
 
     Route::get('alunos/empresa/{empresaId}', [AlunoFrontendController::class, 'byEmpresa']);
 });
@@ -132,15 +132,15 @@ Route::get('agendamento/professor/{professorId}', [AgendamentoControllerApi::cla
 Route::get('agendamento/empresa/{empresaId}', [AgendamentoControllerApi::class, 'byEmpresa']);
 Route::get('agendamento/dia', [AgendamentoControllerApi::class, 'byDia']);
 Route::resource('agendamento', AgendamentoControllerApi::class)->except(['destroy', 'update']);
-Route::resource('agendamento', AgendamentoControllerApi::class)->only(['update'])->middleware('painel');
+Route::resource('agendamento', AgendamentoControllerApi::class)->only(['update'])->middleware(['painel', 'dono:agendamento']);
 Route::middleware('auth:sanctum')->post('agendamento/destroy/{id}', [AgendamentoControllerApi::class, 'destroy']);
 
 Route::get('professor/{id}/aulas', [ProfessoresControllerApi::class, 'aulas']);
 Route::resource('professor', ProfessoresControllerApi::class)->except(['store', 'update', 'destroy']);
-Route::resource('professor', ProfessoresControllerApi::class)->only(['store', 'update', 'destroy'])->middleware('painel');
+Route::resource('professor', ProfessoresControllerApi::class)->only(['store', 'update', 'destroy'])->middleware(['painel', 'dono:professor']);
 
 Route::resource('empresas', EmpresaControllerApi::class)->except(['store', 'update', 'destroy']);
-Route::resource('empresas', EmpresaControllerApi::class)->only(['store', 'update', 'destroy'])->middleware('painel');
+Route::resource('empresas', EmpresaControllerApi::class)->only(['store', 'update', 'destroy'])->middleware(['painel', 'dono:empresas']);
 Route::get('search/empresa', [EmpresaControllerApi::class, 'search'])->name('empresa.search');
 Route::middleware('auth:sanctum')->post('/empresa/update', [EmpresaControllerApi::class, 'update']);
 Route::get('professores/{id}/alunos', [EmpresaControllerApi::class, 'getAlunoByIdProfessor']);
@@ -150,11 +150,11 @@ Route::get('empresa/verificarstatus/{empresaId}',  [EmpresaControllerApi::class,
 
 Route::get('servicos/empresa/{empresaId}', [ServicoControllerApi::class, 'byEmpresa']);
 Route::resource('servicos', ServicoControllerApi::class)->except(['store', 'update', 'destroy']);
-Route::resource('servicos', ServicoControllerApi::class)->only(['store', 'update', 'destroy'])->middleware('painel');
+Route::resource('servicos', ServicoControllerApi::class)->only(['store', 'update', 'destroy'])->middleware(['painel', 'dono:servicos']);
 Route::get('financeiro-categorias', [FinanceiroCategoriaControllerApi::class, 'index']);
 
 Route::post('pagamentoApi', [PagamentoController::class, 'pagamentoStripe']);
-Route::post('/admin/asaas/limpar-sandbox', [PagamentoController::class, 'deleteAllPayments'])->middleware('painel');
+Route::post('/admin/asaas/limpar-sandbox', [PagamentoController::class, 'deleteAllPayments'])->middleware(['painel', 'dono:master']);
 // Desligada: endpoint publico que usava chave sandbox fixa no codigo e terminava em dd()
 // Route::post('/admin/asaas/getwallet', [PagamentoController::class, 'getCustomerWallet']);
 Route::get('/asaas/customer/{customerId}', [PagamentoController::class, 'getCustomer']);
@@ -163,22 +163,22 @@ Route::post('/asaas/getOrCreateAsaasCustome', [PagamentoController::class, 'getO
 
 
 Route::resource('users', UserControllerApi::class)->only(['store']);
-Route::resource('users', UserControllerApi::class)->except(['store'])->middleware('painel');
+Route::resource('users', UserControllerApi::class)->except(['store'])->middleware(['painel', 'dono:users']);
 Route::post('transacao', [UserControllerApi::class, 'transacao']);
 Route::post('googleAuth', [UserControllerApi::class, 'googleAuth']);
 
 Route::get('/alunos/empresa/{empresaId}', [AlunosControllerApi::class, 'byEmpresa']);
 
 Route::resource('aulas', AulasControllerApi::class)->except(['store', 'update', 'destroy']);
-Route::resource('aulas', AulasControllerApi::class)->only(['store', 'update', 'destroy'])->middleware('painel');
+Route::resource('aulas', AulasControllerApi::class)->only(['store', 'update', 'destroy'])->middleware(['painel', 'dono:aulas']);
 
 Route::resource('disponibilidade', DisponibilidadeControllerApi::class)->except(['store', 'update', 'destroy']);
-Route::resource('disponibilidade', DisponibilidadeControllerApi::class)->only(['store', 'update', 'destroy'])->middleware('painel');
+Route::resource('disponibilidade', DisponibilidadeControllerApi::class)->only(['store', 'update', 'destroy'])->middleware(['painel', 'dono:disponibilidade']);
 Route::get('disponibilidade', [DisponibilidadeControllerApi::class, 'disponibilidade']);
 Route::get('disponibilidade/horarios-contratados', [DisponibilidadeControllerApi::class, 'horariosContratados']);
 
 Route::resource('dias', DiaDaSemanaControllerApi::class)->except(['store', 'update', 'destroy']);
-Route::resource('dias', DiaDaSemanaControllerApi::class)->only(['store', 'update', 'destroy'])->middleware('painel');
+Route::resource('dias', DiaDaSemanaControllerApi::class)->only(['store', 'update', 'destroy'])->middleware(['painel', 'dono:master']);
 
 
 
@@ -193,18 +193,18 @@ Route::post('/pix-qrcode', [PixQrController::class, 'generatePixQrCode']);
 Route::post('/customers', [PixQrController::class, 'getOrCreateAsaasCustomer']);
 Route::post('/pix-webhook', [PixQrController::class, 'handleWebhook']);
 Route::post('/pay-pix', [PixQrController::class, 'payPixQrCode']);
-Route::post('/pix-simulate', [PixQrController::class, 'simulatePixPayment'])->middleware('painel');
+Route::post('/pix-simulate', [PixQrController::class, 'simulatePixPayment'])->middleware(['painel', 'dono:master']);
 Route::get('/pix/keys', [PixQrController::class, 'listPixKeys']);
-Route::post('/pix/create-key', [PixQrController::class, 'createPixKey'])->middleware('painel');
-Route::post('/pix/key/delete', [PixQrController::class, 'deletePixKey'])->middleware('painel');
+Route::post('/pix/create-key', [PixQrController::class, 'createPixKey'])->middleware(['painel', 'dono:corpo']);
+Route::post('/pix/key/delete', [PixQrController::class, 'deletePixKey'])->middleware(['painel', 'dono:master']);
 Route::post('/pix-status', [PixQrController::class, 'checkPixStatus']);
 Route::post('/pix-payment', [PixQrController::class, 'createPixPayment']);
-Route::post('/simulate', [PixQrController::class, 'simulatePixPayment'])->middleware('painel');
+Route::post('/simulate', [PixQrController::class, 'simulatePixPayment'])->middleware(['painel', 'dono:master']);
 Route::post('/complete-flow', [PixQrController::class, 'completePixPaymentFlow']);
 Route::get('/status', [PixQrController::class, 'checkPixStatus']);
 // Route::post('/pix-simulate', [PixQrController::class, 'simulatePixPayment']);
 Route::get('/pix/keys', [PixQrController::class, 'listPixKeys']);
-Route::delete('/pix/keys/{pixKeyId}', [PixQrController::class, 'deletePixKey'])->middleware('painel');
+Route::delete('/pix/keys/{pixKeyId}', [PixQrController::class, 'deletePixKey'])->middleware(['painel', 'dono:master']);
 Route::post('/pagamentos/presencial', [PagamentoController::class, 'criarPagamentoPresencial'])->name('empresa.pagamento.presencial');
 Route::post('/gerar-pix', [PagamentoController::class, 'gerarPix'])->name('gerar.pix');
 Route::get('/verificar-pix/{id}', [PagamentoController::class, 'verificarStatusPix'])->name('verificar.pix');
@@ -212,21 +212,21 @@ Route::get('/verificar-pix/{id}', [PagamentoController::class, 'verificarStatusP
 
 Route::post('/asaas/criarcliente', [AsaasController::class, 'createClient'])->name('asaas.createClient');
 Route::post('/asaas/criarclienteautomatico', [AsaasController::class, 'criarCustomerAutomatico'])->name('asaas.createClientAuto');
-Route::post('/asaas/criarChavePix', [AsaasController::class, 'criarChavePix'])->middleware('painel')->name('asaas.criarChavePix');
+Route::post('/asaas/criarChavePix', [AsaasController::class, 'criarChavePix'])->middleware(['painel', 'dono:corpo'])->name('asaas.criarChavePix');
 Route::post('/asaas/pagamentocc', [AsaasController::class, 'pagarComCartao'])->name('asaas.pagarComCartao');
-Route::post('/asaas/criarsubconta', [AsaasController::class, 'createSubaccount'])->middleware('painel')->name('asaas.criarSubConta');
+Route::post('/asaas/criarsubconta', [AsaasController::class, 'createSubaccount'])->middleware(['painel', 'dono:corpo'])->name('asaas.criarSubConta');
 
 
 
 
 Route::get('/disponibilidadedia', [DisponibilidadeServicoController::class, 'getDisponibilidade']);
-Route::post('/disponibilidade/update', [DisponibilidadeServicoController::class, 'updateDisponibilidade'])->middleware('painel');
+Route::post('/disponibilidade/update', [DisponibilidadeServicoController::class, 'updateDisponibilidade'])->middleware(['painel', 'dono:corpo']);
 Route::post('/disponibilidade/reservar', [DisponibilidadeServicoController::class, 'reservarVaga']);
 
 Route::get('/professores/media-avaliacoes', [AvaliacaoController::class, 'mediaAvaliacoes']);
 
-Route::post('/send-whatsapp', [TwilioController::class, 'sendWhatsApp'])->middleware('painel');
-Route::post('/openai/test', [OpenAIController::class, 'testConnection'])->middleware('painel');
+Route::post('/send-whatsapp', [TwilioController::class, 'sendWhatsApp'])->middleware(['painel', 'dono:master']);
+Route::post('/openai/test', [OpenAIController::class, 'testConnection'])->middleware(['painel', 'dono:master']);
 Route::post('/openai/consultar-horarios', [OpenAIController::class, 'consultarHorarios']);
 Route::post('/openai/chat', [OpenAIController::class, 'chatComCliente']);
 Route::post('/agendarHorario', [OpenAIController::class, 'agendarHorario']);
@@ -234,22 +234,22 @@ Route::post('/openai/explicar-sistema', [OpenAIController::class, 'explicarSiste
 
 Route::post('/openai/chat-contexto', [OpenAIController::class, 'chatComContexto']);
 
-Route::post('modalidade/{id}/update', [ModalidadeController::class, 'updateApi'])->middleware('painel')->name('modalidade.update');
-Route::delete('modalidade/{id}/destroy', [ModalidadeController::class, 'destroy'])->middleware('painel')->name('modalidade.destroy');
+Route::post('modalidade/{id}/update', [ModalidadeController::class, 'updateApi'])->middleware(['painel', 'dono:master'])->name('modalidade.update');
+Route::delete('modalidade/{id}/destroy', [ModalidadeController::class, 'destroy'])->middleware(['painel', 'dono:master'])->name('modalidade.destroy');
 
 
 
 Route::post('/aluno/store', [AlunosControllerApi::class, 'store']);
-Route::post('/aluno/{id}/update', [AlunosControllerApi::class, 'update'])->middleware('painel');
-Route::post('/aluno/{id}/update-endereco', [AlunosControllerApi::class, 'updateEndereco'])->middleware('painel');
-Route::delete('/aluno/{id}/destroy/{professor_id}', [AlunosController::class, 'destroy'])->middleware('painel');
-Route::post('/treino/email', [AlunosControllerApi::class, 'treinoEmail'])->middleware('painel');
-Route::post('/treino/service', [AlunosControllerApi::class, 'service'])->middleware('painel');
+Route::post('/aluno/{id}/update', [AlunosControllerApi::class, 'update'])->middleware(['painel', 'dono:aluno']);
+Route::post('/aluno/{id}/update-endereco', [AlunosControllerApi::class, 'updateEndereco'])->middleware(['painel', 'dono:aluno']);
+Route::delete('/aluno/{id}/destroy/{professor_id}', [AlunosController::class, 'destroy'])->middleware(['painel', 'dono:aluno']);
+Route::post('/treino/email', [AlunosControllerApi::class, 'treinoEmail'])->middleware(['painel', 'dono:master']);
+Route::post('/treino/service', [AlunosControllerApi::class, 'service'])->middleware(['painel', 'dono:corpo']);
 Route::get('/treino/cobrancas', [AlunosControllerApi::class, 'getCobrancas']);
 
 
 
-Route::prefix('empresa/pagamento')->middleware('painel')->group(function () {
+Route::prefix('empresa/pagamento')->middleware(['painel', 'dono:pagamento'])->group(function () {
 
     Route::get('/', [PagamentoController::class, 'index'])->name('empresa.pagamento.index');
     Route::get('/create', [PagamentoController::class, 'create'])->name('empresa.pagamento.create');
@@ -302,7 +302,7 @@ Route::post('/webhook/sms', function (Request $request) {
 });
 
 
-Route::middleware('painel')->post('/test-twilio', function () {
+Route::middleware(['painel', 'dono:master'])->post('/test-twilio', function () {
     try {
         $sid = env('TWILIO_SID');
         $token = env('TWILIO_AUTH_TOKEN');
@@ -316,7 +316,7 @@ Route::middleware('painel')->post('/test-twilio', function () {
 
 use App\Http\Controllers\WhatsAppController;
 
-Route::post('/whatsapp/send', [WhatsAppController::class, 'send'])->middleware('painel');
+Route::post('/whatsapp/send', [WhatsAppController::class, 'send'])->middleware(['painel', 'dono:master']);
 Route::post('/whatsapp/receive', [WhatsAppController::class, 'receive']);
 
 
@@ -325,7 +325,7 @@ Route::post('/contato/enviar', [ContatoController::class, 'enviar'])->name('cont
 
 
 
-Route::prefix('google-ads')->middleware('painel')->group(function () {
+Route::prefix('google-ads')->middleware(['painel', 'dono:master'])->group(function () {
     Route::get('auth-url', [GoogleADSController::class, 'getAuthUrl']);
     Route::get('callback', [GoogleADSController::class, 'handleCallback']);
     Route::post('create-campaign', [GoogleADSController::class, 'createCampaign']);
@@ -333,7 +333,7 @@ Route::prefix('google-ads')->middleware('painel')->group(function () {
 });
 
 
-Route::post('email/teste', [EmailController::class, 'teste'])->middleware('painel');
+Route::post('email/teste', [EmailController::class, 'teste'])->middleware(['painel', 'dono:master']);
 
 
 
@@ -477,7 +477,7 @@ Route::middleware('auth:sanctum')->group(function () {});
 use App\Http\Controllers\PlanoAlunoController;
 
 Route::apiResource('planos-alunos', PlanoAlunoController::class)->only(['index', 'show']);
-Route::apiResource('planos-alunos', PlanoAlunoController::class)->only(['store', 'update', 'destroy'])->middleware('painel');
+Route::apiResource('planos-alunos', PlanoAlunoController::class)->only(['store', 'update', 'destroy'])->middleware(['painel', 'dono:master']);
 
 
 
@@ -487,7 +487,7 @@ Route::post('/deepseek/image', [DeepSeekController::class, 'analyzeImage']);
 
 Route::post('/device/token', [DeviceTokenController::class, 'store']);
 Route::delete('/device/token', [DeviceTokenController::class, 'destroy']);
-Route::post('/push/test', [PushTestController::class, 'send'])->middleware('painel');
+Route::post('/push/test', [PushTestController::class, 'send'])->middleware(['painel', 'dono:master']);
 
 use App\Http\Controllers\Api\ValidadorWebhookController;
 Route::post('/webhooks/validador-lead', [ValidadorWebhookController::class, 'store']);

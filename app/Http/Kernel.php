@@ -77,6 +77,7 @@ class Kernel extends HttpKernel
         'tenant'        => \App\Http\Middleware\EnsureTenantContext::class,
         'detect.tenant' => \App\Http\Middleware\DetectTenant::class,
         'master'        => \App\Http\Middleware\IsMasterUser::class,
+        'dono'          => \App\Http\Middleware\ApenasDaPropriaEmpresa::class, // dono:<tipo> = so dados da propria empresa; dono:master = so o administrador
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
     ];

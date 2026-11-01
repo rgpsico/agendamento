@@ -23,6 +23,11 @@ class AppServiceProvider extends ServiceProvider
      */
    public function boot()
     {
+        // Regras "so a propria empresa" do painel web: aplicadas depois que todas as rotas foram registradas
+        $this->app->booted(function () {
+            \App\Support\RegrasDeEmpresa::aplicar($this->app['router']);
+        });
+
         // Força HTTPS se estiver em produção ou se você quiser forçar sempre
         if (str_starts_with(config('app.url', ''), 'https://')) {
             URL::forceScheme('https');
