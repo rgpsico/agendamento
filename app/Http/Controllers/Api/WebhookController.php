@@ -46,7 +46,7 @@ class WebhookController extends Controller
        
         // Verificar o token de autenticação
         $asaasToken = $request->header('asaas-access-token');
-        if ($asaasToken !== '123456@') {
+        if (! hash_equals((string) config('services.asaas.webhook_token'), (string) $asaasToken)) {
             Log::warning('Asaas Webhook: Token inválido', ['token' => $asaasToken]);
             AsaasWebhookLog::create([
                 'event' => $payload['event'] ?? null,

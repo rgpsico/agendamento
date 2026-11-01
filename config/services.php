@@ -34,6 +34,12 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    // Token que o Asaas envia no cabecalho asaas-access-token dos webhooks. O padrao e o valor que ja estava fixo
+    // no codigo; defina ASAAS_WEBHOOK_TOKEN no .env (e o mesmo token no painel do Asaas) para trocar por um forte.
+    'asaas' => [
+        'webhook_token' => env('ASAAS_WEBHOOK_TOKEN', '123456@'),
+    ],
+
     'deepseek' => [
         'key'   => env('DEEP_SEEK_API_KEY', env('DEEPSEEK_API_KEY')),
         'model' => env('DEEPSEEK_MODEL', 'deepseek-chat'),
