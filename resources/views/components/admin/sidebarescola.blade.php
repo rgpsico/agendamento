@@ -249,11 +249,13 @@
                             <span class="menu-arrow"></span>
                         </a>
                         <ul>
+                            @auth
                             <li>
-                                <a href="{{ route('empresa.configuracao', ['userId' => Auth::user()->id]) }}">
+                                <a href="{{ route('empresa.configuracao', ['userId' => Auth::id()]) }}">
                                     <i class="fe fe-briefcase"></i> <span> Empresa</span>
                                 </a>
                             </li>
+                            @endauth
                             @isset(Auth::user()->isAdmin)
                                 <li>
                                     <a href="{{ route('empresa.endereco', ['userId' => Auth::user()->id]) }}">

@@ -826,7 +826,6 @@ class PixQrController extends Controller
                 'message' => 'Erro ao simular o pagamento: HTTP ' . $response->getStatusCode(),
             ], $response->getStatusCode());
         } catch (\Exception $e) {
-            dd($e);
             Log::error('Error simulating PIX payment', [
                 'payment_id' => $paymentId,
                 'error' => $e->getMessage(),
@@ -1394,7 +1393,7 @@ class PixQrController extends Controller
                 'error'   => $error['errors'][0]['description'] ?? $error['message'] ?? 'Erro na API Asaas',
             ], 400);
         } catch (\Exception $e) {
-            dd($e);
+            Log::error('Erro na API Asaas (PixQr)', ['error' => $e->getMessage()]);
             return response()->json([
                 'success' => false,
                 'error'   => $e->getMessage(),

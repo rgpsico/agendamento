@@ -27,7 +27,7 @@ class ProfessorController extends Controller
                     'google_id' => $googleUser->id,
                     'tipo_usuario' => 'Aluno',
                     'remember_token' => Str::random(60), // Gerar um token aleatório
-                    'password' => bcrypt(124) // Isso deve ser atualizado para algo mais seguro mais tarde
+                    'password' => bcrypt(\Illuminate\Support\Str::random(40)) // senha aleatoria; o acesso e pelo Google ou por redefinicao de senhauro mais tarde
                 ]);
 
                 Alunos::create([
@@ -42,11 +42,9 @@ class ProfessorController extends Controller
             return redirect()->route("admin.dashboard");  // ou onde você deseja redirecionar após o login
 
         } catch (\Exception $e) {
-            dd($e);
             \Log::error('Erro com autenticação do Google: ' . $e->getMessage());
 
-            dd($e);
-            return redirect('/')->with('error', 'Erro ao tentar autenticar com o Google.');
+            return redirect('/login')->with('error', 'Erro ao tentar autenticar com o Google.');
         }
     }
 }

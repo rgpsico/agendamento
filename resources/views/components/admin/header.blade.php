@@ -136,8 +136,10 @@
                             </div>
                         </div>
 
+                        @auth
                         <a class="dropdown-item"
-                            href="{{ route('empresa.configuracao', ['userId' => Auth::user()->id]) }}">Configurações</a>
+                            href="{{ route('empresa.configuracao', ['userId' => Auth::id()]) }}">Configurações</a>
+                        @endauth
                         <a class="dropdown-item" href="{{ route('user.logout') }}">Logout</a>
                     </div>
                 </li>

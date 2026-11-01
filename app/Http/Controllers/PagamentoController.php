@@ -1077,8 +1077,6 @@ class PagamentoController extends Controller
                 'access_token' => '$aact_hmlg_000MzkwODA2MWY2OGM3MWRlMDU2NWM3MzJlNzZmNGZhZGY6OmRiMDVhZjk3LWQzMjMtNDBlZi1iMGYyLTkzMGRlMzFiMmRiODo6JGFhY2hfOTcwODhmOTctYWYxYy00MzY0LTgzODAtOTA3MzBhOWY5NmJk',
             ],
         ]);
-        dd($response->getBody());
-
         return $response->getBody();
     }
 

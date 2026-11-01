@@ -151,7 +151,8 @@ Route::get('financeiro-categorias', [FinanceiroCategoriaControllerApi::class, 'i
 
 Route::post('pagamentoApi', [PagamentoController::class, 'pagamentoStripe']);
 Route::post('/admin/asaas/limpar-sandbox', [PagamentoController::class, 'deleteAllPayments']);
-Route::post('/admin/asaas/getwallet', [PagamentoController::class, 'getCustomerWallet']);
+// Desligada: endpoint publico que usava chave sandbox fixa no codigo e terminava em dd()
+// Route::post('/admin/asaas/getwallet', [PagamentoController::class, 'getCustomerWallet']);
 Route::get('/asaas/customer/{customerId}', [PagamentoController::class, 'getCustomer']);
 Route::post('/asaas/getOrCreateAsaasCustome', [PagamentoController::class, 'getOrCreateAsaasCustomer']);
 

@@ -47,6 +47,11 @@ class SocialLiteController extends Controller
 
         $data = $response->json();
 
+        // Sem "code" valido (acesso direto a URL ou autorizacao negada) o Google nao devolve token
+        if (! $code || empty($data['access_token']) || empty($data['expires_in'])) {
+            return redirect('/login')->with('error', 'Não foi possível concluir a autorização com o Google. Tente novamente.');
+        }
+
         $expiresAt = Carbon::now()->addSeconds($data['expires_in']);
         $empresaId = 17;
         // Atualiza ou cria o registro do token
@@ -74,7 +79,7 @@ class SocialLiteController extends Controller
                     'google_id' => $googleUser->id,
                     'tipo_usuario' => 'Aluno', // Default novo usuário como aluno
                     'remember_token' => Str::random(60),
-                    'password' => bcrypt(124)
+                    'password' => bcrypt(\Illuminate\Support\Str::random(40))
                 ]);
 
                 Alunos::create([
@@ -100,8 +105,8 @@ class SocialLiteController extends Controller
                 return redirect('/')->with('error', 'Tipo de usuário não reconhecido.');
             }
         } catch (\Exception $e) {
-            dd($e);
-            return redirect('/')->with('error', 'Erro ao tentar autenticar com o Google.');
+            \Illuminate\Support\Facades\Log::warning('Login com Google (aluno) falhou: ' . $e->getMessage());
+            return redirect('/login')->with('error', 'Erro ao tentar autenticar com o Google.');
         }
     }
 
@@ -113,8 +118,12 @@ class SocialLiteController extends Controller
 
     public function professorGoogleCallback(Request $request)
     {
-
-        $googleUser = Socialite::driver('google')->user();
+        try {
+            $googleUser = Socialite::driver('google')->user();
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('Login com Google (professor) falhou: ' . $e->getMessage());
+            return redirect('/login')->with('error', 'Erro ao tentar autenticar com o Google.');
+        }
         $user = Usuario::where('email', $googleUser->email)->first();
 
         if (!$user) {
@@ -124,7 +133,7 @@ class SocialLiteController extends Controller
                 'google_id' => $googleUser->id,
                 'tipo_usuario' => 'Professor', // Agora setado como professor
                 'remember_token' => Str::random(60),
-                'password' => bcrypt(124)
+                'password' => bcrypt(\Illuminate\Support\Str::random(40))
             ]);
 
             Professor::create([

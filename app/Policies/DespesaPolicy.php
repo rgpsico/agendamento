@@ -13,8 +13,7 @@ class DespesaPolicy
      */
     public function viewAny(Usuario $usuario): bool
     {
-        dd('aaa');
-        return $usuario->id === $despesas->usuario_id || $usuario->isAdmin();  // Exemplo
+        return $usuario->isAdmin();
     }
 
     /**

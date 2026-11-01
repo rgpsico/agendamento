@@ -26,11 +26,6 @@ Route::get('/registrar_escola', [HomeController::class, 'registerProf'])->name('
 Route::get('/loginGoogle', [HomeController::class, 'handleGoogleCallback'])->name('public.googleAuth.prof');
 
 
-Route::get('/registeraluno', function () {
-    return view('auth.registerAluno');
-});
-
-
 Route::get('/login', function () {
     return view('auth.login');
 });

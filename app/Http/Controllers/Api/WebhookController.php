@@ -880,7 +880,6 @@ class WebhookController extends Controller
                 'message' => 'Erro ao simular o pagamento: HTTP ' . $response->getStatusCode(),
             ], $response->getStatusCode());
         } catch (\Exception $e) {
-            dd($e);
             Log::error('Error simulating PIX payment', [
                 'payment_id' => $paymentId,
                 'error' => $e->getMessage(),

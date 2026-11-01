@@ -340,7 +340,7 @@ class HomeController extends Controller
                     'google_id' => $googleUser->id,
                     'tipo_usuario' => 'Aluno',
                     'remember_token' => Str::random(60),
-                    'password' => bcrypt(124)
+                    'password' => bcrypt(\Illuminate\Support\Str::random(40))
                 ]);
 
                 Alunos::create([
@@ -360,11 +360,9 @@ class HomeController extends Controller
             return view('alunoadmin::alunos.index', compact('title', 'agendamentos')); // ou onde você deseja redirecionar após o login
 
         } catch (\Exception $e) {
-            dd($e);
-            // \Log::error('Erro com autenticação do Google: ' . $e->getMessage());
+            \Log::error('Erro com autenticação do Google: ' . $e->getMessage());
 
-            dd($e);
-            return redirect('/')->with('error', 'Erro ao tentar autenticar com o Google.');
+            return redirect('/login')->with('error', 'Erro ao tentar autenticar com o Google.');
         }
     }
 }

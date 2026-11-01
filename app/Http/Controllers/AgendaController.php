@@ -78,7 +78,7 @@ class AgendaController extends Controller
                 'pageTitle' => $this->pageTitle,
                 'view' => $this->view,
                 'route' => $this->route,
-                'model' => $model ?? ''
+                'model' => $model ?? collect()
             ]
         );
     }

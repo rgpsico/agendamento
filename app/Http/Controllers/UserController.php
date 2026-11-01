@@ -135,7 +135,6 @@ class UserController extends Controller
 
     public function edit($id)
     {
-        dd('aaa');
         $user = Usuario::find($id);
         return view('users.edit', compact('user'));
     }

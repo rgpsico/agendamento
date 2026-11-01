@@ -284,8 +284,9 @@ Route::get('/landing', [SiteController::class, 'landing'])->name('site.landing')
 Route::post('/landing/lead', [SiteController::class, 'lead'])->name('site.landing.lead');
 
 // Landing page da escola de surf (template completo)
+// (o template land_pagesurf exige um $site; sem ele a rota dava erro 500)
 Route::get('/escola-de-surf', function () {
-    return view('site.land_pagesurf');
+    return redirect()->route('site.landing');
 })->name('site.land_pagesurf');
 
 
@@ -394,7 +395,7 @@ Route::post('/asaas', [PixQrController::class, 'fazerAgendamentoPix'])->name('em
 Route::post('/contato/enviar/{site}', [EmailController::class, 'enviar'])->name('site.email.enviar');
 
 
-Route::get('/treino', [AgendaController::class, 'treino'])->name('treino');
+Route::get('/treino', [AgendaController::class, 'treino'])->middleware('auth')->name('treino');
 // Logs da aplicação: só usuário master logado (antes estava aberto na internet)
 Route::get('/logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index')->middleware(['auth', 'master']);
 
