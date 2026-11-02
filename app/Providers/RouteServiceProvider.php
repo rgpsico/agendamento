@@ -45,6 +45,30 @@ class RouteServiceProvider extends ServiceProvider
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
 
+        // Rotas publicas que gastam IA (cada chamada custa dinheiro)
+        RateLimiter::for('ia', fn (Request $request) => [
+            Limit::perMinute(12)->by('ia|' . $request->ip()),
+            Limit::perDay(300)->by('ia-dia|' . $request->ip()),
+        ]);
+
+        // Chat do widget do bot: por bot (token) e por visitante
+        RateLimiter::for('bot', fn (Request $request) => [
+            Limit::perMinute(20)->by('bot|' . $request->route('token') . '|' . $request->ip()),
+            Limit::perDay(600)->by('bot-dia|' . $request->ip()),
+        ]);
+
+        // Login: freia tentativa de senha em massa
+        RateLimiter::for('login', fn (Request $request) => Limit::perMinute(10)->by('login|' . $request->ip()));
+
+        // Cadastro publico (usuario/aluno): freia criacao de contas em massa
+        RateLimiter::for('cadastro', fn (Request $request) => Limit::perMinute(6)->by('cadastro|' . $request->ip()));
+
+        // Formularios de contato/lead: freia spam
+        RateLimiter::for('contato', fn (Request $request) => [
+            Limit::perMinute(5)->by('contato|' . $request->ip()),
+            Limit::perDay(40)->by('contato-dia|' . $request->ip()),
+        ]);
+
         $this->routes(function () {
             Route::middleware('api')
                 ->prefix('api')

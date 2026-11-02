@@ -226,12 +226,12 @@ Route::get('/widget/bot/{token}.js',     [WidgetController::class, 'botJs'])->na
 Route::get('/widget/track/{token}.js',   [WidgetController::class, 'trackJs'])->name('widget.track.js');
 
 // API pública do widget — sem auth, CORS liberado
-Route::prefix('api/widget')->middleware('api')->group(function () {
+Route::prefix('api/widget')->middleware(['api', 'throttle:contato'])->group(function () {
     Route::post('{token}/lead', [ModalLeadController::class, 'submit'])->name('widget.lead.submit');
 });
 
 // API pública do bot widget — sem auth
-Route::prefix('api/bot')->middleware('api')->group(function () {
+Route::prefix('api/bot')->middleware(['api', 'throttle:bot'])->group(function () {
     Route::post('{token}/chat', [\App\Http\Controllers\Api\BotWidgetController::class, 'chat'])->name('bot.widget.chat');
 });
 

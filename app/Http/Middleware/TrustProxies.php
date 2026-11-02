@@ -17,6 +17,13 @@ class TrustProxies extends Middleware
      * Fonte: https://www.cloudflare.com/ips/
      */
     protected $proxies = [
+        // Proxies internos do Docker (nginx_proxy_manager -> agendamento_nginx -> php). Sem isto o Laravel ve o IP
+        // do container como se fosse o de todo visitante, e qualquer limite por IP vira um limite global.
+        '172.16.0.0/12',
+        '10.0.0.0/8',
+        '192.168.0.0/16',
+        '127.0.0.1',
+        '::1',
         // IPv4
         '173.245.48.0/20',
         '103.21.244.0/22',

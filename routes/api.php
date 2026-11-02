@@ -98,7 +98,7 @@ Route::prefix('permissions')->middleware(['painel', 'dono:master'])->group(funct
 });
 
 
-Route::post('/login', [AuthControllerApi::class, 'login']);
+Route::post('/login', [AuthControllerApi::class, 'login'])->middleware('throttle:login');
 Route::middleware('auth:sanctum')->get('/me', [AuthControllerApi::class, 'me']);
 Route::middleware('auth:sanctum')->get('agendamentos/com-cliente', [AgendaController::class, 'agendamentosComCliente']);
 Route::middleware('auth:sanctum')->get('empresa/tipopagamento/enabled', [PaymentConfigurationController::class, 'enabled']);
@@ -162,10 +162,10 @@ Route::post('/asaas/getOrCreateAsaasCustome', [PagamentoController::class, 'getO
 
 
 
-Route::resource('users', UserControllerApi::class)->only(['store']);
+Route::resource('users', UserControllerApi::class)->only(['store'])->middleware('throttle:cadastro');
 Route::resource('users', UserControllerApi::class)->except(['store'])->middleware(['painel', 'dono:users']);
 Route::post('transacao', [UserControllerApi::class, 'transacao']);
-Route::post('googleAuth', [UserControllerApi::class, 'googleAuth']);
+Route::post('googleAuth', [UserControllerApi::class, 'googleAuth'])->middleware('throttle:login');
 
 Route::get('/alunos/empresa/{empresaId}', [AlunosControllerApi::class, 'byEmpresa']);
 
@@ -227,19 +227,19 @@ Route::get('/professores/media-avaliacoes', [AvaliacaoController::class, 'mediaA
 
 Route::post('/send-whatsapp', [TwilioController::class, 'sendWhatsApp'])->middleware(['painel', 'dono:master']);
 Route::post('/openai/test', [OpenAIController::class, 'testConnection'])->middleware(['painel', 'dono:master']);
-Route::post('/openai/consultar-horarios', [OpenAIController::class, 'consultarHorarios']);
-Route::post('/openai/chat', [OpenAIController::class, 'chatComCliente']);
-Route::post('/agendarHorario', [OpenAIController::class, 'agendarHorario']);
-Route::post('/openai/explicar-sistema', [OpenAIController::class, 'explicarSistema']);
+Route::post('/openai/consultar-horarios', [OpenAIController::class, 'consultarHorarios'])->middleware('throttle:ia');
+Route::post('/openai/chat', [OpenAIController::class, 'chatComCliente'])->middleware('throttle:ia');
+Route::post('/agendarHorario', [OpenAIController::class, 'agendarHorario'])->middleware('throttle:ia');
+Route::post('/openai/explicar-sistema', [OpenAIController::class, 'explicarSistema'])->middleware('throttle:ia');
 
-Route::post('/openai/chat-contexto', [OpenAIController::class, 'chatComContexto']);
+Route::post('/openai/chat-contexto', [OpenAIController::class, 'chatComContexto'])->middleware('throttle:ia');
 
 Route::post('modalidade/{id}/update', [ModalidadeController::class, 'updateApi'])->middleware(['painel', 'dono:master'])->name('modalidade.update');
 Route::delete('modalidade/{id}/destroy', [ModalidadeController::class, 'destroy'])->middleware(['painel', 'dono:master'])->name('modalidade.destroy');
 
 
 
-Route::post('/aluno/store', [AlunosControllerApi::class, 'store']);
+Route::post('/aluno/store', [AlunosControllerApi::class, 'store'])->middleware('throttle:cadastro');
 Route::post('/aluno/{id}/update', [AlunosControllerApi::class, 'update'])->middleware(['painel', 'dono:aluno']);
 Route::post('/aluno/{id}/update-endereco', [AlunosControllerApi::class, 'updateEndereco'])->middleware(['painel', 'dono:aluno']);
 Route::delete('/aluno/{id}/destroy/{professor_id}', [AlunosController::class, 'destroy'])->middleware(['painel', 'dono:aluno']);
@@ -287,7 +287,7 @@ use Illuminate\Support\Facades\Log;
 
 use App\Models\AsaasWebhookLog;
 
-Route::post('/webhook/sms', function (Request $request) {
+Route::middleware('twilio.assinatura')->post('/webhook/sms', function (Request $request) {
     AsaasWebhookLog::create([
         'event'      => 'twilio_sms_received',
         'payload'    => $request->all(),
@@ -317,11 +317,11 @@ Route::middleware(['painel', 'dono:master'])->post('/test-twilio', function () {
 use App\Http\Controllers\WhatsAppController;
 
 Route::post('/whatsapp/send', [WhatsAppController::class, 'send'])->middleware(['painel', 'dono:master']);
-Route::post('/whatsapp/receive', [WhatsAppController::class, 'receive']);
+Route::post('/whatsapp/receive', [WhatsAppController::class, 'receive'])->middleware('twilio.assinatura');
 
 
 
-Route::post('/contato/enviar', [ContatoController::class, 'enviar'])->name('contato.enviar');
+Route::post('/contato/enviar', [ContatoController::class, 'enviar'])->middleware('throttle:contato')->name('contato.enviar');
 
 
 
@@ -358,9 +358,7 @@ Route::post('/visitante', [SiteVisitanteController::class, 'store']);
 
 use App\Http\Controllers\TwilioWebhookController;
 
-Route::post('/webhook/twilio', [TwilioWebhookController::class, 'inbound']);
-Route::post('/webhook/openai', [TwilioWebhookController::class, 'testOpenAI']);
-Route::post('/webhook/deepseek', [TwilioWebhookController::class, 'askDeepSeek']);
+Route::post('/webhook/twilio', [TwilioWebhookController::class, 'inbound'])->middleware('twilio.assinatura');
 
 
 Route::post('bot/{botId}/interact', [BotController::class, 'interact'])->middleware('auth:sanctum')->name('bot.interact');
@@ -482,7 +480,7 @@ Route::apiResource('planos-alunos', PlanoAlunoController::class)->only(['store',
 
 
 
-Route::post('/deepseek/image', [DeepSeekController::class, 'analyzeImage']);
+Route::post('/deepseek/image', [DeepSeekController::class, 'analyzeImage'])->middleware('throttle:ia');
 
 
 Route::post('/device/token', [DeviceTokenController::class, 'store']);

@@ -40,6 +40,10 @@ return [
         'webhook_token' => env('ASAAS_WEBHOOK_TOKEN', '123456@'),
     ],
 
+    'twilio' => [
+        'token' => env('TWILIO_TOKEN'),
+    ],
+
     'deepseek' => [
         'key'   => env('DEEP_SEEK_API_KEY', env('DEEPSEEK_API_KEY')),
         'model' => env('DEEPSEEK_MODEL', 'deepseek-chat'),
