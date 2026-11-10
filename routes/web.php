@@ -60,6 +60,10 @@ use App\Http\Controllers\CRM\ModalCapturaController;
 use App\Http\Controllers\WidgetController;
 use App\Http\Controllers\Api\ModalLeadController;
 
+// Endereço antigo do site do Jeff: leva para o domínio novo, mantendo caminho e parâmetros
+Route::domain('favelabyjeff.rjpasseios.com.br')->any('/{any?}', function (\Illuminate\Http\Request $request) {
+    return redirect()->away('https://riobyjeff.com.br' . $request->getRequestUri(), 301);
+})->where('any', '.*');
 
 
 // Rota raiz: se vier de um domínio personalizado, exibe o site da empresa.
@@ -71,6 +75,11 @@ use App\Http\Controllers\Api\ModalLeadController;
 // ─────────────────────────────────────────────
 Route::get('/', function (\Illuminate\Http\Request $request) {
     $host = $request->getHost();
+
+    // Endereço antigo do site do Jeff → domínio novo (a rota de domínio no topo não pega a raiz)
+    if ($host === 'favelabyjeff.rjpasseios.com.br') {
+        return redirect()->away('https://riobyjeff.com.br' . $request->getRequestUri(), 301);
+    }
 
     // Domínio do Surf SaaS → landing page de captação
     $dominiosSurf = ['surfgestao.com.br', 'www.surfgestao.com.br'];
