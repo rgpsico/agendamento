@@ -40,6 +40,7 @@
     $svm = $passeios->mapWithKeys(fn ($x) => [(string) $x->id => ['f' => $x->fotos, 'dur' => $x->duracao_txt, 'p' => $x->preco]]);
     $svMap = $passeios->mapWithKeys(fn ($x) => [(string) $x->id => array_merge(['pt' => ['t' => $x->titulo, 'd' => $x->descricao]], $x->tr)]);
     $depoimentos = $site->depoimentos ?? collect();
+    $avaliacaoGoogle = config('sites.avaliacao_google', [])[$site->id] ?? null;
     $temSobre = filled($site->sobre_titulo) || filled($site->sobre_descricao) || !empty($site->sobre_itens);
     $contatos = collect($site->contatos ?? [])->keyBy(fn ($c) => strtolower($c->tipo));
     $instagram = $contatos->get('instagram')?->valor;
@@ -430,10 +431,11 @@
     </div>
 </section>
 
-@if($depoimentos->count())
-<section style="padding-top:0">
+@if($depoimentos->count() || $avaliacaoGoogle)
+<section id="avaliacoes" style="padding-top:0">
     <div class="wrap">
         <div class="reveal"><h2 class="title" data-i18n="rev_title">O que dizem nossos clientes</h2></div>
+        @if($depoimentos->count())
         <div class="reviews" style="margin-top:28px">
             @foreach($depoimentos as $d)
                 <figure class="review reveal" style="margin:0">
@@ -443,6 +445,16 @@
                 </figure>
             @endforeach
         </div>
+        @endif
+        @if($avaliacaoGoogle)
+        <div class="reveal" style="margin-top:28px;text-align:center">
+            @unless($depoimentos->count())
+                <div class="stars" aria-hidden="true" style="font-size:1.6rem">★★★★★</div>
+                <p style="margin:10px auto 20px;max-width:46ch" data-i18n="rev_empty">Já passeou com a gente? Conte como foi: sua avaliação ajuda outros viajantes.</p>
+            @endunless
+            <a class="btn btn--gold" href="{{ $avaliacaoGoogle }}" target="_blank" rel="noopener" data-i18n="rev_cta">Avaliar no Google</a>
+        </div>
+        @endif
     </div>
 </section>
 @endif
@@ -554,7 +566,7 @@
                     @if($zapBase)<li><a href="{{ $zapBase }}" target="_blank" rel="noopener">WhatsApp {{ $site->whatsapp }}</a></li>@endif
                     @if($instagram)<li><a href="{{ str_starts_with($instagram, 'http') ? $instagram : 'https://instagram.com/' . ltrim($instagram, '@') }}" target="_blank" rel="noopener">Instagram</a></li>@endif
                     @if($emailContato)<li><a href="mailto:{{ $emailContato }}">{{ $emailContato }}</a></li>@endif
-                    @if($avaliacaoGoogle = (config('sites.avaliacao_google', [])[$site->id] ?? null))<li><a href="{{ $avaliacaoGoogle }}" target="_blank" rel="noopener" data-i18n="foot_review">Avalie a gente no Google</a></li>@endif
+                    @if($avaliacaoGoogle)<li><a href="{{ $avaliacaoGoogle }}" target="_blank" rel="noopener" data-i18n="foot_review">Avalie a gente no Google</a></li>@endif
                 </ul>
             </div>
         </div>
@@ -620,7 +632,7 @@
       step1_t:'Escolha sua experiência', step1_d:'Explore os passeios e encontre o que combina com sua viagem.',
       step2_t:'Entre em contato', step2_d:'Fale rapidamente pelo WhatsApp ou envie sua solicitação.',
       step3_t:'Aproveite', step3_d:'Receba as informações da reserva e aproveite sua experiência.',
-      rev_title:'O que dizem nossos clientes', form_title:'Vamos planejar sua próxima experiência?', form_sub:'Conte para nós o que você procura e nossa equipe entrará em contato.',
+      rev_title:'O que dizem nossos clientes', rev_empty:'Já passeou com a gente? Conte como foi: sua avaliação ajuda outros viajantes.', rev_cta:'Avaliar no Google', form_title:'Vamos planejar sua próxima experiência?', form_sub:'Conte para nós o que você procura e nossa equipe entrará em contato.',
       quick_hint:'Prefere conversar agora? Responda rápido por aqui.',
       f_name:'Nome', f_email:'E-mail', f_whats:'WhatsApp', f_country:'País', f_date:'Data da viagem', f_people:'Quantidade de pessoas', f_tour:'Passeio de interesse', f_tour_any:'Ainda não sei', f_msg:'Mensagem', f_send:'Quero saber mais',
       ok:'Recebemos seu contato! Para agilizar, continue pelo WhatsApp:', ok_btn:'Continuar no WhatsApp', err:'Não foi possível enviar agora. Tente de novo ou fale pelo WhatsApp.', err_req:'Preencha nome e um e-mail válido.',
@@ -640,7 +652,7 @@
       step1_t:'Choose your experience', step1_d:'Browse the tours and find what fits your trip.',
       step2_t:'Get in touch', step2_d:'Message us quickly on WhatsApp or send your request.',
       step3_t:'Enjoy', step3_d:'Receive your booking details and enjoy the experience.',
-      rev_title:'What our customers say', form_title:"Let's plan your next experience?", form_sub:'Tell us what you are looking for and our team will get back to you.',
+      rev_title:'What our customers say', rev_empty:'Been on a tour with us? Tell us how it went: your review helps other travelers.', rev_cta:'Review on Google', form_title:"Let's plan your next experience?", form_sub:'Tell us what you are looking for and our team will get back to you.',
       quick_hint:'Prefer to talk now? We answer quickly here.',
       f_name:'Name', f_email:'E-mail', f_whats:'WhatsApp', f_country:'Country', f_date:'Travel date', f_people:'Number of people', f_tour:'Tour of interest', f_tour_any:'Not sure yet', f_msg:'Message', f_send:'I want to know more',
       ok:'We received your message! To speed things up, continue on WhatsApp:', ok_btn:'Continue on WhatsApp', err:'We could not send it now. Try again or chat on WhatsApp.', err_req:'Please enter your name and a valid e-mail.',
@@ -660,7 +672,7 @@
       step1_t:'Elige tu experiencia', step1_d:'Explora los paseos y encuentra el que va con tu viaje.',
       step2_t:'Ponte en contacto', step2_d:'Escríbenos rápido por WhatsApp o envía tu solicitud.',
       step3_t:'Disfruta', step3_d:'Recibe la información de la reserva y disfruta tu experiencia.',
-      rev_title:'Lo que dicen nuestros clientes', form_title:'¿Planeamos tu próxima experiencia?', form_sub:'Cuéntanos qué buscas y nuestro equipo se pondrá en contacto.',
+      rev_title:'Lo que dicen nuestros clientes', rev_empty:'¿Ya paseaste con nosotros? Cuéntanos cómo fue: tu opinión ayuda a otros viajeros.', rev_cta:'Evaluar en Google', form_title:'¿Planeamos tu próxima experiencia?', form_sub:'Cuéntanos qué buscas y nuestro equipo se pondrá en contacto.',
       quick_hint:'¿Prefieres hablar ahora? Respondemos rápido por aquí.',
       f_name:'Nombre', f_email:'Correo electrónico', f_whats:'WhatsApp', f_country:'País', f_date:'Fecha del viaje', f_people:'Cantidad de personas', f_tour:'Paseo de interés', f_tour_any:'Aún no sé', f_msg:'Mensaje', f_send:'Quiero saber más',
       ok:'¡Recibimos tu contacto! Para agilizar, continúa por WhatsApp:', ok_btn:'Continuar en WhatsApp', err:'No pudimos enviarlo ahora. Inténtalo de nuevo o habla por WhatsApp.', err_req:'Completa tu nombre y un correo válido.',
@@ -680,7 +692,7 @@
       step1_t:'Scegli la tua esperienza', step1_d:'Esplora i tour e trova quello adatto al tuo viaggio.',
       step2_t:'Contattaci', step2_d:'Scrivici subito su WhatsApp o invia la tua richiesta.',
       step3_t:'Goditela', step3_d:'Ricevi i dettagli della prenotazione e goditi l’esperienza.',
-      rev_title:'Cosa dicono i nostri clienti', form_title:'Pianifichiamo la tua prossima esperienza?', form_sub:'Raccontaci cosa cerchi e il nostro team ti risponderà.',
+      rev_title:'Cosa dicono i nostri clienti', rev_empty:'Hai fatto un tour con noi? Raccontaci come è andata: la tua recensione aiuta altri viaggiatori.', rev_cta:'Recensisci su Google', form_title:'Pianifichiamo la tua prossima esperienza?', form_sub:'Raccontaci cosa cerchi e il nostro team ti risponderà.',
       quick_hint:'Preferisci parlare ora? Rispondiamo subito qui.',
       f_name:'Nome', f_email:'E-mail', f_whats:'WhatsApp', f_country:'Paese', f_date:'Data del viaggio', f_people:'Numero di persone', f_tour:'Tour di interesse', f_tour_any:'Non so ancora', f_msg:'Messaggio', f_send:'Voglio saperne di più',
       ok:'Abbiamo ricevuto il tuo contatto! Per fare prima, continua su WhatsApp:', ok_btn:'Continua su WhatsApp', err:'Non siamo riusciti a inviare ora. Riprova o scrivici su WhatsApp.', err_req:'Inserisci il tuo nome e un’e-mail valida.',
