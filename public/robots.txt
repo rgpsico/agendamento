@@ -1,9 +1,0 @@
-User-agent: *
-Allow: /
-Disallow: /admin
-Disallow: /super-admin
-Disallow: /login
-Disallow: /register
-Disallow: /api
-
-Sitemap: https://surfschool.surfgestao.com.br/sitemap.xml

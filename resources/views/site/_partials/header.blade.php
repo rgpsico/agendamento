@@ -111,6 +111,7 @@
 
     {{-- ── Códigos de rastreamento / marketing (dinâmico) ── --}}
     @include('site._partials.tracking')
+    @include('site._partials.verificacao')
     @php
         $corPrimaria = $site->cores['primaria'] ?? '#667eea';
         $corSecundaria = $site->cores['secundaria'] ?? '#764ba2';

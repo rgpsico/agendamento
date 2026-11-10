@@ -119,6 +119,8 @@ footer{padding-block:28px;border-top:1px solid var(--line);color:var(--muted);fo
 footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 24px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 </style>
+    @include('site._partials.tracking')
+    @include('site._partials.verificacao')
 </head>
 <body>
 

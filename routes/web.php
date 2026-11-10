@@ -726,16 +726,7 @@ use App\Http\Controllers\SiteArtigoPublicPageController;
 use App\Http\Controllers\SitemapController;
 
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
-Route::get('/robots.txt',  fn() => response(
-    "User-agent: *\n" .
-    "Allow: /\n" .
-    "Disallow: /admin\n" .
-    "Disallow: /super-admin\n" .
-    "Disallow: /login\n" .
-    "Disallow: /register\n\n" .
-    "Sitemap: https://" . request()->getHost() . "/sitemap.xml\n",
-    200, ['Content-Type' => 'text/plain']
-))->name('robots');
+Route::get('/robots.txt', [SitemapController::class, 'robots'])->name('robots');
 
 // ─── Blog / Artigos públicos do sistema ───────────────────────────────────────
 use App\Http\Controllers\ConteudoPublicController;

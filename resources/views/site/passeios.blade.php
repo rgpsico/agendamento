@@ -288,6 +288,8 @@
             .fab .bt::after { animation:none; } .btn, .tour, .masonry img { transition:none; }
         }
     </style>
+    @include('site._partials.tracking')
+    @include('site._partials.verificacao')
 </head>
 <body data-zap="{{ $zap }}" data-site="{{ $site->titulo }}" data-contato-url="{{ url('/site/' . $site->slug . '/contato') }}">
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">

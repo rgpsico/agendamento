@@ -474,6 +474,7 @@ footer{background:var(--bg)}
 
   {{-- ── Códigos de rastreamento / marketing ── --}}
   @include('site._partials.tracking')
+    @include('site._partials.verificacao')
 </head>
 <body>
 

@@ -19,16 +19,6 @@ class SitemapController extends Controller
 
         $base = 'https://' . $request->getHost();
 
-        // URLs estáticas da landing page
-        $static = [
-            ['loc' => $base . '/',          'priority' => '1.0',  'changefreq' => 'weekly'],
-            ['loc' => $base . '/#sobre',     'priority' => '0.7',  'changefreq' => 'monthly'],
-            ['loc' => $base . '/#aulas',     'priority' => '0.8',  'changefreq' => 'weekly'],
-            ['loc' => $base . '/#precos',    'priority' => '0.8',  'changefreq' => 'weekly'],
-            ['loc' => $base . '/#contato',   'priority' => '0.6',  'changefreq' => 'monthly'],
-            ['loc' => $base . '/blog',       'priority' => '0.9',  'changefreq' => 'daily'],
-        ];
-
         // Artigos publicados deste site
         $artigos = $site
             ? SiteArtigo::where('site_id', $site->id)
@@ -37,11 +27,50 @@ class SitemapController extends Controller
                 ->get(['slug', 'titulo', 'publicado_em', 'updated_at'])
             : collect();
 
+        // Site desligado (ativo = false) não vai para o Google: sitemap vazio
+        // (as páginas dele também saem com noindex).
+        $static = [];
+        if (!$site || $site->ativo) {
+            // Âncoras (#sobre, #contato...) não são páginas: o Google ignora, então só a raiz
+            $static[] = ['loc' => $base . '/', 'priority' => '1.0', 'changefreq' => 'weekly'];
+
+            if ($artigos->isNotEmpty()) {
+                $static[] = ['loc' => $base . '/blog', 'priority' => '0.9', 'changefreq' => 'daily'];
+            }
+        } else {
+            $artigos = collect();
+        }
+
         $xml = $this->buildXml($static, $artigos, $base);
 
         return response($xml, 200)
             ->header('Content-Type', 'application/xml; charset=utf-8')
             ->header('X-Robots-Tag', 'noindex'); // o sitemap em si não precisa ser indexado
+    }
+
+    /**
+     * robots.txt dinâmico — cada domínio aponta para o próprio sitemap.
+     * Site desligado (ativo = false) bloqueia tudo.
+     * Acesso: GET /robots.txt
+     */
+    public function robots(Request $request): Response
+    {
+        $site = EmpresaSite::resolveByHost($request->getHost());
+
+        if ($site && !$site->ativo) {
+            $txt = "User-agent: *\nDisallow: /\n";
+        } else {
+            $txt = "User-agent: *\n"
+                 . "Allow: /\n"
+                 . "Disallow: /admin\n"
+                 . "Disallow: /super-admin\n"
+                 . "Disallow: /login\n"
+                 . "Disallow: /register\n"
+                 . "Disallow: /api\n\n"
+                 . "Sitemap: https://" . $request->getHost() . "/sitemap.xml\n";
+        }
+
+        return response($txt, 200, ['Content-Type' => 'text/plain; charset=utf-8']);
     }
 
     private function buildXml(array $static, $artigos, string $base): string

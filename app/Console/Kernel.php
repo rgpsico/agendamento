@@ -22,11 +22,6 @@ class Kernel extends ConsoleKernel
         $schedule->command('artigo:limpar-duplicados')
                  ->dailyAt('02:00')
                  ->appendOutputTo(storage_path('logs/artigo-seo.log'));
-
-        // Regera o sitemap.xml: às 3h e logo após cada lote de artigos (07:05 e 19:05)
-        $schedule->command('sitemap:gerar')->dailyAt('03:00');
-        $schedule->command('sitemap:gerar')->dailyAt('07:05');
-        $schedule->command('sitemap:gerar')->dailyAt('19:05');
     }
 
     /**

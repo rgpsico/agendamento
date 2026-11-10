@@ -165,6 +165,9 @@
                                     <button class="btn btn-outline-primary btn-sm" onclick="preencherTracking('Meta / Facebook Pixel','facebook_pixel','pixel','')">
                                         <img src="https://www.facebook.com/favicon.ico" width="14" class="me-1"> Meta Pixel
                                     </button>
+                                    <button class="btn btn-outline-primary btn-sm" onclick="preencherTracking('Google Search Console','google_site_verification','other','')">
+                                        <img src="https://www.google.com/favicon.ico" width="14" class="me-1"> Search Console
+                                    </button>
                                     <button class="btn btn-outline-secondary btn-sm" onclick="preencherTracking('TikTok Pixel','tiktok_pixel','pixel','')">
                                         🎵 TikTok Pixel
                                     </button>
@@ -193,6 +196,7 @@
                                                     <option value="google_tag_manager">Google Tag Manager</option>
                                                     <option value="facebook_pixel">Meta / Facebook Pixel</option>
                                                     <option value="tiktok_pixel">TikTok Pixel</option>
+                                                    <option value="google_site_verification">Google Search Console (verificação)</option>
                                                     <option value="custom">JavaScript personalizado</option>
                                                 </select>
                                             </div>
@@ -281,6 +285,7 @@
                                                         'google_tag_manager' => '🏷️',
                                                         'facebook_pixel'     => '🎯',
                                                         'tiktok_pixel'       => '🎵',
+                                                        'google_site_verification' => '🔎',
                                                         'custom'             => '💻',
                                                       ];
                                                       $labels = [
@@ -288,6 +293,7 @@
                                                         'google_tag_manager' => 'Tag Manager',
                                                         'facebook_pixel'     => 'Meta Pixel',
                                                         'tiktok_pixel'       => 'TikTok Pixel',
+                                                        'google_site_verification' => 'Search Console',
                                                         'custom'             => 'JS Personalizado',
                                                       ];
                                                     @endphp
@@ -364,6 +370,7 @@
         google_tag_manager: 'Ex: GTM-XXXXXXX',
         facebook_pixel:     'Ex: 1234567890123',
         tiktok_pixel:       'Ex: CXXXXXXXXXXXXXXXX',
+        google_site_verification: 'Só o valor do content da tag HTML do Search Console',
         custom:             '',
     };
     function toggleScriptField() {
