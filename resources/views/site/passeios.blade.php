@@ -580,6 +580,27 @@
 @endif
 
 <script>window.SV = {!! json_encode($svMap, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) !!}; window.SVM = {!! json_encode($svm, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) !!};</script>
+{{-- Contador do painel (mesmos endpoints do js/site-metrics.js, sem jQuery) --}}
+<script>
+(function () {
+  var id = {{ (int) ($site->id ?? 0) }};
+  if (!id || navigator.webdriver) return;
+  function send(path) {
+    var d = new FormData(); d.append('empresa_site_id', id);
+    try { if (navigator.sendBeacon && navigator.sendBeacon('/api/' + path, d)) return; } catch (e) {}
+    try { fetch('/api/' + path, { method: 'POST', body: d, keepalive: true }); } catch (e) {}
+  }
+  send('visualizacao');
+  // O endpoint de visitante nao tem sessao: conta o navegador uma vez so
+  try {
+    if (!localStorage.getItem('sv_visitante_' + id)) { send('visitante'); localStorage.setItem('sv_visitante_' + id, '1'); }
+  } catch (e) { send('visitante'); }
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a[href*="wa.me"]');
+    if (a) send('clique-whatsapp');
+  });
+})();
+</script>
 @verbatim
 <script>
 (function () {
