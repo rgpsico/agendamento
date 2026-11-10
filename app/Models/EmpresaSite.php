@@ -22,6 +22,7 @@ class EmpresaSite extends Model
         'cores',
         'descricao',
         'ativo',
+        'blog_automatico',
         'sobre_titulo',
         'sobre_descricao',
         'sobre_imagem',
@@ -39,6 +40,7 @@ class EmpresaSite extends Model
         'cores' => 'array',
         'sobre_itens' => 'array',
         'ativo' => 'boolean',
+        'blog_automatico' => 'boolean',
     ];
 
     public static function normalizeHost(?string $host): ?string

@@ -185,15 +185,15 @@ class GerarArtigoSeo extends Command
             return self::FAILURE;
         }
 
-        // Sites alvo
-        $query = EmpresaSite::where('ativo', true);
+        // Sites alvo: ativos e marcados com "blog automático" na configuração do site
+        $query = EmpresaSite::where('ativo', true)->where('blog_automatico', true);
         if ($this->option('site_id')) {
             $query->where('id', (int) $this->option('site_id'));
         }
         $sites = $query->get();
 
         if ($sites->isEmpty()) {
-            $this->warn('Nenhum site ativo encontrado.');
+            $this->warn('Nenhum site ativo com blog automático marcado.');
             return self::SUCCESS;
         }
 

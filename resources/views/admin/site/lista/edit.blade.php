@@ -165,6 +165,18 @@
 
                                   <div class="form-group">
                                     <div class="modern-checkbox">
+                                        <input type="checkbox" name="blog_automatico" id="blog_automatico" class="form-check-input"
+                                            {{ old('blog_automatico', $site->blog_automatico ?? 0) ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="blog_automatico">
+                                            <i class="fas fa-newspaper me-2 text-info"></i>
+                                            Gerar artigos do blog automaticamente (2 por dia)
+                                        </label>
+                                    </div>
+                                    <small class="text-muted">Só funciona para sites de nichos com temas cadastrados (surf, pilates...).</small>
+                                </div>
+
+                                  <div class="form-group">
+                                    <div class="modern-checkbox">
                                         <input type="checkbox" name="atendimento_com_ia" id="atendimento_com_ia" class="form-check-input"
                                             {{ old('atendimento_com_ia', $site->atendimento_com_ia ?? 0) == 1 ? 'checked' : '' }}>
                                         <label class="form-check-label" for="atendimento_com_ia">

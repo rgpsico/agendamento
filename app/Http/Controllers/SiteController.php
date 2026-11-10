@@ -580,6 +580,7 @@ class SiteController extends Controller
             'atendimento_com_ia' => 'nullable|in:on,off',
             'bot_id' => 'nullable|exists:bots,id',
             'atendimento_com_whatsapp' => 'nullable|in:on,off',
+            'blog_automatico' => 'nullable|in:on,off',
 
             // Novos campos
             'servicos' => 'nullable|array',
@@ -629,6 +630,7 @@ class SiteController extends Controller
                 : null,
             'atendimento_com_ia' => $request->input('atendimento_com_ia') == 'on' ? 1 : 0,
             'atendimento_com_whatsapp' => $request->input('atendimento_com_whatsapp') == 'on' ? 1 : 0,
+            'blog_automatico' => $request->input('blog_automatico') == 'on' ? 1 : 0,
             'dominio_personalizado'  => EmpresaSite::normalizeHost($request->dominio_personalizado), // ← ADD
             ];
 
