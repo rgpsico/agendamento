@@ -41,6 +41,7 @@
     $svMap = $passeios->mapWithKeys(fn ($x) => [(string) $x->id => array_merge(['pt' => ['t' => $x->titulo, 'd' => $x->descricao]], $x->tr)]);
     $depoimentos = $site->depoimentos ?? collect();
     $avaliacaoGoogle = config('sites.avaliacao_google', [])[$site->id] ?? null;
+    $temAvaliacoes = $depoimentos->count() || $avaliacaoGoogle;
     $temSobre = filled($site->sobre_titulo) || filled($site->sobre_descricao) || !empty($site->sobre_itens);
     $contatos = collect($site->contatos ?? [])->keyBy(fn ($c) => strtolower($c->tipo));
     $instagram = $contatos->get('instagram')?->valor;
@@ -316,6 +317,7 @@
             @if($passeios->count())<a href="#passeios" data-i18n="nav_tours">Passeios</a>@endif
             @if($temGaleria)<a href="#galeria" data-i18n="nav_gallery">Galeria</a>@endif
             @if($temSobre)<a href="#sobre" data-i18n="nav_about">Sobre nós</a>@endif
+            @if($temAvaliacoes)<a href="#avaliacoes" data-i18n="nav_reviews">Avaliações</a>@endif
             <a href="#contato" data-i18n="nav_contact">Contato</a>
         </nav>
         <div class="lang" data-lang>
@@ -433,7 +435,7 @@
     </div>
 </section>
 
-@if($depoimentos->count() || $avaliacaoGoogle)
+@if($temAvaliacoes)
 <section id="avaliacoes" style="padding-top:0">
     <div class="wrap">
         <div class="reveal"><h2 class="title" data-i18n="rev_title">O que dizem nossos clientes</h2></div>
@@ -559,6 +561,7 @@
                     @if($temGaleria)<li><a href="#galeria" data-i18n="nav_gallery">Galeria</a></li>@endif
                     @if($galeriaUrl)<li><a href="{{ $galeriaUrl }}" target="_blank" rel="noopener" data-i18n="gal_cta">Ver galeria completa</a></li>@endif
                     @if($temSobre)<li><a href="#sobre" data-i18n="nav_about">Sobre nós</a></li>@endif
+                    @if($temAvaliacoes)<li><a href="#avaliacoes" data-i18n="nav_reviews">Avaliações</a></li>@endif
                     <li><a href="#contato" data-i18n="nav_contact">Contato</a></li>
                 </ul>
             </div>
@@ -620,7 +623,7 @@
 <script>
 (function () {
   var T = {
-    pt: { skip:'Ir para o conteúdo', ask:'Olá! Quero saber mais sobre o passeio: {t}', tours_other_eyebrow:'Também organizamos', tours_other_title:'Outros passeios no Rio', photo:'Foto', nav_home:'Início', nav_tours:'Passeios', nav_gallery:'Galeria', nav_about:'Sobre nós', nav_contact:'Contato',
+    pt: { skip:'Ir para o conteúdo', ask:'Olá! Quero saber mais sobre o passeio: {t}', tours_other_eyebrow:'Também organizamos', tours_other_title:'Outros passeios no Rio', photo:'Foto', nav_home:'Início', nav_tours:'Passeios', nav_gallery:'Galeria', nav_about:'Sobre nós', nav_reviews:'Avaliações', nav_contact:'Contato',
       hero_title:'Viva experiências que você nunca vai esquecer.', hero_sub:'Descubra passeios, praias e experiências incríveis e encontre a aventura perfeita para sua viagem.',
       btn_explore:'Explorar passeios', btn_whats:'Falar pelo WhatsApp', trust1:'Atendimento rápido', trust2:'Reserva fácil', trust3:'Suporte durante sua experiência',
       tours_eyebrow:'Passeios', tours_title:'Experiências que você vai amar', duration:'Duração', from:'a partir de', view_exp:'Ver experiência',
@@ -640,7 +643,7 @@
       ok:'Recebemos seu contato! Para agilizar, continue pelo WhatsApp:', ok_btn:'Continuar no WhatsApp', err:'Não foi possível enviar agora. Tente de novo ou fale pelo WhatsApp.', err_req:'Preencha nome e um e-mail válido.',
       final_title:'Sua próxima história começa aqui.', final_sub:'Descubra experiências incríveis e transforme sua viagem em uma lembrança inesquecível.',
       foot_blurb:'Passeios e experiências no Rio de Janeiro.', foot_menu:'Menu', foot_review:'Avalie a gente no Google', fab_tip:'Fale conosco pelo WhatsApp', hello:'Olá! Vi o site da {s} e gostaria de saber mais.' },
-    en: { skip:'Skip to content', ask:'Hello! I would like to know more about: {t}', tours_other_eyebrow:'We also arrange', tours_other_title:'More ways to see Rio', photo:'Photo', nav_home:'Home', nav_tours:'Tours', nav_gallery:'Gallery', nav_about:'About us', nav_contact:'Contact',
+    en: { skip:'Skip to content', ask:'Hello! I would like to know more about: {t}', tours_other_eyebrow:'We also arrange', tours_other_title:'More ways to see Rio', photo:'Photo', nav_home:'Home', nav_tours:'Tours', nav_gallery:'Gallery', nav_about:'About us', nav_reviews:'Reviews', nav_contact:'Contact',
       hero_title:'Live experiences you will never forget.', hero_sub:'Discover tours, beaches and amazing experiences and find the perfect adventure for your trip.',
       btn_explore:'Explore tours', btn_whats:'Chat on WhatsApp', trust1:'Fast response', trust2:'Easy booking', trust3:'Support during your experience',
       tours_eyebrow:'Tours', tours_title:'Experiences you will love', duration:'Duration', from:'from', view_exp:'View experience',
@@ -660,7 +663,7 @@
       ok:'We received your message! To speed things up, continue on WhatsApp:', ok_btn:'Continue on WhatsApp', err:'We could not send it now. Try again or chat on WhatsApp.', err_req:'Please enter your name and a valid e-mail.',
       final_title:'Your next story starts here.', final_sub:'Discover amazing experiences and turn your trip into an unforgettable memory.',
       foot_blurb:'Tours and experiences in Rio de Janeiro.', foot_menu:'Menu', foot_review:'Review us on Google', fab_tip:'Chat with us on WhatsApp', hello:'Hello! I saw the {s} website and would like to know more.' },
-    es: { skip:'Ir al contenido', ask:'¡Hola! Quisiera saber más sobre: {t}', tours_other_eyebrow:'También organizamos', tours_other_title:'Más formas de conocer Río', photo:'Foto', nav_home:'Inicio', nav_tours:'Paseos', nav_gallery:'Galería', nav_about:'Sobre nosotros', nav_contact:'Contacto',
+    es: { skip:'Ir al contenido', ask:'¡Hola! Quisiera saber más sobre: {t}', tours_other_eyebrow:'También organizamos', tours_other_title:'Más formas de conocer Río', photo:'Foto', nav_home:'Inicio', nav_tours:'Paseos', nav_gallery:'Galería', nav_about:'Sobre nosotros', nav_reviews:'Opiniones', nav_contact:'Contacto',
       hero_title:'Vive experiencias que nunca vas a olvidar.', hero_sub:'Descubre paseos, playas y experiencias increíbles y encuentra la aventura perfecta para tu viaje.',
       btn_explore:'Explorar paseos', btn_whats:'Hablar por WhatsApp', trust1:'Atención rápida', trust2:'Reserva fácil', trust3:'Soporte durante tu experiencia',
       tours_eyebrow:'Paseos', tours_title:'Experiencias que vas a amar', duration:'Duración', from:'desde', view_exp:'Ver experiencia',
@@ -680,7 +683,7 @@
       ok:'¡Recibimos tu contacto! Para agilizar, continúa por WhatsApp:', ok_btn:'Continuar en WhatsApp', err:'No pudimos enviarlo ahora. Inténtalo de nuevo o habla por WhatsApp.', err_req:'Completa tu nombre y un correo válido.',
       final_title:'Tu próxima historia empieza aquí.', final_sub:'Descubre experiencias increíbles y convierte tu viaje en un recuerdo inolvidable.',
       foot_blurb:'Paseos y experiencias en Río de Janeiro.', foot_menu:'Menú', foot_review:'Evalúanos en Google', fab_tip:'Habla con nosotros por WhatsApp', hello:'¡Hola! Vi el sitio de {s} y me gustaría saber más.' },
-    it: { skip:'Vai al contenuto', ask:'Ciao! Vorrei saperne di più su: {t}', tours_other_eyebrow:'Organizziamo anche', tours_other_title:'Altri modi per scoprire Rio', photo:'Foto', nav_home:'Home', nav_tours:'Tour', nav_gallery:'Galleria', nav_about:'Chi siamo', nav_contact:'Contatti',
+    it: { skip:'Vai al contenuto', ask:'Ciao! Vorrei saperne di più su: {t}', tours_other_eyebrow:'Organizziamo anche', tours_other_title:'Altri modi per scoprire Rio', photo:'Foto', nav_home:'Home', nav_tours:'Tour', nav_gallery:'Galleria', nav_about:'Chi siamo', nav_reviews:'Recensioni', nav_contact:'Contatti',
       hero_title:'Vivi esperienze che non dimenticherai mai.', hero_sub:'Scopri tour, spiagge ed esperienze incredibili e trova l’avventura perfetta per il tuo viaggio.',
       btn_explore:'Esplora i tour', btn_whats:'Scrivici su WhatsApp', trust1:'Risposta rapida', trust2:'Prenotazione facile', trust3:'Assistenza durante la tua esperienza',
       tours_eyebrow:'Tour', tours_title:'Esperienze che amerai', duration:'Durata', from:'da', view_exp:'Vedi l’esperienza',
@@ -699,7 +702,7 @@
       f_name:'Nome', f_email:'E-mail', f_whats:'WhatsApp', f_country:'Paese', f_date:'Data del viaggio', f_people:'Numero di persone', f_tour:'Tour di interesse', f_tour_any:'Non so ancora', f_msg:'Messaggio', f_send:'Voglio saperne di più',
       ok:'Abbiamo ricevuto il tuo contatto! Per fare prima, continua su WhatsApp:', ok_btn:'Continua su WhatsApp', err:'Non siamo riusciti a inviare ora. Riprova o scrivici su WhatsApp.', err_req:'Inserisci il tuo nome e un’e-mail valida.',
       final_title:'La tua prossima storia inizia qui.', final_sub:'Scopri esperienze incredibili e trasforma il tuo viaggio in un ricordo indimenticabile.',
-      foot_blurb:'Tour ed esperienze a Rio de Janeiro.', foot_menu:'Menu', foot_review:'Recensiscici su Google', fab_tip:'Scrivici su WhatsApp', hello:'Ciao! Ho visto il sito di {s} e vorrei saperne di più.' }
+      foot_blurb:'Tour ed esperienze a Rio de Janeiro.', foot_menu:'Menu', foot_review:'Lascia una recensione su Google', fab_tip:'Scrivici su WhatsApp', hello:'Ciao! Ho visto il sito di {s} e vorrei saperne di più.' }
   };
   var CODES = { pt:'PT', en:'EN', es:'ES', it:'IT' }, FLAGS = { pt:'#f-br', en:'#f-us', es:'#f-es', it:'#f-it' }, HTMLLANG = { pt:'pt-BR', en:'en', es:'es', it:'it' };
   var body = document.body, siteName = body.dataset.site, zap = body.dataset.zap, lang = 'pt';
