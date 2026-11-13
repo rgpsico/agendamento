@@ -47,7 +47,7 @@ class ArtigoSeoTest extends TestCase
             'user_id' => $usuario->id, 'modalidade_id' => $modalidade->id,
             'nome' => 'Estudio Teste', 'descricao' => 'd', 'telefone' => '1', 'cnpj' => '',
         ]);
-        $site = EmpresaSite::forceCreate(['empresa_id' => $empresa->id, 'slug' => 's' . uniqid(), 'titulo' => 'Estudio Teste', 'ativo' => 1]);
+        $site = EmpresaSite::forceCreate(['empresa_id' => $empresa->id, 'slug' => 's' . uniqid(), 'titulo' => 'Estudio Teste', 'ativo' => 1, 'blog_automatico' => 1]);
         \App\Models\EmpresaEndereco::forceCreate(['empresa_id' => $empresa->id, 'endereco' => 'Rua A', 'cidade' => $cidade, 'estado' => 'RJ', 'uf' => 'RJ', 'cep' => '', 'pais' => 'Brasil']);
 
         return $site;
@@ -160,5 +160,18 @@ class ArtigoSeoTest extends TestCase
         foreach ($diferentes as $t) {
             $this->assertFalse($m->invoke($c, $t, $existentes), "nao deveria repetir: $t");
         }
+    }
+
+    /** @test */
+    public function site_sem_blog_automatico_marcado_nao_recebe_artigo(): void
+    {
+        Http::fake();
+        $site = $this->criarSite('pilates');
+        $site->update(['blog_automatico' => false]);
+
+        $this->gerar($site);
+
+        $this->assertDatabaseMissing('site_artigos', ['site_id' => $site->id]);
+        Http::assertNothingSent();
     }
 }

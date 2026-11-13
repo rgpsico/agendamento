@@ -21,12 +21,41 @@ class NichoConfiguracao extends Model
         'logo',
         'login_imagem',
         'registro_imagem',
+        'recursos',
+        'termos',
         'ativo',
     ];
 
     protected $casts = [
         'ativo' => 'boolean',
+        'recursos' => 'array',
+        'termos' => 'array',
     ];
+
+    /** Funções que um nicho pode ligar (chave => descrição na tela de configuração). */
+    const RECURSOS = [
+        'fila_checkin' => 'Fila de check-in (cliente chega, avisa pelo celular e entra na fila do profissional)',
+    ];
+
+    /** Palavras que um nicho pode trocar (chave => [palavra de sempre, rótulo na tela de configuração]). */
+    const TERMOS = [
+        'profissional' => ['Professor', 'Profissional (singular)'],
+        'profissionais' => ['Professores', 'Profissional (plural)'],
+        'cliente' => ['Aluno', 'Cliente (singular)'],
+        'clientes' => ['Alunos', 'Cliente (plural)'],
+    ];
+
+    public function recurso(string $chave): bool
+    {
+        return (bool) (($this->recursos ?? [])[$chave] ?? false);
+    }
+
+    public function termo(string $chave, ?string $padrao = null): string
+    {
+        $valor = ($this->termos ?? [])[$chave] ?? null;
+
+        return filled($valor) ? $valor : ($padrao ?? (self::TERMOS[$chave][0] ?? $chave));
+    }
 
     /**
      * Resolve a configuração pelo host da requisição.

@@ -167,6 +167,33 @@
                     <small class="text-muted">Mede a página, o formulário e o teste grátis deste nicho nos anúncios do Facebook e Instagram.</small>
                 </div>
 
+                {{-- Palavras do nicho --}}
+                <div class="form-card mb-4">
+                    <div class="section-title">Palavras do nicho</div>
+                    <small class="text-muted d-block mb-3">Como este nicho chama cada pessoa nas telas. Em branco usa a palavra de sempre (entre parênteses).</small>
+                    <div class="row g-3">
+                        @foreach(\App\Models\NichoConfiguracao::TERMOS as $chave => [$padrao, $rotulo])
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">{{ $rotulo }}</label>
+                                <input type="text" name="termos[{{ $chave }}]" class="form-control" maxlength="40"
+                                       value="{{ old('termos.' . $chave, $nicho->termos[$chave] ?? '') }}" placeholder="{{ $padrao }}">
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+
+                {{-- Funções do nicho --}}
+                <div class="form-card mb-4">
+                    <div class="section-title">Funções do nicho</div>
+                    @foreach(\App\Models\NichoConfiguracao::RECURSOS as $chave => $descricao)
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" name="recursos[{{ $chave }}]" id="recurso_{{ $chave }}" value="1"
+                                   {{ old('recursos.' . $chave, $nicho->recursos[$chave] ?? false) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="recurso_{{ $chave }}">{{ $descricao }}</label>
+                        </div>
+                    @endforeach
+                </div>
+
                 {{-- Status --}}
                 <div class="form-card">
                     <div class="section-title">Status</div>

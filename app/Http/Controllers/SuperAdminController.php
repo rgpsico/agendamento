@@ -99,6 +99,18 @@ class SuperAdminController extends Controller
 
     // ─── Nicho Configurações ──────────────────────────────────
 
+    /** Só guarda palavras e funções que o sistema conhece; palavra em branco volta para a de sempre. */
+    private function termosERecursos(Request $request): array
+    {
+        $termos = array_filter(array_intersect_key((array) $request->input('termos', []), NichoConfiguracao::TERMOS), 'filled');
+        $ligados = array_keys(array_filter(array_intersect_key((array) $request->input('recursos', []), NichoConfiguracao::RECURSOS)));
+
+        return [
+            'termos' => $termos ?: null,
+            'recursos' => $ligados ? array_fill_keys($ligados, true) : null,
+        ];
+    }
+
     public function nichos()
     {
         $nichos = NichoConfiguracao::orderBy('nome')->get();
@@ -125,6 +137,8 @@ class SuperAdminController extends Controller
             'login_imagem'   => 'nullable|image|max:4096',
             'registro_imagem'=> 'nullable|image|max:4096',
             'ativo'          => 'boolean',
+            'termos'         => 'nullable|array',
+            'termos.*'       => 'nullable|string|max:40',
         ]);
 
         foreach (['logo', 'login_imagem', 'registro_imagem'] as $campo) {
@@ -136,6 +150,7 @@ class SuperAdminController extends Controller
         }
 
         $data['ativo'] = $request->boolean('ativo', true);
+        $data = array_merge($data, $this->termosERecursos($request));
 
         NichoConfiguracao::create($data);
 
@@ -162,6 +177,8 @@ class SuperAdminController extends Controller
             'login_imagem'   => 'nullable|image|max:4096',
             'registro_imagem'=> 'nullable|image|max:4096',
             'ativo'          => 'boolean',
+            'termos'         => 'nullable|array',
+            'termos.*'       => 'nullable|string|max:40',
         ]);
 
         foreach (['logo', 'login_imagem', 'registro_imagem'] as $campo) {
@@ -174,6 +191,7 @@ class SuperAdminController extends Controller
         }
 
         $data['ativo'] = $request->boolean('ativo', true);
+        $data = array_merge($data, $this->termosERecursos($request));
 
         $nicho->update($data);
 

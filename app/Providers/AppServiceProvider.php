@@ -35,6 +35,10 @@ class AppServiceProvider extends ServiceProvider
 
         Paginator::useBootstrapFive();
 
+        // @termo('profissional') / @termo('cliente', 'Aluno'): a palavra do nicho do domínio. @recurso('fila_checkin') ... @endrecurso
+        Blade::directive('termo', fn ($args) => "<?php echo e(\\App\\Support\\Nicho::termo({$args})); ?>");
+        Blade::if('recurso', fn (string $chave) => \App\Support\Nicho::recurso($chave));
+
         // Páginas legais (termos, privacidade, LGPD): marca, domínio e público do nicho do domínio acessado.
         // O nicho original (pilates) mantém o texto de sempre.
         View::composer(['layouts.legal', 'legal.*'], function ($view) {
