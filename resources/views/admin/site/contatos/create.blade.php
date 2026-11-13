@@ -21,6 +21,7 @@
                                 <option value="whatsapp">WhatsApp</option>
                                 <option value="instagram">Instagram</option>
                                 <option value="endereco">Endereço</option>
+                                <option value="horario">Horário de funcionamento (ex.: Seg a Sex, 9h às 20h)</option>
                             </select>
                         </div>
 

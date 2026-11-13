@@ -217,7 +217,7 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 2
           @if($wa)<div><dt>WhatsApp</dt><dd><a href="https://wa.me/{{ $wa }}?text={{ $waText }}" target="_blank" rel="noopener">{{ $telefone ?: '+'.$wa }}</a></dd></div>
           @elseif($telefone)<div><dt>Telefone</dt><dd>{{ $telefone }}</dd></div>@endif
           @if($endStr)<div><dt>Endereço</dt><dd>{{ $endStr }}</dd></div>@endif
-          @if($instagram)<div><dt>Instagram</dt><dd><a href="https://instagram.com/{{ $instagram }}" target="_blank" rel="noopener">@{{ $instagram }}</a></dd></div>@endif
+          @if($instagram)<div><dt>Instagram</dt><dd><a href="https://instagram.com/{{ $instagram }}" target="_blank" rel="noopener">&#64;{{ $instagram }}</a></dd></div>@endif
           @if($botAtivo)<div><dt>Chat</dt><dd>Use o botão de chat no canto da tela para tirar dúvidas e agendar.</dd></div>@endif
         </dl>
       </div>

@@ -17,9 +17,9 @@
                         <div class="form-group">
                             <label for="tipo">Tipo</label>
                             <select name="tipo" class="form-control" required>
-                                @foreach(['telefone', 'email', 'whatsapp', 'instagram', 'endereco'] as $tipo)
+                                @foreach(['telefone', 'email', 'whatsapp', 'instagram', 'endereco', 'horario'] as $tipo)
                                     <option value="{{ $tipo }}" {{ $contato->tipo == $tipo ? 'selected' : '' }}>
-                                        {{ ucfirst($tipo) }}
+                                        {{ $tipo === 'horario' ? 'Horário de funcionamento' : ucfirst($tipo) }}
                                     </option>
                                 @endforeach
                             </select>
