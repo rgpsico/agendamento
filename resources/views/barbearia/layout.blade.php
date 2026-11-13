@@ -59,6 +59,8 @@
     <a href="{{ route('barbearia.index') }}">{{ $marca }}</a>
     @auth
         <form method="post" action="{{ route('barbearia.sair') }}">@csrf<button type="submit">Sair</button></form>
+    @else
+        <a href="{{ route('barbearia.login') }}" style="font-weight:400;font-size:14px">Entrar</a>
     @endauth
 </header>
 <main>

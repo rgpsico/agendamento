@@ -65,6 +65,32 @@ class BarbeiroFilaTest extends TestCase
 
     // ── acesso ───────────────────────────────────────────────────────────
 
+    public function test_painel_sem_login_manda_para_a_entrada_da_barbearia_e_nao_para_o_login_geral(): void
+    {
+        $this->get(route('barbearia.painel'))->assertRedirect(route('barbearia.login'));
+        $this->get(route('barbearia.painel.fila'))->assertRedirect(route('barbearia.login'));
+    }
+
+    public function test_pagina_de_entrada_direta_e_o_barbeiro_cai_na_propria_fila(): void
+    {
+        $this->get(route('barbearia.login'))->assertOk()->assertSee('Celular')->assertSee('Senha');
+
+        $this->a['user']->forceFill(['telefone' => '21990001111'])->save();
+        $this->post(route('barbearia.entrar'), ['telefone' => '(21) 99000-1111', 'senha' => '1234'])->assertRedirect(route('barbearia.painel'));
+        $this->get(route('barbearia.painel'))->assertRedirect(route('barbearia.painel.fila'));
+
+        // já logado, a página de entrada leva direto para o painel
+        $this->get(route('barbearia.login'))->assertRedirect(route('barbearia.painel'));
+    }
+
+    public function test_senha_errada_volta_para_a_entrada_com_aviso(): void
+    {
+        $this->a['user']->forceFill(['telefone' => '21990001111'])->save();
+
+        $this->from(route('barbearia.login'))->post(route('barbearia.entrar'), ['telefone' => '21990001111', 'senha' => 'errada'])
+            ->assertRedirect(route('barbearia.login'))->assertSessionHasErrors('telefone', null, 'entrar');
+    }
+
     public function test_so_barbeiro_ativo_de_barbearia_abre_a_fila(): void
     {
         $this->get(route('barbearia.painel.fila'))->assertRedirect();

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Barbearia;
 
 use App\Http\Controllers\Controller;
 use App\Models\Alunos;
+use App\Models\NichoConfiguracao;
 use App\Models\Usuario;
 use App\Support\Telefone;
 use Illuminate\Http\Request;
@@ -51,6 +52,18 @@ class ClienteController extends Controller
         $request->session()->regenerate();
 
         return redirect($this->voltar($request));
+    }
+
+    /** Página de entrada direta (barbeiro, dono ou cliente), sem precisar escolher a barbearia antes. */
+    public function login(Request $request)
+    {
+        if ($request->user()) {
+            return redirect($request->user()->tipo_usuario === 'Aluno' ? route('barbearia.index') : route('barbearia.painel'));
+        }
+
+        $nicho = NichoConfiguracao::where('ativo', true)->get()->first(fn ($n) => $n->recurso('fila_checkin'));
+
+        return view('barbearia.entrar', ['nicho' => $nicho]);
     }
 
     public function entrar(Request $request)

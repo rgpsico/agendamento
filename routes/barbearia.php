@@ -20,6 +20,7 @@ Route::prefix('barbearia')->name('barbearia.')->group(function () {
     Route::get('/manifest.webmanifest', [AvisoController::class, 'manifesto'])->name('manifesto');
 
     // cliente: cadastro rápido (nome, celular e senha) e login pelo celular
+    Route::get('/entrar', [ClienteController::class, 'login'])->name('login');
     Route::post('/cadastro', [ClienteController::class, 'cadastro'])->middleware('throttle:cadastro')->name('cadastro');
     Route::post('/entrar', [ClienteController::class, 'entrar'])->middleware('throttle:login')->name('entrar');
     Route::post('/sair', [ClienteController::class, 'sair'])->name('sair');

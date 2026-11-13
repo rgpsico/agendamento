@@ -12,6 +12,11 @@ class Authenticate extends Middleware
      */
     protected function redirectTo(Request $request): ?string
     {
-        return $request->expectsJson() ? null : route('home.index');
+        if ($request->expectsJson()) {
+            return null;
+        }
+
+        // barbeiros, donos e clientes da barbearia entram pelo celular, na página de entrada da própria barbearia
+        return $request->is('barbearia/*') ? route('barbearia.login') : route('home.index');
     }
 }
