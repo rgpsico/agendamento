@@ -7,6 +7,7 @@ use App\Models\Alunos;
 use App\Models\Empresa;
 use App\Models\FilaAtendimento;
 use App\Models\Modalidade;
+use App\Models\NichoConfiguracao;
 use App\Models\Professor;
 use App\Models\Usuario;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -68,6 +69,14 @@ class BarbeariaFilaTest extends TestCase
         $this->b['empresa']->update(['status' => 'inativo']);
 
         $this->get('/barbearia')->assertRedirect(route('barbearia.show', $this->a['empresa']));
+    }
+
+    public function test_dominio_de_outro_nicho_nao_esconde_as_barbearias(): void
+    {
+        // ex: surfgestao.com.br (nicho surf, sem a função de fila) não pode mostrar a lista vazia
+        app()->instance('currentNicho', new NichoConfiguracao(['nicho' => 'surf', 'nome' => 'Surf']));
+
+        $this->get('/barbearia')->assertOk()->assertSee('Barbearia A')->assertSee('Barbearia B');
     }
 
     public function test_lista_tem_atalho_de_entrada_para_barbeiro_e_dono(): void

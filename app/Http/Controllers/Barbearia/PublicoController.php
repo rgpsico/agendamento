@@ -19,7 +19,8 @@ class PublicoController extends Controller
     {
         // nichos com fila de check-in; se o domínio é de um nicho, só as barbearias dele
         $nichos = NichoConfiguracao::where('ativo', true)->get()->filter(fn ($n) => $n->recurso('fila_checkin'));
-        if ($atual = Nicho::atual()) {
+        // (domínio de outro nicho, como surfgestao.com.br, não esconde as barbearias: lista todas)
+        if (($atual = Nicho::atual()) && $atual->recurso('fila_checkin')) {
             $nichos = $nichos->where('nicho', $atual->nicho);
         }
 
