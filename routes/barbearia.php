@@ -31,6 +31,7 @@ Route::prefix('barbearia')->name('barbearia.')->group(function () {
         Route::post('/painel/equipe', [EquipeController::class, 'store'])->name('equipe.store');
         Route::post('/painel/equipe/{professor}/ativo', [EquipeController::class, 'ativo'])->name('equipe.ativo');
         Route::post('/painel/checkin', [EquipeController::class, 'checkin'])->name('checkin.config');
+        Route::post('/painel/capa', [EquipeController::class, 'capa'])->name('capa');
 
         // barbeiro: fila ao vivo e agenda do dia
         Route::get('/painel/fila', [BarbeiroController::class, 'fila'])->name('painel.fila');

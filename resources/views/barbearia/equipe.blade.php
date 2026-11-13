@@ -1,6 +1,9 @@
 @extends('barbearia.layout')
 @section('area', 'dono')
 @section('titulo', 'Equipe')
+@section('head')
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+@endsection
 @section('conteudo')
     <h1>{{ $empresa->nome }}</h1>
     <p class="suave">Painel do dono @if($souBarbeiro)· <a href="{{ route('barbearia.painel.fila') }}"><strong>Minha fila</strong></a>@endif</p>
@@ -12,6 +15,54 @@
             </select>
         </form>
     @endif
+
+    <h2>Capa da barbearia</h2>
+    <div class="caixa" id="caixa-capa" data-url="{{ route('barbearia.capa') }}" data-empresa="{{ $empresa->id }}">
+        @include('barbearia._capa', ['empresa' => $empresa, 'classe' => 'capa-pagina'])
+        <p class="suave" id="capa-msg" style="margin:0 0 10px">Foto larga (de preferência deitada) que aparece na lista e no topo da página da barbearia.</p>
+        <div class="linha-acoes">
+            <label class="btn escuro pequeno" style="margin:0;cursor:pointer;width:auto">{{ $empresa->capa ? 'Trocar foto' : 'Escolher foto' }}
+                <input id="capa-arquivo" type="file" accept="image/jpeg,image/png,image/webp" style="display:none">
+            </label>
+            @if($empresa->capa)
+                <form method="post" action="{{ route('barbearia.capa') }}" style="margin:0">@csrf <input type="hidden" name="empresa" value="{{ $empresa->id }}"><input type="hidden" name="remover" value="1"><button class="btn claro pequeno" type="submit">Remover capa</button></form>
+            @endif
+        </div>
+        @error('capa')<div class="campo-erro">{{ $message }}</div>@enderror
+    </div>
+    <script>
+        // reduz a foto no próprio celular antes de enviar (foto de câmera tem vários MB) e manda por fetch
+        (function () {
+            var caixa = document.getElementById('caixa-capa'), msg = document.getElementById('capa-msg'), campo = document.getElementById('capa-arquivo');
+            var csrf = document.querySelector('meta[name=csrf-token]').content;
+            function erro(t) { msg.textContent = t; msg.style.color = 'var(--erro)'; }
+            campo.addEventListener('change', function () {
+                var arq = campo.files[0];
+                if (!arq) return;
+                msg.style.color = ''; msg.textContent = 'Enviando…';
+                var img = new Image(), url = URL.createObjectURL(arq);
+                img.onload = function () {
+                    var lado = 1600, esc = Math.min(1, lado / Math.max(img.width, img.height));
+                    var c = document.createElement('canvas'); c.width = Math.round(img.width * esc); c.height = Math.round(img.height * esc);
+                    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+                    URL.revokeObjectURL(url);
+                    c.toBlob(function (blob) {
+                        if (!blob) return erro('Não foi possível preparar a foto. Tente outra.');
+                        var f = new FormData(); f.append('capa', blob, 'capa.jpg'); f.append('empresa', caixa.dataset.empresa);
+                        fetch(caixa.dataset.url, { method: 'POST', body: f, credentials: 'same-origin', headers: { 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' } })
+                            .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+                            .then(function (r) {
+                                if (r.ok) { location.reload(); return; }
+                                erro((r.j.errors && r.j.errors.capa && r.j.errors.capa[0]) || r.j.message || 'Não foi possível enviar a foto.');
+                            })
+                            .catch(function () { erro('Falha de conexão. Tente de novo.'); });
+                    }, 'image/jpeg', 0.85);
+                };
+                img.onerror = function () { URL.revokeObjectURL(url); erro('Esse arquivo não abriu como imagem. Tente outra foto.'); };
+                img.src = url;
+            });
+        })();
+    </script>
 
     <h2>{{ $nicho->termo('profissionais') }}</h2>
     <div class="caixa">

@@ -11,6 +11,7 @@ use App\Support\Telefone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 /** Painel do dono da barbearia: equipe de barbeiros (cada um com login próprio) e o QR de check-in da parede. */
 class EquipeController extends Controller
@@ -106,6 +107,52 @@ class EquipeController extends Controller
 
         return redirect()->route('barbearia.equipe', ['empresa' => $empresa->id])
             ->with('ok', $request->boolean('renovar') ? 'QR renovado: imprima o novo; o antigo parou de valer.' : 'Configuração salva.');
+    }
+
+    /** Troca ou remove a capa da barbearia (foto larga que aparece na lista e no topo da página). */
+    public function capa(Request $request)
+    {
+        $empresa = $this->empresa($request);
+        $disco = Storage::disk('public');
+
+        if ($request->boolean('remover')) {
+            $this->apagarCapa($empresa);
+            $empresa->update(['capa' => null]);
+
+            return $this->voltarEquipe($request, $empresa, 'Capa removida.');
+        }
+
+        $request->validate(
+            ['capa' => ['required', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:6144']],
+            ['capa.required' => 'Escolha uma foto.', 'capa.image' => 'O arquivo precisa ser uma imagem.', 'capa.mimes' => 'Use uma foto JPG, PNG ou WebP.', 'capa.max' => 'A foto passou de 6 MB. Escolha uma menor.']
+        );
+
+        $antiga = $empresa->capa;
+        $caminho = $disco->putFile('barbearia/capas', $request->file('capa'));
+        $empresa->update(['capa' => $caminho]);
+
+        if ($antiga && $antiga !== $caminho) {
+            $disco->delete($antiga);
+        }
+
+        return $this->voltarEquipe($request, $empresa, 'Capa atualizada.');
+    }
+
+    private function apagarCapa(Empresa $empresa): void
+    {
+        if ($empresa->capa) {
+            Storage::disk('public')->delete($empresa->capa);
+        }
+    }
+
+    private function voltarEquipe(Request $request, Empresa $empresa, string $mensagem)
+    {
+        // o celular envia a foto por fetch (já reduzida): responde JSON; o formulário comum volta para a página
+        if ($request->expectsJson()) {
+            return response()->json(['ok' => true, 'mensagem' => $mensagem, 'capa' => $empresa->fresh()->capaUrl()]);
+        }
+
+        return redirect()->route('barbearia.equipe', ['empresa' => $empresa->id])->with('ok', $mensagem);
     }
 
     /** Barbearias (empresas de nicho com fila) do usuário logado como dono. */

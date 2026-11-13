@@ -30,6 +30,7 @@ class Empresa extends Model
         'status',
         'checkin_token',
         'checkin_exige_qr',
+        'capa',
     ];
 
     protected $dates = [
@@ -40,6 +41,12 @@ class Empresa extends Model
         'data_vencimento' => 'date',
         'checkin_exige_qr' => 'boolean',
     ];
+
+    /** Endereço da capa da barbearia, ou null quando ainda não tem. */
+    public function capaUrl(): ?string
+    {
+        return $this->capa ? asset('storage/' . $this->capa) : null;
+    }
 
     /** Código secreto do QR de check-in da parede; nasce no primeiro uso e pode ser renovado. */
     public function tokenCheckin(bool $renovar = false): string

@@ -55,6 +55,15 @@
         .tabela { width:100%; border-collapse:collapse; }
         .tabela td { padding:10px 0; border-bottom:1px solid var(--linha); vertical-align:middle; }
         .linha-acoes { display:flex; gap:8px; align-items:center; justify-content:space-between; }
+        .capa { display:block; width:100%; aspect-ratio:16/7; object-fit:cover; background:var(--fundo); }
+        .capa.vazia { background:repeating-linear-gradient(135deg, var(--fundo) 0 16px, #2c2a25 16px 32px); border-bottom:3px solid var(--ouro); }
+        .capa-pagina { border-radius:14px; margin:0 0 16px; }
+        .capa-pagina.vazia { border-bottom:0; }
+        a.barbearia { display:block; background:var(--cartao); border:1px solid var(--linha); border-radius:14px; overflow:hidden; color:inherit; text-decoration:none; }
+        a.barbearia:hover { border-color:var(--ouro); }
+        a.barbearia .corpo { display:flex; align-items:center; gap:12px; padding:12px 14px; }
+        a.barbearia .corpo .meio { flex:1; min-width:0; }
+        a.barbearia .corpo strong { display:block; }
         .chip { font-size:12px; font-weight:800; letter-spacing:.8px; text-transform:uppercase; padding:5px 11px; border-radius:999px; background:var(--ouro); color:#1b1b1b; white-space:nowrap; }
         .passos { font-size:12px; font-weight:700; letter-spacing:.6px; text-transform:uppercase; color:var(--suave); margin:0 0 6px; }
 

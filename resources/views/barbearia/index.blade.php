@@ -6,10 +6,12 @@
 
     <div class="lista">
         @forelse($barbearias as $b)
-            <a class="cartao" href="{{ route('barbearia.show', $b) }}">
-                <span class="avatar">{{ mb_strtoupper(mb_substr($b->nome, 0, 1)) }}</span>
-                <span class="meio"><strong>{{ $b->nome }}</strong><span class="suave">{{ $b->descricao }}</span></span>
-                <span class="selo {{ $b->esperando ? '' : 'vazio' }}">{{ $b->esperando ? $b->esperando.' na fila' : 'sem fila' }}</span>
+            <a class="barbearia" href="{{ route('barbearia.show', $b) }}">
+                @include('barbearia._capa', ['empresa' => $b, 'classe' => 'capa-lista'])
+                <span class="corpo">
+                    <span class="meio"><strong>{{ $b->nome }}</strong><span class="suave">{{ $b->descricao }}</span></span>
+                    <span class="selo {{ $b->esperando ? '' : 'vazio' }}">{{ $b->esperando ? $b->esperando.' na fila' : 'sem fila' }}</span>
+                </span>
             </a>
         @empty
             <div class="aviso info">Nenhuma barbearia cadastrada ainda.</div>
