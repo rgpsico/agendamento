@@ -79,6 +79,25 @@ class BarbeariaFilaTest extends TestCase
         $this->get('/barbearia')->assertOk()->assertSee('Barbearia A')->assertSee('Barbearia B');
     }
 
+    public function test_lista_mostra_a_fila_de_cada_barbearia_sem_misturar(): void
+    {
+        $mk = function (string $nome, array $b, string $status) {
+            $u = Usuario::forceCreate(['nome' => $nome, 'email' => strtolower($nome) . '@celular.invalid', 'password' => 'x', 'tipo_usuario' => 'Aluno']);
+            $aluno = Alunos::create(['usuario_id' => $u->id]);
+            FilaAtendimento::create(['empresa_id' => $b['empresa']->id, 'professor_id' => $b['barbeiro']->id, 'aluno_id' => $aluno->id, 'status' => $status, 'chegou_em' => now()]);
+        };
+        $mk('Um', $this->a, 'aguardando');
+        $mk('Dois', $this->a, 'aguardando');
+        $mk('Tres', $this->a, 'atendendo'); // quem já está na cadeira não conta como espera
+        $mk('Quatro', $this->a, 'concluido');
+
+        $html = $this->get('/barbearia')->assertOk()->getContent();
+
+        $this->assertStringContainsString('2 na fila', $html);
+        $this->assertStringContainsString('sem fila', $html); // a barbearia B está vazia
+        $this->assertStringNotContainsString('3 na fila', $html);
+    }
+
     public function test_lista_tem_atalho_de_entrada_para_barbeiro_e_dono(): void
     {
         $this->get('/barbearia')->assertOk()->assertSee(route('barbearia.login'), false)->assertSee('Entre no seu painel');

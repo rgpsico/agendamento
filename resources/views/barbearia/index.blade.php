@@ -9,6 +9,7 @@
             <a class="cartao" href="{{ route('barbearia.show', $b) }}">
                 <span class="avatar">{{ mb_strtoupper(mb_substr($b->nome, 0, 1)) }}</span>
                 <span class="meio"><strong>{{ $b->nome }}</strong><span class="suave">{{ $b->descricao }}</span></span>
+                <span class="selo {{ $b->esperando ? '' : 'vazio' }}">{{ $b->esperando ? $b->esperando.' na fila' : 'sem fila' }}</span>
             </a>
         @empty
             <div class="aviso info">Nenhuma barbearia cadastrada ainda.</div>

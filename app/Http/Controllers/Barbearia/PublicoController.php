@@ -27,6 +27,15 @@ class PublicoController extends Controller
         $modalidades = Modalidade::whereIn('nicho', $nichos->pluck('nicho'))->pluck('id');
         $barbearias = Empresa::whereIn('modalidade_id', $modalidades)->where('status', 'ativo')->orderBy('nome')->get();
 
+        // quantos esperam agora e quantos barbeiros atendem, por barbearia (duas consultas, não uma por cartão)
+        $ids = $barbearias->pluck('id');
+        $esperando = FilaAtendimento::whereIn('empresa_id', $ids)->where('status', FilaAtendimento::AGUARDANDO)->selectRaw('empresa_id, count(*) as total')->groupBy('empresa_id')->pluck('total', 'empresa_id');
+        $equipe = Professor::whereIn('empresa_id', $ids)->where('ativo', true)->selectRaw('empresa_id, count(*) as total')->groupBy('empresa_id')->pluck('total', 'empresa_id');
+        $barbearias->each(function ($b) use ($esperando, $equipe) {
+            $b->esperando = (int) ($esperando[$b->id] ?? 0);
+            $b->barbeiros_ativos = (int) ($equipe[$b->id] ?? 0);
+        });
+
         // só uma barbearia: o cliente vai direto escolher o barbeiro, sem passar por uma lista de um item
         if ($barbearias->count() === 1) {
             return redirect()->route('barbearia.show', $barbearias->first());
