@@ -1,4 +1,5 @@
 @extends('barbearia.layout')
+@section('area', 'barbeiro')
 @section('titulo', 'Minha fila')
 @section('head')
     <meta name="csrf-token" content="{{ csrf_token() }}">

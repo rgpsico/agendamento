@@ -1,6 +1,7 @@
 @extends('barbearia.layout')
 @section('titulo', $empresa->nome)
 @section('conteudo')
+    <p class="passos">Passo 1 de 2 · escolha o {{ mb_strtolower($nicho->termo('profissional')) }}</p>
     <h1>{{ $empresa->nome }}</h1>
     <p class="suave">{{ $empresa->descricao }}</p>
 

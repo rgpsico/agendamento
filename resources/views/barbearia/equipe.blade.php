@@ -1,4 +1,5 @@
 @extends('barbearia.layout')
+@section('area', 'dono')
 @section('titulo', 'Equipe')
 @section('conteudo')
     <h1>{{ $empresa->nome }}</h1>

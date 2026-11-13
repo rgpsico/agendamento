@@ -14,4 +14,5 @@
             <div class="aviso info">Nenhuma barbearia cadastrada ainda.</div>
         @endforelse
     </div>
+    <p class="suave" style="text-align:center;margin-top:22px">É {{ $nicho ? mb_strtolower($nicho->termo('profissional')) : 'barbeiro' }} ou dono? <a href="{{ route('barbearia.login') }}"><strong>Entre no seu painel</strong></a></p>
 @endsection

@@ -63,6 +63,30 @@ class BarbeariaFilaTest extends TestCase
         $this->get('/barbearia')->assertOk()->assertSee('Barbearia A')->assertSee('Barbearia B')->assertDontSee('Studio Pilates');
     }
 
+    public function test_com_uma_unica_barbearia_a_lista_pula_direto_para_ela(): void
+    {
+        $this->b['empresa']->update(['status' => 'inativo']);
+
+        $this->get('/barbearia')->assertRedirect(route('barbearia.show', $this->a['empresa']));
+    }
+
+    public function test_lista_tem_atalho_de_entrada_para_barbeiro_e_dono(): void
+    {
+        $this->get('/barbearia')->assertOk()->assertSee(route('barbearia.login'), false)->assertSee('Entre no seu painel');
+    }
+
+    public function test_cada_papel_tem_a_sua_area_visual(): void
+    {
+        // cliente: claro; barbeiro: painel escuro; dono: painel azul
+        $this->get(route('barbearia.show', $this->a['empresa']))->assertOk()->assertSee('area-cliente', false)->assertSee('Passo 1 de 2')->assertDontSee('Painel do barbeiro');
+
+        $this->actingAs($this->a['barbeiro']->usuario)->get(route('barbearia.painel.fila'))
+            ->assertOk()->assertSee('area-barbeiro', false)->assertSee('Painel do barbeiro')->assertDontSee('Painel do dono');
+
+        $this->actingAs($this->a['dono'])->get(route('barbearia.equipe'))
+            ->assertOk()->assertSee('area-dono', false)->assertSee('Painel do dono')->assertDontSee('Painel do barbeiro');
+    }
+
     public function test_pagina_da_barbearia_lista_barbeiros_ativos_com_a_palavra_do_nicho(): void
     {
         $inativo = Usuario::forceCreate(['nome' => 'Barbeiro Inativo', 'email' => 'i@teste.com', 'password' => 'x', 'tipo_usuario' => 'Professor']);

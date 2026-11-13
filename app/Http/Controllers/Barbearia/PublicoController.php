@@ -26,6 +26,11 @@ class PublicoController extends Controller
         $modalidades = Modalidade::whereIn('nicho', $nichos->pluck('nicho'))->pluck('id');
         $barbearias = Empresa::whereIn('modalidade_id', $modalidades)->where('status', 'ativo')->orderBy('nome')->get();
 
+        // só uma barbearia: o cliente vai direto escolher o barbeiro, sem passar por uma lista de um item
+        if ($barbearias->count() === 1) {
+            return redirect()->route('barbearia.show', $barbearias->first());
+        }
+
         return view('barbearia.index', ['nicho' => $nichos->first(), 'barbearias' => $barbearias]);
     }
 
