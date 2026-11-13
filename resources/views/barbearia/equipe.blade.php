@@ -2,7 +2,7 @@
 @section('titulo', 'Equipe')
 @section('conteudo')
     <h1>{{ $empresa->nome }}</h1>
-    <p class="suave">Painel do dono</p>
+    <p class="suave">Painel do dono @if($souBarbeiro)· <a href="{{ route('barbearia.painel.fila') }}"><strong>Minha fila</strong></a>@endif</p>
 
     @if($barbearias->count() > 1)
         <form method="get" style="margin-bottom:12px">

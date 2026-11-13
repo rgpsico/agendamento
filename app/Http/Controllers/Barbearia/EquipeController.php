@@ -22,7 +22,10 @@ class EquipeController extends Controller
             return redirect()->route('barbearia.equipe');
         }
 
-        return view('barbearia.painel_barbeiro', ['nicho' => NichoConfiguracao::where('nicho', 'barbearia')->first()]);
+        // barbeiro vai para a fila dele; quem não é dono nem barbeiro de uma barbearia não tem painel aqui
+        abort_unless(BarbeiroController::doUsuario($request->user()), 403, 'Você não tem acesso ao painel da barbearia.');
+
+        return redirect()->route('barbearia.painel.fila');
     }
 
     public function index(Request $request)
@@ -34,6 +37,7 @@ class EquipeController extends Controller
             'empresa' => $empresa,
             'barbearias' => $this->barbearias($request),
             'barbeiros' => Professor::where('empresa_id', $empresa->id)->with('usuario')->orderByDesc('ativo')->orderBy('id')->get(),
+            'souBarbeiro' => (bool) BarbeiroController::doUsuario($request->user()),
             'linkQr' => route('barbearia.qr', [$empresa, $empresa->tokenCheckin()]),
         ]);
     }

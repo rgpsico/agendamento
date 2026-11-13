@@ -61,12 +61,15 @@ class CheckinController extends Controller
 
         $empresa = $fila->empresa;
 
-        return view('barbearia.fila', [
+        $dados = [
             'nicho' => NichoConfiguracao::daEmpresa($empresa),
             'empresa' => $empresa,
             'fila' => $fila->load('professor.usuario'),
             'posicao' => $fila->posicao(),
-        ]);
+        ];
+
+        // a tela se atualiza sozinha buscando só o miolo
+        return $request->ajax() || $request->boolean('fragmento') ? view('barbearia._status_fila', $dados) : view('barbearia.fila', $dados);
     }
 
     public function desistir(Request $request, FilaAtendimento $fila)

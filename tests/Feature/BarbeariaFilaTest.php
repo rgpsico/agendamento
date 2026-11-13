@@ -364,9 +364,9 @@ class BarbeariaFilaTest extends TestCase
         $this->get(route('barbearia.qr', [$this->a['empresa'], $antigo]))->assertNotFound();
     }
 
-    public function test_barbeiro_ve_o_painel_dele_e_nao_a_equipe(): void
+    public function test_barbeiro_cai_na_fila_dele_e_nao_acessa_a_equipe(): void
     {
-        $this->actingAs($this->a['barbeiroUser'])->get(route('barbearia.painel'))->assertOk()->assertSee('Olá, Barbeiro A');
+        $this->actingAs($this->a['barbeiroUser'])->get(route('barbearia.painel'))->assertRedirect(route('barbearia.painel.fila'));
         $this->get(route('barbearia.equipe'))->assertForbidden();
     }
 }

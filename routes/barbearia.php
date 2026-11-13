@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Barbearia\BarbeiroController;
 use App\Http\Controllers\Barbearia\CheckinController;
 use App\Http\Controllers\Barbearia\ClienteController;
 use App\Http\Controllers\Barbearia\EquipeController;
@@ -24,6 +25,13 @@ Route::prefix('barbearia')->name('barbearia.')->group(function () {
         Route::post('/painel/equipe', [EquipeController::class, 'store'])->name('equipe.store');
         Route::post('/painel/equipe/{professor}/ativo', [EquipeController::class, 'ativo'])->name('equipe.ativo');
         Route::post('/painel/checkin', [EquipeController::class, 'checkin'])->name('checkin.config');
+
+        // barbeiro: fila ao vivo e agenda do dia
+        Route::get('/painel/fila', [BarbeiroController::class, 'fila'])->name('painel.fila');
+        Route::post('/painel/fila/{fila}/chamar', [BarbeiroController::class, 'chamar'])->name('painel.fila.chamar');
+        Route::post('/painel/fila/{fila}/iniciar', [BarbeiroController::class, 'iniciar'])->name('painel.fila.iniciar');
+        Route::post('/painel/fila/{fila}/finalizar', [BarbeiroController::class, 'finalizar'])->name('painel.fila.finalizar');
+        Route::post('/painel/fila/{fila}/ausente', [BarbeiroController::class, 'ausente'])->name('painel.fila.ausente');
 
         Route::get('/fila/{fila}', [CheckinController::class, 'fila'])->name('fila');
         Route::post('/fila/{fila}/desistir', [CheckinController::class, 'desistir'])->name('fila.desistir');

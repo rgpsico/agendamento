@@ -11,13 +11,15 @@ class FilaAtendimento extends Model
     const ATENDENDO = 'atendendo';
     const CONCLUIDO = 'concluido';
     const DESISTIU = 'desistiu';
+    const AUSENTE = 'ausente'; // foi chamado e não apareceu
 
     protected $table = 'fila_atendimentos';
 
-    protected $fillable = ['empresa_id', 'professor_id', 'aluno_id', 'status', 'chegou_em', 'iniciado_em', 'finalizado_em'];
+    protected $fillable = ['empresa_id', 'professor_id', 'aluno_id', 'status', 'chegou_em', 'chamado_em', 'iniciado_em', 'finalizado_em'];
 
     protected $casts = [
         'chegou_em' => 'datetime',
+        'chamado_em' => 'datetime',
         'iniciado_em' => 'datetime',
         'finalizado_em' => 'datetime',
     ];
