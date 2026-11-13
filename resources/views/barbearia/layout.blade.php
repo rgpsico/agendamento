@@ -9,6 +9,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex">
+    @yield('head')
     <title>@yield('titulo', 'Barbearia') · {{ $nicho->nome ?? 'Barbearia' }}</title>
     <style>
         :root { --fundo:{{ $cor1 }}; --ouro:{{ $cor2 }}; --papel:#f6f3ec; --tinta:#1b1b1b; --suave:#6b665c; --linha:#e3ddd0; --ok:#2f7d4f; --erro:#b3261e; }

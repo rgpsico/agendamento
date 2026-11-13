@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Barbearia\AvisoController;
 use App\Http\Controllers\Barbearia\BarbeiroController;
 use App\Http\Controllers\Barbearia\CheckinController;
 use App\Http\Controllers\Barbearia\ClienteController;
@@ -13,6 +14,10 @@ use Illuminate\Support\Facades\Route;
  */
 Route::prefix('barbearia')->name('barbearia.')->group(function () {
     Route::get('/', [PublicoController::class, 'index'])->name('index');
+
+    // app do barbeiro (aviso no celular): service worker e manifesto
+    Route::get('/sw.js', [AvisoController::class, 'serviceWorker'])->name('sw');
+    Route::get('/manifest.webmanifest', [AvisoController::class, 'manifesto'])->name('manifesto');
 
     // cliente: cadastro rápido (nome, celular e senha) e login pelo celular
     Route::post('/cadastro', [ClienteController::class, 'cadastro'])->middleware('throttle:cadastro')->name('cadastro');
@@ -32,6 +37,11 @@ Route::prefix('barbearia')->name('barbearia.')->group(function () {
         Route::post('/painel/fila/{fila}/iniciar', [BarbeiroController::class, 'iniciar'])->name('painel.fila.iniciar');
         Route::post('/painel/fila/{fila}/finalizar', [BarbeiroController::class, 'finalizar'])->name('painel.fila.finalizar');
         Route::post('/painel/fila/{fila}/ausente', [BarbeiroController::class, 'ausente'])->name('painel.fila.ausente');
+
+        // aviso no celular do barbeiro (Web Push)
+        Route::post('/painel/aviso', [AvisoController::class, 'inscrever'])->name('painel.aviso');
+        Route::delete('/painel/aviso', [AvisoController::class, 'cancelar'])->name('painel.aviso.cancelar');
+        Route::post('/painel/aviso/testar', [AvisoController::class, 'testar'])->name('painel.aviso.testar');
 
         Route::get('/fila/{fila}', [CheckinController::class, 'fila'])->name('fila');
         Route::post('/fila/{fila}/desistir', [CheckinController::class, 'desistir'])->name('fila.desistir');

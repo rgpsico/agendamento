@@ -9,6 +9,7 @@ use App\Models\Empresa;
 use App\Models\FilaAtendimento;
 use App\Models\NichoConfiguracao;
 use App\Models\Professor;
+use App\Services\Barbearia\AvisoBarbeiro;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -50,6 +51,11 @@ class CheckinController extends Controller
         });
 
         [$entrada, $nova] = $fila;
+
+        // avisa o celular do barbeiro depois de responder ao cliente: o check-in nunca espera (nem falha por causa do push)
+        if ($nova) {
+            app()->terminating(fn () => app(AvisoBarbeiro::class)->novoCliente($entrada));
+        }
 
         return redirect()->route('barbearia.fila', $entrada)
             ->with($nova ? 'ok' : 'erro', $nova ? 'Você entrou na fila!' : 'Você já está na fila desta barbearia.');

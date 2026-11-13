@@ -1,5 +1,7 @@
 @php($atendendo = $fila->firstWhere('status', 'atendendo'))
 @php($esperando = $fila->where('status', 'aguardando')->values())
+{{-- ids de quem espera: a tela compara a cada atualização para tocar o alarme quando chega gente nova --}}
+<span id="ids-espera" data-ids="{{ $esperando->pluck('id')->implode(',') }}" hidden></span>
 
 <div class="caixa" style="display:flex;justify-content:space-around;text-align:center;gap:8px">
     <div><div class="grande" style="font-size:2rem">{{ $esperando->count() }}</div><div class="suave">esperando</div></div>
