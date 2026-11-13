@@ -27,7 +27,9 @@ class Empresa extends Model
         'modalidade_id',
         'banners',
         'data_vencimento',
-        'status'
+        'status',
+        'checkin_token',
+        'checkin_exige_qr',
     ];
 
     protected $dates = [
@@ -35,8 +37,19 @@ class Empresa extends Model
     ];
 
     protected $casts = [
-        'data_vencimento' => 'date'
+        'data_vencimento' => 'date',
+        'checkin_exige_qr' => 'boolean',
     ];
+
+    /** Código secreto do QR de check-in da parede; nasce no primeiro uso e pode ser renovado. */
+    public function tokenCheckin(bool $renovar = false): string
+    {
+        if ($renovar || ! $this->checkin_token) {
+            $this->forceFill(['checkin_token' => \Illuminate\Support\Str::random(32)])->save();
+        }
+
+        return $this->checkin_token;
+    }
 
 
 

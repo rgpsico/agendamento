@@ -45,6 +45,14 @@ class NichoConfiguracao extends Model
         'clientes' => ['Alunos', 'Cliente (plural)'],
     ];
 
+    /** Configuração do nicho a que a empresa pertence (pela modalidade dela), seja qual for o domínio acessado. */
+    public static function daEmpresa(Empresa $empresa): ?self
+    {
+        $nicho = Modalidade::where('id', $empresa->modalidade_id)->value('nicho');
+
+        return $nicho ? static::where('nicho', $nicho)->first() : null;
+    }
+
     public function recurso(string $chave): bool
     {
         return (bool) (($this->recursos ?? [])[$chave] ?? false);

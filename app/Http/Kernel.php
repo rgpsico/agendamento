@@ -76,6 +76,7 @@ class Kernel extends HttpKernel
         'signed' => \App\Http\Middleware\ValidateSignature::class,
         'tenant'        => \App\Http\Middleware\EnsureTenantContext::class,
         'detect.tenant' => \App\Http\Middleware\DetectTenant::class,
+        'empresa.recurso' => \App\Http\Middleware\EmpresaComRecurso::class,
         'master'        => \App\Http\Middleware\IsMasterUser::class,
         'twilio.assinatura' => \App\Http\Middleware\VerificaAssinaturaTwilio::class, // webhooks do Twilio: confere X-Twilio-Signature
         'dono'          => \App\Http\Middleware\ApenasDaPropriaEmpresa::class, // dono:<tipo> = so dados da propria empresa; dono:master = so o administrador

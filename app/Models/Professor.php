@@ -16,6 +16,7 @@ class Professor extends Model
     protected $fillable = [
         'usuario_id',
         'empresa_id',
+        'ativo',
         'especialidade',
         'sobre',
         'avatar',
