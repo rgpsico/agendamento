@@ -31,7 +31,20 @@
                     @if($f->chamado_em) · <strong style="color:var(--ok)">chamado às {{ $f->chamado_em->format('H:i') }}</strong>@endif
                     @if($horarioHoje->has($f->aluno_id)) · tem horário marcado às {{ $horarioHoje->get($f->aluno_id) }}@endif
                 </span>
+                @if($f->mensagem)
+                    <span class="suave" style="display:block;margin-top:4px">Você perguntou às {{ $f->mensagem_em->format('H:i') }}:
+                        @if($f->resposta)<strong style="color:var(--ok)">{{ $f->resposta }}</strong> (às {{ $f->resposta_em->format('H:i') }})@else sem resposta ainda @endif
+                    </span>
+                @endif
             </span>
+            <details class="recado" style="width:100%;margin-top:8px">
+                <summary class="btn claro pequeno" style="width:100%;list-style:none">{{ $f->mensagem ? 'Perguntar de novo' : 'Perguntar onde está' }}</summary>
+                <form method="post" action="{{ route('barbearia.painel.fila.mensagem', $f) }}" style="margin:8px 0 0">
+                    @csrf
+                    <input type="text" name="texto" maxlength="140" value="Onde você está? Já vai ser a sua vez." aria-label="Mensagem para o cliente" style="width:100%;margin-bottom:8px">
+                    <button class="btn pequeno" style="width:100%" type="submit">Enviar mensagem</button>
+                </form>
+            </details>
             <div class="linha-acoes" style="width:100%;margin-top:8px">
                 @unless($f->chamado_em)
                     <form method="post" action="{{ route('barbearia.painel.fila.chamar', $f) }}" style="margin:0;flex:1">@csrf<button class="btn claro pequeno" style="width:100%" type="submit">Chamar</button></form>

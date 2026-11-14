@@ -268,4 +268,104 @@ class BarbeiroFilaTest extends TestCase
 
         $this->actingAs($f->aluno->usuario)->get(route('barbearia.fila', $f))->assertSee('Voltar para a barbearia')->assertDontSee('Sair da fila');
     }
+
+    // ── recado "onde você está?" ──────────────────────────────────────────
+
+    public function test_barbeiro_manda_recado_e_o_cliente_ve_na_tela_da_fila(): void
+    {
+        $f = $this->entrarNaFila('Cliente', $this->a);
+        $cliente = $f->aluno->usuario;
+
+        $this->actingAs($this->a['user'])->get(route('barbearia.painel.fila'))->assertSee('Perguntar onde está');
+        $this->actingAs($cliente)->get(route('barbearia.fila', $f))->assertDontSee('perguntou');
+
+        $this->actingAs($this->a['user'])->post(route('barbearia.painel.fila.mensagem', $f), ['texto' => 'Cadê você, já é o próximo?'])
+            ->assertRedirect(route('barbearia.painel.fila'))->assertSessionHas('ok');
+
+        $this->assertSame('Cadê você, já é o próximo?', $f->fresh()->mensagem);
+        $this->actingAs($cliente)->get(route('barbearia.fila', $f))->assertSee('perguntou')->assertSee('Cadê você, já é o próximo?')->assertSee('Estou na barbearia');
+        $this->get(route('barbearia.fila', ['fila' => $f, 'fragmento' => 1]))->assertSee('Cadê você')->assertDontSee('<html', false);
+    }
+
+    public function test_recado_em_branco_usa_a_pergunta_padrao(): void
+    {
+        $f = $this->entrarNaFila('Cliente', $this->a);
+
+        $this->actingAs($this->a['user'])->post(route('barbearia.painel.fila.mensagem', $f), ['texto' => '  '])->assertSessionHas('ok');
+
+        $this->assertStringContainsString('Onde você está', $f->fresh()->mensagem);
+    }
+
+    public function test_recado_muito_longo_e_recusado(): void
+    {
+        $f = $this->entrarNaFila('Cliente', $this->a);
+
+        $this->actingAs($this->a['user'])->post(route('barbearia.painel.fila.mensagem', $f), ['texto' => str_repeat('a', 141)])->assertSessionHasErrors('texto');
+        $this->assertNull($f->fresh()->mensagem);
+    }
+
+    public function test_recado_e_escapado_na_tela_do_cliente(): void
+    {
+        $f = $this->entrarNaFila('Cliente', $this->a);
+        $this->actingAs($this->a['user'])->post(route('barbearia.painel.fila.mensagem', $f), ['texto' => '<script>alert(1)</script>']);
+
+        $this->actingAs($f->aluno->usuario)->get(route('barbearia.fila', $f))->assertDontSee('<script>alert(1)</script>', false)->assertSee('&lt;script&gt;', false);
+    }
+
+    public function test_cliente_responde_e_o_barbeiro_ve_a_resposta(): void
+    {
+        $f = $this->entrarNaFila('Cliente', $this->a);
+        $this->actingAs($this->a['user'])->post(route('barbearia.painel.fila.mensagem', $f), ['texto' => 'Onde você está?']);
+
+        $this->actingAs($f->aluno->usuario)->post(route('barbearia.fila.responder', $f), ['resposta' => 'chegando'])->assertRedirect(route('barbearia.fila', $f));
+        $this->assertSame('Estou chegando', $f->fresh()->resposta);
+
+        $this->actingAs($this->a['user'])->get(route('barbearia.painel.fila'))->assertSee('Você perguntou')->assertSee('Estou chegando');
+        $this->actingAs($f->aluno->usuario)->get(route('barbearia.fila', $f))->assertSee('Você respondeu:');
+    }
+
+    public function test_nova_pergunta_limpa_a_resposta_antiga(): void
+    {
+        $f = $this->entrarNaFila('Cliente', $this->a);
+        $this->actingAs($this->a['user'])->post(route('barbearia.painel.fila.mensagem', $f), ['texto' => 'um']);
+        $this->actingAs($f->aluno->usuario)->post(route('barbearia.fila.responder', $f), ['resposta' => 'aqui']);
+        $this->actingAs($this->a['user'])->post(route('barbearia.painel.fila.mensagem', $f), ['texto' => 'dois']);
+
+        $this->assertNull($f->fresh()->resposta);
+        $this->assertSame('dois', $f->fresh()->mensagem);
+    }
+
+    public function test_resposta_invalida_ou_sem_pergunta_nao_grava_nada(): void
+    {
+        $f = $this->entrarNaFila('Cliente', $this->a);
+        $cliente = $f->aluno->usuario;
+
+        $this->actingAs($cliente)->post(route('barbearia.fila.responder', $f), ['resposta' => 'aqui']);
+        $this->assertNull($f->fresh()->resposta); // ninguém perguntou
+
+        $this->actingAs($this->a['user'])->post(route('barbearia.painel.fila.mensagem', $f), ['texto' => 'x']);
+        $this->actingAs($cliente)->post(route('barbearia.fila.responder', $f), ['resposta' => 'qualquer coisa'])->assertSessionHasErrors('resposta');
+        $this->assertNull($f->fresh()->resposta);
+    }
+
+    public function test_so_o_barbeiro_da_fila_manda_recado_e_so_o_dono_da_vaga_responde(): void
+    {
+        $f = $this->entrarNaFila('Cliente', $this->a);
+
+        $this->actingAs($this->b['user'])->post(route('barbearia.painel.fila.mensagem', $f), ['texto' => 'oi'])->assertForbidden();
+        $this->actingAs($f->aluno->usuario)->post(route('barbearia.painel.fila.mensagem', $f), ['texto' => 'oi'])->assertForbidden();
+
+        $this->actingAs($this->a['user'])->post(route('barbearia.painel.fila.mensagem', $f), ['texto' => 'oi']);
+        $outro = $this->entrarNaFila('Outro', $this->a)->aluno->usuario;
+        $this->actingAs($outro)->post(route('barbearia.fila.responder', $f), ['resposta' => 'aqui'])->assertForbidden();
+        $this->assertNull($f->fresh()->resposta);
+    }
+
+    public function test_recado_para_quem_nao_esta_mais_esperando_da_erro(): void
+    {
+        $f = $this->entrarNaFila('Cliente', $this->a, '10:00', 'atendendo');
+
+        $this->actingAs($this->a['user'])->post(route('barbearia.painel.fila.mensagem', $f), ['texto' => 'oi'])->assertSessionHas('erro');
+        $this->assertNull($f->fresh()->mensagem);
+    }
 }

@@ -14,6 +14,7 @@
             (function () {
                 var caixa = document.getElementById('caixa-fila');
                 var chamado = caixa.querySelector('#status-fila').dataset.chamado === '1';
+                var mensagem = caixa.querySelector('#status-fila').dataset.mensagem;
                 var timer = setInterval(function () {
                     if (document.hidden) return;
                     fetch(caixa.dataset.url, { headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' })
@@ -23,6 +24,9 @@
                             caixa.innerHTML = html;
                             var s = caixa.querySelector('#status-fila');
                             if (s && s.dataset.chamado === '1' && !chamado && navigator.vibrate) navigator.vibrate([300, 150, 300]);
+                            // recado novo do barbeiro: vibra (a mensagem aparece no topo)
+                            if (s && s.dataset.mensagem !== '0' && s.dataset.mensagem !== mensagem && navigator.vibrate) navigator.vibrate([300, 150, 300, 150, 300]);
+                            mensagem = s ? s.dataset.mensagem : mensagem;
                             chamado = !!s && s.dataset.chamado === '1';
                             if (s && s.dataset.aberta !== '1') clearInterval(timer);
                         })

@@ -89,6 +89,19 @@ class CheckinController extends Controller
         return redirect()->route('barbearia.fila', $fila)->with('ok', 'Você saiu da fila.');
     }
 
+    /** Resposta rápida do cliente ao recado do barbeiro. */
+    public function responder(Request $request, FilaAtendimento $fila)
+    {
+        $this->doCliente($request, $fila);
+        $dados = $request->validate(['resposta' => ['required', 'in:'.implode(',', array_keys(FilaAtendimento::RESPOSTAS))]]);
+
+        if ($fila->status === FilaAtendimento::AGUARDANDO && $fila->mensagem) {
+            $fila->update(['resposta' => FilaAtendimento::RESPOSTAS[$dados['resposta']], 'resposta_em' => now()]);
+        }
+
+        return redirect()->route('barbearia.fila', $fila)->with('ok', 'Resposta enviada ao barbeiro.');
+    }
+
     /** A página da fila é só da pessoa que fez o check-in. */
     private function doCliente(Request $request, FilaAtendimento $fila): void
     {

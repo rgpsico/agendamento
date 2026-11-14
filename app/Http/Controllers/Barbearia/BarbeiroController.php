@@ -47,6 +47,23 @@ class BarbeiroController extends Controller
         });
     }
 
+    /** Recado do barbeiro para o cliente que espera ("onde você está?"); o cliente vê na tela da fila e pode responder. */
+    public function mensagem(Request $request, FilaAtendimento $fila)
+    {
+        $dados = $request->validate(['texto' => ['nullable', 'string', 'max:140']]);
+        $texto = trim((string) ($dados['texto'] ?? '')) ?: 'Onde você está? Já vai ser a sua vez.';
+
+        return $this->acao($request, $fila, function (FilaAtendimento $f) use ($texto) {
+            if ($f->status !== FilaAtendimento::AGUARDANDO) {
+                return ['erro', 'Este cliente não está mais esperando.'];
+            }
+            // nova mensagem limpa a resposta antiga: a resposta que aparece é sempre a da última pergunta
+            $f->update(['mensagem' => $texto, 'mensagem_em' => now(), 'resposta' => null, 'resposta_em' => null]);
+
+            return ['ok', 'Mensagem enviada: o cliente vê no celular.'];
+        });
+    }
+
     public function iniciar(Request $request, FilaAtendimento $fila)
     {
         return $this->acao($request, $fila, function (FilaAtendimento $f) {

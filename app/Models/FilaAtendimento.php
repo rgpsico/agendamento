@@ -13,13 +13,22 @@ class FilaAtendimento extends Model
     const DESISTIU = 'desistiu';
     const AUSENTE = 'ausente'; // foi chamado e não apareceu
 
+    /** Respostas rápidas que o cliente pode dar ao recado do barbeiro (chave => texto mostrado ao barbeiro). */
+    const RESPOSTAS = [
+        'aqui' => 'Estou na barbearia',
+        'chegando' => 'Estou chegando',
+        'demora' => 'Vou demorar uns 10 minutos',
+    ];
+
     protected $table = 'fila_atendimentos';
 
-    protected $fillable = ['empresa_id', 'professor_id', 'aluno_id', 'status', 'chegou_em', 'chamado_em', 'iniciado_em', 'finalizado_em'];
+    protected $fillable = ['empresa_id', 'professor_id', 'aluno_id', 'status', 'chegou_em', 'chamado_em', 'mensagem', 'mensagem_em', 'resposta', 'resposta_em', 'iniciado_em', 'finalizado_em'];
 
     protected $casts = [
         'chegou_em' => 'datetime',
         'chamado_em' => 'datetime',
+        'mensagem_em' => 'datetime',
+        'resposta_em' => 'datetime',
         'iniciado_em' => 'datetime',
         'finalizado_em' => 'datetime',
     ];

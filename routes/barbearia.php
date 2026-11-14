@@ -36,6 +36,7 @@ Route::prefix('barbearia')->name('barbearia.')->group(function () {
         // barbeiro: fila ao vivo e agenda do dia
         Route::get('/painel/fila', [BarbeiroController::class, 'fila'])->name('painel.fila');
         Route::post('/painel/fila/{fila}/chamar', [BarbeiroController::class, 'chamar'])->name('painel.fila.chamar');
+        Route::post('/painel/fila/{fila}/mensagem', [BarbeiroController::class, 'mensagem'])->name('painel.fila.mensagem');
         Route::post('/painel/fila/{fila}/iniciar', [BarbeiroController::class, 'iniciar'])->name('painel.fila.iniciar');
         Route::post('/painel/fila/{fila}/finalizar', [BarbeiroController::class, 'finalizar'])->name('painel.fila.finalizar');
         Route::post('/painel/fila/{fila}/ausente', [BarbeiroController::class, 'ausente'])->name('painel.fila.ausente');
@@ -46,6 +47,7 @@ Route::prefix('barbearia')->name('barbearia.')->group(function () {
         Route::post('/painel/aviso/testar', [AvisoController::class, 'testar'])->name('painel.aviso.testar');
 
         Route::get('/fila/{fila}', [CheckinController::class, 'fila'])->name('fila');
+        Route::post('/fila/{fila}/responder', [CheckinController::class, 'responder'])->name('fila.responder');
         Route::post('/fila/{fila}/desistir', [CheckinController::class, 'desistir'])->name('fila.desistir');
     });
 

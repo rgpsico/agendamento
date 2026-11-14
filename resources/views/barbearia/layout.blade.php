@@ -44,6 +44,7 @@
         .aviso.erro { background:#fbe7e5; color:#7a1812; }
         .aviso.info { background:#efe7d1; color:#5b4a14; }
         label { display:block; font-weight:600; font-size:.9rem; margin:12px 0 4px; }
+        details.recado summary { cursor:pointer; } details.recado summary::-webkit-details-marker { display:none; }
         input[type=text], input[type=tel], input[type=password] { color:var(--tinta); width:100%; padding:13px 14px; border:1px solid var(--linha); border-radius:10px; font-size:1rem; background:var(--cartao); }
         input:focus { outline:2px solid var(--ouro); border-color:var(--ouro); }
         .campo-erro { color:var(--erro); font-size:.85rem; margin-top:4px; }

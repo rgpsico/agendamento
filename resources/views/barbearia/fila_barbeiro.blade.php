@@ -78,6 +78,8 @@
                     .then(function (r) { return r.ok ? r.text() : null; })
                     .then(function (html) {
                         if (html === null) return;
+                        // não troca a lista enquanto o barbeiro escreve um recado (senão o campo fecha e perde o texto)
+                        if (caixa.querySelector('details[open]')) return;
                         caixa.innerHTML = html;
                         var agora = idsAtuais();
                         var novos = agora.filter(function (id) { return conhecidos.indexOf(id) === -1; });
