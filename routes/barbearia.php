@@ -6,6 +6,7 @@ use App\Http\Controllers\Barbearia\CheckinController;
 use App\Http\Controllers\Barbearia\ClienteController;
 use App\Http\Controllers\Barbearia\EquipeController;
 use App\Http\Controllers\Barbearia\PublicoController;
+use App\Http\Controllers\Barbearia\VisaoController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -27,6 +28,7 @@ Route::prefix('barbearia')->name('barbearia.')->group(function () {
 
     Route::middleware('auth')->group(function () {
         Route::get('/painel', [EquipeController::class, 'painel'])->name('painel');
+        Route::get('/painel/visao', [VisaoController::class, 'index'])->name('visao');
         Route::get('/painel/equipe', [EquipeController::class, 'index'])->name('equipe');
         Route::post('/painel/equipe', [EquipeController::class, 'store'])->name('equipe.store');
         Route::post('/painel/equipe/{professor}/ativo', [EquipeController::class, 'ativo'])->name('equipe.ativo');

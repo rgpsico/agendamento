@@ -5,16 +5,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 @endsection
 @section('conteudo')
-    <h1>{{ $empresa->nome }}</h1>
-    <p class="suave">Painel do dono @if($souBarbeiro)· <a href="{{ route('barbearia.painel.fila') }}"><strong>Minha fila</strong></a>@endif</p>
-
-    @if($barbearias->count() > 1)
-        <form method="get" style="margin-bottom:12px">
-            <select name="empresa" onchange="this.form.submit()" style="width:100%;padding:12px;border-radius:10px;border:1px solid var(--linha)">
-                @foreach($barbearias as $b)<option value="{{ $b->id }}" @selected($b->id === $empresa->id)>{{ $b->nome }}</option>@endforeach
-            </select>
-        </form>
-    @endif
+    @include('barbearia._dono_menu', ['aba' => 'equipe'])
 
     <h2>Capa da barbearia</h2>
     <div class="caixa" id="caixa-capa" data-url="{{ route('barbearia.capa') }}" data-empresa="{{ $empresa->id }}">

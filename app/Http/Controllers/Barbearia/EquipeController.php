@@ -20,7 +20,7 @@ class EquipeController extends Controller
     public function painel(Request $request)
     {
         if ($this->barbearias($request)->isNotEmpty()) {
-            return redirect()->route('barbearia.equipe');
+            return redirect()->route('barbearia.visao');
         }
 
         // barbeiro vai para a fila dele; quem não é dono nem barbeiro de uma barbearia não tem painel aqui
