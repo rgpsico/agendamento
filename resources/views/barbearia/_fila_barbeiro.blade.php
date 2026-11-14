@@ -23,6 +23,9 @@
 <div class="lista">
     @forelse($esperando as $i => $f)
         @php($c = $clientes->get($f->aluno_id))
+        {{-- WhatsApp do cliente: o barbeiro toca em Chamar/Enviar e o WhatsApp DELE abre com a mensagem pronta, só falta enviar --}}
+        @php($zap = \App\Support\Telefone::whatsapp(optional(optional($c)->usuario)->telefone))
+        @php($apresentacao = 'Oi '.\Illuminate\Support\Str::of(optional(optional($c)->usuario)->nome ?? '')->before(' ').'! Aqui é '.optional($barbeiro->usuario)->nome.' da '.$barbeiro->empresa->nome.'. ')
         <div class="cartao" style="flex-wrap:wrap">
             <span class="avatar">{{ $i + 1 }}º</span>
             <span class="meio">
@@ -39,15 +42,17 @@
             </span>
             <details class="recado" style="width:100%;margin-top:8px">
                 <summary class="btn claro pequeno" style="width:100%;list-style:none">{{ $f->mensagem ? 'Perguntar de novo' : 'Perguntar onde está' }}</summary>
-                <form method="post" action="{{ route('barbearia.painel.fila.mensagem', $f) }}" style="margin:8px 0 0">
+                <form method="post" action="{{ route('barbearia.painel.fila.mensagem', $f) }}" style="margin:8px 0 0"
+                      @if($zap) data-wa-base="https://wa.me/{{ $zap }}" data-wa-prefixo="{{ $apresentacao }}" @endif>
                     @csrf
                     <input type="text" name="texto" maxlength="140" value="Onde você está? Já vai ser a sua vez." aria-label="Mensagem para o cliente" style="width:100%;margin-bottom:8px">
-                    <button class="btn pequeno" style="width:100%" type="submit">Enviar mensagem</button>
+                    <button class="btn pequeno" style="width:100%" type="submit">{{ $zap ? 'Enviar pelo WhatsApp' : 'Enviar mensagem' }}</button>
                 </form>
             </details>
             <div class="linha-acoes" style="width:100%;margin-top:8px">
                 @unless($f->chamado_em)
-                    <form method="post" action="{{ route('barbearia.painel.fila.chamar', $f) }}" style="margin:0;flex:1">@csrf<button class="btn claro pequeno" style="width:100%" type="submit">Chamar</button></form>
+                    <form method="post" action="{{ route('barbearia.painel.fila.chamar', $f) }}" style="margin:0;flex:1"
+                          @if($zap) data-wa="https://wa.me/{{ $zap }}?text={{ rawurlencode($apresentacao.'É a sua vez, pode vir! 💈') }}" @endif>@csrf<button class="btn claro pequeno" style="width:100%" type="submit">Chamar</button></form>
                 @endunless
                 @unless($atendendo)
                     <form method="post" action="{{ route('barbearia.painel.fila.iniciar', $f) }}" style="margin:0;flex:1">@csrf<button class="btn pequeno" style="width:100%" type="submit">Iniciar</button></form>

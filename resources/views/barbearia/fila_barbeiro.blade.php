@@ -90,6 +90,23 @@
             }, 8000);
         })();
 
+        // WhatsApp: ao tocar em Chamar / Enviar mensagem, grava na fila e abre o WhatsApp do próprio barbeiro com o texto pronto
+        document.addEventListener('submit', function (e) {
+            var f = e.target;
+            var wa = f.dataset && f.dataset.wa;
+            if (!wa && f.dataset && f.dataset.waBase) {
+                var campo = f.querySelector('[name=texto]');
+                var texto = (campo && campo.value.trim()) || 'Onde você está? Já vai ser a sua vez.';
+                wa = f.dataset.waBase + '?text=' + encodeURIComponent((f.dataset.waPrefixo || '') + texto);
+            }
+            if (!wa) return; // sem número válido: envio normal, só pela tela do cliente
+            e.preventDefault();
+            var janela = window.open(wa, '_blank'); // dentro do toque, para o navegador não bloquear
+            fetch(f.action, { method: 'POST', body: new FormData(f), credentials: 'same-origin', keepalive: true, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .catch(function () {})
+                .then(function () { if (!janela) { location.href = wa; } else { location.reload(); } });
+        });
+
         // 2) aviso no celular com o app fechado (Web Push)
         (function () {
             var box = document.getElementById('aviso-box');

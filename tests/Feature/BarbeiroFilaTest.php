@@ -368,4 +368,35 @@ class BarbeiroFilaTest extends TestCase
         $this->actingAs($this->a['user'])->post(route('barbearia.painel.fila.mensagem', $f), ['texto' => 'oi'])->assertSessionHas('erro');
         $this->assertNull($f->fresh()->mensagem);
     }
+
+    // ── WhatsApp do barbeiro ──────────────────────────────────────────────
+
+    public function test_numero_do_whatsapp_so_vale_com_ddd_e_celular(): void
+    {
+        $this->assertSame('5521988887777', \App\Support\Telefone::whatsapp('(21) 98888-7777'));
+        $this->assertSame('5521988887777', \App\Support\Telefone::whatsapp('+55 21 98888-7777'));
+        $this->assertSame('', \App\Support\Telefone::whatsapp('12345'));
+        $this->assertSame('', \App\Support\Telefone::whatsapp(null));
+    }
+
+    public function test_chamar_e_perguntar_abrem_o_whatsapp_com_o_numero_do_cliente(): void
+    {
+        $f = $this->entrarNaFila('Joao Silva', $this->a);
+        $f->aluno->usuario->forceFill(['telefone' => '21988887777'])->save();
+
+        $r = $this->actingAs($this->a['user'])->get(route('barbearia.painel.fila'))->assertOk();
+        $r->assertSee('data-wa="https://wa.me/5521988887777?text=', false)
+            ->assertSee('data-wa-base="https://wa.me/5521988887777"', false)
+            ->assertSee('Enviar pelo WhatsApp')
+            ->assertSee(rawurlencode('Oi Joao! Aqui é Barbeiro A da Barbearia A.'), false);
+    }
+
+    public function test_sem_numero_valido_nao_oferece_whatsapp(): void
+    {
+        $f = $this->entrarNaFila('Joao Silva', $this->a);
+        $f->aluno->usuario->forceFill(['telefone' => '123'])->save();
+
+        $this->actingAs($this->a['user'])->get(route('barbearia.painel.fila'))->assertOk()
+            ->assertDontSee('wa.me', false)->assertDontSee('Enviar pelo WhatsApp')->assertSee('Enviar mensagem');
+    }
 }

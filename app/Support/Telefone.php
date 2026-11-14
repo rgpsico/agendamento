@@ -18,6 +18,14 @@ class Telefone
         return ltrim($digitos, '0') === '' ? '' : $digitos;
     }
 
+    /** Número para abrir o WhatsApp (wa.me): 55 + DDD + celular; vazio se o número guardado não parece um celular/fixo do Brasil. */
+    public static function whatsapp($valor): string
+    {
+        $n = self::normalizar($valor);
+
+        return in_array(strlen($n), [10, 11], true) ? '55'.$n : '';
+    }
+
     /** E-mail fictício (".invalid" nunca existe) só para preencher a coluna obrigatória de quem entra só com celular. */
     public static function emailFicticio(string $telefone): string
     {
