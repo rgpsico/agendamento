@@ -106,7 +106,7 @@ class BarbeariaFilaTest extends TestCase
     public function test_cada_papel_tem_a_sua_area_visual(): void
     {
         // cliente: claro; barbeiro: painel escuro; dono: painel azul
-        $this->get(route('barbearia.show', $this->a['empresa']))->assertOk()->assertSee('area-cliente', false)->assertSee('Passo 1 de 2')->assertDontSee('Painel do barbeiro');
+        $this->get(route('barbearia.show', $this->a['empresa']))->assertOk()->assertSee('area-cliente', false)->assertSee('Entre para fazer check-in')->assertDontSee('Painel do barbeiro');
 
         $this->actingAs($this->a['barbeiro']->usuario)->get(route('barbearia.painel.fila'))
             ->assertOk()->assertSee('area-barbeiro', false)->assertSee('Painel do barbeiro')->assertDontSee('Painel do dono');
@@ -420,5 +420,57 @@ class BarbeariaFilaTest extends TestCase
     {
         $this->actingAs($this->a['barbeiroUser'])->get(route('barbearia.painel'))->assertRedirect(route('barbearia.painel.fila'));
         $this->get(route('barbearia.equipe'))->assertForbidden();
+    }
+
+    // ── check-in na própria tela da barbearia ─────────────────────────────
+
+    public function test_tela_da_barbearia_visitante_ve_o_acesso_e_nenhum_botao_de_entrar_na_fila(): void
+    {
+        $this->get(route('barbearia.show', $this->a['empresa']))->assertOk()
+            ->assertSee('Entre para fazer check-in')->assertSee('Cadastrar e continuar')->assertDontSee('Entrar na fila</button>', false);
+    }
+
+    public function test_tela_da_barbearia_cliente_sem_qr_ve_o_leitor_e_nao_o_botao(): void
+    {
+        $this->actingAs($this->cliente())->get(route('barbearia.show', $this->a['empresa']))->assertOk()
+            ->assertSee('Ler QR code')->assertSee('id="ler-qr"', false)->assertDontSee('Entrar na fila</button>', false);
+    }
+
+    public function test_tela_da_barbearia_cliente_com_qr_ve_o_botao_em_cada_barbeiro_e_entra_na_fila(): void
+    {
+        $cliente = $this->cliente();
+        $this->actingAs($cliente);
+        $this->noLocal($this->a);
+
+        $this->get(route('barbearia.show', $this->a['empresa']))->assertOk()
+            ->assertSee('Check-in liberado')->assertSee(route('barbearia.checkin', [$this->a['empresa'], $this->a['barbeiro']]), false)
+            ->assertSee('Entrar na fila</button>', false)->assertDontSee('id="ler-qr"', false);
+
+        $this->post(route('barbearia.checkin', [$this->a['empresa'], $this->a['barbeiro']]))->assertRedirect();
+        $this->assertSame(1, FilaAtendimento::where('empresa_id', $this->a['empresa']->id)->count());
+
+        // depois de entrar, a tela mostra a posição em vez de novo botão
+        $this->get(route('barbearia.show', $this->a['empresa']))->assertOk()
+            ->assertSee('Você já está na fila')->assertSee('Ver minha posição')->assertDontSee('Entrar na fila</button>', false);
+    }
+
+    public function test_tela_da_barbearia_sem_exigencia_de_qr_libera_o_botao_direto(): void
+    {
+        $this->a['empresa']->update(['checkin_exige_qr' => false]);
+        $this->actingAs($this->cliente())->get(route('barbearia.show', $this->a['empresa']))->assertOk()
+            ->assertSee('Check-in liberado')->assertSee('Entrar na fila</button>', false);
+    }
+
+    public function test_tela_da_barbearia_barbeiro_logado_nao_ve_botao_de_cliente(): void
+    {
+        $this->actingAs($this->a['barbeiro']->usuario)->get(route('barbearia.show', $this->a['empresa']))->assertOk()
+            ->assertSee('use a conta de cliente')->assertDontSee('Entrar na fila</button>', false)->assertDontSee('id="ler-qr"', false);
+    }
+
+    public function test_qr_lido_na_tela_libera_o_check_e_volta_para_a_mesma_tela(): void
+    {
+        $this->actingAs($this->cliente());
+        $this->get(route('barbearia.qr', [$this->a['empresa'], $this->a['empresa']->tokenCheckin()]))->assertRedirect(route('barbearia.show', $this->a['empresa']));
+        $this->get(route('barbearia.show', $this->a['empresa']))->assertSee('Check-in liberado');
     }
 }

@@ -52,11 +52,22 @@ class PublicoController extends Controller
             return $b;
         });
 
+        // quem está logado como cliente e já tem vaga aberta aqui vê "ver minha posição" em vez de entrar de novo
+        $minhaFila = null;
+        $ehCliente = false;
+        if ($usuario = $request->user()) {
+            $ehCliente = $usuario->tipo_usuario === 'Aluno';
+            $aluno = $ehCliente ? Alunos::where('usuario_id', $usuario->id)->first() : null;
+            $minhaFila = $aluno ? FilaAtendimento::abertas()->where('empresa_id', $empresa->id)->where('aluno_id', $aluno->id)->first() : null;
+        }
+
         return view('barbearia.show', [
             'nicho' => $request->attributes->get('nicho'),
             'empresa' => $empresa,
             'barbeiros' => $barbeiros,
             'noLocal' => $this->noLocal($empresa),
+            'ehCliente' => $ehCliente,
+            'minhaFila' => $minhaFila,
         ]);
     }
 

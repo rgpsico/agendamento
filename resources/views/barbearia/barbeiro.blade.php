@@ -1,7 +1,7 @@
 @extends('barbearia.layout')
 @section('titulo', optional($barbeiro->usuario)->nome)
 @section('conteudo')
-    <p class="passos">Passo 2 de 2 · entre na fila</p>
+    <p class="passos">Entre na fila</p>
     <p class="suave"><a href="{{ route('barbearia.show', $empresa) }}">← {{ $empresa->nome }}</a></p>
     <div class="cartao" style="margin-bottom:14px">
         <span class="avatar">{{ mb_strtoupper(mb_substr(optional($barbeiro->usuario)->nome ?? '?', 0, 1)) }}</span>
