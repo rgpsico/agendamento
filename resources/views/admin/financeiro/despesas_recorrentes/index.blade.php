@@ -154,7 +154,7 @@
 
             rows.push({
                 "Descrição": tds[0].innerText.trim(),
-                "Valor (R$)": parseFloat(tds[1].innerText.replace('.', '').replace(',', '.')),
+                "Valor (R$)": parseFloat(tds[1].innerText.replace(/\./g, '').replace(',', '.')),
                 "Categoria": tds[2].innerText.trim(),
                 "Frequência": tds[3].innerText.trim(),
                 "Status": tds[4].innerText.trim(),

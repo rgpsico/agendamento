@@ -143,7 +143,7 @@ document.getElementById('exportCsv').addEventListener('click', function () {
         const tds = tr.querySelectorAll('td');
         if(tds.length === 0) return;
 
-        const valor = parseFloat(tds[1].innerText.replace('R$', '').replace('.', '').replace(',', '.')) || 0;
+        const valor = parseFloat(tds[1].innerText.replace('R$', '').replace(/\./g, '').replace(',', '.')) || 0;
         total += valor;
 
         rows.push({

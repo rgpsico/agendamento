@@ -159,7 +159,7 @@
                         {{ $receitas->links() }}
                     </div>
                     <div class="mb-2 text-end">
-                        <button id="exportCsv" class="btn btn-success btn-sm">Exportar CSV</button>
+                        <button id="exportCsv" class="btn btn-success btn-sm" title="Exporta as linhas desta página. O relatório completo do período está no Dashboard Financeiro.">Exportar esta página (Excel)</button>
                     </div>
                 </div>
             </div>
@@ -170,7 +170,6 @@
 
 
 
-    <button id="exportCsv" class="btn btn-success mb-2">Exportar CSV</button>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
@@ -197,7 +196,7 @@ document.getElementById('exportCsv').addEventListener('click', function () {
         if(tds.length === 0) return;
 
         // Valor numérico
-        const valor = parseFloat(tds[4].innerText.replace('R$', '').replace('.', '').replace(',', '.')) || 0;
+        const valor = parseFloat(tds[4].innerText.replace('R$', '').replace(/\./g, '').replace(',', '.').trim()) || 0;
         total += valor;
 
         rows.push({
