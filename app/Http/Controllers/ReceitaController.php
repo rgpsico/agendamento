@@ -57,14 +57,15 @@ class ReceitaController extends Controller
 
         // Novo: filtro por período
         if ($request->filled('data_inicio') && $request->filled('data_fim')) {
-            $query->whereBetween('data_vencimento', [$request->data_inicio, $request->data_fim]);
+            // mesmo critério do dashboard: recebimento, senão vencimento, senão lançamento
+            $query->noPeriodo($request->data_inicio, $request->data_fim);
         }
 
         // Clone da query para total filtrado
         $totalReceitas = (clone $query)->sum('valor');
 
         // Paginação
-        $receitas = $query->orderBy('created_at', 'desc')
+        $receitas = $query->orderByRaw(Receita::DATA_COMPETENCIA_SQL . ' DESC')->orderByDesc('id')
                         ->paginate(15)
                         ->withQueryString();
 
@@ -177,6 +178,7 @@ class ReceitaController extends Controller
             'status'           => 'required|in:PENDENTE,RECEBIDA',
             'metodo_pagamento' => 'required|in:' . implode(',', array_keys(Receita::METODOS)),
             'data_vencimento'  => 'nullable|date',
+            'data_recebimento' => 'nullable|date',
             'categoria_id'     => 'nullable|exists:financeiro_categorias,id'
         ]);
 
@@ -188,9 +190,13 @@ class ReceitaController extends Controller
             ? FinanceiroCategoria::whereKey($request->categoria_id)->value('id')
             : null;
 
-        // Marcou como recebida agora: registra a data do recebimento.
-        if ($request->status === 'RECEBIDA' && ! $receita->data_recebimento) {
-            $dados['data_recebimento'] = now();
+        // Data de recebimento: a informada; recebida sem data => hoje; pendente => sem data.
+        if ($request->status === 'RECEBIDA') {
+            $dados['data_recebimento'] = $request->filled('data_recebimento')
+                ? $request->data_recebimento
+                : ($receita->data_recebimento ?? now());
+        } else {
+            $dados['data_recebimento'] = null;
         }
 
         $this->receitaService->atualizarReceita($id, $dados);

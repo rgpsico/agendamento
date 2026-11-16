@@ -28,7 +28,7 @@ class DespesaController extends Controller
             $q->where('status', $request->status)
         )
         ->when($request->filled('data_inicio') && $request->filled('data_fim'), fn($q) => 
-            $q->whereBetween('data_vencimento', [$request->data_inicio, $request->data_fim])
+            $q->noPeriodo($request->data_inicio, $request->data_fim) // vencimento; sem vencimento, lançamento
         );
 
     // Total das despesas filtradas (soma no banco)

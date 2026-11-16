@@ -45,6 +45,21 @@ class Despesas extends Model
         return $this->belongsTo(Usuario::class);  // Assumindo modelo Usuario
     }
 
+    /** Data que vale para relatórios: vencimento; sem vencimento, a data do lançamento. */
+    public const DATA_COMPETENCIA_SQL = 'DATE(COALESCE(despesas.data_vencimento, despesas.created_at))';
+
+    /** Despesas cuja data de competência está no período (datas Y-m-d, inclusive). */
+    public function scopeNoPeriodo($query, string $inicio, string $fim)
+    {
+        return $query->whereRaw(self::DATA_COMPETENCIA_SQL . ' BETWEEN ? AND ?', [$inicio, $fim]);
+    }
+
+    public function getDataCompetenciaAttribute(): ?\Carbon\Carbon
+    {
+        // casts() (sintaxe do Laravel 11) é ignorado no Laravel 10: data_vencimento pode vir como texto
+        return $this->data_vencimento ? \Carbon\Carbon::parse($this->data_vencimento) : $this->created_at;
+    }
+
     // Scope para despesas pendentes
     public function scopePending($query)
     {

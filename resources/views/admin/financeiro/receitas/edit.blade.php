@@ -47,6 +47,13 @@
 
 
                         <div class="mb-3">
+                            <label for="data_recebimento" class="form-label">Data de recebimento <small class="text-muted">(é a data usada no dashboard e no Excel)</small></label>
+                            <input type="date" id="data_recebimento" name="data_recebimento" class="form-control"
+                                   value="{{ old('data_recebimento', $receita->data_recebimento ? $receita->data_recebimento->format('Y-m-d') : '') }}">
+                            <small class="text-muted">Deixe em branco se ainda não recebeu. Ao marcar como "Recebido" sem data, usamos a data de hoje.</small>
+                        </div>
+
+                        <div class="mb-3">
                             <label for="data_vencimento" class="form-label">Data de Vencimento</label>
                             <input type="date" id="data_vencimento" name="data_vencimento" class="form-control" 
                                    value="{{ old('data_vencimento', $receita->data_vencimento ? $receita->data_vencimento->format('Y-m-d') : '') }}">

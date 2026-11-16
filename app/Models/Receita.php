@@ -34,6 +34,23 @@ class Receita extends Model
         'OUTRO'    => 'Outro',
     ];
 
+    /**
+     * Data que vale para relatórios (regime de caixa): recebimento; se ainda não recebida, vencimento;
+     * sem nenhuma das duas, a data do lançamento.
+     */
+    public const DATA_COMPETENCIA_SQL = 'DATE(COALESCE(receitas.data_recebimento, receitas.data_vencimento, receitas.created_at))';
+
+    /** Receitas cuja data de competência está no período (datas Y-m-d, inclusive). */
+    public function scopeNoPeriodo($query, string $inicio, string $fim)
+    {
+        return $query->whereRaw(self::DATA_COMPETENCIA_SQL . ' BETWEEN ? AND ?', [$inicio, $fim]);
+    }
+
+    public function getDataCompetenciaAttribute(): ?\Carbon\Carbon
+    {
+        return $this->data_recebimento ?? $this->data_vencimento ?? $this->created_at;
+    }
+
     /** Forma de pagamento: a da própria receita (lançamento manual) ou a do pagamento do agendamento. */
     public function getMetodoAttribute(): ?string
     {

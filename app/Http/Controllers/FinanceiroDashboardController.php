@@ -39,18 +39,18 @@ class FinanceiroDashboardController extends Controller
 
         // Receitas normais
         if (in_array('todos', $tipos) || in_array('receitas', $tipos)) {
-            $totalReceitas = Receita::whereBetween('created_at', [$dataInicio, $dataFim . ' 23:59:59'])->sum('valor');
-            $receitasPendentes = Receita::where('status', 'PENDENTE')->whereBetween('created_at', [$dataInicio, $dataFim . ' 23:59:59'])->count();
-            $receitasRecebidas = Receita::where('status', 'RECEBIDA')->whereBetween('created_at', [$dataInicio, $dataFim . ' 23:59:59'])->count();
-            $totalReceitasPendentes = Receita::where('status', 'PENDENTE')->whereBetween('created_at', [$dataInicio, $dataFim . ' 23:59:59'])->sum('valor');
-            $totalReceitasRecebidas = Receita::where('status', 'RECEBIDA')->whereBetween('created_at', [$dataInicio, $dataFim . ' 23:59:59'])->sum('valor');
+            $totalReceitas = Receita::noPeriodo($dataInicio, $dataFim)->sum('valor');
+            $receitasPendentes = Receita::where('status', 'PENDENTE')->noPeriodo($dataInicio, $dataFim)->count();
+            $receitasRecebidas = Receita::where('status', 'RECEBIDA')->noPeriodo($dataInicio, $dataFim)->count();
+            $totalReceitasPendentes = Receita::where('status', 'PENDENTE')->noPeriodo($dataInicio, $dataFim)->sum('valor');
+            $totalReceitasRecebidas = Receita::where('status', 'RECEBIDA')->noPeriodo($dataInicio, $dataFim)->sum('valor');
         }
 
         // Despesas normais
         if (in_array('todos', $tipos) || in_array('despesas', $tipos)) {
-            $totalDespesas = Despesas::whereBetween('created_at', [$dataInicio, $dataFim . ' 23:59:59'])->sum('valor');
-            $despesasPendentes = Despesas::whereIn('status', ['PENDING', 'PENDENTE'])->whereBetween('created_at', [$dataInicio, $dataFim . ' 23:59:59'])->count();
-            $totalDespesasPendentes = Despesas::whereIn('status', ['PENDING', 'PENDENTE'])->whereBetween('created_at', [$dataInicio, $dataFim . ' 23:59:59'])->sum('valor');
+            $totalDespesas = Despesas::noPeriodo($dataInicio, $dataFim)->sum('valor');
+            $despesasPendentes = Despesas::whereIn('status', ['PENDING', 'PENDENTE'])->noPeriodo($dataInicio, $dataFim)->count();
+            $totalDespesasPendentes = Despesas::whereIn('status', ['PENDING', 'PENDENTE'])->noPeriodo($dataInicio, $dataFim)->sum('valor');
         }
 
         // Receitas Recorrentes
@@ -91,7 +91,7 @@ class FinanceiroDashboardController extends Controller
         // Receitas normais
         if (in_array('todos', $tipos) || in_array('receitas', $tipos)) {
             $receitas = Receita::with(['usuario', 'categoria', 'pagamento'])
-                ->whereBetween('created_at', [$dataInicio, $dataFim . ' 23:59:59']);
+                ->noPeriodo($dataInicio, $dataFim);
 
             if ($request->get('status') === 'RECEBIDA') {
                 $receitas->where('status', 'RECEBIDA');
@@ -123,7 +123,7 @@ class FinanceiroDashboardController extends Controller
         // Despesas normais
         if (in_array('todos', $tipos) || in_array('despesas', $tipos)) {
             $despesas = Despesas::with(['usuario', 'categoria'])
-                ->whereBetween('created_at', [$dataInicio, $dataFim . ' 23:59:59']);
+                ->noPeriodo($dataInicio, $dataFim);
 
             // despesas são gravadas como PENDING / PAID
             if ($request->get('status') === 'PENDENTE') {
@@ -150,10 +150,10 @@ class FinanceiroDashboardController extends Controller
         }
 
         // Ordenar por data
-        $despesasDetalhadas = $despesasDetalhadas->sortByDesc('created_at');
+        $despesasDetalhadas = $despesasDetalhadas->sortByDesc(fn ($d) => $d->data_competencia ?? $d->data_inicio ?? $d->created_at);
 
         // Ordenar por data
-        $receitasDetalhadas = $receitasDetalhadas->sortByDesc('created_at');
+        $receitasDetalhadas = $receitasDetalhadas->sortByDesc(fn ($r) => $r->data_competencia ?? $r->data_inicio ?? $r->created_at);
         $tipoSelecionado = $tipos;
 
         return view('admin.financeiro.dashboard.dashboard', compact(
@@ -195,7 +195,7 @@ class FinanceiroDashboardController extends Controller
             $linhas[$chave]['recebido'] += $recebido;
         };
 
-        Receita::whereBetween('created_at', [$dataInicio, $dataFim . ' 23:59:59'])
+        Receita::noPeriodo($dataInicio, $dataFim)
             ->selectRaw("categoria_id, SUM(valor) AS total, SUM(CASE WHEN UPPER(status) = 'RECEBIDA' THEN valor ELSE 0 END) AS recebido")
             ->groupBy('categoria_id')
             ->get()
@@ -235,7 +235,6 @@ class FinanceiroDashboardController extends Controller
 
         $dataInicio = $request->get('data_inicio', now()->startOfMonth()->format('Y-m-d'));
         $dataFim    = $request->get('data_fim', now()->endOfMonth()->format('Y-m-d'));
-        $periodo    = [$dataInicio, $dataFim . ' 23:59:59'];
 
         $recorrentesPeriodo = function ($query) use ($dataInicio, $dataFim) {
             $query->where('data_inicio', '<=', $dataFim)
@@ -248,10 +247,10 @@ class FinanceiroDashboardController extends Controller
 
         // Receitas
         $receitas = Receita::with(['usuario', 'categoria', 'pagamento'])
-            ->whereBetween('created_at', $periodo)->orderBy('created_at')->get();
+            ->noPeriodo($dataInicio, $dataFim)->orderByRaw(Receita::DATA_COMPETENCIA_SQL)->get();
 
         $linhasReceitas = $receitas->map(fn ($r) => [
-            $data($r->created_at),
+            $data($r->data_competencia),
             $r->descricao,
             $r->usuario->nome ?? '',
             $r->categoria->nome ?? 'Sem categoria',
@@ -265,11 +264,11 @@ class FinanceiroDashboardController extends Controller
 
         // Despesas (o model formata o valor como texto; aqui usamos o número bruto)
         $despesas = Despesas::with('categoria')
-            ->whereBetween('created_at', $periodo)->orderBy('created_at')->get();
+            ->noPeriodo($dataInicio, $dataFim)->orderByRaw(Despesas::DATA_COMPETENCIA_SQL)->get();
         $valorDespesa = fn ($d) => (float) $d->getRawOriginal('valor');
 
         $linhasDespesas = $despesas->map(fn ($d) => [
-            $data($d->created_at),
+            $data($d->data_competencia),
             $d->descricao,
             $d->categoria->nome ?? 'Sem categoria',
             $statusDespesa($d->status),
@@ -332,9 +331,9 @@ class FinanceiroDashboardController extends Controller
 
         $xlsx = (new \App\Support\PlanilhaXlsx())
             ->aba('Resumo', ['Item', 'Valor'], $resumo, ['texto', 'moeda'])
-            ->aba('Receitas', ['Lançamento', 'Descrição', 'Aluno', 'Categoria', 'Forma de pagamento', 'Status', 'Vencimento', 'Recebimento', 'Valor'],
+            ->aba('Receitas', ['Data', 'Descrição', 'Aluno', 'Categoria', 'Forma de pagamento', 'Status', 'Vencimento', 'Recebimento', 'Valor'],
                 $linhasReceitas, ['data', 'texto', 'texto', 'texto', 'texto', 'texto', 'data', 'data', 'moeda'])
-            ->aba('Despesas', ['Lançamento', 'Descrição', 'Categoria', 'Status', 'Vencimento', 'Valor'],
+            ->aba('Despesas', ['Data', 'Descrição', 'Categoria', 'Status', 'Vencimento', 'Valor'],
                 $linhasDespesas, ['data', 'texto', 'texto', 'texto', 'data', 'moeda'])
             ->aba('Recorrentes', ['Tipo', 'Descrição', 'Categoria', 'Frequência', 'Início', 'Fim', 'Valor'],
                 $linhasRec, ['texto', 'texto', 'texto', 'texto', 'data', 'data', 'moeda'])
@@ -352,9 +351,9 @@ class FinanceiroDashboardController extends Controller
         $dataFim = $request->get('data_fim', now()->endOfMonth()->format('Y-m-d'));
 
         if ($tipo === 'receitas') {
-            $query = Receita::whereBetween('created_at', [$dataInicio, $dataFim . ' 23:59:59']);
+            $query = Receita::noPeriodo($dataInicio, $dataFim);
         } else { // despesas
-            $query = Despesas::whereBetween('created_at', [$dataInicio, $dataFim . ' 23:59:59']);
+            $query = Despesas::noPeriodo($dataInicio, $dataFim);
         }
 
         if ($status) {
