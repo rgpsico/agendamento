@@ -725,7 +725,8 @@ class PagamentoController extends Controller
             'valor' => $pagamento->valor,
             'data_recebimento'  => null,
             'categoria_id' => $request->input('categoria_id') ?? null,
-            'usuario_id' => $request->input('aluno_id'),
+            // receitas.usuario_id é o USUÁRIO do aluno (antes gravava o id da tabela alunos)
+            'usuario_id' => \App\Models\Alunos::whereKey($request->input('aluno_id'))->value('usuario_id') ?? auth()->id(),
             'status' => 'pendente', // 👈 marca como pendente
             'empresa_id' => $empresaId,
         ]);
@@ -786,7 +787,8 @@ class PagamentoController extends Controller
                 'valor' => $pagamento->valor,
                 'data_recebimento'  => null,
                 'categoria_id' => $request->input('categoria_id') ?? null,
-                'usuario_id' => $request->input('aluno_id'),
+                // receitas.usuario_id é o USUÁRIO do aluno (antes gravava o id da tabela alunos)
+            'usuario_id' => \App\Models\Alunos::whereKey($request->input('aluno_id'))->value('usuario_id') ?? auth()->id(),
                 'status' => 'pendente',
                 'empresa_id' => $empresaId,
             ]);

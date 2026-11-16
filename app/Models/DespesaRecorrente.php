@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class DespesaRecorrente extends Model
 {
-    use HasFactory, \App\Models\Concerns\DaEmpresaLogada;
+    use HasFactory, \App\Models\Concerns\DaEmpresaLogada, \App\Models\Concerns\LancamentoRecorrente;
 
     protected $table = 'despesas_recorrentes';
 

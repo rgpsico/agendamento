@@ -43,6 +43,7 @@
                             <label class="form-label">Frequência</label>
                             <select name="frequencia" class="form-select">
                                 <option value="">Todas</option>
+                                <option value="diario" {{ request('frequencia')=='diario' ? 'selected':'' }}>Diária</option>
                                 <option value="mensal" {{ request('frequencia')=='mensal' ? 'selected':'' }}>Mensal</option>
                                 <option value="semanal" {{ request('frequencia')=='semanal' ? 'selected':'' }}>Semanal</option>
                                 <option value="anual" {{ request('frequencia')=='anual' ? 'selected':'' }}>Anual</option>
@@ -108,7 +109,7 @@
                                         <td>{{ $receita->descricao }}</td>
                                         <td>{{ number_format($receita->valor,2,',','.') }}</td>
                                         <td>{{ $receita->categoria->nome ?? '-' }}</td>
-                                        <td>{{ ucfirst($receita->frequencia) }}</td>
+                                        <td>{{ ['diario' => 'Diária', 'semanal' => 'Semanal', 'mensal' => 'Mensal', 'anual' => 'Anual'][strtolower((string) $receita->frequencia)] ?? ucfirst($receita->frequencia) }}</td>
                                         <td>{{ $receita->status }}</td>
                                         <td>{{ $receita->data_inicio->format('d/m/Y') }}</td>
                                         <td>{{ $receita->data_fim ? $receita->data_fim->format('d/m/Y') : '-' }}</td>

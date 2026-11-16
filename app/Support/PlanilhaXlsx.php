@@ -195,6 +195,9 @@ class PlanilhaXlsx
             }
 
             $estilo = self::ESTILO[$tipo] ?? 0;
+            if ($tipo === 'numero' && is_int($valor)) {
+                $estilo = 0; // inteiro: sem casas decimais
+            }
 
             if ($valor === null || $valor === '') {
                 $xml .= '<c r="' . $ref . '" s="' . $estilo . '"/>';

@@ -22,12 +22,6 @@ class FinanceiroDashboardController extends Controller
             $tipos = ['todos'];
         }
 
-        $recorrentesPeriodo = function ($query) use ($dataInicio, $dataFim) {
-            $query->where('data_inicio', '<=', $dataFim)
-                ->where(function ($q) use ($dataInicio) {
-                    $q->whereNull('data_fim')->orWhere('data_fim', '>=', $dataInicio);
-                });
-        };
 
         // Inicializa totais
         $totalReceitas = $totalDespesas = 0;
@@ -55,12 +49,15 @@ class FinanceiroDashboardController extends Controller
 
         // Receitas Recorrentes
         if (in_array('todos', $tipos) || in_array('receitas_recorrentes', $tipos)) {
-            $totalReceitasRecorrentes = ReceitaRecorrente::where($recorrentesPeriodo)->sum('valor');
+            // valor × quantas vezes acontece no período (aluguel mensal em 3 meses = 3×)
+            $totalReceitasRecorrentes = ReceitaRecorrente::noPeriodo($dataInicio, $dataFim)->get()
+                ->sum(fn ($r) => $r->valorNoPeriodo($dataInicio, $dataFim));
         }
 
         // Despesas Recorrentes
         if (in_array('todos', $tipos) || in_array('despesas_recorrentes', $tipos)) {
-            $totalDespesasRecorrentes = DespesaRecorrente::where($recorrentesPeriodo)->sum('valor');
+            $totalDespesasRecorrentes = DespesaRecorrente::noPeriodo($dataInicio, $dataFim)->get()
+                ->sum(fn ($d) => $d->valorNoPeriodo($dataInicio, $dataFim));
         }
 
         $receitasMes = 0;
@@ -84,7 +81,7 @@ class FinanceiroDashboardController extends Controller
 
         $resultadoMes = $receitasMes - $despesasMes;
 
-        $faturamentoPorCategoria = $this->faturamentoPorCategoria($dataInicio, $dataFim, $recorrentesPeriodo);
+        $faturamentoPorCategoria = $this->faturamentoPorCategoria($dataInicio, $dataFim);
 
         $receitasDetalhadas = collect();
 
@@ -105,7 +102,7 @@ class FinanceiroDashboardController extends Controller
         // Receitas recorrentes
         if (in_array('todos', $tipos) || in_array('receitas_recorrentes', $tipos)) {
             $receitasRecorrentes = ReceitaRecorrente::with(['usuario', 'categoria'])
-                ->where($recorrentesPeriodo);
+                ->noPeriodo($dataInicio, $dataFim);
 
             if ($request->get('status') === 'RECEBIDA') {
                 $receitasRecorrentes->where('status', 'ACTIVE'); // ajuste se tiver outro status
@@ -138,7 +135,7 @@ class FinanceiroDashboardController extends Controller
         // Despesas recorrentes
         if (in_array('todos', $tipos) || in_array('despesas_recorrentes', $tipos)) {
             $despesasRecorrentes = DespesaRecorrente::with(['usuario', 'categoria'])
-                ->where($recorrentesPeriodo);
+                ->noPeriodo($dataInicio, $dataFim);
 
             if ($request->get('status') === 'ACTIVE') {
                 $despesasRecorrentes->where('status', 'ACTIVE'); // ajuste conforme sua regra
@@ -185,7 +182,7 @@ class FinanceiroDashboardController extends Controller
      *
      * @return \Illuminate\Support\Collection<int, array{nome:string, total:float, recebido:float, pendente:float, percentual:float}>
      */
-    private function faturamentoPorCategoria(string $dataInicio, string $dataFim, \Closure $recorrentesPeriodo)
+    private function faturamentoPorCategoria(string $dataInicio, string $dataFim)
     {
         $linhas = [];
         $somar = function ($categoriaId, float $total, float $recebido) use (&$linhas) {
@@ -201,11 +198,9 @@ class FinanceiroDashboardController extends Controller
             ->get()
             ->each(fn ($r) => $somar($r->categoria_id, (float) $r->total, (float) $r->recebido));
 
-        ReceitaRecorrente::where($recorrentesPeriodo)
-            ->selectRaw('categoria_id, SUM(valor) AS total')
-            ->groupBy('categoria_id')
-            ->get()
-            ->each(fn ($r) => $somar($r->categoria_id, (float) $r->total, 0.0));
+        // recorrentes: valor × vezes no período; entram como previstas (a receber)
+        ReceitaRecorrente::noPeriodo($dataInicio, $dataFim)->get()
+            ->each(fn ($r) => $somar($r->categoria_id, $r->valorNoPeriodo($dataInicio, $dataFim), 0.0));
 
         $nomes = \App\Models\FinanceiroCategoria::whereIn('id', array_keys($linhas))->pluck('nome', 'id');
         $geral = array_sum(array_column($linhas, 'total')) ?: 1;
@@ -236,10 +231,6 @@ class FinanceiroDashboardController extends Controller
         $dataInicio = $request->get('data_inicio', now()->startOfMonth()->format('Y-m-d'));
         $dataFim    = $request->get('data_fim', now()->endOfMonth()->format('Y-m-d'));
 
-        $recorrentesPeriodo = function ($query) use ($dataInicio, $dataFim) {
-            $query->where('data_inicio', '<=', $dataFim)
-                ->where(fn ($q) => $q->whereNull('data_fim')->orWhere('data_fim', '>=', $dataInicio));
-        };
 
         $statusReceita = fn ($s) => strtoupper((string) $s) === 'RECEBIDA' ? 'Recebida' : 'Pendente';
         $statusDespesa = fn ($s) => in_array(strtoupper((string) $s), ['PAID', 'PAGA', 'PAGO'], true) ? 'Paga' : 'Pendente';
@@ -280,8 +271,8 @@ class FinanceiroDashboardController extends Controller
 
         // Recorrentes ativas no período
         $frequencias = ['DIARIA' => 'Diária', 'SEMANAL' => 'Semanal', 'MENSAL' => 'Mensal', 'ANUAL' => 'Anual'];
-        $receitasRec = ReceitaRecorrente::with('categoria')->where($recorrentesPeriodo)->get();
-        $despesasRec = DespesaRecorrente::with('categoria')->where($recorrentesPeriodo)->get();
+        $receitasRec = ReceitaRecorrente::with('categoria')->noPeriodo($dataInicio, $dataFim)->get();
+        $despesasRec = DespesaRecorrente::with('categoria')->noPeriodo($dataInicio, $dataFim)->get();
         $linhasRec = [];
         foreach ([['Receita', $receitasRec], ['Despesa', $despesasRec]] as [$tipo, $itens]) {
             foreach ($itens as $i) {
@@ -289,16 +280,18 @@ class FinanceiroDashboardController extends Controller
                     $tipo,
                     $i->descricao,
                     $i->categoria->nome ?? 'Sem categoria',
-                    $frequencias[$i->frequencia] ?? $i->frequencia,
+                    $frequencias[str_replace('DIARIO', 'DIARIA', strtoupper((string) $i->frequencia))] ?? $i->frequencia,
                     $data($i->data_inicio),
                     $data($i->data_fim),
                     (float) $i->getRawOriginal('valor'),
+                    $i->vezesNoPeriodo($dataInicio, $dataFim),
+                    $i->valorNoPeriodo($dataInicio, $dataFim),
                 ];
             }
         }
 
         // Por categoria
-        $porCategoria = $this->faturamentoPorCategoria($dataInicio, $dataFim, $recorrentesPeriodo);
+        $porCategoria = $this->faturamentoPorCategoria($dataInicio, $dataFim);
         $linhasCategoria = $porCategoria->map(fn ($l) => [
             $l['nome'], $l['total'], $l['recebido'], $l['pendente'], $l['percentual'] / 100,
         ])->all();
@@ -308,8 +301,8 @@ class FinanceiroDashboardController extends Controller
         $totalReceitas  = (float) $receitas->sum('valor');
         $recebido       = (float) $receitas->filter(fn ($r) => strtoupper((string) $r->status) === 'RECEBIDA')->sum('valor');
         $despesasPagas  = (float) $despesas->filter(fn ($d) => $statusDespesa($d->status) === 'Paga')->sum($valorDespesa);
-        $totalRecReceitas = (float) $receitasRec->sum(fn ($i) => (float) $i->getRawOriginal('valor'));
-        $totalRecDespesas = (float) $despesasRec->sum(fn ($i) => (float) $i->getRawOriginal('valor'));
+        $totalRecReceitas = (float) $receitasRec->sum(fn ($i) => $i->valorNoPeriodo($dataInicio, $dataFim));
+        $totalRecDespesas = (float) $despesasRec->sum(fn ($i) => $i->valorNoPeriodo($dataInicio, $dataFim));
         $empresa = \App\Models\Empresa::find(\App\Support\EmpresasDoUsuario::ids($request->user())[0] ?? 0);
 
         $resumo = [
@@ -335,8 +328,8 @@ class FinanceiroDashboardController extends Controller
                 $linhasReceitas, ['data', 'texto', 'texto', 'texto', 'texto', 'texto', 'data', 'data', 'moeda'])
             ->aba('Despesas', ['Data', 'Descrição', 'Categoria', 'Status', 'Vencimento', 'Valor'],
                 $linhasDespesas, ['data', 'texto', 'texto', 'texto', 'data', 'moeda'])
-            ->aba('Recorrentes', ['Tipo', 'Descrição', 'Categoria', 'Frequência', 'Início', 'Fim', 'Valor'],
-                $linhasRec, ['texto', 'texto', 'texto', 'texto', 'data', 'data', 'moeda'])
+            ->aba('Recorrentes', ['Tipo', 'Descrição', 'Categoria', 'Frequência', 'Início', 'Fim', 'Valor de cada', 'Vezes no período', 'Total no período'],
+                $linhasRec, ['texto', 'texto', 'texto', 'texto', 'data', 'data', 'moeda', 'numero', 'moeda'])
             ->aba('Por categoria', ['Categoria', 'Faturamento', 'Recebido', 'A receber', '% do total'],
                 $linhasCategoria, ['texto', 'moeda', 'moeda', 'moeda', 'percentual']);
 

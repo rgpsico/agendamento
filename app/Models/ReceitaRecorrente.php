@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ReceitaRecorrente extends Model
 {
-    use HasFactory, \App\Models\Concerns\DaEmpresaLogada;
+    use HasFactory, \App\Models\Concerns\DaEmpresaLogada, \App\Models\Concerns\LancamentoRecorrente;
 
     protected $table = 'receitas_recorrentes';
 
@@ -22,6 +22,16 @@ class ReceitaRecorrente extends Model
         'categoria_id',
         'status'
     ];
+
+    /**
+     * A coluna é enum('diario','semanal','mensal','anual'); o formulário manda DIARIA/SEMANAL/MENSAL/ANUAL
+     * (padrão das despesas). Sem converter, "DIARIA" não cabe no enum e a gravação falha.
+     */
+    public function setFrequenciaAttribute($valor): void
+    {
+        $mapa = ['DIARIA' => 'diario', 'DIARIO' => 'diario', 'SEMANAL' => 'semanal', 'MENSAL' => 'mensal', 'ANUAL' => 'anual'];
+        $this->attributes['frequencia'] = $mapa[strtoupper((string) $valor)] ?? $valor;
+    }
 
     protected $casts = [
         'valor' => 'decimal:2',

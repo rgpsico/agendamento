@@ -49,12 +49,17 @@
 
                         <div class="mb-3">
                             <label for="frequencia" class="form-label">Frequência</label>
+                            @php
+                                // banco guarda diario/semanal/mensal/anual; o formulário usa DIARIA/SEMANAL/MENSAL/ANUAL
+                                $freqAtual = strtoupper((string) old('frequencia', $receitaRecorrente->frequencia));
+                                $freqAtual = $freqAtual === 'DIARIO' ? 'DIARIA' : $freqAtual;
+                            @endphp
                             <select class="form-control" id="frequencia" name="frequencia" required>
                                 <option value="">Selecione</option>
-                                <option value="DIARIA" {{ old('frequencia', $receitaRecorrente->frequencia) == 'DIARIA' ? 'selected' : '' }}>Diária</option>
-                                <option value="SEMANAL" {{ old('frequencia', $receitaRecorrente->frequencia) == 'SEMANAL' ? 'selected' : '' }}>Semanal</option>
-                                <option value="MENSAL" {{ old('frequencia', $receitaRecorrente->frequencia) == 'MENSAL' ? 'selected' : '' }}>Mensal</option>
-                                <option value="ANUAL" {{ old('frequencia', $receitaRecorrente->frequencia) == 'ANUAL' ? 'selected' : '' }}>Anual</option>
+                                <option value="DIARIA" {{ $freqAtual == 'DIARIA' ? 'selected' : '' }}>Diária</option>
+                                <option value="SEMANAL" {{ $freqAtual == 'SEMANAL' ? 'selected' : '' }}>Semanal</option>
+                                <option value="MENSAL" {{ $freqAtual == 'MENSAL' ? 'selected' : '' }}>Mensal</option>
+                                <option value="ANUAL" {{ $freqAtual == 'ANUAL' ? 'selected' : '' }}>Anual</option>
                             </select>
                             @error('frequencia')
                                 <small class="text-danger">{{ $message }}</small>

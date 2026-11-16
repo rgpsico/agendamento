@@ -85,17 +85,15 @@ class ReceitaRecorrenteController extends Controller
         $dados = $request->validate([
             'descricao'    => 'required|string|max:255',
             'valor'        => 'required|numeric|min:0',
-            'categoria_id' => 'nullable|exists:financeiro_categorias,id',
+            'categoria_id' => 'required|exists:financeiro_categorias,id', // coluna NOT NULL
             'frequencia'   => 'required|in:DIARIA,SEMANAL,MENSAL,ANUAL',
             'data_inicio'  => 'required|date',
             'data_fim'     => 'nullable|date|after_or_equal:data_inicio',
             'status'       => 'nullable|in:ACTIVE,INACTIVE',
         ]);
 
-        // Categoria só da própria empresa (o model filtra); de outra empresa vira "sem categoria".
-        $dados['categoria_id'] = ! empty($dados['categoria_id'])
-            ? FinanceiroCategoria::whereKey($dados['categoria_id'])->value('id')
-            : null;
+        // Categoria só da própria empresa (o model filtra).
+        abort_unless(FinanceiroCategoria::whereKey($dados['categoria_id'])->exists(), 422, 'Categoria inválida.');
 
         return $dados;
     }
