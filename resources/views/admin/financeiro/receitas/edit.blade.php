@@ -17,9 +17,6 @@
                         <h5 class="card-title mb-0">Dados da Receita</h5>
                     </div>
 
-                       <input type="hidden" id="empresa_id" name="empresa_id" class="form-control" 
-                                   value="{{ old('empresa_id', $receita->empresa_id) }}" required>
-
                     <div class="card-body">
                         <div class="mb-3">
                             <label for="descricao" class="form-label">Descrição</label>
@@ -30,7 +27,7 @@
                         <div class="mb-3">
                         <label for="categoria_id" class="form-label">Categoria</label>
                         <select id="categoria_id" name="categoria_id" class="form-control">
-                            <option value="">Selecione uma categoria</option>
+                            <option value="">Sem categoria</option>
                             @foreach($categorias as $categoria)
                                 <option value="{{ $categoria->id }}" 
                                     {{ old('categoria_id', $receita->categoria_id) == $categoria->id ? 'selected' : '' }}>
@@ -56,12 +53,11 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="metodo_pagamento" class="form-label">Método de Pagamento</label>
+                            <label for="metodo_pagamento" class="form-label">Forma de pagamento</label>
                             <select id="metodo_pagamento" name="metodo_pagamento" class="form-control" required>
-                                <option value="DINHEIRO" {{ old('metodo_pagamento', $receita->metodo_pagamento) == 'DINHEIRO' ? 'selected' : '' }}>Dinheiro</option>
-                                <option value="PIX" {{ old('metodo_pagamento', $receita->metodo_pagamento) == 'PIX' ? 'selected' : '' }}>Pix</option>
-                                <option value="CARTAO" {{ old('metodo_pagamento', $receita->metodo_pagamento) == 'CARTAO' ? 'selected' : '' }}>Cartão</option>
-                                <option value="BOLETO" {{ old('metodo_pagamento', $receita->metodo_pagamento) == 'BOLETO' ? 'selected' : '' }}>Boleto</option>
+                                @foreach(\App\Models\Receita::METODOS as $valor => $rotulo)
+                                    <option value="{{ $valor }}" {{ old('metodo_pagamento', $receita->metodo) === $valor ? 'selected' : '' }}>{{ $rotulo }}</option>
+                                @endforeach
                             </select>
                         </div>
 

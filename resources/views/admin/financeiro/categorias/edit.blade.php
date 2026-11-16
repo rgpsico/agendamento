@@ -7,7 +7,7 @@
 
             <div class="card shadow">
                 <div class="card-body">
-                    <form action="{{ route('financeiro.categorias.update', $categoria->id) }}" method="POST">
+                    <form action="{{ route('financeiro.categorias.update', ['categoria' => $categoria->id, 'tipo' => $tipo]) }}" method="POST">
                         @csrf
                         @method('PUT')
 
@@ -28,16 +28,7 @@
                             @enderror
                         </div>
 
-                        <div class="mb-3">
-                            <label for="tipo" class="form-label">Tipo</label>
-                            <select class="form-control" id="tipo" name="tipo" required>
-                                <option value="DESPESA" {{ old('tipo', $categoria->tipo) == 'DESPESA' ? 'selected' : '' }}>Despesa</option>
-                                <option value="RECEITA" {{ old('tipo', $categoria->tipo) == 'RECEITA' ? 'selected' : '' }}>Receita</option>
-                            </select>
-                            @error('tipo')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
+                        <p class="text-muted mb-3">Tipo: <strong>{{ $tipo === 'DESPESA' ? 'Despesa' : 'Receita' }}</strong></p>
 
                         <div class="text-end">
                             <a href="{{ route('financeiro.categorias.index') }}" class="btn btn-secondary">Cancelar</a>

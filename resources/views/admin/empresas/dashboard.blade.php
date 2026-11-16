@@ -279,7 +279,9 @@
                 @php
                     $cards = [
                         ['Total de Alunos', $numeroTotalDeAlunos, 'fas fa-users', 'primary'],
-                        ['Total Arrecadação', 'R$ ' . number_format($arrecadacao, 2, ',', '.'), 'fas fa-dollar-sign', 'success'],
+                        \App\Support\Modulos::pode(auth()->user(), 'financeiro')
+                            ? ['Total Arrecadação', 'R$ ' . number_format($arrecadacao, 2, ',', '.'), 'fas fa-dollar-sign', 'success']
+                            : ['Aulas Realizadas', $realizadas, 'fas fa-check-circle', 'success'],
                         ['Número de Aulas', $numero_total_de_aulas, 'fas fa-chalkboard-teacher', 'warning'],
                         ['Aulas Canceladas', $aulasCanceladas, 'fas fa-times-circle', 'danger']
                     ];
@@ -576,9 +578,10 @@
                 }
             });
 
-            // Company Status Check
+            // Company Status Check (só para o dono; o funcionário não tem empresa própria)
+            @if(Auth::user()->empresa)
             $.ajax({
-                url: "{{ route('empresa.verificarStatus', ['empresaId' => Auth::user()->empresa->id ?? '']) }}",
+                url: "{{ route('empresa.verificarStatus', ['empresaId' => Auth::user()->empresa->id]) }}",
                 method: "GET",
                 success: function(response) {
                     if (response.status === 'inativo') {
@@ -603,6 +606,7 @@
                     console.error('Erro ao verificar status da empresa:', xhr.responseText);
                 }
             });
+            @endif
         });
     </script>
 

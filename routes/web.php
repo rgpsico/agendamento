@@ -581,8 +581,10 @@ Route::prefix('financeiro')->middleware(['auth'])->group(function () {
 
     Route::get('/dashboard', [\App\Http\Controllers\FinanceiroDashboardController::class, 'index'])
         ->name('admin.financeiro.dashboard');
+    Route::get('/dashboard/exportar', [\App\Http\Controllers\FinanceiroDashboardController::class, 'exportar'])
+        ->name('admin.financeiro.exportar');
 
-    Route::get('despesas/resumo/ajax', [DespesaController::class, 'resumo'])->name('despesas.resumo');
+    Route::get('despesas/resumo/ajax', [DespesaController::class, 'apiResumo'])->name('despesas.resumo');
 
     Route::get('despesas/buscar_despesas', [DespesaController::class, 'buscar_despesas'])->name('despesas.buscar_despesas');
 });

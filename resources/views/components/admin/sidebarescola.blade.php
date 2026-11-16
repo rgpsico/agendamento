@@ -23,6 +23,11 @@
                 <ul>
                     <!-- Seção: Menu -->
                     <li class="menu-title"><span>Menu</span></li>
+                    @php
+                        // Áreas liberadas: dono/master veem tudo; funcionário só o que o dono liberou (App\Support\Modulos)
+                        $podeArea = fn (string $m) => auth()->check() && \App\Support\Modulos::pode(auth()->user(), $m);
+                        $ehMaster = auth()->check() && auth()->user()->isMasterUser();
+                    @endphp
 
                     <!-- Dashboard -->
                     <li>
@@ -53,6 +58,7 @@
                         </li>
                     @endisset
 
+                @if($podeArea('ia'))
                 <li class="submenu">
                     <a href="#">
                         <i class="fas fa-robot" style="font-size: 18px;"></i>
@@ -69,9 +75,11 @@
                         <li><a href="{{ route('admin.conversations.index') }}">Conversas</a></li> <!-- Novo -->
                     </ul>
                 </li>
+                @endif
 
 
               
+                        @if($podeArea('financeiro'))
                         <li class="submenu">
                         <a href="#">
                             <i class="fas fa-dollar-sign" style="font-size: 18px;"></i>
@@ -115,7 +123,9 @@
                                 <a href="#">📦 Planos Empresas<span class="menu-arrow"></span></a>
                                 <ul>                      
                                     <li><a href="{{ route('admin.planos.index') }}">Listar Planos</a></li>
+                                    @if($ehMaster)
                                     <li><a href="{{ route('admin.planos.create') }}">Cadastrar Plano</a></li>
+                                    @endif
                                   <li><a href="{{ route('admin.empresas.planos.index',  Auth::user()->empresa->id ?? 1 ) }}">🏢 Plano da Empresa</a></li>
                                 </ul>
                             </li>
@@ -134,6 +144,7 @@
 
                         </ul>
                     </li>
+                        @endif
 
 
 
@@ -189,15 +200,19 @@
                             </ul>
                         </li>
 
+                    @endisset
+
+                    @if(isset(Auth::user()->empresa->user_id) || (Auth::user()?->professor && $podeArea('clientes')))
                         <!-- Alunos -->
                         <li>
                             <a href="{{ route('alunos.index') }}">
                                 <i class="fe fe-users"></i><span>Clientes</span>
                             </a>
                         </li>
-                    @endisset
+                    @endif
 
                     <!-- Agenda -->
+                    @if($podeArea('agenda'))
                     <li class="submenu">
                         <a href="#">
                             <i class="fe fe-calendar"></i>
@@ -209,6 +224,7 @@
                             <li><a href="{{ route('agenda.calendario') }}">Calendário</a></li>
                         </ul>
                     </li>
+                    @endif
 
                     @isset(Auth::user()->empresa->id)
                         <li class="submenu">
@@ -242,6 +258,7 @@
                     @endisset
 
                     <!-- Dados Cadastrais -->
+                    @if($podeArea('configuracoes'))
                     <li class="submenu">
                         <a href="#">
                             <i class="fe fe-file"></i>
@@ -266,6 +283,7 @@
                             @endisset
                         </ul>
                     </li>
+                    @endif
 
                     <!-- Pagamentos -->
                     @isset(Auth::user()->empresa->user_id)
@@ -334,6 +352,7 @@
                         </li>
                         @endmasterUser
                         
+                        @if($podeArea('usuarios'))
                         <li class="submenu">
                      
                             <a href="#">
@@ -344,11 +363,14 @@
                             <ul>
                                 <li><a href="{{ route('admin.usuarios.index') }}">Usuários</a></li>
                                 {{-- <li><a href="{{ route('admin.perfis.index') }}">Perfis</a></li> --}}
+                                @if($ehMaster)
                                 <li><a href="{{ route('admin.permissions.index') }}">Permissões</a></li>
                                 <li><a href="{{ route('admin.roles.index') }}">Papéis</a></li>
+                                @endif
                             </ul>
                         
                     </li>
+                        @endif
 
                         @masterUser
                         <li class="submenu">

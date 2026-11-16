@@ -44,9 +44,15 @@ class ReceitaController extends Controller
         }
 
         if ($request->metodo_pagamento) {
-            $query->whereHas('pagamento', function ($q) use ($request) {
-                $q->where('metodo_pagamento', $request->metodo_pagamento);
+            $query->where(function ($q) use ($request) {
+                // forma de pagamento da própria receita (manual) ou do pagamento do agendamento
+                $q->where('metodo_pagamento', $request->metodo_pagamento)->orWhere(fn ($qq) => $qq->whereNull('metodo_pagamento')
+                    ->whereHas('pagamento', fn ($p) => $p->where('metodo_pagamento', $request->metodo_pagamento)));
             });
+        }
+
+        if ($request->filled('categoria_id')) {
+            $query->where('categoria_id', $request->categoria_id);
         }
 
         // Novo: filtro por período
@@ -62,7 +68,9 @@ class ReceitaController extends Controller
                         ->paginate(15)
                         ->withQueryString();
 
-        return view('admin.financeiro.receitas.index', compact('receitas', 'totalReceitas'));
+        $categorias = FinanceiroCategoria::where('tipo', 'receita')->orderBy('nome')->get();
+
+        return view('admin.financeiro.receitas.index', compact('receitas', 'totalReceitas', 'categorias'));
     }
 
 
@@ -74,56 +82,75 @@ class ReceitaController extends Controller
      */
     public function create()
     {
-        $professor = Auth::user()->professor;
-        $categorias = FinanceiroCategoria::where('tipo', 'receita')->get();
-        if (!$professor) {
-            auth()->logout();
-            return redirect()->back()->with('error', 'Professor não encontrado.');
-        }
+        $categorias = FinanceiroCategoria::where('tipo', 'receita')->orderBy('nome')->get();
 
-        $alunos = $professor->alunos()->with('usuario')->get();
+        return view('admin.financeiro.receitas.create', [
+            'alunos'       => $this->alunosDaEmpresa(),
+            'agendamentos' => collect(),
+            'categorias'   => $categorias,
+        ]);
+    }
 
-        $agendamentos = Agendamento::with(['aluno.usuario', 'modalidade'])
-            ->whereIn('aluno_id', $alunos->pluck('id'))
-            ->get();
+    /** Alunos/pacientes de todos os profissionais da(s) empresa(s) do usuário logado (dono ou profissional). */
+    private function alunosDaEmpresa()
+    {
+        $empresas = \App\Support\EmpresasDoUsuario::ids(Auth::user());
 
-        return view('admin.financeiro.receitas.create', compact('alunos', 'agendamentos','categorias'));
+        return \App\Models\Professor::whereIn('empresa_id', $empresas ?: [0])
+            ->with('alunos.usuario')
+            ->get()
+            ->pluck('alunos')
+            ->flatten()
+            ->unique('id')
+            ->sortBy(fn ($aluno) => mb_strtolower($aluno->usuario->nome ?? ''))
+            ->values();
     }
 
     /**
      * Salvar nova receita manual.
      */
     public function store(Request $request)
-{
-    $request->validate([
-        'aluno_id'         => 'required|exists:alunos,id',
-     
-        'valor'            => 'required|numeric|min:0',
-        'metodo_pagamento' => 'required|string',
-        'status'           => 'required|in:PENDENTE,RECEBIDA',
-        'data_vencimento'  => 'nullable|date',
-        'empresa_id'       => 'required|exists:empresa,id',
-    ]);
+    {
+        $request->validate([
+            'descricao'        => 'nullable|string|max:255',
+            'aluno_id'         => 'nullable|exists:alunos,id',
+            'categoria_id'     => 'nullable|exists:financeiro_categorias,id',
+            'valor'            => 'required|numeric|min:0',
+            'metodo_pagamento' => 'required|in:' . implode(',', array_keys(Receita::METODOS)),
+            'status'           => 'required|in:PENDENTE,RECEBIDA',
+            'data_recebimento' => 'nullable|date',
+            'data_vencimento'  => 'nullable|date',
+        ]);
 
-    $dadosReceita = [
-        'descricao'        => 'Pagamento da aula',
-        'valor'            => $request->valor,
-        'data'             => now(), // data de lançamento
-        'data_vencimento'  => $request->data_vencimento, // vencimento
-        'categoria_id'     => null, // ajustar se tiver categorias
-        'usuario_id'       => auth()->id(),
-        'status'           => $request->status,
-        'empresa_id'       => $request->empresa_id,     
-        'aluno_id'         => $request->aluno_id,
-        'metodo_pagamento' => $request->metodo_pagamento,
-        'pagamento_id'     => null, 
-    ];
+        // Aluno e categoria só da própria empresa (a categoria já é filtrada pelo model).
+        $aluno = $request->filled('aluno_id')
+            ? $this->alunosDaEmpresa()->firstWhere('id', (int) $request->aluno_id)
+            : null;
+        abort_if($request->filled('aluno_id') && ! $aluno, 422, 'Aluno não encontrado nesta empresa.');
 
-    $this->receitaService->lancarReceitaManual($dadosReceita);
+        $categoriaId = $request->filled('categoria_id')
+            ? FinanceiroCategoria::whereKey($request->categoria_id)->value('id')
+            : null;
 
-    return redirect()->route('financeiro.receitas.index')
-        ->with('success', 'Receita lançada com sucesso!');
-}
+        $recebida = $request->status === 'RECEBIDA';
+
+        $this->receitaService->lancarReceitaManual([
+            'descricao'        => $request->descricao ?: ($aluno ? 'Pagamento de ' . ($aluno->usuario->nome ?? 'aluno') : 'Receita avulsa'),
+            'valor'            => $request->valor,
+            'data_recebimento' => $recebida ? ($request->data_recebimento ?: now()) : null,
+            'data_vencimento'  => $request->data_vencimento,
+            'metodo_pagamento' => $request->metodo_pagamento,
+            'categoria_id'     => $categoriaId,
+            // usuario_id = de quem é a receita (o aluno); sem aluno, quem lançou
+            'usuario_id'       => $aluno->usuario_id ?? auth()->id(),
+            'status'           => $request->status,
+            'pagamento_id'     => null,
+            // empresa_id: preenchido pelo model com a empresa do usuário logado
+        ]);
+
+        return redirect()->route('financeiro.receitas.index')
+            ->with('success', 'Receita lançada com sucesso!');
+    }
 
 
 
@@ -134,7 +161,7 @@ class ReceitaController extends Controller
     {
            $categorias = FinanceiroCategoria::where('tipo', 'receita')->get();
         $receita = $this->receitaService->buscarReceita($id);
-        $agendamentos = Agendamento::with('aluno')->get();
+        $agendamentos = collect(); // a tela de edição não usa; antes carregava os agendamentos de todas as empresas
 
         return view('admin.financeiro.receitas.edit', compact('receita', 'agendamentos','categorias'));
     }
@@ -148,24 +175,25 @@ class ReceitaController extends Controller
             'descricao'        => 'nullable|string|max:255',
             'valor'            => 'required|numeric|min:0',
             'status'           => 'required|in:PENDENTE,RECEBIDA',
-            'metodo_pagamento' => 'required|string',
+            'metodo_pagamento' => 'required|in:' . implode(',', array_keys(Receita::METODOS)),
             'data_vencimento'  => 'nullable|date',
-            'empresa_id'       => 'required|exists:empresa,id',
             'categoria_id'     => 'nullable|exists:financeiro_categorias,id'
         ]);
 
-        $this->receitaService->atualizarReceita(
-            $id,
-            $request->only([
-                'descricao',
-                'valor',
-                'status',
-                'metodo_pagamento',
-                'data_vencimento',
-                'categoria_id',
-                'empresa_id'
-            ])
-        );
+        $receita = $this->receitaService->buscarReceita($id); // 404 se for de outra empresa
+        $dados = $request->only(['descricao', 'valor', 'status', 'metodo_pagamento', 'data_vencimento', 'categoria_id']);
+
+        // Só categorias da própria empresa (o model filtra); id de outra empresa vira "sem categoria".
+        $dados['categoria_id'] = $request->filled('categoria_id')
+            ? FinanceiroCategoria::whereKey($request->categoria_id)->value('id')
+            : null;
+
+        // Marcou como recebida agora: registra a data do recebimento.
+        if ($request->status === 'RECEBIDA' && ! $receita->data_recebimento) {
+            $dados['data_recebimento'] = now();
+        }
+
+        $this->receitaService->atualizarReceita($id, $dados);
 
         return redirect()->route('financeiro.receitas.index')
             ->with('success', 'Receita atualizada com sucesso!');

@@ -151,7 +151,7 @@ Route::get('empresa/verificarstatus/{empresaId}',  [EmpresaControllerApi::class,
 Route::get('servicos/empresa/{empresaId}', [ServicoControllerApi::class, 'byEmpresa']);
 Route::resource('servicos', ServicoControllerApi::class)->except(['store', 'update', 'destroy']);
 Route::resource('servicos', ServicoControllerApi::class)->only(['store', 'update', 'destroy'])->middleware(['painel', 'dono:servicos']);
-Route::get('financeiro-categorias', [FinanceiroCategoriaControllerApi::class, 'index']);
+Route::get('financeiro-categorias', [FinanceiroCategoriaControllerApi::class, 'index'])->middleware('painel');
 
 Route::post('pagamentoApi', [PagamentoController::class, 'pagamentoStripe']);
 Route::post('/admin/asaas/limpar-sandbox', [PagamentoController::class, 'deleteAllPayments'])->middleware(['painel', 'dono:master']);
@@ -439,14 +439,14 @@ Route::post('/aluno/enviarmensagemaoaluno', [ChatProfessorController::class, 'en
 
 use App\Http\Controllers\Api\DespesasApiController;
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware('painel')->group(function () {
     Route::get('/despesas', [DespesasApiController::class, 'index']);
     Route::get('/despesas/{id}', [DespesasApiController::class, 'show']);
     Route::get('/despesas/resumo', [DespesasApiController::class, 'resumo']);
 });
 
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware('painel')->group(function () {
     Route::get('/receitas', [ReceitaApiController::class, 'index']);
     Route::get('/receitas/{id}', [ReceitaApiController::class, 'show']);
     Route::get('/receita/resumo', [ReceitaApiController::class, 'resumo']);
@@ -455,20 +455,23 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::middleware('auth:sanctum')->get('/alunoadmin/aulas', [AlunoadminController::class, 'aulasJson']);
 
 
-Route::get('/despesas-recorrentes', [DespesaRecorrenteApiController::class, 'index']);
-Route::get('/despesas-recorrentes/{id}', [DespesaRecorrenteApiController::class, 'show']);
-Route::get('/despesas-recorrente/resumo', [DespesaRecorrenteApiController::class, 'resumo']);
-Route::middleware('auth:sanctum')->group(function () {});
+// Financeiro: só logado (sessão do painel ou token); os models filtram pela empresa do usuário.
+Route::middleware('painel')->group(function () {
+    Route::get('/despesas-recorrentes', [DespesaRecorrenteApiController::class, 'index']);
+    Route::get('/despesas-recorrentes/{id}', [DespesaRecorrenteApiController::class, 'show']);
+    Route::get('/despesas-recorrente/resumo', [DespesaRecorrenteApiController::class, 'resumo']);
+});
 
 
 
 use App\Http\Controllers\Api\ReceitaRecorrenteApiController;
 use App\Http\Controllers\FinanceiroDashboardController;
 
-Route::get('/receitas-recorrente', [ReceitaRecorrenteApiController::class, 'index']);
-Route::get('/receitas-recorrentes/{id}', [ReceitaRecorrenteApiController::class, 'show']);
-Route::get('/receitas-recorren/resumo', [ReceitaRecorrenteApiController::class, 'resumo']);
-Route::middleware('auth:sanctum')->group(function () {});
+Route::middleware('painel')->group(function () {
+    Route::get('/receitas-recorrente', [ReceitaRecorrenteApiController::class, 'index']);
+    Route::get('/receitas-recorrentes/{id}', [ReceitaRecorrenteApiController::class, 'show']);
+    Route::get('/receitas-recorren/resumo', [ReceitaRecorrenteApiController::class, 'resumo']);
+});
 
 
 

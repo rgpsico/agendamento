@@ -13,17 +13,36 @@ class FinanceiroReceitaService
     public function lancarReceita(array $dados): Receita
     {
         return DB::transaction(function () use ($dados) {
-            return Receita::create([
-                'pagamento_id' => $dados['pagamento_id'] ?? null,
-                'descricao'     => $dados['descricao'] ?? 'Receita automática',
-                'valor'         => $dados['valor'],
-                'data_recebimento'          => $dados['data'] ?? now(),
-                'categoria_id'  => $dados['categoria_id'] ?? null,
-                'usuario_id'    => $dados['usuario_id'],
-                'status'        => $dados['status'] ?? 'confirmado',
-                'empresa_id'    => $dados['empresa_id']
-            ]);
+            $campos = [
+                'pagamento_id'     => $dados['pagamento_id'] ?? null,
+                'descricao'        => $dados['descricao'] ?? 'Receita automática',
+                'valor'            => $dados['valor'],
+                'data_recebimento' => array_key_exists('data_recebimento', $dados) ? $dados['data_recebimento'] : ($dados['data'] ?? now()),
+                'data_vencimento'  => $dados['data_vencimento'] ?? null,
+                'metodo_pagamento' => $dados['metodo_pagamento'] ?? null,
+                'categoria_id'     => $dados['categoria_id'] ?? $this->categoriaDoPagamento($dados['pagamento_id'] ?? null),
+                'usuario_id'       => $dados['usuario_id'] ?? null,
+                'status'           => $dados['status'] ?? 'confirmado',
+                'empresa_id'       => $dados['empresa_id'] ?? null,
+            ];
+
+            return Receita::create($campos);
         });
+    }
+
+    /**
+     * Categoria do serviço agendado. Cada serviço tem uma categoria de receita (criada junto com ele),
+     * então o faturamento já sai separado por serviço (ex.: Pilates x Fisioterapia).
+     */
+    private function categoriaDoPagamento(?int $pagamentoId): ?int
+    {
+        if (! $pagamentoId) {
+            return null;
+        }
+
+        $pagamento = \App\Models\Pagamento::with('agendamento.servico')->find($pagamentoId);
+
+        return $pagamento?->agendamento?->servico?->categoria_id;
     }
 
     /**
@@ -64,6 +83,7 @@ public function listarReceitas()
     public function atualizarReceita(int $id, array $dados): bool
     {
         $receita = Receita::findOrFail($id);
+
         return $receita->update($dados);
     }
 

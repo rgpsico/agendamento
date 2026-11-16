@@ -76,10 +76,10 @@
                                                     <img class="avatar-img rounded-circle" src="{{ asset('admin/img/doctors/doctor-02.jpg') }}" alt="User Image">
                                                 @endif
                                             </a>
-                                            <a href="">{{ $agendamento->professor->usuario->nome ?? 'AQUI' }}</a>
+                                            <a href="">{{ $agendamento->professor->usuario->nome ?? '-' }}</a>
                                         </h2>
                                     </td>
-                                    <td>{{ $agendamento->modalidade->nome }}</td>
+                                    <td>{{ $agendamento->modalidade->nome ?? $agendamento->servico->titulo ?? '-' }}</td>
                                     <td>
                                         <span class="text-primary d-block">{{ date('d/m/Y', strtotime($agendamento->data_da_aula)) }}</span>
                                     </td>
@@ -110,7 +110,7 @@
                                             Atualizar Status
                                         </button>
                                     
-                                        <button class="btn btn-warning avaliar-btn" data-empresa_id='{{$agendamento->professor->usuario->empresa->id}}' data-id="{{ $agendamento->id }}" data-professor="{{ $agendamento->professor->usuario->nome ?? 'AQUI' }}">
+                                        <button class="btn btn-warning avaliar-btn" data-empresa_id='{{ $agendamento->professor->empresa_id ?? $agendamento->professor?->usuario?->empresa?->id }}' data-id="{{ $agendamento->id }}" data-professor="{{ $agendamento->professor->usuario->nome ?? '-' }}">
                                             Avaliar Aula ⭐
                                         </button>
                                     

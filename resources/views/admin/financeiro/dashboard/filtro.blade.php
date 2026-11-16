@@ -34,5 +34,10 @@
                 <button type="submit" class="btn-filter">
                     <span>📊</span> Filtrar
                 </button>
+                {{-- Relatório do período em Excel para o contador (usa as datas preenchidas acima) --}}
+                <button type="submit" class="btn-filter" style="background:#1d6f42;"
+                        formaction="{{ route('admin.financeiro.exportar') }}" title="Baixar receitas, despesas e resumo do período em Excel">
+                    <span>📥</span> Exportar Excel
+                </button>
             </form>
         </div>

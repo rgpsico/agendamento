@@ -44,7 +44,9 @@ class EmpresaController extends Controller
     public function dashboard(Request $request)
     {
 
-        if (!Auth::user()->empresa) {
+        // Sem empresa própria: funcionário (professor de uma empresa) vê o próprio painel; os demais vão criar a empresa.
+        $ehFuncionario = \App\Support\Modulos::ehFuncionario(Auth::user());
+        if (!Auth::user()->empresa && !$ehFuncionario) {
             return redirect()->route('empresa.configuracao', ['userId' => Auth::user()->id]);
         }
 
@@ -76,6 +78,12 @@ class EmpresaController extends Controller
         $arrecadacaoPorDia = $agendamentos->groupBy('data_da_aula')->map(function ($day) {
             return $day->sum('valor_aula');
         });
+
+        // Valores só para quem tem a área Financeiro (dono sempre tem).
+        if (! \App\Support\Modulos::pode(Auth::user(), 'financeiro')) {
+            $arrecadacao = 0;
+            $arrecadacaoPorDia = collect();
+        }
 
         return view('admin.empresas.dashboard', [
             'pageTitle' => 'DashBoard',

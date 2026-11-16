@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ReceitaRecorrente extends Model
 {
-    use HasFactory;
+    use HasFactory, \App\Models\Concerns\DaEmpresaLogada;
 
     protected $table = 'receitas_recorrentes';
 

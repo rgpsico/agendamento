@@ -1,9 +1,16 @@
 <x-admin.layout title="Editar Usuário">
     <div class="page-wrapper">
-         <!-- Mensagens de Sucesso -->
-       
-
+        <div class="content container-fluid">
      <x-alert-messages />
+            @if($errors->any())
+                <div class="alert alert-danger">
+                    <ul class="mb-0">
+                        @foreach($errors->all() as $erro)
+                            <li>{{ $erro }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
             <h3>Editar Usuário</h3>
 
             <form action="{{ route('admin.usuarios.update', $user->id) }}" method="POST">
@@ -27,7 +34,7 @@
                 </div>
 
                 <!-- Senha -->
-             @can('alterar_senha') {{-- ou @can('alterar_senha') se usar permissão --}}
+             @if($podeDefinirAreas || auth()->user()->can('alterar_senha'))
             <div class="row mt-3">
                 <div class="col-md-6">
                     <div class="form-group">
@@ -43,9 +50,14 @@
                     </div>
                 </div>
             </div>
-            @endcan
+            @endif
 
 
+                @if($podeDefinirAreas)
+                    @include('admin.usuarios._areas', ['marcadas' => $areasMarcadas, 'acessoTotal' => $alvoAcessoTotal])
+                @endif
+
+                @if($ehMaster)
                 <!-- Perfis -->
                 <div class="row mt-4">
                     <div class="col-md-6">
@@ -103,6 +115,8 @@
                         </div>
                     </div>
                 </div>
+
+                @endif
 
                 <div class="mt-3 d-flex justify-content-end">
                     <a href="{{ route('admin.usuarios.index') }}" class="btn btn-secondary mr-2">Cancelar</a>

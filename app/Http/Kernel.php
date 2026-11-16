@@ -40,6 +40,7 @@ class Kernel extends HttpKernel
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\DetectTenant::class,        // detecta tenant pelo domínio
             \App\Http\Middleware\HandleInertiaRequests::class,
+            \App\Http\Middleware\VerificaModulo::class,  // funcionário só entra nas áreas liberadas pelo dono
         ],
 
         // Rotas da API de uso interno: login pela sessao do painel (ou token Sanctum) e escrita so via AJAX/JSON
@@ -49,6 +50,7 @@ class Kernel extends HttpKernel
             \Illuminate\Session\Middleware\StartSession::class,
             'auth:web,sanctum',
             \App\Http\Middleware\PainelApiWrites::class,
+            \App\Http\Middleware\VerificaModulo::class,
         ],
 
         'api' => [

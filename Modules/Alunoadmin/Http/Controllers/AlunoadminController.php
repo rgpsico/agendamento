@@ -36,7 +36,7 @@ class AlunoadminController extends Controller
 
         $id = auth()->user()->aluno->id;
 
-        $query = Agendamento::with('professor.usuario', 'modalidade')
+        $query = Agendamento::with('professor.usuario', 'professor.empresa', 'modalidade', 'servico')
             ->where('aluno_id', $id);
 
 
@@ -71,7 +71,7 @@ class AlunoadminController extends Controller
 
     
        
-        $query = Agendamento::with('professor.usuario', 'modalidade')
+        $query = Agendamento::with('professor.usuario', 'professor.empresa', 'modalidade', 'servico')
             ->where('aluno_id', $id);
             
   

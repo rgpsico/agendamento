@@ -7,7 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class FinanceiroCategoria extends Model
 {
-    use HasFactory;
+    use HasFactory, \App\Models\Concerns\DaEmpresaLogada;
+
+    /** Categorias sem empresa (empresa_id nulo) são padrões visíveis para todas. */
+    protected static bool $empresaOpcional = true;
 
     protected $table = 'financeiro_categorias';
 
@@ -15,6 +18,7 @@ class FinanceiroCategoria extends Model
         'nome',
         'descricao',
         'tipo', // opcional: 'despesa' ou 'receita' se você quiser diferenciar
+        'empresa_id',
     ];
 
     // Relacionamentos

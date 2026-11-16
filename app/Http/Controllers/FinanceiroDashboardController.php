@@ -39,18 +39,18 @@ class FinanceiroDashboardController extends Controller
 
         // Receitas normais
         if (in_array('todos', $tipos) || in_array('receitas', $tipos)) {
-            $totalReceitas = Receita::whereBetween('created_at', [$dataInicio, $dataFim])->sum('valor');
-            $receitasPendentes = Receita::where('status', 'PENDENTE')->whereBetween('created_at', [$dataInicio, $dataFim])->count();
-            $receitasRecebidas = Receita::where('status', 'RECEBIDA')->whereBetween('created_at', [$dataInicio, $dataFim])->count();
-            $totalReceitasPendentes = Receita::where('status', 'PENDENTE')->whereBetween('created_at', [$dataInicio, $dataFim])->sum('valor');
-            $totalReceitasRecebidas = Receita::where('status', 'RECEBIDA')->whereBetween('created_at', [$dataInicio, $dataFim])->sum('valor');
+            $totalReceitas = Receita::whereBetween('created_at', [$dataInicio, $dataFim . ' 23:59:59'])->sum('valor');
+            $receitasPendentes = Receita::where('status', 'PENDENTE')->whereBetween('created_at', [$dataInicio, $dataFim . ' 23:59:59'])->count();
+            $receitasRecebidas = Receita::where('status', 'RECEBIDA')->whereBetween('created_at', [$dataInicio, $dataFim . ' 23:59:59'])->count();
+            $totalReceitasPendentes = Receita::where('status', 'PENDENTE')->whereBetween('created_at', [$dataInicio, $dataFim . ' 23:59:59'])->sum('valor');
+            $totalReceitasRecebidas = Receita::where('status', 'RECEBIDA')->whereBetween('created_at', [$dataInicio, $dataFim . ' 23:59:59'])->sum('valor');
         }
 
         // Despesas normais
         if (in_array('todos', $tipos) || in_array('despesas', $tipos)) {
-            $totalDespesas = Despesas::whereBetween('created_at', [$dataInicio, $dataFim])->sum('valor');
-            $despesasPendentes = Despesas::where('status', 'PENDENTE')->whereBetween('created_at', [$dataInicio, $dataFim])->count();
-            $totalDespesasPendentes = Despesas::where('status', 'PENDENTE')->whereBetween('created_at', [$dataInicio, $dataFim])->sum('valor');
+            $totalDespesas = Despesas::whereBetween('created_at', [$dataInicio, $dataFim . ' 23:59:59'])->sum('valor');
+            $despesasPendentes = Despesas::whereIn('status', ['PENDING', 'PENDENTE'])->whereBetween('created_at', [$dataInicio, $dataFim . ' 23:59:59'])->count();
+            $totalDespesasPendentes = Despesas::whereIn('status', ['PENDING', 'PENDENTE'])->whereBetween('created_at', [$dataInicio, $dataFim . ' 23:59:59'])->sum('valor');
         }
 
         // Receitas Recorrentes
@@ -84,12 +84,14 @@ class FinanceiroDashboardController extends Controller
 
         $resultadoMes = $receitasMes - $despesasMes;
 
+        $faturamentoPorCategoria = $this->faturamentoPorCategoria($dataInicio, $dataFim, $recorrentesPeriodo);
+
         $receitasDetalhadas = collect();
 
         // Receitas normais
         if (in_array('todos', $tipos) || in_array('receitas', $tipos)) {
             $receitas = Receita::with(['usuario', 'categoria', 'pagamento'])
-                ->whereBetween('created_at', [$dataInicio, $dataFim]);
+                ->whereBetween('created_at', [$dataInicio, $dataFim . ' 23:59:59']);
 
             if ($request->get('status') === 'RECEBIDA') {
                 $receitas->where('status', 'RECEBIDA');
@@ -120,13 +122,14 @@ class FinanceiroDashboardController extends Controller
 
         // Despesas normais
         if (in_array('todos', $tipos) || in_array('despesas', $tipos)) {
-            $despesas = Despesas::with(['usuario', 'categoria', 'pagamento'])
-                ->whereBetween('created_at', [$dataInicio, $dataFim]);
+            $despesas = Despesas::with(['usuario', 'categoria'])
+                ->whereBetween('created_at', [$dataInicio, $dataFim . ' 23:59:59']);
 
+            // despesas são gravadas como PENDING / PAID
             if ($request->get('status') === 'PENDENTE') {
-                $despesas->where('status', 'PENDENTE');
+                $despesas->whereIn('status', ['PENDING', 'PENDENTE']);
             } elseif ($request->get('status') === 'RECEBIDA') {
-                $despesas->where('status', 'RECEBIDA');
+                $despesas->whereIn('status', ['PAID', 'PAGA', 'PAGO']);
             }
 
             $despesasDetalhadas = $despesasDetalhadas->merge($despesas->get());
@@ -171,8 +174,174 @@ class FinanceiroDashboardController extends Controller
             'dataFim',
             'tipoSelecionado',
             'receitasDetalhadas',
-            'despesasDetalhadas'
+            'despesasDetalhadas',
+            'faturamentoPorCategoria'
         ));
+    }
+
+    /**
+     * Faturamento do período por categoria de receita (ex.: Pilates x Fisioterapia).
+     * Soma receitas avulsas/de agendamento e receitas recorrentes ativas no período.
+     *
+     * @return \Illuminate\Support\Collection<int, array{nome:string, total:float, recebido:float, pendente:float, percentual:float}>
+     */
+    private function faturamentoPorCategoria(string $dataInicio, string $dataFim, \Closure $recorrentesPeriodo)
+    {
+        $linhas = [];
+        $somar = function ($categoriaId, float $total, float $recebido) use (&$linhas) {
+            $chave = $categoriaId ?: 0;
+            $linhas[$chave] ??= ['total' => 0.0, 'recebido' => 0.0];
+            $linhas[$chave]['total'] += $total;
+            $linhas[$chave]['recebido'] += $recebido;
+        };
+
+        Receita::whereBetween('created_at', [$dataInicio, $dataFim . ' 23:59:59'])
+            ->selectRaw("categoria_id, SUM(valor) AS total, SUM(CASE WHEN UPPER(status) = 'RECEBIDA' THEN valor ELSE 0 END) AS recebido")
+            ->groupBy('categoria_id')
+            ->get()
+            ->each(fn ($r) => $somar($r->categoria_id, (float) $r->total, (float) $r->recebido));
+
+        ReceitaRecorrente::where($recorrentesPeriodo)
+            ->selectRaw('categoria_id, SUM(valor) AS total')
+            ->groupBy('categoria_id')
+            ->get()
+            ->each(fn ($r) => $somar($r->categoria_id, (float) $r->total, 0.0));
+
+        $nomes = \App\Models\FinanceiroCategoria::whereIn('id', array_keys($linhas))->pluck('nome', 'id');
+        $geral = array_sum(array_column($linhas, 'total')) ?: 1;
+
+        return collect($linhas)
+            ->map(fn ($l, $id) => [
+                'nome'       => $id ? ($nomes[$id] ?? 'Categoria removida') : 'Sem categoria',
+                'total'      => $l['total'],
+                'recebido'   => $l['recebido'],
+                'pendente'   => $l['total'] - $l['recebido'],
+                'percentual' => round($l['total'] / $geral * 100, 1),
+            ])
+            ->sortByDesc('total')
+            ->values();
+    }
+
+    /**
+     * Relatório do período em Excel (.xlsx) para o contador:
+     * Resumo, Receitas, Despesas, Recorrentes e Faturamento por categoria. Só dados da empresa logada.
+     */
+    public function exportar(Request $request)
+    {
+        $request->validate([
+            'data_inicio' => 'nullable|date',
+            'data_fim'    => 'nullable|date|after_or_equal:data_inicio',
+        ]);
+
+        $dataInicio = $request->get('data_inicio', now()->startOfMonth()->format('Y-m-d'));
+        $dataFim    = $request->get('data_fim', now()->endOfMonth()->format('Y-m-d'));
+        $periodo    = [$dataInicio, $dataFim . ' 23:59:59'];
+
+        $recorrentesPeriodo = function ($query) use ($dataInicio, $dataFim) {
+            $query->where('data_inicio', '<=', $dataFim)
+                ->where(fn ($q) => $q->whereNull('data_fim')->orWhere('data_fim', '>=', $dataInicio));
+        };
+
+        $statusReceita = fn ($s) => strtoupper((string) $s) === 'RECEBIDA' ? 'Recebida' : 'Pendente';
+        $statusDespesa = fn ($s) => in_array(strtoupper((string) $s), ['PAID', 'PAGA', 'PAGO'], true) ? 'Paga' : 'Pendente';
+        $data = fn ($d) => $d ? \Carbon\Carbon::parse($d) : null;
+
+        // Receitas
+        $receitas = Receita::with(['usuario', 'categoria', 'pagamento'])
+            ->whereBetween('created_at', $periodo)->orderBy('created_at')->get();
+
+        $linhasReceitas = $receitas->map(fn ($r) => [
+            $data($r->created_at),
+            $r->descricao,
+            $r->usuario->nome ?? '',
+            $r->categoria->nome ?? 'Sem categoria',
+            Receita::METODOS[$r->metodo] ?? ($r->metodo ?? ''),
+            $statusReceita($r->status),
+            $data($r->data_vencimento),
+            $data($r->data_recebimento),
+            (float) $r->valor,
+        ])->all();
+        $linhasReceitas[] = ['TOTAL', '', '', '', '', '', null, null, (float) $receitas->sum('valor')];
+
+        // Despesas (o model formata o valor como texto; aqui usamos o número bruto)
+        $despesas = Despesas::with('categoria')
+            ->whereBetween('created_at', $periodo)->orderBy('created_at')->get();
+        $valorDespesa = fn ($d) => (float) $d->getRawOriginal('valor');
+
+        $linhasDespesas = $despesas->map(fn ($d) => [
+            $data($d->created_at),
+            $d->descricao,
+            $d->categoria->nome ?? 'Sem categoria',
+            $statusDespesa($d->status),
+            $data($d->data_vencimento),
+            $valorDespesa($d),
+        ])->all();
+        $totalDespesas = $despesas->sum($valorDespesa);
+        $linhasDespesas[] = ['TOTAL', '', '', '', null, (float) $totalDespesas];
+
+        // Recorrentes ativas no período
+        $frequencias = ['DIARIA' => 'Diária', 'SEMANAL' => 'Semanal', 'MENSAL' => 'Mensal', 'ANUAL' => 'Anual'];
+        $receitasRec = ReceitaRecorrente::with('categoria')->where($recorrentesPeriodo)->get();
+        $despesasRec = DespesaRecorrente::with('categoria')->where($recorrentesPeriodo)->get();
+        $linhasRec = [];
+        foreach ([['Receita', $receitasRec], ['Despesa', $despesasRec]] as [$tipo, $itens]) {
+            foreach ($itens as $i) {
+                $linhasRec[] = [
+                    $tipo,
+                    $i->descricao,
+                    $i->categoria->nome ?? 'Sem categoria',
+                    $frequencias[$i->frequencia] ?? $i->frequencia,
+                    $data($i->data_inicio),
+                    $data($i->data_fim),
+                    (float) $i->getRawOriginal('valor'),
+                ];
+            }
+        }
+
+        // Por categoria
+        $porCategoria = $this->faturamentoPorCategoria($dataInicio, $dataFim, $recorrentesPeriodo);
+        $linhasCategoria = $porCategoria->map(fn ($l) => [
+            $l['nome'], $l['total'], $l['recebido'], $l['pendente'], $l['percentual'] / 100,
+        ])->all();
+        $linhasCategoria[] = ['TOTAL', (float) $porCategoria->sum('total'), (float) $porCategoria->sum('recebido'), (float) $porCategoria->sum('pendente'), null];
+
+        // Resumo
+        $totalReceitas  = (float) $receitas->sum('valor');
+        $recebido       = (float) $receitas->filter(fn ($r) => strtoupper((string) $r->status) === 'RECEBIDA')->sum('valor');
+        $despesasPagas  = (float) $despesas->filter(fn ($d) => $statusDespesa($d->status) === 'Paga')->sum($valorDespesa);
+        $totalRecReceitas = (float) $receitasRec->sum(fn ($i) => (float) $i->getRawOriginal('valor'));
+        $totalRecDespesas = (float) $despesasRec->sum(fn ($i) => (float) $i->getRawOriginal('valor'));
+        $empresa = \App\Models\Empresa::find(\App\Support\EmpresasDoUsuario::ids($request->user())[0] ?? 0);
+
+        $resumo = [
+            ['Empresa', $empresa->nome ?? ''],
+            ['Período', \Carbon\Carbon::parse($dataInicio)->format('d/m/Y') . ' a ' . \Carbon\Carbon::parse($dataFim)->format('d/m/Y')],
+            ['Gerado em', now()->format('d/m/Y H:i')],
+            ['', ''],
+            ['Receitas lançadas', $totalReceitas],
+            ['   recebidas', $recebido],
+            ['   a receber', $totalReceitas - $recebido],
+            ['Receitas recorrentes', $totalRecReceitas],
+            ['Despesas lançadas', (float) $totalDespesas],
+            ['   pagas', $despesasPagas],
+            ['   a pagar', (float) $totalDespesas - $despesasPagas],
+            ['Despesas recorrentes', $totalRecDespesas],
+            ['', ''],
+            ['TOTAL (receitas − despesas)', ($totalReceitas + $totalRecReceitas) - ((float) $totalDespesas + $totalRecDespesas)],
+        ];
+
+        $xlsx = (new \App\Support\PlanilhaXlsx())
+            ->aba('Resumo', ['Item', 'Valor'], $resumo, ['texto', 'moeda'])
+            ->aba('Receitas', ['Lançamento', 'Descrição', 'Aluno', 'Categoria', 'Forma de pagamento', 'Status', 'Vencimento', 'Recebimento', 'Valor'],
+                $linhasReceitas, ['data', 'texto', 'texto', 'texto', 'texto', 'texto', 'data', 'data', 'moeda'])
+            ->aba('Despesas', ['Lançamento', 'Descrição', 'Categoria', 'Status', 'Vencimento', 'Valor'],
+                $linhasDespesas, ['data', 'texto', 'texto', 'texto', 'data', 'moeda'])
+            ->aba('Recorrentes', ['Tipo', 'Descrição', 'Categoria', 'Frequência', 'Início', 'Fim', 'Valor'],
+                $linhasRec, ['texto', 'texto', 'texto', 'texto', 'data', 'data', 'moeda'])
+            ->aba('Por categoria', ['Categoria', 'Faturamento', 'Recebido', 'A receber', '% do total'],
+                $linhasCategoria, ['texto', 'moeda', 'moeda', 'moeda', 'percentual']);
+
+        return $xlsx->download('financeiro_' . $dataInicio . '_a_' . $dataFim . '.xlsx');
     }
 
     public function detalhes(Request $request)
@@ -183,13 +352,17 @@ class FinanceiroDashboardController extends Controller
         $dataFim = $request->get('data_fim', now()->endOfMonth()->format('Y-m-d'));
 
         if ($tipo === 'receitas') {
-            $query = Receita::whereBetween('created_at', [$dataInicio, $dataFim]);
+            $query = Receita::whereBetween('created_at', [$dataInicio, $dataFim . ' 23:59:59']);
         } else { // despesas
-            $query = Despesas::whereBetween('created_at', [$dataInicio, $dataFim]);
+            $query = Despesas::whereBetween('created_at', [$dataInicio, $dataFim . ' 23:59:59']);
         }
 
         if ($status) {
-            $query->where('status', $status);
+            if ($tipo === 'receitas') {
+                $query->where('status', $status);
+            } else { // despesas são gravadas como PENDING / PAID
+                $query->whereIn('status', $status === 'PENDENTE' ? ['PENDING', 'PENDENTE'] : ['PAID', 'PAGA', 'PAGO']);
+            }
         }
 
         $dados = $query->get(['descricao', 'valor', 'status', 'data_vencimento']);

@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class Despesas extends Model
 {
-    use HasFactory;
+    use HasFactory, \App\Models\Concerns\DaEmpresaLogada;
 
     protected $fillable = [
         'descricao',

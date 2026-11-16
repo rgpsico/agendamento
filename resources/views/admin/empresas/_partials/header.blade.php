@@ -2,7 +2,7 @@
 <div class="page-header">
     <div class="row">
         <div class="col-lg-6 col-md-12 mb-2 mb-lg-0">
-            <h3 class="page-title">Bem-vindo <b class="text-capitalize">{{ Auth::user()->empresa->nome ?? 'Usuário' }}</b>
+            <h3 class="page-title">Bem-vindo <b class="text-capitalize">{{ Auth::user()->empresa->nome ?? Auth::user()->nome ?? 'Usuário' }}</b>
             </h3>
             <ul class="breadcrumb">
                 <li class="breadcrumb-item">
@@ -40,7 +40,7 @@
                             method: 'POST',
                             data: {
                                 user_id: '{{Auth::user()->id}}',
-                                empresa_id:'{{Auth::user()->empresa->id}}'
+                                empresa_id:'{{ Auth::user()->empresa->id ?? '' }}'
                             },
                             headers: {
                                 'Accept': 'application/json',

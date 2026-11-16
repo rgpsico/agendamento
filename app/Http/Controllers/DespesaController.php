@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreDespesaRequest;
 use App\Http\Requests\UpdateDespesaRequest;
 use App\Models\Despesas;
-use App\Models\FinanceiroCategoria;
+use App\Models\DespesaCategoria;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;  // Para usuário logado
 
@@ -15,12 +15,11 @@ class DespesaController extends Controller
   public function index()
 {
     $request = request();
-    $categorias = FinanceiroCategoria::where('tipo', 'despesa')->get();
+    $categorias = DespesaCategoria::orderByRaw('empresa_id IS NULL')->orderBy('nome')->get();
     $user = Auth::user();
 
     // Query base para despesas
-    $query = Despesas::where('usuario_id', $user->id)
-        ->when($user->empresa_id, fn($q) => $q->where('empresa_id', $user->empresa_id))
+    $query = Despesas::query() // a empresa logada é aplicada pelo model (DaEmpresaLogada)
         // Filtros
         ->when($request->filled('categoria_id'), fn($q) => 
             $q->where('categoria_id', $request->categoria_id)
@@ -50,8 +49,7 @@ class DespesaController extends Controller
 {
     $user = Auth::user();
    
-    $query = Despesas::where('usuario_id', $user->id)
-        ->when($user->empresa_id, fn($q) => $q->where('empresa_id', $user->empresa_id))
+    $query = Despesas::query() // a empresa logada é aplicada pelo model (DaEmpresaLogada)
         ->with(['categoria']);
 
     // filtros
@@ -80,8 +78,7 @@ public function apiResumo(Request $request)
 {
     $user = Auth::user();
 
-    $query = Despesas::where('usuario_id', $user->id)
-        ->when($user->empresa_id, fn($q) => $q->where('empresa_id', $user->empresa_id));
+    $query = Despesas::query(); // a empresa logada é aplicada pelo model (DaEmpresaLogada)
 
     if ($request->filled('status')) {
         $query->where('status', $request->status);
@@ -105,10 +102,10 @@ public function apiResumo(Request $request)
     // Mostrar formulário de criação (pré-preenche empresa_id e usuario_id)
     public function create()
     {
-           $categorias = FinanceiroCategoria::where('tipo', 'despesa')->get();
+           $categorias = DespesaCategoria::orderByRaw('empresa_id IS NULL')->orderBy('nome')->get();
         $user = Auth::user();
         $defaultData = [
-            'empresa_id' => $user->empresa_id ?? null,  // Assuma que Usuario tem empresa_id
+            'empresa_id' => $user->empresa?->id,
             'usuario_id' => $user->id,
             'status' => 'PENDING',
         ];
@@ -121,9 +118,11 @@ public function apiResumo(Request $request)
     {
         $user = Auth::user();
         $data = $request->validated();
-        $data['empresa_id'] ??= $user->empresa_id ?? null;  // Define se não passado
+        // empresa_id: definido pelo model (DaEmpresaLogada) com a empresa do usuário logado
         $data['usuario_id'] ??= $user->id;  // Sempre define o usuário logado
         
+        abort_unless(DespesaCategoria::whereKey($data['categoria_id'])->exists(), 422, 'Categoria inválida.');
+
         Despesas::create($data);
 
         return redirect()->route('financeiro.despesas.index')
@@ -133,7 +132,7 @@ public function apiResumo(Request $request)
     // Mostrar formulário de edição
     public function edit($id)
     {
-       $categorias = FinanceiroCategoria::where('tipo', 'despesa')->get();
+       $categorias = DespesaCategoria::orderByRaw('empresa_id IS NULL')->orderBy('nome')->get();
         $despesa = Despesas::findOrFail($id);
     
         // $this->authorize('update', $despesa);  // Policy verifica se é do usuário
@@ -145,7 +144,11 @@ public function apiResumo(Request $request)
     {
         $despesa = Despesas::findOrFail($id);
         // $this->authorize('update', $despesa);
-        $despesa->update($request->validated());  // Não altera usuario_id/empresa_id aqui
+        $dados = $request->validated();  // Não altera usuario_id/empresa_id aqui
+        if (isset($dados['categoria_id'])) {
+            abort_unless(DespesaCategoria::whereKey($dados['categoria_id'])->exists(), 422, 'Categoria inválida.');
+        }
+        $despesa->update($dados);
 
         return redirect()->route('financeiro.despesas.index')
             ->with('success', 'Despesa atualizada com sucesso!');
@@ -166,7 +169,7 @@ public function apiResumo(Request $request)
     public function show($id)
     {
         $despesa = Despesas::findOrFail($id);
-        $this->authorize('view', $despesa);
+        // a empresa logada já é garantida pelo model (outra empresa = 404)
         return view('admin.financeiro.despesas.show', compact('despesa'));
     }
 }

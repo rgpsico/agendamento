@@ -61,7 +61,7 @@ class ReceitaRecorrenteController extends Controller
             'valor' => 'required|numeric',
            'frequencia' => 'required|in:DIARIA,SEMANAL,MENSAL,ANUAL',
             'data_inicio' => 'required|date',
-            'empresa_id' => 'required|exists:empresa,id',
+            'empresa_id' => 'nullable|exists:empresa,id', // o model usa a empresa do usuário logado
             'usuario_id' => 'required|exists:usuarios,id',
         ]);
 

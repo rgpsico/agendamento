@@ -28,16 +28,20 @@
 
                         <div class="mb-3">
                             <label for="valor" class="form-label">Valor (R$)</label>
-                            <input type="text"  class="form-control" id="valor" name="valor" value="{{ old('valor', $despesa->valor) }}" required>
+                            <input type="number" step="0.01" min="0" class="form-control" id="valor" name="valor" value="{{ old('valor', $despesa->getRawOriginal('valor')) }}" required>
                             @error('valor')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
 
                         <div class="mb-3">
-                            <label for="categoria" class="form-label">Categoria</label>
-                            <input type="text" class="form-control" id="categoria" name="categoria" value="{{ old('categoria', $despesa->categoria) }}">
-                            @error('categoria')
+                            <label for="categoria_id" class="form-label">Categoria</label>
+                            <select class="form-control" id="categoria_id" name="categoria_id" required>
+                                @foreach($categorias as $categoria)
+                                    <option value="{{ $categoria->id }}" {{ (string) old('categoria_id', $despesa->categoria_id) === (string) $categoria->id ? 'selected' : '' }}>{{ $categoria->nome }}</option>
+                                @endforeach
+                            </select>
+                            @error('categoria_id')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>

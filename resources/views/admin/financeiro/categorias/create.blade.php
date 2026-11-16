@@ -29,9 +29,8 @@
                         <div class="mb-3">
                             <label for="tipo" class="form-label">Tipo</label>
                             <select class="form-control" id="tipo" name="tipo" required>
-                                <option value="">Selecione</option>
-                                <option value="DESPESA" {{ old('tipo') == 'DESPESA' ? 'selected' : '' }}>Despesa</option>
-                                <option value="RECEITA" {{ old('tipo') == 'RECEITA' ? 'selected' : '' }}>Receita</option>
+                                                                <option value="DESPESA" {{ old('tipo', $tipo) == 'DESPESA' ? 'selected' : '' }}>Despesa</option>
+                                <option value="RECEITA" {{ old('tipo', $tipo) == 'RECEITA' ? 'selected' : '' }}>Receita</option>
                             </select>
                             @error('tipo')
                                 <small class="text-danger">{{ $message }}</small>

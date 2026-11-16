@@ -24,11 +24,11 @@ class StoreDespesaRequest extends FormRequest
         return [
             'descricao' => 'required|string|max:255',
             'valor' => 'required|numeric|min:0',
-            'categoria_id' => 'required|string|max:255',  // Removi nullable, pois na migração é nullable, mas valide como required se quiser
+            'categoria_id' => 'required|integer|exists:despesas_categorias,id',
             'status' => 'required|in:PENDING,PAID',
-            'data_vencimento' => 'nullable|date|after_or_equal:today',  // Evita datas passadas
-            'empresa_id' => 'required|exists:empresa,id',  // Valida existência
-            'usuario_id' => 'required|exists:usuarios,id',
+            'data_vencimento' => 'nullable|date',  // contas já vencidas/pagas também são lançadas
+            'empresa_id' => 'nullable|exists:empresa,id',  // o model troca pela empresa do usuário logado
+            'usuario_id' => 'nullable|exists:usuarios,id',
         ];
     }
 }

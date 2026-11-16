@@ -26,7 +26,7 @@
                 </table>
             </div>
             <div class="modal-footer">
-                <button id="exportExcel" class="btn btn-success">Exportar para Excel</button>
+                <a id="exportExcel" class="btn btn-success" href="{{ route('admin.financeiro.exportar', ['data_inicio' => $dataInicio, 'data_fim' => $dataFim]) }}">Exportar para Excel</a>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
             </div>
         </div>
@@ -47,6 +47,9 @@
 
             <!-- Métricas Principais -->
             @include('admin.financeiro.dashboard.visaogeral')
+
+            <!-- Faturamento por categoria (ex.: Pilates x Fisioterapia) -->
+            @include('admin.financeiro.dashboard.por_categoria')
 
             <!-- Receitas Detalhadas -->
             @include('admin.financeiro.dashboard.receitas')

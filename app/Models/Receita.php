@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Receita extends Model
 {
-    use HasFactory;
+    use HasFactory, \App\Models\Concerns\DaEmpresaLogada;
 
     protected $table = 'receitas'; // Ajuste se necessário
 
@@ -21,8 +21,24 @@ class Receita extends Model
         'status',
         'empresa_id',
         'data_recebimento',
-        'data_vencimento'
+        'data_vencimento',
+        'metodo_pagamento',
     ];
+
+    /** Formas de pagamento de uma receita lançada no painel. */
+    public const METODOS = [
+        'PIX'      => 'Pix',
+        'DINHEIRO' => 'Dinheiro',
+        'CARTAO'   => 'Cartão',
+        'BOLETO'   => 'Boleto',
+        'OUTRO'    => 'Outro',
+    ];
+
+    /** Forma de pagamento: a da própria receita (lançamento manual) ou a do pagamento do agendamento. */
+    public function getMetodoAttribute(): ?string
+    {
+        return $this->metodo_pagamento ?: $this->pagamento?->metodo_pagamento;
+    }
 
  protected $casts = [
     'data' => 'datetime',

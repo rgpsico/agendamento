@@ -47,6 +47,17 @@
                             <option value="PIX" {{ request('metodo_pagamento') === 'PIX' ? 'selected' : '' }}>Pix</option>
                             <option value="DINHEIRO" {{ request('metodo_pagamento') === 'DINHEIRO' ? 'selected' : '' }}>Dinheiro</option>
                             <option value="CARTAO" {{ request('metodo_pagamento') === 'CARTAO' ? 'selected' : '' }}>Cartão</option>
+                            <option value="BOLETO" {{ request('metodo_pagamento') === 'BOLETO' ? 'selected' : '' }}>Boleto</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2 col-sm-6">
+                        <label class="form-label">Categoria</label>
+                        <select name="categoria_id" class="form-control">
+                            <option value="">Todas</option>
+                            @foreach($categorias as $categoria)
+                                <option value="{{ $categoria->id }}" {{ (string) request('categoria_id') === (string) $categoria->id ? 'selected' : '' }}>{{ $categoria->nome }}</option>
+                            @endforeach
                         </select>
                     </div>
 
@@ -115,7 +126,7 @@
                                                 {{ $receita->status === 'RECEBIDA' ? 'Recebido' : 'Pendente' }}
                                             </span>
                                         </td>
-                                        <td>{{ $receita->pagamento->metodo_pagamento ?? '-' }}</td>
+                                        <td>{{ \App\Models\Receita::METODOS[$receita->metodo] ?? ($receita->metodo ?: '-') }}</td>
                                         <td>{{ $receita->data_recebimento ? \Carbon\Carbon::parse($receita->data_recebimento)->format('d/m/Y') : '-' }}</td>
                                         <td>{{ $receita->data_vencimento ? \Carbon\Carbon::parse($receita->data_vencimento)->format('d/m/Y') : '-' }}</td>
                                         <td class="text-center">
