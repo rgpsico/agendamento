@@ -55,7 +55,8 @@ class PaymentConfiguration extends Model
     public static function getForEmpresa($userId)
     {
 
-        $empresa_id = Empresa::where("user_id", $userId)->value('id');
+        // empresa que o usuário possui ou, se for funcionário, a empresa onde trabalha
+        $empresa_id = Usuario::find($userId)?->empresa?->id;
 
         if (!$empresa_id) {
             throw new \Exception("Nenhuma empresa encontrada para o usuário informado.");

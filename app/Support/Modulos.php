@@ -40,7 +40,7 @@ class Modulos
             'Financeiro',
             'Receitas, despesas, dashboard financeiro, relatórios, planos e pagamentos.',
             ['financeiro.', 'admin.financeiro.', 'despesas.', 'alunos.planos.', 'planos-alunos.', 'pagamento.index',
-                'empresa.pagamento.', 'empresa.tipopagamento.', 'integracoes.', 'integracao.', 'configuracoes.pagamentos'],
+                'empresa.pagamento.'],
             ['api/receitas', 'api/receita/', 'api/despesas', 'api/despesas-recorrente', 'api/receitas-recorren', 'api/financeiro-categorias'],
         ],
         'servicos' => [
@@ -52,7 +52,7 @@ class Modulos
         'site' => [
             'Site e redes sociais',
             'Site do estúdio, artigos, depoimentos, domínio e redes sociais.',
-            ['admin.site.', 'virtualhosts.', 'siteservicos.', 'admin.social.', 'admin.gerarSSL'],
+            ['admin.site.', 'virtualhosts.', 'siteservicos.', 'admin.social.', 'admin.gerarSSL', 'site-templates.'],
             [],
         ],
         'crm' => [
@@ -68,10 +68,11 @@ class Modulos
             [],
         ],
         'configuracoes' => [
-            'Dados da empresa',
-            'Dados cadastrais, endereço, fotos, plano da empresa e configurações.',
+            'Dados da empresa e integrações',
+            'Dados cadastrais, endereço, fotos, plano da empresa e integrações de pagamento (Asaas, Pix, Stripe, Mercado Pago).',
             ['empresa.configuracao', 'empresa.endereco', 'empresa.update', 'empresa.fotos', 'empresa.upload', 'empresa.edit',
-                'empresa.profile', 'configuracoes.empresa', 'configuracoes.index', 'configuracoes.salvar', 'admin.empresas.planos'],
+                'empresa.profile', 'configuracoes.empresa', 'configuracoes.index', 'configuracoes.salvar', 'admin.empresas.planos',
+                'integracoes.', 'integracao.', 'configuracoes.pagamentos', 'empresa.tipopagamento.', 'empresa.pagamento.config'],
             [],
         ],
         'usuarios' => [
@@ -119,19 +120,22 @@ class Modulos
         $nome = $request->route()?->getName() ?? '';
         $uri = ltrim($request->path(), '/');
 
+        // Vale o prefixo mais específico (ex.: 'empresa.pagamento.config' > 'empresa.pagamento.').
+        $melhor = null;
+        $tamanho = 0;
         foreach (self::AREAS as $chave => [, , $rotas, $apis]) {
             foreach ($rotas as $prefixo) {
-                if ($nome !== '' && str_starts_with($nome, $prefixo)) {
-                    return $chave;
+                if ($nome !== '' && str_starts_with($nome, $prefixo) && strlen($prefixo) > $tamanho) {
+                    [$melhor, $tamanho] = [$chave, strlen($prefixo)];
                 }
             }
             foreach ($apis as $prefixo) {
-                if (str_starts_with($uri, $prefixo)) {
-                    return $chave;
+                if (str_starts_with($uri, $prefixo) && strlen($prefixo) > $tamanho) {
+                    [$melhor, $tamanho] = [$chave, strlen($prefixo)];
                 }
             }
         }
 
-        return null;
+        return $melhor;
     }
 }

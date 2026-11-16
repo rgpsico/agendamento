@@ -35,7 +35,7 @@
                             <i class="fe fe-home"></i> <span>Dashboard</span>
                         </a>
                     </li>
-                    @isset(Auth::user()->empresa->user_id)
+                    @if($podeArea('site'))
                         <li class="submenu">
                             <a href="#">
                                 <i class="fas fa-globe" style="font-size: 18px;"></i>
@@ -50,13 +50,15 @@
                                 <li><a href="{{ route('admin.site.depoimentos.index') }}">Depoimentos</a></li>
                                 <li><a href="{{ route('admin.site.contatos.index') }}">Contatos</a></li>
                                 <li><a href="{{ route('admin.site.artigos.index') }}">Artigos</a></li>
+                                @if($ehMaster)
                                 <li><a href="{{ route('virtualhosts.index') }}">Virtual</a></li>
+                                @endif
 
 
 
                             </ul>
                         </li>
-                    @endisset
+                    @endif
 
                 @if($podeArea('ia'))
                 <li class="submenu">
@@ -153,7 +155,7 @@
                 
 
 
-                    @isset(Auth::user()->empresa->user_id)
+                    @if($ehMaster)
                         <li class="submenu">
                             <a href="#">
                              <i class="fas fa-layer-group" style="font-size: 14px; margin-left: 5px;"></i>
@@ -168,9 +170,9 @@
                             
                             </ul>
                         </li>
-                    @endisset
+                    @endif
 
-                    @isset(Auth::user()->empresa->user_id)
+                    @if($podeArea('servicos'))
                         <!-- Serviços -->
                         <li class="submenu">
                             <a href="#">
@@ -183,9 +185,9 @@
                                 <li><a href="{{ route('admin.servico.create') }}">Cadastrar Serviço</a></li>
                             </ul>
                         </li>
-                    @endisset
+                    @endif
 
-                    @isset(Auth::user()->empresa->user_id)
+                    @if($podeArea('agenda'))
                         <!-- Horários -->
                         <li class="submenu">
                             <a href="#">
@@ -200,9 +202,9 @@
                             </ul>
                         </li>
 
-                    @endisset
+                    @endif
 
-                    @if(isset(Auth::user()->empresa->user_id) || (Auth::user()?->professor && $podeArea('clientes')))
+                    @if(isset(Auth::user()->empresa->id) && $podeArea('clientes'))
                         <!-- Alunos -->
                         <li>
                             <a href="{{ route('alunos.index') }}">
@@ -226,7 +228,7 @@
                     </li>
                     @endif
 
-                    @isset(Auth::user()->empresa->id)
+                    @if(isset(Auth::user()->empresa->id) && $podeArea('crm'))
                         <li class="submenu">
                             <a href="#">
                                 <i class="fas fa-chart-line" style="font-size: 18px;"></i>
@@ -245,9 +247,9 @@
                                 @endmasterUser
                             </ul>
                         </li>
-                    @endisset
+                    @endif
 
-                    @isset(Auth::user()->empresa->id)
+                    @if(isset(Auth::user()->empresa->id) && $podeArea('configuracoes'))
                         <!-- Fotos -->
                         <li>
                             <a href="{{ route('empresa.fotos', ['userId' => Auth::user()->id]) }}">
@@ -255,7 +257,7 @@
                                 <span>Fotos</span>
                             </a>
                         </li>
-                    @endisset
+                    @endif
 
                     <!-- Dados Cadastrais -->
                     @if($podeArea('configuracoes'))
@@ -286,7 +288,7 @@
                     @endif
 
                     <!-- Pagamentos -->
-                    @isset(Auth::user()->empresa->user_id)
+                    @if($podeArea('financeiro'))
                         <li class="submenu">
                             <a href="#">
                                 <i class="fas fa-credit-card" style="font-size: 18px;"></i>
@@ -296,10 +298,14 @@
                             <ul>
                                 <li><a href="{{ route('pagamento.index') }}">Listar</a></li>
                                 <li><a href="{{ route('empresa.pagamento.create') }}">Cadastrar</a></li>
+                                @if($podeArea('configuracoes'))
                                 <li><a href="{{ route('empresa.pagamento.config.index') }}">Configurações</a></li>
+                                @endif
                             </ul>
                         </li>
+                    @endif
 
+                    @if($podeArea('configuracoes'))
                         <li class="submenu">
                             <a href="#">
                                 <i class="fas fa-credit-card" style="font-size: 18px;"></i>
@@ -320,7 +326,7 @@
                                 </li>
                             </ul>
                         </li>
-                    @endisset
+                    @endif
                    
                       @if((auth()->check() && auth()->user()->can('admin-access')) || (auth()->check() && auth()->user()->isMasterUser()))
                         <!-- Gestão de Empresas -->

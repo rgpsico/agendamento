@@ -10,9 +10,6 @@
                     <form action="{{ route('financeiro.receitas_recorrentes.update', $receitaRecorrente->id) }}" method="POST">
                         @csrf
                         @method('PUT')
-
-                          <input type="text" class="form-control" id="empresa_id" name="empresa_id" value="{{ Auth::user()->empresa->id }}" required>
-                    <input type="text" class="form-control" id="usuario_id" name="usuario_id" value="{{  Auth::user()->id }}" required>
                      
 
                         <div class="mb-3">

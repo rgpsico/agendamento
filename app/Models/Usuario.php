@@ -111,11 +111,40 @@ class Usuario extends Authenticatable
         return $this->hasOne(Alunos::class, 'usuario_id', 'id');
     }
 
-    // Relacionamento com Empresa
+    // Relacionamento com Empresa (a empresa de que o usuário é DONO)
     public function empresa()
     {
         return $this->hasOne(Empresa::class, 'user_id', 'id');
     }
+
+    /**
+     * $usuario->empresa = a empresa em que a pessoa trabalha:
+     * a que ela possui ou, se for funcionária (professor sem empresa própria), a do estúdio onde trabalha.
+     * Assim as telas do painel funcionam para o funcionário; o que ele pode abrir é decidido pelas
+     * áreas liberadas (App\Support\Modulos). Para saber se é DONO use Modulos::acessoTotal()
+     * ou a relação $usuario->empresa()->exists().
+     */
+    public function getEmpresaAttribute(): ?Empresa
+    {
+        if (! $this->relationLoaded('empresa')) {
+            $this->setRelation('empresa', $this->empresa()->first());
+        }
+
+        $propria = $this->getRelation('empresa');
+        if ($propria) {
+            return $propria;
+        }
+
+        if ($this->empresaDeTrabalho === false) {
+            $empresaId = $this->professor?->empresa_id;
+            $this->empresaDeTrabalho = $empresaId ? Empresa::find($empresaId) : null;
+        }
+
+        return $this->empresaDeTrabalho;
+    }
+
+    /** @var Empresa|null|false cache da empresa onde o funcionário trabalha (false = ainda não buscada) */
+    private Empresa|null|false $empresaDeTrabalho = false;
 
     public function lastConversationWithEmpresa()
     {

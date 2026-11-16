@@ -50,47 +50,54 @@ class ReceitaRecorrenteController extends Controller
 
 
     public function create() {
-        $categorias = FinanceiroCategoria::all();
+        $categorias = FinanceiroCategoria::where('tipo', 'receita')->orderBy('nome')->get();
 
         return view('admin.financeiro.receitas_recorrentes.create', compact('categorias'));
     }
 
     public function store(Request $request) {
-        $request->validate([
-            'descricao' => 'required|string|max:255',
-            'valor' => 'required|numeric',
-           'frequencia' => 'required|in:DIARIA,SEMANAL,MENSAL,ANUAL',
-            'data_inicio' => 'required|date',
-            'empresa_id' => 'nullable|exists:empresa,id', // o model usa a empresa do usuário logado
-            'usuario_id' => 'required|exists:usuarios,id',
-        ]);
+        $dados = $this->validar($request);
+        // usuario_id = quem lançou; empresa_id = preenchido pelo model com a empresa do usuário logado
+        $dados['usuario_id'] = auth()->id();
 
-        ReceitaRecorrente::create($request->all());
+        ReceitaRecorrente::create($dados);
 
         return redirect()->route('financeiro.receitas_recorrentes.index')
             ->with('success', 'Receita recorrente criada com sucesso!');
     }
 
-   public function edit(ReceitaRecorrente $receitaRecorrente) {
-       $categorias = FinanceiroCategoria::all();
-    return view('admin.financeiro.receitas_recorrentes.edit', compact('receitaRecorrente', 'categorias'));
-}
+    public function edit(ReceitaRecorrente $receitaRecorrente) {
+        $categorias = FinanceiroCategoria::where('tipo', 'receita')->orderBy('nome')->get();
 
+        return view('admin.financeiro.receitas_recorrentes.edit', compact('receitaRecorrente', 'categorias'));
+    }
 
     public function update(Request $request, ReceitaRecorrente $receitaRecorrente) {
-
-      
-        $request->validate([
-            'descricao' => 'required|string|max:255',
-            'valor' => 'required|numeric',
-            'frequencia' => 'required|in:DIARIA,SEMANAL,MENSAL,ANUAL',
-            'data_inicio' => 'required|date',
-        ]);
-
-        $receitaRecorrente->update($request->all());
+        // Só os campos do formulário; empresa e autor do lançamento não mudam.
+        $receitaRecorrente->update($this->validar($request));
 
         return redirect()->route('financeiro.receitas_recorrentes.index')
             ->with('success', 'Receita recorrente atualizada com sucesso!');
+    }
+
+    private function validar(Request $request): array
+    {
+        $dados = $request->validate([
+            'descricao'    => 'required|string|max:255',
+            'valor'        => 'required|numeric|min:0',
+            'categoria_id' => 'nullable|exists:financeiro_categorias,id',
+            'frequencia'   => 'required|in:DIARIA,SEMANAL,MENSAL,ANUAL',
+            'data_inicio'  => 'required|date',
+            'data_fim'     => 'nullable|date|after_or_equal:data_inicio',
+            'status'       => 'nullable|in:ACTIVE,INACTIVE',
+        ]);
+
+        // Categoria só da própria empresa (o model filtra); de outra empresa vira "sem categoria".
+        $dados['categoria_id'] = ! empty($dados['categoria_id'])
+            ? FinanceiroCategoria::whereKey($dados['categoria_id'])->value('id')
+            : null;
+
+        return $dados;
     }
 
     public function destroy(ReceitaRecorrente $receitaRecorrente) {

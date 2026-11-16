@@ -34,12 +34,16 @@ class LeadPolicy
 
     public function delete(Usuario $usuario, Lead $lead): bool
     {
-        return $this->sameTenant($usuario, $lead) && ($usuario->can('crm.leads.delete') || $usuario->hasRole('admin') || $usuario->isMasterUser());
+        // dono do estúdio (ou master) exclui; funcionário só com permissão explícita
+        return $this->sameTenant($usuario, $lead) && (\App\Support\Modulos::acessoTotal($usuario)
+            || $usuario->can('crm.leads.delete') || $usuario->hasRole('admin'));
     }
 
     public function viewReports(Usuario $usuario): bool
     {
-        return $this->hasTenant($usuario) && ($usuario->can('crm.reports.view') || $usuario->hasAnyRole(['admin', 'manager']) || $usuario->isMasterUser());
+        // dono/master e funcionário com a área CRM liberada
+        return $this->hasTenant($usuario) && (\App\Support\Modulos::pode($usuario, 'crm')
+            || $usuario->can('crm.reports.view') || $usuario->hasAnyRole(['admin', 'manager']));
     }
 
     private function sameTenant(Usuario $usuario, Lead $lead): bool

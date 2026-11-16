@@ -13,7 +13,7 @@ class DespesasRecorrenteController extends Controller
      */
     public function index()
     {
-        $categorias = DespesaCategoria::all();
+        $categorias = DespesaCategoria::orderByRaw('empresa_id IS NULL')->orderBy('nome')->get();
         $query = DespesaRecorrente::query()->with('categoria', 'usuario', 'empresa');
 
         if ($descricao = request('descricao')) {
@@ -53,7 +53,7 @@ class DespesasRecorrenteController extends Controller
      */
     public function create()
     {
-        $categorias = DespesaCategoria::all();
+        $categorias = DespesaCategoria::orderByRaw('empresa_id IS NULL')->orderBy('nome')->get();
         return view('admin.financeiro.despesas_recorrentes.create', compact('categorias'));
     }
 
@@ -70,6 +70,8 @@ class DespesasRecorrenteController extends Controller
             'data_inicio' => 'required|date',
             'data_fim' => 'nullable|date|after_or_equal:data_inicio',
         ]);
+        // categoria visível para esta empresa (própria ou padrão); o model filtra
+        abort_unless(DespesaCategoria::whereKey($request->categoria_id)->exists(), 422, 'Categoria inválida.');
 
         DespesaRecorrente::create([
             'descricao' => $request->descricao,
@@ -92,7 +94,7 @@ class DespesasRecorrenteController extends Controller
      */
     public function edit(DespesaRecorrente $despesaRecorrente)
     {
-        $categorias = DespesaCategoria::all();
+        $categorias = DespesaCategoria::orderByRaw('empresa_id IS NULL')->orderBy('nome')->get();
         return view('admin.financeiro.despesas_recorrentes.edit', compact('despesaRecorrente', 'categorias'));
     }
 
@@ -110,6 +112,7 @@ class DespesasRecorrenteController extends Controller
             'data_fim' => 'nullable|date|after_or_equal:data_inicio',
             'status' => 'required|in:ACTIVE,INACTIVE',
         ]);
+        abort_unless(DespesaCategoria::whereKey($request->categoria_id)->exists(), 422, 'Categoria inválida.');
 
         $despesaRecorrente->update($request->only([
             'descricao',
