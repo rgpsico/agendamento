@@ -677,6 +677,32 @@ class ChatController extends Controller
 
 
         $cleanUserMessage = $this->sanitizeMessage($request->mensagem);
+
+        // Conversa de WhatsApp: a mensagem é da equipe para o cliente; envia pelo WhatsApp e grava só ela.
+        if ($conversation && $conversation->ehWhatsapp()) {
+            $canal = $conversation->whatsappCanal;
+            abort_unless($canal && $canal->ativo, 422, 'O número de WhatsApp desta conversa não está ativo.');
+
+            try {
+                $sids = app(\App\Services\WhatsApp\TwilioWhatsApp::class)->enviar($canal, (string) $conversation->telefone, $cleanUserMessage);
+            } catch (\Throwable $e) {
+                \Log::error('WhatsApp: falha ao enviar resposta da equipe', ['conversa' => $conversation->id, 'erro' => $e->getMessage()]);
+                abort(502, 'Não foi possível enviar pelo WhatsApp. Se a última mensagem do cliente tem mais de 24 horas, o WhatsApp só permite mensagens de modelo aprovado.');
+            }
+
+            $conversation->messages()->create([
+                'from' => 'bot', 'to' => 'user', 'role' => 'assistant',
+                'body' => $cleanUserMessage, 'twilio_sid' => $sids[0] ?? null,
+            ]);
+            // Quem responde pelo painel assume a conversa: a IA para de responder até ser reativada.
+            $conversation->update(['human_controlled' => true]);
+
+            return response()->json([
+                'conversation_id' => $conversation->id,
+                'bot_response'    => $cleanUserMessage,
+            ]);
+        }
+
         // Salva a mensagem do usuário
         $userMessage = Message::create([
             'from' => 'user',

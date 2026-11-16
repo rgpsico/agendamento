@@ -424,6 +424,12 @@ Route::prefix('admin/bot')->name('admin.bot.')->middleware('auth')->group(functi
     Route::get('tokens', [BotController::class, 'tokens'])->name('tokens');
     Route::get('logs', [BotController::class, 'logs'])->name('logs');
 
+    // WhatsApp atendido pela IA (área "Atendimento com IA")
+    Route::get('whatsapp', [\App\Http\Controllers\WhatsappCanalController::class, 'index'])->name('whatsapp.index');
+    Route::post('whatsapp', [\App\Http\Controllers\WhatsappCanalController::class, 'store'])->name('whatsapp.store');
+    Route::put('whatsapp/{canal}', [\App\Http\Controllers\WhatsappCanalController::class, 'update'])->whereNumber('canal')->name('whatsapp.update');
+    Route::delete('whatsapp/{canal}', [\App\Http\Controllers\WhatsappCanalController::class, 'destroy'])->whereNumber('canal')->name('whatsapp.destroy');
+
     Route::get('/{bot}', [BotController::class, 'show'])->name('show');
 });
 

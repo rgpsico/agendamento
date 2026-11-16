@@ -146,7 +146,7 @@ class DeepSeekService
     }
 
 
-    public function getDeepSeekResponseWithPrompt(Bot $bot, string $question, Conversation $conversation, int $empresa_id, int $contextMessages = 10): array
+    public function getDeepSeekResponseWithPrompt(Bot $bot, string $question, Conversation $conversation, int $empresa_id, int $contextMessages = 10, string $contextoCanal = ''): array
     {
         // 1. System prompt — tools são a fonte de verdade sobre serviços
         $systemPrompt  = $bot->prompt . "\n";
@@ -178,6 +178,9 @@ class DeepSeekService
         $systemPrompt .= "- PROIBIDO confirmar agendamento sem receber `sucesso: true` da tool `criar_agendamento`.\n";
         $systemPrompt .= "- PROIBIDO inventar dados. Sempre use as tools.\n";
         $systemPrompt .= "- Sempre responda em português.";
+        if ($contextoCanal !== '') {
+            $systemPrompt .= "\n\n## Canal desta conversa\n" . $contextoCanal;
+        }
 
         // 2. Histórico da conversa.
         // As chamadas de ferramenta e seus resultados (aluno_id, servico_id, professor_id...) não ficam na
@@ -195,10 +198,12 @@ class DeepSeekService
             }
         } else {
             // Conversas antigas (sem cache): usa o texto salvo, sem repetir a pergunta atual
+            // as N mensagens MAIS RECENTES, em ordem cronológica (antes pegava as N primeiras da conversa)
             $history = $conversation->messages()
-                ->orderBy('created_at', 'asc')
+                ->orderByDesc('created_at')->orderByDesc('id')
                 ->take($contextMessages)
-                ->get();
+                ->get()
+                ->reverse();
 
             foreach ($history as $msg) {
                 $role = ($msg->role === 'assistant') ? 'assistant' : 'user';

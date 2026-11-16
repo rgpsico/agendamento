@@ -75,6 +75,7 @@
                         <li><a href="{{ route('admin.bot.tokens') }}">Tokens / Consumo</a></li>
                         <li><a href="{{ route('admin.bot.logs') }}">Histórico / Logs</a></li>
                         <li><a href="{{ route('admin.conversations.index') }}">Conversas</a></li> <!-- Novo -->
+                        <li><a href="{{ route('admin.bot.whatsapp.index') }}">WhatsApp</a></li>
                     </ul>
                 </li>
                 @endif

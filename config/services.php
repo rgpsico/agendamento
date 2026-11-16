@@ -41,7 +41,9 @@ return [
     ],
 
     'twilio' => [
-        'token' => env('TWILIO_TOKEN'),
+        'sid'      => env('TWILIO_SID'),
+        'token'    => env('TWILIO_TOKEN'),
+        'whatsapp' => env('TWILIO_WHATSAPP'), // número padrão (ex.: sandbox) — os de cada empresa ficam em whatsapp_canais
     ],
 
     'deepseek' => [

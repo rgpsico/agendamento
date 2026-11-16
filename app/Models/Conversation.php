@@ -19,6 +19,8 @@ class Conversation extends Model
         'human_controlled',
         'telefone',
         'last_message_is_opened',
+        'canal',
+        'whatsapp_canal_id',
     ];
 
     protected $casts = [
@@ -50,6 +52,16 @@ class Conversation extends Model
         return $this->hasMany(Message::class, 'conversation_id', 'id');
     }
 
+
+    public function whatsappCanal()
+    {
+        return $this->belongsTo(WhatsappCanal::class, 'whatsapp_canal_id');
+    }
+
+    public function ehWhatsapp(): bool
+    {
+        return $this->canal === 'whatsapp';
+    }
 
     public function bot()
     {
