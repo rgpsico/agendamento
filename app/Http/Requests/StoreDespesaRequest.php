@@ -27,6 +27,7 @@ class StoreDespesaRequest extends FormRequest
             'categoria_id' => 'required|integer|exists:despesas_categorias,id',
             'status' => 'required|in:PENDING,PAID',
             'data_vencimento' => 'nullable|date',  // contas já vencidas/pagas também são lançadas
+            'data_pagamento' => 'nullable|date',
             'empresa_id' => 'nullable|exists:empresa,id',  // o model troca pela empresa do usuário logado
             'usuario_id' => 'nullable|exists:usuarios,id',
         ];

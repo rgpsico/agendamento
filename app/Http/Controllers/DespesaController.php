@@ -122,6 +122,7 @@ public function apiResumo(Request $request)
         $data['usuario_id'] ??= $user->id;  // Sempre define o usuário logado
         
         abort_unless(DespesaCategoria::whereKey($data['categoria_id'])->exists(), 422, 'Categoria inválida.');
+        $data['data_pagamento'] = $this->dataPagamento($data['status'], $data['data_pagamento'] ?? null);
 
         Despesas::create($data);
 
@@ -148,6 +149,9 @@ public function apiResumo(Request $request)
         if (isset($dados['categoria_id'])) {
             abort_unless(DespesaCategoria::whereKey($dados['categoria_id'])->exists(), 422, 'Categoria inválida.');
         }
+        if (isset($dados['status'])) {
+            $dados['data_pagamento'] = $this->dataPagamento($dados['status'], $dados['data_pagamento'] ?? $despesa->data_pagamento);
+        }
         $despesa->update($dados);
 
         return redirect()->route('financeiro.despesas.index')
@@ -171,5 +175,15 @@ public function apiResumo(Request $request)
         $despesa = Despesas::findOrFail($id);
         // a empresa logada já é garantida pelo model (outra empresa = 404)
         return view('admin.financeiro.despesas.show', compact('despesa'));
+    }
+
+    /** Paga: a data informada ou hoje; pendente: sem data de pagamento. */
+    private function dataPagamento(?string $status, $informada)
+    {
+        if (! in_array(strtoupper((string) $status), Despesas::PAGA, true)) {
+            return null;
+        }
+
+        return $informada ?: now()->toDateString();
     }
 }

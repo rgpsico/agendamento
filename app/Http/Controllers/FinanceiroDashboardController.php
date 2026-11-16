@@ -264,10 +264,11 @@ class FinanceiroDashboardController extends Controller
             $d->categoria->nome ?? 'Sem categoria',
             $statusDespesa($d->status),
             $data($d->data_vencimento),
+            $data($d->data_pagamento),
             $valorDespesa($d),
         ])->all();
         $totalDespesas = $despesas->sum($valorDespesa);
-        $linhasDespesas[] = ['TOTAL', '', '', '', null, (float) $totalDespesas];
+        $linhasDespesas[] = ['TOTAL', '', '', '', null, null, (float) $totalDespesas];
 
         // Recorrentes ativas no período
         $frequencias = ['DIARIA' => 'Diária', 'SEMANAL' => 'Semanal', 'MENSAL' => 'Mensal', 'ANUAL' => 'Anual'];
@@ -326,8 +327,8 @@ class FinanceiroDashboardController extends Controller
             ->aba('Resumo', ['Item', 'Valor'], $resumo, ['texto', 'moeda'])
             ->aba('Receitas', ['Data', 'Descrição', 'Aluno', 'Categoria', 'Forma de pagamento', 'Status', 'Vencimento', 'Recebimento', 'Valor'],
                 $linhasReceitas, ['data', 'texto', 'texto', 'texto', 'texto', 'texto', 'data', 'data', 'moeda'])
-            ->aba('Despesas', ['Data', 'Descrição', 'Categoria', 'Status', 'Vencimento', 'Valor'],
-                $linhasDespesas, ['data', 'texto', 'texto', 'texto', 'data', 'moeda'])
+            ->aba('Despesas', ['Data', 'Descrição', 'Categoria', 'Status', 'Vencimento', 'Pagamento', 'Valor'],
+                $linhasDespesas, ['data', 'texto', 'texto', 'texto', 'data', 'data', 'moeda'])
             ->aba('Recorrentes', ['Tipo', 'Descrição', 'Categoria', 'Frequência', 'Início', 'Fim', 'Valor de cada', 'Vezes no período', 'Total no período'],
                 $linhasRec, ['texto', 'texto', 'texto', 'texto', 'data', 'data', 'moeda', 'numero', 'moeda'])
             ->aba('Por categoria', ['Categoria', 'Faturamento', 'Recebido', 'A receber', '% do total'],

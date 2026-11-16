@@ -27,6 +27,7 @@ class UpdateDespesaRequest extends FormRequest
             'categoria_id' => 'sometimes|required|integer|exists:despesas_categorias,id',
             'status' => 'sometimes|required|in:PENDING,PAID',
             'data_vencimento' => 'sometimes|nullable|date',
+            'data_pagamento' => 'sometimes|nullable|date',
             // Não valide empresa_id/usuario_id no update, pois não devem mudar
         ];
     }

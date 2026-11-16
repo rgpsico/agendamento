@@ -64,6 +64,15 @@
                             @enderror
                         </div>
 
+                        <div class="mb-3">
+                            <label for="data_pagamento" class="form-label">Data de pagamento <small class="text-muted">(se já pagou)</small></label>
+                            <input type="date" class="form-control" id="data_pagamento" name="data_pagamento" value="{{ old('data_pagamento') }}">
+                            <small class="text-muted">Ao marcar como "Pago" sem data, usamos a data de hoje. É a data usada no dashboard e no Excel.</small>
+                            @error('data_pagamento')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
+
                         <div class="text-end">
                             <a href="{{ route('financeiro.despesas.index') }}" class="btn btn-secondary">Cancelar</a>
                             <button type="submit" class="btn btn-primary">Salvar</button>

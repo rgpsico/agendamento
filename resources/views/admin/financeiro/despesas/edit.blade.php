@@ -59,8 +59,17 @@
 
                         <div class="mb-3">
                             <label for="data_vencimento" class="form-label">Data de Vencimento</label>
-                            <input type="date" class="form-control" id="data_vencimento" name="data_vencimento" value="{{ old('data_vencimento', $despesa->data_vencimento) }}">
+                            <input type="date" class="form-control" id="data_vencimento" name="data_vencimento" value="{{ old('data_vencimento', $despesa->data_vencimento ? \Carbon\Carbon::parse($despesa->data_vencimento)->format('Y-m-d') : '') }}">
                             @error('data_vencimento')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="data_pagamento" class="form-label">Data de pagamento <small class="text-muted">(se já pagou)</small></label>
+                            <input type="date" class="form-control" id="data_pagamento" name="data_pagamento" value="{{ old('data_pagamento', $despesa->data_pagamento ? \Carbon\Carbon::parse($despesa->data_pagamento)->format('Y-m-d') : '') }}">
+                            <small class="text-muted">Ao marcar como "Pago" sem data, usamos a data de hoje. É a data usada no dashboard e no Excel.</small>
+                            @error('data_pagamento')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>

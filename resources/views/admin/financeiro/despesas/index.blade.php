@@ -76,6 +76,7 @@
                                     <th>Categoria</th>
                                     <th>Status</th>
                                     <th>Data Vencimento</th>
+                                    <th>Pago em</th>
                                     <th>Empresa</th>
                                     <th>Usuário</th>
                                     <th class="text-center">Ações</th>
@@ -92,7 +93,8 @@
                                                 {{ $despesa->status === 'PAID' ? 'Pago' : 'Pendente' }}
                                             </span>
                                         </td>
-                                        <td>{{ \Carbon\Carbon::parse($despesa->data_vencimento)->format('d/m/Y') }}</td>
+                                        <td>{{ $despesa->data_vencimento ? \Carbon\Carbon::parse($despesa->data_vencimento)->format('d/m/Y') : '-' }}</td>
+                                        <td>{{ $despesa->data_pagamento ? \Carbon\Carbon::parse($despesa->data_pagamento)->format('d/m/Y') : '-' }}</td>
                                         <td>{{ $despesa->empresa->nome ?? '-' }}</td>
                                         <td>{{ $despesa->usuario->nome ?? '-' }}</td>
                                         <td class="text-center">
@@ -152,8 +154,9 @@ document.getElementById('exportCsv').addEventListener('click', function () {
             "Categoria": tds[2].innerText.trim(),
             "Status": tds[3].innerText.trim(),
             "Data Vencimento": tds[4].innerText.trim(),
-            "Empresa": tds[5].innerText.trim(),
-            "Usuário": tds[6].innerText.trim()
+            "Pago em": tds[5].innerText.trim(),
+            "Empresa": tds[6].innerText.trim(),
+            "Usuário": tds[7].innerText.trim()
         });
     });
 
@@ -164,6 +167,7 @@ document.getElementById('exportCsv').addEventListener('click', function () {
         "Categoria": "",
         "Status": "",
         "Data Vencimento": "",
+        "Pago em": "",
         "Empresa": "",
         "Usuário": ""
     });
