@@ -745,15 +745,28 @@ class ChatController extends Controller
     {
 
 
-        $bot = Bot::where('id', $request->bot_id)->first(); // garante que existe
+        $bot = Bot::findOrFail($request->bot_id);
 
         $userId = auth()->check() ? auth()->id() : null;
 
+        // A empresa é sempre a dona do bot (antes vinha do visitante).
+        $empresaId = (int) $bot->empresa_id;
 
-        // Busca ou cria a conversa
-        $conversation = $request->conversation_id
-            ? Conversation::find($request->conversation_id)
-            : Conversation::createWithBot($bot, $request->phone, $userId, $request->empresa_id);
+        // Continuar conversa: só uma que este visitante começou nesta sessão (ou que é dele, logado),
+        // do mesmo bot. Antes dava para escrever em qualquer conversa pelo id.
+        $conversation = null;
+        if ($request->conversation_id) {
+            $candidata = Conversation::where('bot_id', $bot->id)->find($request->conversation_id);
+            $minhas = (array) session('chat_conversas', []);
+            if ($candidata && (in_array($candidata->id, $minhas, true) || ($userId && (int) $candidata->user_id === (int) $userId))) {
+                $conversation = $candidata;
+            }
+        }
+
+        if (! $conversation) {
+            $conversation = Conversation::createWithBot($bot, $request->phone, $userId, $empresaId);
+            session()->push('chat_conversas', $conversation->id);
+        }
 
         // Sanitiza a mensagem do usuário
         $cleanUserMessage = $this->sanitizeMessage($request->mensagem);
@@ -761,7 +774,9 @@ class ChatController extends Controller
         // Salva a mensagem do usuário
         $userMessage = Message::createUserMessage($conversation->id, $cleanUserMessage);
 
-        $this->twilioService->enviarAlertaNovaMensagem($conversation->id, $userMessage, $request->empresa_id, $request->empresa_telefone);
+        // Aviso ao dono: telefone da própria empresa (antes vinha do visitante e o Twilio mandava para qualquer número).
+        $this->twilioService->enviarAlertaNovaMensagem($conversation->id, $userMessage, $empresaId, \App\Models\EmpresaSite::where('empresa_id', $empresaId)->where('bot_id', $bot->id)->value('whatsapp')
+                ?: \App\Models\Empresa::whereKey($empresaId)->value('telefone'));
 
         $respostaBot = null;
 
@@ -1075,8 +1090,10 @@ class ChatController extends Controller
             $conversation = null;
         }
 
-        // Carrega os bots disponíveis (caso queira permitir escolher)
-        $bots = Bot::all();
+        // Bots da(s) empresa(s) do usuário (antes listava os de todas as empresas)
+        $bots = auth()->user()->isMasterUser()
+            ? Bot::all()
+            : Bot::whereIn('empresa_id', \App\Support\EmpresasDoUsuario::ids(auth()->user()) ?: [0])->get();
 
 
         return view('admin.chat.index', [

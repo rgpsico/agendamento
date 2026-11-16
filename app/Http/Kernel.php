@@ -80,6 +80,7 @@ class Kernel extends HttpKernel
         'detect.tenant' => \App\Http\Middleware\DetectTenant::class,
         'empresa.recurso' => \App\Http\Middleware\EmpresaComRecurso::class,
         'master'        => \App\Http\Middleware\IsMasterUser::class,
+        'conversa.propria' => \App\Http\Middleware\ConversaDoUsuario::class, // chat: só conversas do próprio usuário/empresa
         'twilio.assinatura' => \App\Http\Middleware\VerificaAssinaturaTwilio::class, // webhooks do Twilio: confere X-Twilio-Signature
         'dono'          => \App\Http\Middleware\ApenasDaPropriaEmpresa::class, // dono:<tipo> = so dados da propria empresa; dono:master = so o administrador
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,

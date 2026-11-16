@@ -365,11 +365,11 @@ Route::post('bot/{botId}/interact', [BotController::class, 'interact'])->middlew
 // Chat de teste do bot agora é só do painel: POST /admin/bot/{bot}/chat (autenticado)
 
 
-Route::get('/conversations/aberta', [ChatProfessorController::class, 'verificarConversaAlunoEmpresa']);
-Route::get('/conversations', [ChatController::class, 'listByEmpresaAndUser']);
-Route::get('/conversations/lista', [ChatController::class, 'listByEmpresaOrProfessor']);
+Route::get('/conversations/aberta', [ChatProfessorController::class, 'verificarConversaAlunoEmpresa'])->middleware(['painel', 'conversa.propria']); // chat: só logado e só as próprias conversas
+Route::get('/conversations', [ChatController::class, 'listByEmpresaAndUser'])->middleware(['painel', 'conversa.propria']); // chat: só logado e só as próprias conversas
+Route::get('/conversations/lista', [ChatController::class, 'listByEmpresaOrProfessor'])->middleware(['painel', 'conversa.propria']); // chat: só logado e só as próprias conversas
 
-Route::post('/conversations/last/opened', [ChatController::class, 'markLastConversationOpened']);
+Route::post('/conversations/last/opened', [ChatController::class, 'markLastConversationOpened'])->middleware(['painel', 'conversa.propria']); // chat: só logado e só as próprias conversas
 
 
 // /conversations/{id} (leitura) e /conversations/{id}/human-control agora são do painel: /admin/conversas/{id}/json e /human-control (com login)
@@ -380,24 +380,24 @@ Route::post('/conversations/last/opened', [ChatController::class, 'markLastConve
 
 // removidas: /professoresteste e /alunosteste listavam nome e e-mail de todos, sem login
 
-Route::get('/listarconversasaluno', [ChatController::class, 'listarConversasAluno']);
-Route::get('/aluno/conversas', [ChatAlunoController::class, 'listarConversasDoAluno']);
-Route::get('/aluno/conversas/alunoeempresa', [ChatAlunoController::class, 'listarInteracoesAlunoEmpresa']);
+Route::get('/listarconversasaluno', [ChatController::class, 'listarConversasAluno'])->middleware(['painel', 'conversa.propria']); // chat: só logado e só as próprias conversas
+Route::get('/aluno/conversas', [ChatAlunoController::class, 'listarConversasDoAluno'])->middleware(['painel', 'conversa.propria']); // chat: só logado e só as próprias conversas
+Route::get('/aluno/conversas/alunoeempresa', [ChatAlunoController::class, 'listarInteracoesAlunoEmpresa'])->middleware(['painel', 'conversa.propria']); // chat: só logado e só as próprias conversas
 
-Route::post('/conversations/professor/mensagem', [ChatController::class, 'professorenviandomensagemparaaluno']);
-    Route::post('/conversations/passeio/mensagem', [ChatController::class, 'enviarMensagemPasseio']);
+Route::post('/conversations/professor/mensagem', [ChatController::class, 'professorenviandomensagemparaaluno'])->middleware(['painel', 'conversa.propria']); // chat: só logado e só as próprias conversas
+    Route::post('/conversations/passeio/mensagem', [ChatController::class, 'enviarMensagemPasseio'])->middleware(['painel', 'conversa.propria']); // chat: só logado e só as próprias conversas
 
     
-    Route::get('/listarmensagembyidconversaprof', [ChatProfessorController::class, 'listarMensagensByIdConversa']);
-Route::get('/conversations/aberta', [ChatProfessorController::class, 'verificarConversaAlunoEmpresa']);
+    Route::get('/listarmensagembyidconversaprof', [ChatProfessorController::class, 'listarMensagensByIdConversa'])->middleware(['painel', 'conversa.propria']); // chat: só logado e só as próprias conversas
+Route::get('/conversations/aberta', [ChatProfessorController::class, 'verificarConversaAlunoEmpresa'])->middleware(['painel', 'conversa.propria']); // chat: só logado e só as próprias conversas
 
     
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/aluno/listarmensagembyidconversa', [ChatAlunoController::class, 'listarMensagensByIdConversa']);
+    Route::get('/aluno/listarmensagembyidconversa', [ChatAlunoController::class, 'listarMensagensByIdConversa'])->middleware(['painel', 'conversa.propria']); // chat: só logado e só as próprias conversas
    
-    Route::post('/conversations/aluno/mensagem', [ChatController::class, 'alunoenviandomensagemparaoprofessor']);
+    Route::post('/conversations/aluno/mensagem', [ChatController::class, 'alunoenviandomensagemparaoprofessor'])->middleware(['painel', 'conversa.propria']); // chat: só logado e só as próprias conversas
     
-    Route::get('/conversations', [ChatController::class, 'listByEmpresaAndUser']);
+    Route::get('/conversations', [ChatController::class, 'listByEmpresaAndUser'])->middleware(['painel', 'conversa.propria']); // chat: só logado e só as próprias conversas
     
     
     Route::get('/mensagensPorConversa', [ChatController::class, 'mensagensDaConversa']);

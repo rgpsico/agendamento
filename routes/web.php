@@ -448,14 +448,17 @@ Route::prefix('admin/social')->name('admin.social.')->middleware(['auth'])->grou
 
 Route::post('/admin/bot/{bot}/chat', [BotController::class, 'chat'])->middleware('auth')->name('admin.bot.chat');
 
-Route::post('/chat/store', [ChatController::class, 'store'])->name('chat.store');
+// chat público do site: sem login, com limite de envios
+Route::post('/chat/store', [ChatController::class, 'store'])->middleware('throttle:20,1')->name('chat.store');
 
-Route::post('/chat/enviarparabatepaposite', [ChatController::class, 'enviarparabatepaposite'])->name('chat.enviarparabatepaposite');
+Route::post('/chat/enviarparabatepaposite', [ChatController::class, 'enviarparabatepaposite'])->middleware(['auth', 'conversa.propria'])->name('chat.enviarparabatepaposite');
 
 
-Route::get('/chat/{conversationId?}', [ChatController::class, 'chat'])->name('chat.index');
+// painel do dono: só logado e só conversas da própria empresa (antes abria qualquer conversa sem login)
+Route::get('/chat/{conversationId?}', [ChatController::class, 'chat'])->middleware(['auth', 'conversa.propria'])->name('chat.index');
 
 Route::post('/chat/update-control', [ChatController::class, 'updateControl'])
+    ->middleware(['auth', 'conversa.propria'])
     ->name('chat.updateControl');
 
 use App\Http\Controllers\SuperAdminController;
