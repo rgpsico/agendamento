@@ -292,7 +292,7 @@
     @include('site._partials.tracking')
     @include('site._partials.verificacao')
 </head>
-<body data-zap="{{ $zap }}" data-site="{{ $site->titulo }}" data-contato-url="{{ url('/site/' . $site->slug . '/contato') }}">
+<body data-lang-padrao="{{ data_get($site->cores, 'idioma', 'en') }}" data-zap="{{ $zap }}" data-site="{{ $site->titulo }}" data-contato-url="{{ url('/site/' . $site->slug . '/contato') }}">
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <defs>
         <symbol id="f-br" viewBox="0 0 24 16"><rect width="24" height="16" fill="#009b3a"/><path d="M12 2.2 21 8l-9 5.8L3 8z" fill="#fedf00"/><circle cx="12" cy="8" r="3.3" fill="#002776"/></symbol>
@@ -728,8 +728,11 @@
     $$('[data-wa="hello"]').forEach(function (a) { a.href = 'https://wa.me/' + zap + '?text=' + encodeURIComponent(hello); });
   }
   var saved = null; try { saved = localStorage.getItem('site_lang'); } catch (e) {}
-  var nav = (navigator.language || 'pt').slice(0, 2).toLowerCase();
-  setLang(saved && T[saved] ? saved : (T[nav] ? nav : 'pt'));
+  // Primeira visita: abre no idioma padrão do site (inglês, para turistas); navegador em espanhol/italiano
+  // abre no idioma dele. Se o visitante já escolheu um idioma, vale a escolha dele.
+  var nav = (navigator.language || '').slice(0, 2).toLowerCase();
+  var padrao = T[body.dataset.langPadrao] ? body.dataset.langPadrao : 'en';
+  setLang(saved && T[saved] ? saved : ((nav === 'es' || nav === 'it') ? nav : padrao));
 
   $$('[data-lang]').forEach(function (box) {
     $('button', box).addEventListener('click', function (e) { e.stopPropagation(); var o = box.classList.toggle('open'); this.setAttribute('aria-expanded', o); });

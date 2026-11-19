@@ -15,5 +15,8 @@ class VerifyCsrfToken extends Middleware
         'api/widget/*',
         'api/bot/*',
         'api/track/*',
+        // Formulário público do site da empresa: não depende de login, e com a página aberta por horas
+        // o token expirava e o visitante via "não foi possível enviar". Tem honeypot e limite por minuto.
+        'site/*/contato',
     ];
 }

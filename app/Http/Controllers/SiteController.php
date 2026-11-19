@@ -73,13 +73,36 @@ class SiteController extends Controller
 
         try {
             $dono = \App\Models\Usuario::find($site->empresa->user_id ?? null);
-            if ($dono?->email) {
-                Mail::raw(
-                    "Novo contato pelo seu site ({$site->titulo}).\n\n" .
+            $copias = array_values(array_diff((array) (config('sites.copia_contato', [])[$site->id] ?? []), [$dono?->email]));
+            $destino = $dono?->email ?: array_shift($copias);
+            if ($destino) {
+                $marca = config('sites.marca_email', [])[$site->id] ?? ($site->titulo ?: config('mail.from.name'));
+                $texto = "Novo contato pelo site ({$marca}).\n\n" .
                     "Nome: {$data['nome']}\nE-mail: {$data['email']}\n" .
                     'WhatsApp: ' . ($data['whatsapp'] ?? '-') . "\n" . $obs . "\n\n" .
-                    'Veja no CRM: ' . url('/admin/crm/leads'),
-                    fn ($m) => $m->to($dono->email)->subject("Novo contato pelo site: {$data['nome']}")
+                    'Veja no CRM: ' . rtrim(config('app.url'), '/') . '/admin/crm/leads';
+                $html = view('emails.site-contato', [
+                    'marca'      => $marca,
+                    'nome'       => $data['nome'],
+                    'email'      => $data['email'],
+                    'whatsapp'   => $data['whatsapp'] ?? null,
+                    'pais'       => $data['pais'] ?? null,
+                    'dataViagem' => filled($data['data'] ?? null) ? rescue(fn () => \Carbon\Carbon::parse($data['data'])->format('d/m/Y'), $data['data'], false) : null,
+                    'pessoas'    => $data['pessoas'] ?? null,
+                    'passeio'    => $data['passeio'] ?? null,
+                    'mensagem'   => $data['mensagem'] ?? null,
+                    // Painel fica no domínio da plataforma, não no domínio do site do cliente.
+                    'crmUrl'     => rtrim(config('app.url'), '/') . '/admin/crm/leads',
+                    'siteUrl'    => $site->dominio_personalizado ?: url('/site/' . $site->slug),
+                ])->render();
+
+                Mail::html(
+                    $html,
+                    // Sai com o nome do site (ex.: "RJ Passeios"), não da plataforma; "Responder" vai direto pro visitante.
+                    fn ($m) => $m->text($texto)
+                        ->from(config('mail.from.address'), $marca)
+                        ->replyTo($data['email'], $data['nome'])
+                        ->to($destino)->bcc($copias)->subject("Novo contato pelo site: {$data['nome']}")
                 );
             }
         } catch (\Throwable $e) {
